@@ -1,0 +1,12 @@
+ &pom_input
+wind_input      =  '/nethome/gm11v07/Desktop/1D_INPUTS/windstress.da',
+surfaceS_input  =  '/nethome/gm11v07/Desktop/1D_INPUTS/SsurfaceAA1.da',
+radiance_input  =  '/nethome/gm11v07/Desktop/1D_INPUTS/radiance.da',
+ism_input       =  '/nethome/gm11v07/Desktop/1D_INPUTS/ism.da',
+Sal_input       =  '/nethome/gm11v07/Desktop/1D_INPUTS/SAA1Data.da',
+Temp_input      =  '/nethome/gm11v07/Desktop/1D_INPUTS/TAA1Data.da',
+Sprofile_input  =  '/nethome/gm11v07/Desktop/1D_INPUTS/SinitialAA1.da',
+Tprofile_input  =  '/nethome/gm11v07/Desktop/1D_INPUTS/TinitialAA1.da',
+heat_input      =  '/nethome/gm11v07/Desktop/1D_INPUTS/heatflux.da',
+surfNut_input   =  '/nethome/gm11v07/Desktop/1D_INPUTS/NutAcquavita.da'
+/

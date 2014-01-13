@@ -1,0 +1,237 @@
+#include "cppdefs.h"
+  SUBROUTINE vertdiff_bio_1d
+!
+ use global_mem, ONLY:RLEN,ZERO
+ use Service
+ use api_bfm, ONLY:D3STATEB
+ use constants
+!
+#ifdef INCLUDE_BEN
+ use Mem, ONLY:D3STATE,D3SOURCE,NO_BOXES,NO_D3_BOX_STATES,ppO2o, &
+  ppN1p,ppN3n,ppN4n,ppN5s,ppR6c,ppR6n,ppR6p,ppR6s,ppP1c,ppP1n,ppP1p, &
+  ppP1s,ppP1l,sediR6,sediPPY,iiP1,n1p,n3n,n4n,n5s,D2SOURCE
+#else
+   use Mem, ONLY:D3STATE,D3SOURCE,NO_BOXES,NO_D3_BOX_STATES,ppO2o, &
+     ppN1p,ppN3n,ppN4n,ppN5s,ppR6c,ppR6n,ppR6p,ppR6s,ppP1c,ppP1n,ppP1p, &
+     ppP1s,ppP1l,sediR6,sediPPY,iiP1,n1p,n3n,n4n,n5s
+#endif
+ use POM, ONLY:SMOTH,KB,DZ,H,DTI,DZR 
+!
+ implicit none
+ integer :: ll,k,m,llneg,n,nbc
+ real(RLEN) :: fbio(KB), ffbio(KB), fbbio(KB),fmean(KB) 
+ real(RLEN) :: surflux, dzr(KB)  
+ real(RLEN) :: cbo,sink(KB),dti2,trelax  
+!
+        dti2 = DTIE*2.
+        trelax=dz(1)/SEC_PER_DAY
+        do m = 1 , NO_D3_BOX_STATES
+            surflux=ZERO 
+            fbio = ZERO
+            fbbio = ZERO
+            ffbio = ZERO
+            fmean = ZERO
+            sink = ZERO
+            do k = 1 , KB - 1
+                        fbio(k) = D3STATE(k,m)
+                        fbbio(k) = bbccc3D(k,m)
+                        fmean(k) = iniconc(k,m)
+            end do
+!
+!
+! Surface fluxes Nutrients:
+            select case ( m )
+            case (ppO2o)
+            surflux = .00
+            NBC = 1
+            case (ppN1p)
+!            pon1p=0.01
+            surflux = -(pon1p-n1p(1))*trelax
+            NBC = 1
+ !           surflux=pon1p
+ !           nbc=2
+            case (ppN3n)
+            surflux = -(pon3n-n3n(1))*trelax
+!            surflux= pon3n
+!            nbc=2
+            NBC = 1
+            case (ppN4n)
+            surflux = -(pon4n-n4n(1))*trelax
+            NBC = 1
+!            surflux=pon4n
+!            nbc= 2
+            case (ppN5s)
+            surflux = -(pon5s-n5s(1))*trelax
+            NBC = 1
+!            surflux=pon5s
+!            nbc=2
+            case default
+ !           surflux = 0.
+ !           NBC = 1
+            end select
+            
+!    Sedimentation:
+            select case ( m )
+            case (ppR6c,ppR6n,ppR6p,ppR6s)
+            do k = 1 , KB - 1
+                      sink(k) = -sediR6(k)/SEC_PER_DAY
+            end do
+
+            case (ppP1c,ppP1n,ppP1p,ppP1l,ppP1s) 
+            do k = 1 , KB - 1
+                      sink(k) = -sediPPY(k,iiP1)/SEC_PER_DAY
+            end do
+            end select
+! SINKING:
+!
+        CALL ADVERTE(fbbio,fbio,DTIE2,ffbio,DZR,sink,H,m)
+!
+! calculate transport due to vertical diffusion.
+! 
+!             write(6,*) 'BEFORE PROFE ', m, nbc, surflux, sink(1)
+            call profe(ffbio,surflux,0.,0.,nbc,dti2,m)
+!       -----COMPUTE RATE OF CHANGE DUE TO PHYSICAL PROCESSES-----
+!
+             cbo=minval(ARRAY=ffbio(1:KB-1))
+             IF(cbo<0.) THEN
+              print*,'NEGATIVE CONCENTRATION IN TRANSPORT!'
+              ll = 0
+              llneg = 0
+              do k = 1 , KB - 1
+                     if(ffbio(k).LT.0.) then
+                      llneg=llneg+1
+                       kneg(llneg)=k
+                       lll(llneg)=ll
+                     end if
+              end do
+              do n=1,llneg
+               ll=lll(n)
+                write (6,*) &
+                            'PHYS RATE GENERATE NEG. CONC. !!! ' &
+                            , m , fbbio(kneg(n)) , ffbio(kneg(n)) &
+                            , kneg(n)
+!                ffbio(kneg(n))=1.E-05 ! Clippin
+! Relaxing by reducing Source term to 5% positive Value:
+                 srelax=min( .95* &
+                   fbbio(kneg(n))/(fbbio(kneg(n))-ffbio(kneg(n))),srelax)
+                 write(6,*) ntime,srelax
+              enddo
+            
+             ENDIF 
+             IF (tflag.eq.1) THEN
+ !     leap frog estimation of source term using ffbio as temporary storage:
+             ll=0 
+             do k = 1 , KB - 1
+                        ll = ll + 1
+                        wticcc(ll,m) = (ffbio(k)-bbccc3D(ll,m)) &
+                       *86400./dti2
+                        D3RATE(ll,m) = D3SOURCE(ll,m) + wticcc(ll,m)
+             end do
+            ELSE
+!    Integration step with estimated BFM source:
+               ll=0
+               do k = 1 , KB - 1
+                 ll = ll + 1
+                 if(ntime.ge.144000) then
+!                 IF (ntime.ge.4608000) THEN
+!                  IF (ntime.ge.41472000)  THEN
+                  if (m.eq.2.or.m.eq.27.or.m.eq.28.or.m.eq.29.or.m.eq.3) then 
+!                 ! get transport rates:
+                  wticcc(ll,m)= (ffbio(k)-bbccc3D(ll,m)) &
+                       *86400./dti2 - D3SOURCE(ll,m)
+                  endif
+                 endif
+                 bccc3D(ll,m)=D3STATE(ll,m)
+                 !
+                 bbccc3D(ll,m)=(1.-SMOTH)*D3STATE(ll,m) &
+                             +.5*SMOTH*(ffbio(k)+fbbio(k))
+                 D3STATE(ll,m)=ffbio(k)
+               end do
+             END IF
+            END IF
+            end do
+         ELSE
+          do m = 1 , NO_D3_BOX_STATES
+            IF(transmask3D(m)) THEN
+              D3RATE(:,m) = D3SOURCE(:,m) + wticcc(:,m)
+            ENDIF
+          enddo
+         ENDIF
+!
+       if(llneg.gt.0) then
+         write(6,*) 'Source term relaxing...', srelax
+          do m = 1 , NO_D3_BOX_STATES
+            IF(transmask3D(m)) THEN
+             bbccc3D(:,m)=bbccc3D(:,m)-.5*SMOTH*D3STATE(:,m) 
+             D3STATE(:,m)=(1-srelax)*wticcc(:,m) + srelax*D3STATE(:,m)
+             bbccc3D(:,m)=bbccc3D(:,m)+.5*SMOTH*D3STATE(:,m) 
+             D2SOURCE=srelax*D2SOURCE
+            ENDIF
+          enddo
+       endif
+! Output rates of phosphates and chlorophyll:
+!       IF (ntime.ge.41472000)  THEN
+       IF (ntime.ge.144000)  THEN
+!       IF (ntime.ge.4608000) THEN
+          D3RATE(:,1)=(D3SOURCE(:,27)+D3SOURCE(:,28)+D3SOURCE(:,29)+D3SOURCE(:,30)) &
+                    /(bccc3D(:,27)+bccc3D(:,28)+bccc3D(:,29)+bccc3D(:,30))
+          wticcc(:,1)=(wticcc(:,27)+wticcc(:,28)+wticcc(:,29)+wticcc(:,30)) &
+                    /(bccc3D(:,27)+bccc3D(:,28)+bccc3D(:,29)+bccc3D(:,30))
+          D3RATE(:,2)=D3SOURCE(:,2)/bccc3D(:,2)
+          wticcc(:,2)=wticcc(:,2)/bccc3D(:,2)
+          write(75,*) ntime
+          write(76,*) D3RATE(:,1)
+          write(77,*) D3RATE(:,2)
+          write(78,*) wticcc(:,1)
+          write(79,*) wticcc(:,2)
+       END IF
+      return
+      end
+!
+      SUBROUTINE ADVERTE(FB,F,DTI2,FF,DZR,W,H,N)
+!
+! Momme Butenschoen, September 2006
+! Universita' di Bologna
+!
+!    advection subroutine of POM adapted to include ecological sources
+!    by source splitting mechanism
+!
+      use global_mem, ONLY:RLEN
+      use mem, ONLY:D3SOURCE
+      use POM, ONLY:KB
+      IMPLICIT NONE
+      REAL(RLEN) :: FB(KB),F(KB),FF(KB)
+      REAL(RLEN) :: DZR(KB),W(KB)
+      REAL(RLEN) :: H,DTI2
+      INTEGER :: k,n
+!
+       F(KB)=F(KB-1)
+       FB(KB)=FB(KB-1)
+!
+!****** DO VERTICAL ADVECTION **********
+! mind downward velocities are negative!
+! central scheme:
+!      FF(1)=.5E0*DZR(1)*(F(1)+F(2))*W(2)
+!
+!      DO K=2,KB-1
+!         FF(K)=-.5E0*DZR(K)*((F(K-1)+F(K))*W(K) &
+!                          -(F(K)+F(K+1))*W(K+1))
+!      END DO
+! upwind scheme:
+      FF(1)=DZR(1)*F(1)*W(2)
+
+      DO K=2,KB-1
+         FF(K)=DZR(K)*(F(K)*W(K+1) &
+                          -F(K-1)*W(K))
+      END DO
+
+!******STEP FORWARD IN TIME **********
+!
+      DO K=1,KB-1
+       FF(K)=FB(K)+(DTI2*FF(K)/H)+D3SOURCE(k,n)*DTI2/86400.
+      END DO
+!
+      RETURN
+!
+      END
+
