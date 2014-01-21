@@ -237,7 +237,7 @@
    real(RLEN),allocatable,dimension(:,:,:),public :: rtmp3Db
 #endif
 
-#ifdef POM_BFM
+#ifdef BFM_POM
    !---------------------------------------------
    ! Additional 1D arrays
    !---------------------------------------------

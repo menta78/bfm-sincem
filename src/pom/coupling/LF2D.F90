@@ -1,7 +1,7 @@
 #include "INCLUDE.h"
  SUBROUTINE LF2D
 !
-#ifdef POM_BFM
+#ifdef BFM_POM
 !
 #ifdef INCLUDE_BEN
  use global_mem, ONLY:RLEN,ZERO
