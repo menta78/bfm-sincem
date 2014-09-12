@@ -77,8 +77,8 @@
       DO K = 2,KB - 1
           Q2B(K) = ABS(Q2B(K))
           Q2LB(K) = ABS(Q2LB(K))
-          BOYGR(K) = GEE* (RHO(K-1)-RHO(K))/ (DZZ(K-1)*DH) & 
-                     +GEE**2*2.*1.025/ (CC(K-1)**2+CC(K)**2)
+          BOYGR(K) = GEE* (RHO(K-1)-RHO(K))/ (DZZ(K-1)*DH)! & (G) 
+!                     +GEE**2*2.*1.025/ (CC(K-1)**2+CC(K)**2) (G)
           DTEF(K) = Q2B(K)*SQRT(Q2B(K))/ (B1*Q2LB(K)+SMALL)
           SPROD(K) = .25*KM(K)* ((U(K)+U(K)-U(K-1)-U(K-1))**2+ &
                     (V(K)+V(K)-V(K-1)-V(K-1))**2)/ (DZZ(K-1)*DH)**2* &

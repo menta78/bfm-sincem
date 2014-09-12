@@ -27,10 +27,10 @@
 
 &BFM_conf
         MODE    = 'POM1D',
-        CPPDEFS = 'BFM_STANDALONE INCLUDE_PELCO2 INCLUDE_DIAG BFM_POM BFM_NOPOINTERS INCLUDE_BEN',
+        CPPDEFS = 'BFM_STANDALONE INCLUDE_PELCO2 INCLUDE_DIAG BFM_POM BFM_NOPOINTERS',
         ARCH    = 'gfortran.inc',
         PROC    = 1,
-        EXP     = 'pom_bfm_1d',
+        EXP     = 'pom_bfm_1d_pelagic',
         BFMEXE  = 'pom.exe'
 /
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

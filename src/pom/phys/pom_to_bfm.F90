@@ -15,25 +15,18 @@
       real tauw
       parameter (rcp=4.187E6)
       integer :: k,ll
-!      REAL(RLEN) :: ISM
+!      REAL(RLEN) :: 
 !
 !     -----1D ARRAYS FOR BFM-----
 !
       do k = 1 , KB - 1
              ETW(k) = tb(k)
              ESW(k) = sb(k)
-             ERHO(k) = (rho(k)*1.E3)+1025.
+             ERHO(k) = (rho(k)*1.E3)+1000.
              ESS(k) = ISM(k)
+             Depth(k) = dz(k)*h   !   (G)
       end do
-
-      Depth(1) = dz(1)
-      do k = 2, KB-1
-             Depth(k) = dz(k)+depth(k-1)
-      end do
-      Depth=Depth*h
-!
-!
-!    Surface radiation in deg.C transformed in W.m-2
+!  Surface radiation in deg.C transformed in W.m-2
 !
       EIR(1) = (-1)*SWRAD*rcp
 !

@@ -114,8 +114,7 @@
           PI_Bens(i,:)  =   0.0
         end if
       end do
-      sediPPY_Ben(:,:)  =  sediPPY(:,BOTindices)    
-
+       sediPPY_Ben(:,:)  =  sediPPY(:,BOTindices)    
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
       ! Compute total microzooplankton conc. used as food for filtereeders
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

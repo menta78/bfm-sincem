@@ -6,26 +6,27 @@
 #ifdef INCLUDE_BEN
  use global_mem, ONLY:RLEN,ZERO
 ! use Mem, ONLY:D2STATE,D2SOURCE,NO_BOXES_XY,NO_D2_BOX_STATES
- use Mem, ONLY:D2STATE_BEN,NO_BOXES_XY,NO_D2_BOX_STATES_BEN,D2SOURCE_BEN
-
+ use Mem, ONLY:D2STATE_BEN,NO_BOXES_XY,NO_D2_BOX_STATES_BEN,D2SOURCE_BEN, &
+               NO_BOXES_Z_BEN, NO_STATES_BEN, NO_BOXES_BEN
+ use api_bfm, ONLY:D2STATEB_BEN
 !#ifndef ONESOURCE
 #ifdef EXPLICIT_SINK
  use Mem, Only: D2SINK_BEN
 #endif
 
- use api_bfm, ONLY:D2STATEB_BEN
  use Service, ONLY: smothass,deltat
+
  implicit none
  integer m, n, i
  real(RLEN) :: dtie2
- real(RLEN) :: ccc_tmp2D(NO_D2_BOX_STATES_BEN,NO_BOXES_XY)
-! real(RLEN) :: ccc_tmp2D(NO_D2_BOX_STATES_BEN,NO_BOXES_BEN)
+! real(RLEN) :: ccc_tmp2D(NO_D2_BOX_STATES_BEN,NO_BOXES_XY)
+ real(RLEN) :: ccc_tmp2D(NO_D2_BOX_STATES_BEN,NO_BOXES_BEN)
  real(RLEN) :: p_small=1.0D-80
 !
   ccc_tmp2D=ZERO
 !
  dtie2 = deltat*2.0
-   PRINT*,'ccc_tmp2D',size(ccc_tmp2D)
+
 !
 #ifndef D1SOURCE
 !        

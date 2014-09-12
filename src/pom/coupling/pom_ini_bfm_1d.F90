@@ -82,6 +82,10 @@ subroutine pom_ini_bfm_1d
 #ifdef INCLUDE_BEN
    NO_STATES   = NO_D3_BOX_STATES * NO_BOXES +   &
                  NO_D2_BOX_STATES_BEN 
+   NO_BOXES_Z_BEN  = 1
+   NO_BOXES_BEN = NO_BOXES_XY * NO_BOXES_Z_BEN
+   NO_STATES_BEN = NO_BOXES_BEN * NO_D2_BOX_STATES_BEN
+
 #else
    NO_STATES   = NO_D3_BOX_STATES * NO_BOXES
 #endif
@@ -138,7 +142,7 @@ subroutine pom_ini_bfm_1d
    !---------------------------------------------
    call calcmean_bfm(INIT)
    call init_netcdf_bfm(title=out_title,start_time='01-01-0000', &
-             time_unit=0,lat=alat,lon=alon,z=z,dz=dz,      &
+             time_unit=0,lat=alat,lon=alon,z=zz,dz=dzz,      & ! (G)
              oceanpoint=ocepoint,                  &
              surfacepoint=(/(i,i=1,NO_BOXES_XY)/), &
              bottompoint=(/(i,i=1,NO_BOXES_XY)/))!  &     (G)
@@ -150,9 +154,9 @@ subroutine pom_ini_bfm_1d
    allocate(D3STATEB(NO_D3_BOX_STATES,NO_BOXES))
 !   allocate(D3STATEB(NO_BOXES,NO_D3_BOX_STATES))
 
-! #ifdef INCLUDE_BEN
-!    allocate(D2STATEB(NO_D2_BOX_STATES_BEN,NO_BOXES_XY))
-! #endif   
+#ifdef INCLUDE_BEN
+   allocate(D2STATEB_BEN(NO_D2_BOX_STATES_BEN,NO_BOXES_XY))
+#endif   
    !---------------------------------------------
    ! Override homogeneous initialisation 
    ! MAV: crappy stuff, to be improved

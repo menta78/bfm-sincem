@@ -42,7 +42,6 @@
            VB(KB-1)))**2)
 
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-!        TO RESTORE BOTTOM B.L. DELETE NEXT LINE                       c
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       UF(KB-1) = (C(KB-1)*VHP(KB-2)-UF(KB-1))/ &

@@ -9,11 +9,11 @@
 #ifdef INCLUDE_BEN   
  use Mem, ONLY:D3STATE,D3SOURCE,NO_BOXES,NO_BOXES_Z,NO_D3_BOX_STATES,ppO2o, &
    ppN1p,ppN3n,ppN4n,ppN5s,ppR6c,ppR6n,ppR6p,ppR6s,ppP1c,ppP1n,ppP1p, &
-   ppP1s,ppP1l,sediR6,sediPPY,iiP1,n1p,n3n,n4n,n5s,D2SOURCE_BEN
+   ppP1s,ppP1l,sediR6,sediPPY,iiP1,n1p,n3n,n4n,n5s,D2SOURCE_BEN,jsurO2o,Depth
 #else
  use Mem, ONLY:D3STATE,D3SOURCE,NO_BOXES,NO_BOXES_Z,NO_D3_BOX_STATES,ppO2o, &
    ppN1p,ppN3n,ppN4n,ppN5s,ppR6c,ppR6n,ppR6p,ppR6s,ppP1c,ppP1n,ppP1p, &
-   ppP1s,ppP1l,sediR6,sediPPY,iiP1,n1p,n3n,n4n,n5s
+   ppP1s,ppP1l,sediR6,sediPPY,iiP1,n1p,n3n,n4n,n5s,jsurO2o,Depth
 #endif
  use POM, ONLY:SMOTH,KB,DZ,H,DTI,DZR,time 
 !
@@ -25,7 +25,8 @@
 !
         dti2 = DTI*2.
 !        trelax=dz(1)/SEC_PER_DAY
-        trelax=0.22/SEC_PER_DAY
+!        trelax=0.22/SEC_PER_DAY
+        trelax=0.6/SEC_PER_DAY
         do m = 1 , NO_D3_BOX_STATES
           surflux = ZERO 
           fbio    = ZERO
@@ -48,28 +49,33 @@
 ! Surface fluxes Nutrients:
           select case ( m )
           case (ppO2o)
-            surflux = .00
+!            surflux = .00
+            surflux=-(jsurO2o(1)/SEC_PER_DAY)
+            NBC = 1
+          case (ppO3c)
+!            surflux = .00
+            surflux=-(jsurO3c(1)/SEC_PER_DAY)
             NBC = 1
           case (ppN1p)
-!            surflux = -(pon1p-n1p(1))*trelax
- !           NBC = 2
-             surflux=pon1p
-             NBC=2
+             NBC = 1
+             surflux = -(pon1p-n1p(1))*trelax
+!            NBC = 2
+!            surflux=pon1p
           case (ppN3n)
-!            surflux = -(pon3n-n3n(1))*trelax
-!            NBC= 2
-             surflux= pon3n
-             NBC=2
+             NBC = 1
+             surflux = -(pon3n-n3n(1))*trelax
+!             NBC = 2
+!             surflux= pon3n
           case (ppN4n)
-!            surflux = -(pon4n-n4n(1))*trelax
-!            NBC = 2
-             surflux=pon4n
-             NBC=2
+             NBC = 1
+             surflux = -(pon4n-n4n(1))*trelax
+!             NBC = 2
+!             surflux=pon4n
           case (ppN5s)
-!            surflux = -(pon5s-n5s(1))*trelax
-!            NBC = 2
-             surflux=pon5s
-             NBC=2
+             NBC = 1
+             surflux = -(pon5s-n5s(1))*trelax
+!             NBC = 2
+!             surflux=pon5s
           case default
              surflux = 0.
              NBC = 1
@@ -78,19 +84,16 @@
 !    Sedimentation:
           select case ( m )
           case (ppR6c,ppR6n,ppR6p,ppR6s)
-            do k = 1 , KB - 1
+            do k = 1 , KB - 2
                       sink(k) = -sediR6(k)/SEC_PER_DAY
             end do
 
 !            case (ppP1c,ppP1n,ppP1p,ppP1l,ppP1s) 
           case (ppP1c,ppP1n,ppP1p,ppP1s)
-            do k = 1 , KB - 1
+            do k = 1 , KB - 2
                       sink(k) = -sediPPY(iiP1,k)/SEC_PER_DAY
-!                      PRINT *,'k,iiP1,sediPPY(k,iiP1)',k,iiP1,sediPPY(k,iiP1)
-!                      sink(k)=0.            (G)
             end do
           end select
-!                      PRINT*,'sink',sink
 
 ! SINKING:
 !
@@ -98,8 +101,8 @@
 !
 ! calculate transport due to vertical diffusion.
 ! 
-        call profe(ffbio,surflux,ZERO,surflux,nbc,dti2,m)
-
+!        call profe(ffbio,surflux,ZERO,surflux,nbc,dti2,m)
+        call profe(ffbio,surflux,surflux,nbc,dti2)     ! (G)
 !       -----COMPUTE RATE OF CHANGE DUE TO PHYSICAL PROCESSES-----
 !
           do k=1,NO_BOXES_Z + 1
@@ -120,6 +123,11 @@
           endif
 
       enddo
+
+      if (.NOT.AssignAirPelFluxesInBFMFlag) then
+      jsurO2o(:)=ZERO
+      endif
+
       end
 !
       SUBROUTINE ADVERTE(FB,F,DTI2,FF,DZR,W,H,N)

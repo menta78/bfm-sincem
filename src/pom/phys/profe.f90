@@ -1,4 +1,5 @@
-      SUBROUTINE PROFE(FF,WFSURF,SWRAD,FSURF,NBC,DT2,M)
+      SUBROUTINE PROFE(FF,WFSURF,FSURF,NBC,DT2)
+!      SUBROUTINE PROFE(FF,WFSURF,SWRAD,FSURF,NBC,DT2,M)
 !
 !   Momme Butenschon, May 2004
 !   Dipartimento di Fisica
@@ -9,8 +10,11 @@
 !
       implicit none
 !     .. Scalar Arguments ..
-      REAL(RLEN) :: DT2,FSURF,SWRAD,WFSURF
-      INTEGER :: M,NBC
+      REAL(RLEN) :: DT2,FSURF,WFSURF
+      INTEGER :: NBC
+!      REAL(RLEN) :: DT2,FSURF,SWRAD,WFSURF
+!      INTEGER :: M,NBC
+
 !     ..
 !     .. Array Arguments ..
       REAL(RLEN) :: FF(KB)

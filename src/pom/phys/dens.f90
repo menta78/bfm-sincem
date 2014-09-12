@@ -43,7 +43,7 @@
 !      For shallow water the pressure dependency can be neglected
 !      in which case it should also be omitted in PROFQ
           CR = 1449.1 + .0821*P + 4.55*TR - .045*TR**2 + 1.34* (SR-35.)
-          RHOR = RHOR + 1.E5*P/CR**2* (1.-2.0*P/CR**2)
+!          RHOR = RHOR + 1.E5*P/CR**2* (1.-2.0*P/CR**2)
          RHO(K) = (RHOR-1000.)*1.E-3
       END DO
       RHO(KB) = RHO(KB-1)

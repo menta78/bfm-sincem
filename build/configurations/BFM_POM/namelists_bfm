@@ -46,9 +46,9 @@
    bfm_init     = 0
    bfm_rstctl   = .FALSE.
    bio_setup    = 3
-   out_fname    = 'BFM_standalone_benthic'
+   out_fname    = 'BFM_POM_benthic'
    out_dir      = '.'
-   out_title    = 'BFM_STANDALONE_BENTHIC'
+   out_title    = 'BFM_POM_BENTHIC'
    out_delta    = 300  !every 30 days
    parallel_log = .FALSE.
 	filename_nml_conf = 'BFM_General.nml',
@@ -137,8 +137,8 @@
      CalcMesoZooPlankton(1) = .TRUE.
      CalcMesoZooPlankton(2) = .TRUE.
            CalcPelChemistry = .TRUE.
-AssignPelBenFluxesInBFMFlag = .FALSE.
-AssignAirPelFluxesInBFMFlag = .TRUE.
+AssignPelBenFluxesInBFMFlag = .TRUE.
+AssignAirPelFluxesInBFMFlag = .FALSE.
             ChlDynamicsFlag = 2
             LightPeriodFlag = 1
           LightLocationFlag = 3
@@ -147,7 +147,8 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
                     p_small = 1.0e-20
                        slp0 = 1013.25E0
                       p_PAR = 0.50
-                     p_eps0 = 0.10
+!                     p_eps0 = 0.10
+                     p_eps0 = 0.12
                     p_epsR6 = 0.1d-3
                    p_epsESS = 0.04d-3
                    p_pe_R1c = 0.60
@@ -155,7 +156,7 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
                    p_pe_R1p = 0.832
                       p_qro = 0.5
                p_qon_dentri = 1.25
-                p_qon_nitri = 1.5
+                p_qon_nitri = 1.0 
                     p_poro0 = 0.7
                     p_d_tot = 0.30
 	filename_nml_conf = 'BFM_General.nml',
@@ -166,13 +167,13 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
 !-------------------------------------------------------
 ! Benthic flags and parameters :
 &Param_parameters_ben
-        CalcBenOrganisms(1) = .FALSE.
-        CalcBenOrganisms(2) = .FALSE.
-        CalcBenOrganisms(3) = .FALSE.
-        CalcBenOrganisms(4) = .FALSE.
-        CalcBenOrganisms(5) = .FALSE.
-         CalcBenBacteria(1) = .FALSE.
-         CalcBenBacteria(2) = .FALSE.
+        CalcBenOrganisms(1) = .TRUE.
+        CalcBenOrganisms(2) = .TRUE.
+        CalcBenOrganisms(3) = .TRUE.
+        CalcBenOrganisms(4) = .TRUE.
+        CalcBenOrganisms(5) = .TRUE.
+         CalcBenBacteria(1) = .TRUE.
+         CalcBenBacteria(2) = .TRUE.
                  p_InitSink = 100.0
                   p_d_tot_2 = 0.35
                   p_clD1D2m = 0.01
@@ -193,24 +194,24 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
 !<variablename>0 = <realvalue>
 !-------------------------------------------------------------------------!
 &bfm_init_nml
-   N1p0 = 0.3,
-   N3n0 = 2.0,
+   N1p0 = 0.8,
+   N3n0 = 2,
    N4n0 = 0.5,
-   N5s0 = 4.0,
+   N5s0 = 5.0,
    N6r0 = 1.0,
-   O2o0 = 300.0,
+   O2o0 = 280.0,
    O3c0 = 27060.00,
    O3h0 = 2660.0,
    O4n0 = 200.0,
-   P1c0 = 1.0,
-   P2c0 = 1.0,
-   P3c0 = 1.0,
+   P1c0 = 10.0,
+   P2c0 = 5.0,
+   P3c0 = 5.0,
    P4c0 = 1.0,
-   Z3c0 = 1.0,
-   Z4c0 = 1.0,
-   Z5c0 = 1.0,
-   Z6c0 = 1.0,
-   B1c0 = 1.0,
+   Z3c0 = 5.0,
+   Z4c0 = 5.0,
+   Z5c0 = 5.0,
+   Z6c0 = 5.0,
+   B1c0 = 5.0,
    R1c0 = 1.0,
    R2c0 = 0.1,
    R3c0 = 1.0,
@@ -224,13 +225,14 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
 !Benthic initialisation of standard variables
 !<variablename>0 = <realvalue>
 !-------------------------------------------------------------------------!
+
 &bfm_init_nml_ben
-   Y1c0  = 160.0,
-   Y2c0  = 470,
-   Y3c0  = 310.0,
+   Y1c0  = 30.0,
+   Y2c0  = 610.0,
+   Y3c0  = 140.0,
    Y4c0  = 220.0,
    Y5c0  = 160.0,
-   H1c0  = 165.0,
+   H1c0  = 120.0,
    H2c0  = 45.0,
    K1p0  = 0.1,
    K11p0 = 80.0,
@@ -247,20 +249,21 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
    D7m0  = 0.25,
    D8m0  = 0.25,
    D9m0  = 0.25,
-   Q6c0  = 10265.19,
-   Q6n0  = 200.0,
-   Q6p0  = 25.0,
-   Q6s0  = 10.0,
+   Q6c0  = 10250.0,
+   Q6n0  = 120.0,
+   Q6p0  = 10.0,
+   Q6s0  = 88.2,
    Q1c0  = 10.4988,
    Q11c0 = 10.4988,
-   G2o0  = 0.008879,
+!   G2o0  = 0.008879,
+   G2o0  = 0.67,
    G3c0  = 120.15,
    G13c0 = 440.8475,
    G23c0 = 11920.0,
    G3h0  = 10.35,
    G13h0 = 50.0,
    G23h0 = 1192.0,
-	filename_nml_conf = 'BFM_General.nml',
+        filename_nml_conf = 'BFM_General.nml',
 /
 
 !-------------------------------------------------------------------------!
@@ -272,7 +275,7 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
 !-------------------------------------------------------------------------!
 &bfm_save_nml
    ave_save = 'ETW','O2o','DIC',
-          'EIR',
+          'EIR','ESW','ERHO',
           'xEPS',
           'Chla',
           'N1p','N3n','N4n','N5s',
@@ -282,7 +285,7 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
           'P1n','P2n','P3n','P4n',
           'P1p','P2p','P3p','P4p',
           'Z3c','Z4c','Z5c','Z6c',
-          'R1c','R2c','R6c',
+          'R1c','R2c','R3c','R6c',
           'R1n','R6n',
           'R1p','R6p',
           'P1s','R6s',
@@ -302,7 +305,8 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
 ! p_burvel_PI     [m/d]              Bottom Burial Velocity for plankton 
 !-------------------------------------------------------------------------!
 &Settling_parameters
-  p_burvel_R6 = 1.5,
+!  p_burvel_R6 = 1.5,
+  p_burvel_R6 = 1.6,
   p_burvel_R2 = 0.0,
   p_burvel_PI = 0.0
 	filename_nml_conf = 'Benthic_Environment.nml',
@@ -369,10 +373,10 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
    AtmCO2_N  =    0  , 'CMIP5_Historical_GHG_1765_2005.dat' , .FALSE.  , 'CO2'   , '1764-07-01 00:00' ,  'yearly'  ,  .TRUE.
    AtmSLP_N  =    0  , 'AtmSLP.nc' , .TRUE.  ,'AtmSLP' , '1764-07-01 00:00'  , 'dummy' ,  .TRUE.
    AtmTDP_N  =    0  , 'AtmTDP.nc' , .TRUE.  ,'AtmTDP' , '1764-07-01 00:00'  , 'dummy' ,  .TRUE.
-   phstart       = 8.10E0
+   phstart       = 8.12E0
    K1K2          = 2
    MethodCalcCO2 = 2
-  CalcBioAlkFlag = .FALSE.
+  CalcBioAlkFlag = .TRUE.
           M2XACC = 1.0E-10
         M2PHDELT = 0.3
          M2MAXIT = 100
@@ -413,41 +417,48 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
 ! p_qup       [mmolP/mgC/day]  Membrane affinity for N 
 ! p_chn       [mmolN/m3]       Half saturation ammonium conc. for uptake
 ! p_chp       [mmolP/m3]       Half saturation phosphate conc. for uptake
-! p_ruen      [1/d]            Relaxation timescale for N uptake/remin.
+! p_ruen      [1/d]            Relaxation timescale for N uptaken/remin.
 ! p_ruep      [1/d]            Relaxation timescale for P uptake/remin.
 ! p_rec       [1/d]            Relaxation timescale for semi-labile excretion
 ! p_pu_ea_R3  [-]              Excretion of semi-refractory DOC
 !-------------------------------------------------------------------------!
+
 &PelBacteria_parameters
 !                B1
-     p_version = 1
+     p_version = 3
          p_q10 = 2.95
         p_chdo = 30.0
-          p_sd = 0.1
+          p_sd = 0.0
          p_sd2 = 0.0
-       p_suhR1 = 0.3
+!       p_suhR1 = 1.0
+       p_suhR1 = 0.5
        p_sulR1 = 0.0
-        p_suR2 = 0.0
-        p_suR3 = 0.0
-        p_suR6 = 0.01
+!       p_suR2 = 0.025
+       p_suR2 = 0.05
+!        p_suR3 = 0.0
+        p_suR3 = 0.01
+        p_suR6 = 0.1
          p_sum = 8.38
-       p_pu_ra = 0.6
+       p_pu_ra = 0.4
      p_pu_ra_o = 0.2
          p_srs = 0.01
       p_qncPBA = 0.0167
       p_qpcPBA = 0.00185
         p_qlnc = 0.0167
-        p_qlpc = 0.00185
-         p_qun = 0.0
-         p_qup = 0.0
+        p_qlpc = 0.00095
+         p_qun = 0.05
+         p_qup = 0.005
          p_chn = 5.00
-         p_chp = 1.00
+!         p_chp = 1.00
+         p_chp = 0.5
          p_rec = 1.0
         p_ruen = 1.0
         p_ruep = 1.0
-    p_pu_ea_R3 = 0.0
-	filename_nml_conf = 'Pelagic_Ecology.nml',
+!    p_pu_ea_R3 = 0.0
+     p_pu_ea_R3 = 0.015
+        filename_nml_conf = 'Pelagic_Ecology.nml',
 /
+
 
 !-------------------------------------------------------------------------!
 !NAMELIST Phyto_parameters, Phyto_parameters_iron, PAR_parameters, LightAdaptation_parameters
@@ -503,7 +514,7 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
 !  p_qscPPY    [mmolSi/mgC]   Reference quotum Si:C
 !                   ---- nutrient stressed sinking ----
 !  p_esNI      [-]            Nutrient stress threshold for sinking
-!  p_res       [m/d]          Maximum Sinking vel city (m/d)
+!  p_res       [m/d]          Maximum Sinking velocity (m/d)
 !              --------- Chlorophyll parameters -----------
 !  p_switchChl [1-4]          Switch for Chla-a synthesis 
 !  p_sdchl     [1/d]          Specific turnover rate for Chla 
@@ -528,19 +539,20 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
 !  p_addepth   [m]            Adaptation depth. Meaningless with high-res models
 !
 !-------------------------------------------------------------------------!
+
 &Phyto_parameters
 !               P1      P2      P3      P4
         p_q10 = 2.0,    2.0,    2.0,    2.0
        p_temp = 0.0,    0.0,    0.0,    0.0
-        p_sum = 2.5,    3.0,    3.5,    0.5
-        p_srs = 0.1,    0.05,   0.1,    0.1
-       p_sdmo = 0.05,   0.05,   0.05,   0.0
-       p_thdo = 0.1,    0.1,    0.1,    0.1
-        p_seo = 0.0,    0.0,    0.0,    0.0
+        p_sum = 2.5,    3.0,    3.5,    0.83 
+        p_srs = 0.05,   0.05,   0.05,   0.1
+       p_sdmo = 0.01,   0.01,   0.01,   0.2
+       p_thdo = 0.1,    0.1,    0.1,    0.5
+        p_seo = 0.0,    0.0,    0.0,    0.5
        p_sheo = 0.0,    0.0,    0.0,    100.0
-      p_pu_ea = 0.05,   0.1,    0.1,    0.15
+      p_pu_ea = 0.01,   0.1,    0.1,    0.15
       p_pu_ra = 0.1,    0.1,    0.2,    0.1
-  p_switchDOC = 1,      1,      1,      1
+  p_switchDOC = 3,      3,      3,      3
   p_netgrowth = .FALSE.,.FALSE.,.FALSE.,.FALSE.
      p_limnut = 1,      1,      1,      1
         p_qun = 0.025,  0.025,  0.025,  0.025
@@ -553,20 +565,21 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
      p_qpcPPY = 7.86e-4,7.86e-4,7.86e-4,7.86e-4
         p_xqp = 2.0,    2.0,    2.0,    2.0
    p_switchSi = 1,      0,      0,      0
-       p_chPs = 0.3,    0.0,    0.0,    0.0
+       p_chPs = 1.0,    0.0,    0.0,    0.0
     p_Contois = 0.0,    0.0,    0.0,    0.0
         p_qus = 0.0,    0.0,    0.0,    0.0
        p_qslc = 4.3e-3, 0.0,    0.0,    0.0
      p_qscPPY = 8.5e-3, 0.0,    0.0,    0.0
        p_esNI = 0.7,    0.75,   0.75,   0.75
-       p_res  = 0.0,    0.0,    0.0,    0.0
-  p_switchChl = 1,      1,      1,      1
+       p_res  = 5.0,    0.5,    0.5,    5.0 
+  p_switchChl = 3,      3,      3,      3
       p_sdchl = 0.2,    0.2,    0.2,    0.2
-  p_alpha_chl = 5.8e-6, 1.1e-5, 1.1e-5, 6.8e-6
-     p_qlcPPY = 0.025,  0.015,  0.02,   0.02
+  p_alpha_chl = 0.7e-5, 0.7e-5, 1.1e-5, 6.8e-6
+!     p_qlcPPY = 0.02,  0.015,  0.02,   0.02
+     p_qlcPPY = 0.035,  0.025,  0.02,   0.035
     p_epsChla = 0.03,   0.03,   0.03,   0.03
-    p_EpEk_or = 0.0,    0.0,    0.0,    0.0
- p_tochl_relt = 0.0,    0.0,    0.0,    0.0
+    p_EpEk_or = 3.0,    3.0,    3.0,    3.0
+ p_tochl_relt = 0.25,    0.25,    0.25,    0.25
 	filename_nml_conf = 'Pelagic_Ecology.nml',
 /
 
@@ -577,6 +590,7 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
 &PAR_parameters
 !               P1      P2      P3      P4
   p_iswLtyp =   5,      5,      5,      5
+
 	filename_nml_conf = 'Pelagic_Ecology.nml',
 /
 &LightAdaptation_parameters
@@ -609,38 +623,40 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
 ! p_qpcMIZ     [mmolN/mgC]     Maximum quotum N:C
 ! p_paPBA(z,b) [-]             Availability of pelagic Bacteria group b 
 !                              to Zooplankton group z
-! p_paPPY(z,p) [-]             Availability of PhytoPlankton group p
+! p_paPPY(z,p) [-]             Availabili0ty of PhytoPlankton group p
 !                              to Zooplankton group z
 ! p_paMIZ(z,m) [-]             Availability of MicroZooplankton group m
 !                              to Zooplankton group z
 !-------------------------------------------------------------------------!
+
 &MicroZoo_parameters
 !              Z5      Z6
        p_q10 =  2.0,    2.0
        p_srs =  0.02,   0.02
-       p_sum =  2.0,    4.0
+       p_sum =  2.0,    5.0
        p_sdo =  0.25,   0.25
-        p_sd =  0.05,   0.05
-        p_pu =  0.6,    0.5
-     p_pu_ea =  0.4,    0.3
-      p_chro =  0.5,    0.5
-      p_chuc =  20.0,   20.0
-   p_minfood =  20.0,   20.0
+        p_sd =  0.0,    0.0,
+        p_pu =  0.5,    0.3
+     p_pu_ea =  0.25,   0.35
+      p_chro =  0.5,     0.5 
+      p_chuc =  200.0,  200.0
+   p_minfood =  50.0,   50.0
     p_qpcMIZ =  1.85d-3,1.85d-3
     p_qncMIZ =  1.67d-2,1.67d-2
-     p_paPBA =  0.1,    0.9
+     p_paPBA =  0.1,    1.0
 !               P1      P2      P3      P4
 !       Z5
-p_paPPY(1,:) =  0.2,    1.0,    0.1,    0.0
+p_paPPY(1,:) =  1.0,    1.0,    0.1,    0.0
 !       Z6
-p_paPPY(2,:) =  0.0,    0.1,    1.0,    0.0
+p_paPPY(2,:) =  0.0,    0.2,    1.0,    0.0
 !               Z5      Z6
 !       Z5
-p_paMIZ(1,:) =  1.0,    0.8
+p_paMIZ(1,:) =  1.0,    1.0
 !       Z6
 p_paMIZ(2,:) =  0.0,    0.2
-	filename_nml_conf = 'Pelagic_Ecology.nml',
+        filename_nml_conf = 'Pelagic_Ecology.nml',
 /
+
 
 !-------------------------------------------------------------------------!
 !NAMELIST MesoZoo_parameters
@@ -665,16 +681,17 @@ p_paMIZ(2,:) =  0.0,    0.2
 ! p_paMEZ(z,m) [-]             Availability of MesoZooplankton group m
 !                              to Zooplankton group z
 !-------------------------------------------------------------------------!
+
 &MesoZoo_parameters
 !               Z3      Z4
        p_q10 =  2.0,    2.0
        p_srs =  0.01,   0.02
        p_sum =  2.0,    2.0
-       p_vum =  0.025,  0.025
+       p_vum =  0.0025,  0.0025
        p_puI =  0.6,    0.6
        p_peI =  0.3,    0.35
        p_sdo =  0.01,   0.01
-        p_sd =  0.02,   0.02
+        p_sd =  0.02,   0.01
        p_sds =  2.0,    2.0
     p_qpcMEZ =  1.67d-3,1.67d-3
     p_qncMEZ =  0.015,  0.015
@@ -683,10 +700,10 @@ p_paMIZ(2,:) =  0.0,    0.2
 !       Z3
 p_paPPY(1,:) =  0.0,    0.0,    0.0,    0.0
 !       Z4
-p_paPPY(2,:) =  1.0,    0.0,    0.0,    0.7
+p_paPPY(2,:) =  1.0,    0.75,   0.7,    0.5
 !               Z5      Z6
 !       Z3
-p_paMIZ(1,:) =  0.0,    0.0
+p_paMIZ(1,:) =  1.0,    0.0
 !       Z4
 p_paMIZ(2,:)=   1.0,    0.0,
 !               Z3      Z4
@@ -694,8 +711,9 @@ p_paMIZ(2,:)=   1.0,    0.0,
 p_paMEZ(1,:)=   1.0,    1.0
 !       Z4
 p_paMEZ(2,:)=   0.0,    1.0
-	filename_nml_conf = 'Pelagic_Ecology.nml',
+        filename_nml_conf = 'Pelagic_Ecology.nml',
 /
+
 
 !-------------------------------------------------------------------------!
 !NAMELIST PelChem_parameters, PelChem_parameters_iron
@@ -724,19 +742,32 @@ p_paMEZ(2,:)=   0.0,    1.0
 !-------------------------------------------------------------------------!
 &PelChem_parameters
   p_q10N4N3 = 2.367
-    p_sN4N3 = 0.01
+    p_sN4N3 = 0.1
     p_clO2o = 10.0
       p_rOS = 0.05
    p_sN3O4n = 0.35
     p_clN6r = 1.0
      p_rPAo = 1.0
   p_q10R6N5 = 1.49
-    p_sR6N5 = 0.02
+    p_sR6N5 = 0.5
+
 	filename_nml_conf = 'Pelagic_Environment.nml',
 /
 
 &PelChem_parameters_iron
 	filename_nml_conf = 'Pelagic_Environment.nml',
+/
+
+&PelChem_parameters_NO_BACT
+    p_sR6O3 = 0.25
+    p_sR6N1 = 0.25
+    p_sR6N4 = 0.25
+    p_sR1O3 = 0.25
+    p_sR1N1 = 0.25
+    p_sR1N4 = 0.25
+    p_sR2O3 = 0.25
+    p_sR3O3 = 0.25
+        filename_nml_conf = 'Pelagic_Environment.nml',
 /
 
 !-------------------------------------------------------------------------!

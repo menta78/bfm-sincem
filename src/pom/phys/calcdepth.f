@@ -29,9 +29,7 @@
 !     .. Intrinsic Functions ..
       INTRINSIC EXP,FLOAT
 !     ..
-      print *,'KB',KB
-!      KL1 = 7
-!      KL2 = KB - 6
+
       BB = FLOAT(KL2-KL1) + 4.
       CC = FLOAT(KL1) - 2.
       DEL1 = 2./BB/EXP(.693147*FLOAT(KL1-2))
@@ -53,6 +51,7 @@
       DO K = 1,KB - 1
           DZ(K) = Z(K) - Z(K+1)
           DZZ(K) = ZZ(K) - ZZ(K+1)
+
       END DO
       RETURN
       END

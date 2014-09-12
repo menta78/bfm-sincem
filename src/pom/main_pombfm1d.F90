@@ -178,10 +178,11 @@
       READ (11,REC=ICOUNTF) WSU1,WSV1
       READ (11,REC=ICOUNTF+1) WSU2,WSV2
 !     ------CONVERT TO POM UNITS---------
-      WSU1 = -WSU1*1.e-4
-      WSU2 = -WSU2*1.e-4
-      WSV1 = -WSV1*1.e-4
-      WSV2 = -WSV2*1.e-4
+!           from N/m2 to m2/s2
+      WSU1 = -WSU1*1.e-3
+      WSU2 = -WSU2*1.e-3
+      WSV1 = -WSV1*1.e-3
+      WSV2 = -WSV2*1.e-3
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 !      READ INITIAL SST-SSS                                                    c
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -245,6 +246,9 @@
 !       BFM SET UP (include initial conditions definition)
 !***********************************************************************
 #ifndef POM_only
+!-----------------------------------!
+!   initialization of BFM           !
+!-----------------------------------!
       CALL pom_ini_bfm_1d
 #endif
       time0=0.
@@ -327,7 +331,6 @@
       END DO
 
       CALL PROFQ(DT2)
-
 !
 !     ----MIXING TIME STEP (ASSELIN)-----
 !
@@ -339,6 +342,7 @@
           Q2LB(K) = Q2L(K)
           Q2L(K)  = Q2LF(K)
       END DO
+
 !
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 !     SKIP THE T AND S CALC> IF PROFILES PROVIDED BY DATA              c
@@ -353,7 +357,9 @@
 !
 !         ------TEMPERATURE------
 !
+!         CALL PROFT1D(TF,TB,WTSURF,SWRAD,TSURF,1,DT2)
          CALL PROFT1D(TF,TB,WTSURF,SWRAD,TSURF,3,DT2)
+
 !
 !         ----SALINITY INCLUDING LATERAL ADVECTION TERM-----
 !
@@ -364,7 +370,8 @@
              wsadv(k) = -(sstar(k)-s(k))/(1.*86400.)
            ENDIF
          ENDDO
-         CALL PROFS(SF,SB,WSSURF,WSADV,0.,SSURF,3,DT2)
+!         CALL PROFS(SF,SB,WSSURF,WSADV,0.,SSURF,1,DT2)
+        CALL PROFS(SF,SB,WSSURF,WSADV,0.,SSURF,3,DT2)
 !
 !     ----MIXING TIME STEP (ASSELIN)-----
 !
@@ -394,13 +401,17 @@
 #ifdef  POM_only
         if(mod(intt,864).eq.0) then
         do k= 1, kb
-        WRITE(100,*) time,zz(k),TB(k),SB(k)
+        WRITE(102,*) time,zz(k),TB(k),SB(k),RHO(k)
         enddo
         endif
 #endif
 
 #ifndef POM_only
+!---------------------------------------------!
+!  Call BFM after physics has been calculated ! 
+!---------------------------------------------!
       CALL pom_bfm_1d
+
 #endif
 !     -----VELOCITY-----
 !
@@ -453,8 +464,8 @@
          IF (ICOUNTF.GT.13) THEN
              ICOUNTF = 2
              READ (11,REC=1) WSU1,WSV1
-             WSU1 = -WSU1*1.e-4
-             WSV1 = -WSV1*1.e-4
+             WSU1 = -WSU1*1.e-3
+             WSV1 = -WSV1*1.e-3
              READ (13,REC=1) SSS1
              READ(21,REC=1) SWRAD1,WTSURF1,QCORR1
              WTSURF1=WTSURF1-SWRAD1+QCORR1
@@ -474,8 +485,8 @@
 
          READ(18,REC=ICOUNTF) NO3_2,NH4_2,PO4_2,SIO4_2
          READ (11,REC=ICOUNTF) WSU2,WSV2
-         WSU2 = -WSU2*1.e-4
-         WSV2 = -WSV2*1.e-4
+         WSU2 = -WSU2*1.e-3
+         WSV2 = -WSV2*1.e-3
          READ (13,REC=ICOUNTF) SSS2
          READ (21,REC=ICOUNTF) SWRAD2,WTSURF2,QCORR2
          WTSURF2=WTSURF2-SWRAD2+QCORR2
@@ -516,5 +527,6 @@
 !102   call error_msg_prn(NML_READ,"main_POMBFM.F90","Params_POMBFM")
 
        PRINT *,'main done'
- 
+! 105 FORMAT(f6.1,4f15.2)
+
       END

@@ -1,12 +1,12 @@
  &pom_input
-wind_input      =  '/nethome/gm11v07/Desktop/1D_INPUTS/windstress.da',
-surfaceS_input  =  '/nethome/gm11v07/Desktop/1D_INPUTS/SsurfaceAA1.da',
-radiance_input  =  '/nethome/gm11v07/Desktop/1D_INPUTS/radiance.da',
-ism_input       =  '/nethome/gm11v07/Desktop/1D_INPUTS/ism.da',
-Sal_input       =  '/nethome/gm11v07/Desktop/1D_INPUTS/SAA1Data.da',
-Temp_input      =  '/nethome/gm11v07/Desktop/1D_INPUTS/TAA1Data.da',
-Sprofile_input  =  '/nethome/gm11v07/Desktop/1D_INPUTS/SinitialAA1.da',
-Tprofile_input  =  '/nethome/gm11v07/Desktop/1D_INPUTS/TinitialAA1.da',
-heat_input      =  '/nethome/gm11v07/Desktop/1D_INPUTS/heatflux.da',
-surfNut_input   =  '/nethome/gm11v07/Desktop/1D_INPUTS/NutAcquavita.da'
+wind_input      =  '/nethome/gm11v07/Desktop/1D_INPUTS/MA21/windstress_mon_Mussap.da',
+surfaceS_input  =  '/nethome/gm11v07/Desktop/1D_INPUTS/MA21/Ssurf_16m.da',
+radiance_input  =  '/nethome/gm11v07/Desktop/1D_INPUTS/MA21/radiance_Mussap.da',
+ism_input       =  '/nethome/gm11v07/Desktop/1D_INPUTS/MA21/ism.da',
+Sal_input       =  '/nethome/gm11v07/Desktop/1D_INPUTS/MA21/ClimaS_MA21_16m.da',
+Temp_input      =  '/nethome/gm11v07/Desktop/1D_INPUTS/MA21/ClimaT_MA21_16m.da',
+Sprofile_input  =  '/nethome/gm11v07/Desktop/1D_INPUTS/MA21/Sinit_16m.da',
+Tprofile_input  =  '/nethome/gm11v07/Desktop/1D_INPUTS/MA21/Tinit_16m.da',
+heat_input      =  '/nethome/gm11v07/Desktop/1D_INPUTS/MA21/heatflux.da',
+surfNut_input   =  '/nethome/gm11v07/Desktop/1D_INPUTS/MA21/NutrientsARPAOGS.da'
 /

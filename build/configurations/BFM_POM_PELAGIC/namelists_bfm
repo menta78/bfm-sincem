@@ -45,7 +45,7 @@
    bio_calc     = .TRUE.
    bfm_init     = 0
    bfm_rstctl   = .FALSE.
-   bio_setup    = 3
+   bio_setup    = 1
    out_fname    = 'POM_BFM_1D'
    out_dir      = '.'
    out_title    = 'POM_BFM_1D'

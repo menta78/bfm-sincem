@@ -42,23 +42,54 @@
 !-------------------------------------------------------------------------!
 !BOC
 !
-
+!
+!&FilterFeeder_parameters
+!sw_uptake=4,
+!p_dwat = 3.0,
+!p_su = 0.60,
+!p_q10 = 2.0,
+!p_Rps = 0.00,
+!p_R6 = 0.0,
+!p_clu = 0.0,
+!p_chu = 300.0,
+!p_puePI = 0.25,
+!p_pueZI = 0.25,
+!p_pueQ6 = 0.7,
+!p_srr = 0.0027,
+!p_sra = 0.010,
+!p_pur = 0.1225,
+!p_sd = 0.00,
+!p_sd2 = 0.0,
+!p_qn = 0.0119,
+!p_qp = 0.000792,
+!p_clm = 0.0,
+!p_cm = 0.001,
+!p_puQ6 = 0.065,
+!p_PI = 1.0
+!p_ZI = 1.0
+!p_vum=0.2e-3
+!p_clO2o = 30.0
+!p_height=0.02,
+!p_max=0.10
+!p_pePel=1.0
+!/
+!
 &FilterFeeder_parameters
 sw_uptake=4,
 p_dwat = 3.0,
-p_su = 0.60,
+p_su = 0.13,
 p_q10 = 2.0,
 p_Rps = 0.00,
-p_R6 = 0.0,
-p_clu = 0.0,
+p_R6 = 0.1,
+p_clu = 50.0,
 p_chu = 300.0,
 p_puePI = 0.25,
 p_pueZI = 0.25,
 p_pueQ6 = 0.7,
 p_srr = 0.0027,
 p_sra = 0.010,
-p_pur = 0.1225,
-p_sd = 0.00,
+p_pur = 0.15,
+p_sd = 0.0025,
 p_sd2 = 0.0,
 p_qn = 0.0119,
 p_qp = 0.000792,
@@ -73,6 +104,7 @@ p_height=0.02,
 p_max=0.10
 p_pePel=1.0
 /
+
 
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 !  sw_uptake     =1: uptake accodring original ERSEM euqation.

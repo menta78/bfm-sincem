@@ -2,14 +2,17 @@
 ! MODEL
 !
 ! NAMELIST
-! H= depth(m), DTI=timestep (seconds), ALAT= Latitude (degrees) 
+! H= depth(m), DTI=timestep (seconds), ALAT= Latitude (degrees), IDIAGN= diagnostic mode,
+! IDAYS=length of run (days), KL1 & KL2=number of top and bottom levels not equally distributed,
+! savef=saving frequency (days)
+!  
 !
  &Params_POMBFM
-H=20.,
+H=16.,
 DTI=100.,
 ALAT=45.,
 IDIAGN=1,
-IDAYS=360,
+IDAYS=1800,
 SMOTH=0.1,
 ihotst=0,
 UMOL=2.e-5,

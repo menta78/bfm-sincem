@@ -53,8 +53,7 @@
 !  N_coeff:  	 number of coefficients in the solution
 
 &BenNitrate_parameters
-!p_sK3G4 = 0.35,
-p_sK3G4 = 4.0,
+p_sK3G4 = 0.35,
 p_zATo = 16.0,
 p_diff = 9.7e-05,
 p_q10 = 2.0,

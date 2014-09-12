@@ -10,8 +10,8 @@
                                   Q2LB,RHO,WT 
       real(RLEN),dimension(KB) :: Z,ZZ,DZ,DZZ,DZR, &
                                   A,C,VH,VHP
-      real(RLEN),dimension(KB) :: GM,GH,SM,SH,KN,SPROD,BPROD,PROD,DTEF,&
-                                  KM,KH,KQ,L,TINIZ,SINIZ
+      real(RLEN),public,dimension(KB) :: GM,GH,SM,SH,KN,SPROD,BPROD,&
+                                         PROD,DTEF,KM,KH,KQ,L,TINIZ,SINIZ
       real(RLEN)               :: WUSURF,WVSURF,WUBOT,WVBOT, &
                                   WTSURF,SWRAD,WSSURF,UMOL,DTI,SMOTH 
       real(RLEN)               :: H,D,DT,rlat,rlon, &

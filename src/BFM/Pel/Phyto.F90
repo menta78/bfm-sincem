@@ -342,7 +342,7 @@
   call quota_flux( iiPel, ppphytoc, ppphytoc,ppO3c, rrc, tfluxC )
   call flux_vector( iiPel, ppO2o,ppO2o,-( rrc/ MW_C) )
   call flux_vector( iiPel, ppO2o,ppO2o, rugc/ MW_C ) 
-
+!
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Potential-Net prim prod. (mgC /m3/d)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
