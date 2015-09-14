@@ -438,6 +438,7 @@
      integer, intent(IN):: Year
      integer, intent(INOUT):: Month, Day, Hour
      real(RLEN)  :: ref, res, now, good
+     now = 0.0
      if (Month == 0 ) then  ! year case
         ref = FLOAT(yeardays(Year)) / 2
   L1:   do 

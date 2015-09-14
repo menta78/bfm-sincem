@@ -397,7 +397,6 @@ contains
 
    tmpname = TRIM(out_fname)
 #ifdef BFM_PARALLEL
-   LEVEL2 "BFM is running in Parallel"
    parallel = .TRUE.
    ! variable parallel_rank must have been assigned previously
    ! in the coupling with the ocean model 
@@ -420,6 +419,8 @@ contains
     end if
     open(LOGUNIT,file=logfname,action='write',  &
         form='formatted',err=100)
+
+   if (bfm_lwp) WRITE(*,*) "BFM is running in Parallel"
 
    ! provide different file names for each process domain
    !

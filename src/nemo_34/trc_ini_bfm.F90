@@ -361,6 +361,9 @@
       DO ll = 1, ntra
                                        DEALLOCATE( sf_trcdta(ll)%fnow )     !  arrays in the structure
          IF( sf_trcdta(ll)%ln_tint )   DEALLOCATE( sf_trcdta(ll)%fdta )
+      ! close iom channel
+      call iom_close(sf_trcdta(ll)%num)
+
       ENDDO
    ENDIF
 

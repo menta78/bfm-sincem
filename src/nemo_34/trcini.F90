@@ -101,6 +101,13 @@ CONTAINS
       if ( ln_dm2dc .AND. LightPeriodFlag .NE. 1) &
                  CALL ctl_stop( ' The diurnal cycle (ln_dm2dc) is not compatible with the BFM LightPeriodFlag = 1.' )
 
+      IF(ln_ctl) THEN            ! print mean trends (used for debugging)
+         CALL prt_ctl_trc_init
+         WRITE(charout, FMT="('ini ')")
+         CALL prt_ctl_trc_info( charout )
+         CALL prt_ctl_trc( tab4d=trn, mask=tmask, clinfo=ctrcnm )
+      ENDIF
+
       IF( nn_timing == 1 )   CALL timing_stop('trc_init')
       
    END SUBROUTINE trc_init

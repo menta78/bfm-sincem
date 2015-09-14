@@ -122,15 +122,19 @@ CONTAINS
          DO jn = 1, ntrc
             IF( ln_trc_ini(jn) )  THEN    ! open input file only if ln_trc_ini(jn) is true
                clndta = TRIM( sn_trcdta(jn)%clvar ) 
-               clntrc = TRIM( ctrcnm   (jn)       ) 
+               if (jn > jptra) then
+                  clntrc='Dummy' ! By pass weird formats in ocean.output if ntrc > jptra
+               else
+                  clntrc = TRIM( ctrcnm   (jn)       ) 
+               endif
                zfact  = rn_trfac(jn)
                IF( clndta /=  clntrc ) THEN 
-                  CALL ctl_warn( 'trc_dta_init: passive tracer data initialisation :  ',   &
-                  &              'the variable name in the data file : '//clndta//   & 
-                  &              '  must be the same than the name of the passive tracer : '//clntrc//' ')
+                  CALL ctl_warn( 'trc_dta_init: passive tracer data initialisation    ',   &
+                  &              'Input name of data file : '//TRIM(clndta)//   &
+                  &              ' differs from that of tracer : '//TRIM(clntrc)//' ')
                ENDIF
-               WRITE(numout,*) ' read an initial file for passive tracer number :', jn, ' name : ', clndta, & 
-               &               ' multiplicative factor : ', zfact
+               WRITE(numout,'(a, i3,3a,e11.3)') ' Read IC file for tracer number :', &
+               &            jn, ', name : ', TRIM(clndta), ', Multiplicative Scaling factor : ', zfact
             ENDIF
          END DO
       ENDIF
