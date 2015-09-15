@@ -168,8 +168,8 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
 !-------------------------------------------------------------------------!
 &bfm_save_nml
    ave_save = 'EIR','ETW','EWIND','ESW',
-          'Ac','DIC','EPCO2air',
-          'pH','CO2','pCO2','HCO3','CO3','CO2airflux'
+          'ALK','DIC','EPCO2air',
+          'pH','CO2','pCO2','HCO3','CO3','CO2airflux' 'jsurO2o'
 	filename_nml_conf = 'BFM_General.nml',
 /
 
@@ -762,8 +762,8 @@ p_paMEZ(2,:)=   0.0,    1.0
    tw                = 25.0,
    ts                = 25.0,
    tde               = 0.0,
-   ww                = 1.0,
-   ws                = 1.0,
+   ww                = 4.0,
+   ws                = 4.0,
    CO2inc            = 0.0,
    forcing_file      = '',
    use_external_data = .false.,

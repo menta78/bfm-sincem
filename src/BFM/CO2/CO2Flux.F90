@@ -13,12 +13,10 @@
 ! /*
 ! DESCRIPTION
 !   This function computes the CO2 flux at the air-sea interface
-!   as forced by temperature, wind and chemical enhancement
-!   (Schneider et al., 1999).
+!   as forced by temperature, salinity and wind.
 !   Uses equation from:
-!   R. Wanninkhof (1992), Relationship between windspeed and gas
-!   exchange over the oecean
-!   J. GeoPhys. Res. 97, 7373-7382
+!   Wanninkhof (2014), Relationship between wind speed and gas exchange 
+!   over the ocean revisited. Limnol. Oceanogr. Methods 12:351-362.
 !
 !   notes: 
 !   - K0 = co2/pco2 [1.e-6 mol / (l * 1.e-6 atm)]
@@ -29,12 +27,12 @@
 !*/
 ! AUTHORS
 !   H. Thomas (NIOZ) adapted from the OCMIP standard files
-!   T. Lovato (CMCC) added atmospheric pCO2 and chemical enhancement
+!   T. Lovato (CMCC) Introduce updates from Wanninkhof (2014)
 ! 
 ! CHANGE_LOG
 !
 ! COPYING
-!   Copyright (C) 2013, the BFM System Team (bfm_st@lists.cmcc.it)
+!   Copyright (C) 2015 BFM System Team (bfm_st@lists.cmcc.it)
 !   Copyright (C) 2004  H. Thomas and the ERSEM team (vichi@ingv.it)
 !
 !   This program is free software; you can redistribute it and/or modify
@@ -74,49 +72,59 @@
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 IMPLICIT NONE
 
-    real(RLEN) :: k0(NO_BOXES_XY)    ! 1.e-6 mol / (l * 1.e-6 atm)
-    real(RLEN) :: wind(NO_BOXES_XY)  ! m/s
-    real(RLEN) :: ice(NO_BOXES_XY)   ! fraction
-    real(RLEN) :: temp(NO_BOXES_XY)  ! deg C
-    real(RLEN) :: salt(NO_BOXES_XY)  ! -
-    real(RLEN) :: rho(NO_BOXES_XY)   ! kg/m3
-    real(RLEN) :: pco2air(NO_BOXES_XY) ! uatm
-    real(RLEN) :: pco2sea(NO_BOXES_XY) ! uatm
-    real(RLEN) :: tmpflux(NO_BOXES)
+  real(RLEN) :: k0(NO_BOXES_XY)    ! 1.e-6 mol / (l * 1.e-6 atm)
+  real(RLEN) :: wind(NO_BOXES_XY)  ! m/s
+  real(RLEN) :: ice(NO_BOXES_XY)   ! fraction
+  real(RLEN) :: temp(NO_BOXES_XY)  ! deg C
+  real(RLEN) :: salt(NO_BOXES_XY)  ! -
+  real(RLEN) :: rho(NO_BOXES_XY)   ! kg/m3
+  real(RLEN) :: pco2air(NO_BOXES_XY) ! uatm
+  real(RLEN) :: pco2sea(NO_BOXES_XY) ! uatm
+  real(RLEN) :: tmpflux(NO_BOXES)
 
-    real(RLEN),parameter  :: C1=2073.1_RLEN
-    real(RLEN),parameter  :: C2=125.62_RLEN
-    real(RLEN),parameter  :: C3=3.6276_RLEN
-    real(RLEN),parameter  :: C4=0.043219_RLEN
-    real(RLEN),parameter  :: CO2SCHMIDT=660.0_RLEN
-    real(RLEN),parameter  :: d=0.31_RLEN
-    real(RLEN),parameter  :: CM2M=0.01_RLEN
-    integer, save :: first=0
-    real(RLEN),allocatable,save,dimension(:) :: pschmidt,temp2,bt, &
-                                         ken,tk,tk100,tk1002,ScRatio
-    integer :: AllocStatus
+  real(RLEN),parameter  :: CO2SCHMIDT=660.0_RLEN
+  real(RLEN),parameter  :: CM2M=0.01_RLEN
+  ! Wind speed coefficient
+  real(RLEN),parameter  :: d=0.251_RLEN
+  ! Schmidt number fit (4th order)
+  real(RLEN),parameter  :: C1=2116.8_RLEN
+  real(RLEN),parameter  :: C2=-136.25_RLEN
+  real(RLEN),parameter  :: C3=4.7353_RLEN
+  real(RLEN),parameter  :: C4=-0.092307_RLEN
+  real(RLEN),parameter  :: C5=0.0007555_RLEN
+  ! Gas solutbility fit (K0)
+  real(RLEN),parameter  :: A1=-58.0931_RLEN
+  real(RLEN),parameter  :: A2=90.5069_RLEN
+  real(RLEN),parameter  :: A3=22.2940_RLEN
+  real(RLEN),parameter  :: B1=0.027766_RLEN
+  real(RLEN),parameter  :: B2=-0.025888_RLEN
+  real(RLEN),parameter  :: B3=0.0050578_RLEN
+  integer, save :: first=0
+  real(RLEN),allocatable,save,dimension(:) :: pschmidt,temp2,bt, &
+                                       kv,tk,tk100,tk1002,ScRatio
+  integer :: AllocStatus
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 !BEGIN compute
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-   if (first==0) then
-      first=1
-      allocate(pschmidt(NO_BOXES_XY),stat=AllocStatus)
-      if (AllocStatus  /= 0) stop "error allocating pschmidt"
-      allocate(temp2(NO_BOXES_XY),stat=AllocStatus)
-      if (AllocStatus  /= 0) stop "error allocating temp2"
-      allocate(bt(NO_BOXES_XY),stat=AllocStatus)
-      if (AllocStatus  /= 0) stop "error allocating bt"
-      allocate(ken(NO_BOXES_XY),stat=AllocStatus)
-      if (AllocStatus  /= 0) stop "error allocating ken"
-      allocate(tk(NO_BOXES_XY),stat=AllocStatus)
-      if (AllocStatus  /= 0) stop "error allocating tk"
-      allocate(tk100(NO_BOXES_XY),stat=AllocStatus)
-      if (AllocStatus  /= 0) stop "error allocating tk100"
-      allocate(tk1002(NO_BOXES_XY),stat=AllocStatus)
-      if (AllocStatus  /= 0) stop "error allocating tk1002"
-      allocate(ScRatio(NO_BOXES_XY),stat=AllocStatus)
-      if (AllocStatus  /= 0) stop "error allocating ScRatio"
-   end if
+    if (first==0) then
+       first=1
+       allocate(pschmidt(NO_BOXES_XY),stat=AllocStatus)
+       if (AllocStatus  /= 0) stop "error allocating pschmidt"
+       allocate(temp2(NO_BOXES_XY),stat=AllocStatus)
+       if (AllocStatus  /= 0) stop "error allocating temp2"
+       allocate(bt(NO_BOXES_XY),stat=AllocStatus)
+       if (AllocStatus  /= 0) stop "error allocating bt"
+       allocate(kv(NO_BOXES_XY),stat=AllocStatus)
+       if (AllocStatus  /= 0) stop "error allocating kv"
+       allocate(tk(NO_BOXES_XY),stat=AllocStatus)
+       if (AllocStatus  /= 0) stop "error allocating tk"
+       allocate(tk100(NO_BOXES_XY),stat=AllocStatus)
+       if (AllocStatus  /= 0) stop "error allocating tk100"
+       allocate(tk1002(NO_BOXES_XY),stat=AllocStatus)
+       if (AllocStatus  /= 0) stop "error allocating tk1002"
+       allocate(ScRatio(NO_BOXES_XY),stat=AllocStatus)
+       if (AllocStatus  /= 0) stop "error allocating ScRatio"
+    end if
 
     temp = ETW(SRFindices)
     salt = ESW(SRFindices)
@@ -127,69 +135,64 @@ IMPLICIT NONE
     pco2sea = pCO2(SRFindices)
     tmpflux(:) = ZERO
     
-    !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    ! Calculate Schmidt number,
-    ! ratio between the kinematic viscosity and the molecular 
-    ! diffusivity of carbon dioxide.
-    !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    ! Schmidt number (Sc), ratio between the kinematic viscosity 
+    ! and the molecular diffusivity of the gas.
+    ! Parameters refitted in Wanninkhof (2014)
+    !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     temp2 = temp*temp
-    pschmidt = (C1 - C2*temp + C3*temp2 - C4*temp2*temp)
+    pschmidt = (C1 + C2*temp + C3*temp2 + C4*temp2*temp + C5*temp2*temp2)
 
     ScRatio = CO2SCHMIDT/pschmidt
     !
     ! ScRatio is limited to 0 when T > 40 °C  
     WHERE(ScRatio .le. 0.0_RLEN); ScRatio=0.0_RLEN ; END WHERE    
-    !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-    ! Compute Chemical enhancement the Temperature dependent
-    ! gas transfer 
-    !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-    bt = 2.5_RLEN*(0.5246_RLEN + 1.6256E-02_RLEN*temp + 4.9946E-04_RLEN*temp2) 
+    !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    ! Chemical enhancement of gas transfer (Wanninkhof, 1992)
+    ! Not included in Wanninkhof (2014)
+    !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    ! bt = 2.5_RLEN*(0.5246_RLEN + 1.6256E-02_RLEN*temp + 4.9946E-04_RLEN*temp2) 
+    bt = 0.0_RLEN
+    !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    !Compute gas transfer velocity
+    !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    kv = (bt + d*wind*wind)*sqrt(ScRatio)*  CM2M*HOURS_PER_DAY
 
-    !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-    ! Calculate wind dependency + Chemical enhancement
-    ! including conversion cm/hr => m/day :
-    !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-    ken = (bt + d*wind*wind)*sqrt(ScRatio)* CM2M*HOURS_PER_DAY
-    !
-    !Alternative way, without enhancement
-    !kun = (d*wind*wind)*sqrt(ScRatio)*  CM2M*HOURS_PER_DAY
-    !
-    ! ---------------------------------------------------------------------
-    ! K0, solubility of co2 in the water (K Henry)
-    ! from Weiss 1974; K0 = [co2]/pco2 [mol kg-1 atm-1]
-    ! ---------------------------------------------------------------------
+    !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    ! K0, solubility of co2 in the water (K Henry) according to Weiss 1974
+    ! K0 = [co2]/pco2 [mol kg-1 atm-1]
+    ! Parameters refitted in Wanninkhof 2014
+    !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     tk = temp - ZERO_KELVIN
     tk100 = tk/100.0_RLEN
     tk1002 = tk100*tk100
-    k0 = exp(93.4517_RLEN/tk100 - 60.2409_RLEN + 23.3585_RLEN * log(tk100) +   &
-       salt * (.023517_RLEN - 0.023656_RLEN * tk100 + 0.0047036_RLEN * tk1002))
+    k0 = exp( A1 + A2/tk100 + A3*log(tk100) + salt*(B1 + B2*tk100 + B3*tk1002) )
 
-    !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     ! flux co2 in mmol/m2/day   
-    !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     ! (m * d-1) * uatm * (mol * kg-1 * atm-1) * (kg * m-3)
     !     d-1   1.e-6      mol   m-2
     !     umol m-2 d-1 / 1000 = mmol/m2/d
-    CO2airflux(:) = ken * (pco2air - pco2sea) * k0 * rho / 1000.0_RLEN
+    CO2airflux(:) = kv * (pco2air - pco2sea) * k0 * rho / 1000.0_RLEN
 
-  !---------------------------------------------------------------
-  ! flux is positive downward. 
-  ! Conversion from mmolC/m2/d to mgC/m3/d.
-  ! The fraction of ice-free water is also considered
-  ! Boundary variable first assigned, then the source term is 
-  ! added to the Source/Sink arrays if the Flag is TRUE
-  ! In the water, the flux is subtracted from
-  ! (or added to) the diagonal element of O3c (i.e. infinite source)
-  !---------------------------------------------------------------
-  jsurO3c(:) = jsurO3c(:) + (ONE-ice(:)) * CO2airflux(:) * MW_C
-  tmpflux(SRFindices) = jsurO3c(:) / Depth(SRFindices)
-  if ( AssignAirPelFluxesInBFMFlag) then
-     call flux_vector( iiPel, ppO3c,ppO3c, tmpflux )
-  end if
-!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  return
+    !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    ! Flux is positive downward. 
+    ! Conversion from mmolC/m2/d to mgC/m3/d.
+    ! The fraction of ice-free water is also considered
+    ! Boundary variable first assigned, then the source term is 
+    ! added to the Source/Sink arrays if the Flag is TRUE
+    ! In the water, the flux is subtracted from
+    ! (or added to) the diagonal element of O3c (i.e. infinite source)
+    !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    jsurO3c(:) = jsurO3c(:) + (ONE-ice(:)) * CO2airflux(:) * MW_C
+    tmpflux(SRFindices) = jsurO3c(:) / Depth(SRFindices)
+    if ( AssignAirPelFluxesInBFMFlag) then
+       call flux_vector( iiPel, ppO3c,ppO3c, tmpflux )
+    end if
 
-!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    return
+
   end subroutine CO2Flux
 
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -265,6 +268,8 @@ IMPLICIT NONE
     write(LOGUNIT,*) " e (pH2Ovapor): ",e(1)," T dew point :", EATD(1)
 #endif
   end select
+   
+  return
 !EOC
   end subroutine CalcPCO2Air
 

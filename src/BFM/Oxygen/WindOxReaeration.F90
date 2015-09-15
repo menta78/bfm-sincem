@@ -83,16 +83,20 @@
   real(RLEN) :: ice(NO_BOXES_XY)   ! fraction
   real(RLEN) :: tmpflux(NO_BOXES)
 
-  real(RLEN),parameter  :: C1=1953.4_RLEN
-  real(RLEN),parameter  :: C2=128.0_RLEN
-  real(RLEN),parameter  :: C3=3.9918_RLEN
-  real(RLEN),parameter  :: C4=0.050091_RLEN
   real(RLEN),parameter  :: O2SCHMIDT=660.0_RLEN
-  real(RLEN),parameter  :: d=0.31_RLEN
   real(RLEN),parameter  :: CM2M=0.01_RLEN
+  ! Wind speed coefficient
+  real(RLEN),parameter  :: d=0.251_RLEN
+  ! Schmidt number fit (4th order)
+  real(RLEN),parameter  :: C1=1920.4_RLEN
+  real(RLEN),parameter  :: C2=-135.6_RLEN
+  real(RLEN),parameter  :: C3=5.2122_RLEN
+  real(RLEN),parameter  :: C4=-0.10939_RLEN
+  real(RLEN),parameter  :: C5=0.00093777_RLEN
+
   integer, save :: first=0
   real(RLEN),allocatable,save,dimension(:) :: pschmidt,temp2,bt,  &
-                                         kun,O2AIRFlux,ScRatio
+                                         kv,O2AIRFlux,ScRatio
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 !BEGIN compute
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -105,8 +109,8 @@
       if (AllocStatus  /= 0) stop "error allocating temp2"
       allocate(bt(NO_BOXES_XY),stat=AllocStatus)
       if (AllocStatus  /= 0) stop "error allocating bt"
-      allocate(kun(NO_BOXES_XY),stat=AllocStatus)
-      if (AllocStatus  /= 0) stop "error allocating kun"
+      allocate(kv(NO_BOXES_XY),stat=AllocStatus)
+      if (AllocStatus  /= 0) stop "error allocating kv"
       allocate(O2AIRFlux(NO_BOXES_XY),stat=AllocStatus)
       if (AllocStatus  /= 0) stop "error allocating O2AIRFlux"
       allocate(ScRatio(NO_BOXES_XY),stat=AllocStatus)
@@ -124,7 +128,7 @@
     ! diffusivity of carbon dioxide.
     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     temp2 = temp*temp
-    pschmidt = (C1 - C2*temp + C3*temp2 - C4*temp2*temp)
+    pschmidt = (C1 + C2*temp + C3*temp2 + C4*temp2*temp + C5*temp2*temp2)
 
     ScRatio = O2SCHMIDT / pschmidt
     !
@@ -134,17 +138,15 @@
     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     ! Calculate wind dependency, including conversion cm/hr => m/day :
     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-    kun = (d*wind*wind)*sqrt(ScRatio)* CM2M*HOURS_PER_DAY
+    kv = (d*wind*wind)*sqrt(ScRatio)* CM2M*HOURS_PER_DAY
     !
-    ! This is the old formulation used before 2012 modifications
-    !kun_old = (0.074E00_RLEN*wind*wind)*sqrt(O2SCHMIDT/pschmidt)
     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     ! flux o2 in mmol/m3/day   
     ! cxoO2 [mMol/m3] is the O2 concentration at saturation 
     ! computed using ETW
     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     !
-    O2AIRFlux(:) = (ONE-ice(:)) * kun * ( cxoO2(SRFindices)- O2o(SRFindices)) 
+    O2AIRFlux(:) = (ONE-ice(:)) * kv * ( cxoO2(SRFindices)- O2o(SRFindices)) 
     ! Update flux
     jsurO2o(:)  = jsurO2o(:) + O2AIRFlux(:)
     ! Convert to mmol/m2/day
@@ -155,7 +157,7 @@
 #ifdef DEBUG
     write(LOGUNIT,*) ' Oxygen Reareation'
     write(LOGUNIT,'(A,I3,A,F12.6,A,F12.6)') 'Idx: ', SRFindices(1),' DOSat ',cxoO2(1),' DOwater ',O2o(1)
-    write(LOGUNIT,'(A,F12.6,A,F10.2,A,F12.6)') 'O2 flux  ', jsurO2o(1),' Depth ',Depth(1),' kun ', kun(1)
+    write(LOGUNIT,'(A,F12.6,A,F10.2,A,F12.6)') 'O2 flux  ', jsurO2o(1),' Depth ',Depth(1),' kv ', kv(1)
     write(LOGUNIT,'(A,F12.6,A,F12.6,A,F12.6)') 'New Flux ', O2AIRFlux(1), ' wind ', wind(1),' temp ',temp(1)
     write(LOGUNIT,*)
 #endif
