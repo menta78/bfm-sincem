@@ -84,7 +84,7 @@ MODULE init_var_bfm_local
 %2d-state-ice-InitInternal
 
 #endif
-
+      return
 end subroutine init_organic_constituents
 
 
@@ -152,7 +152,6 @@ END MODULE init_var_bfm_local
 !  Original author(s): Marcello Vichi
 !
 ! !LOCAL VARIABLES:
-   integer,parameter    :: namlst=10
    integer              :: icontrol,i,j,n,Flun
    integer,parameter    :: NSAVE=120  ! Maximum no variables which can be saved
    character(len=64),dimension(NSAVE):: var_save
@@ -247,12 +246,13 @@ END MODULE init_var_bfm_local
    ! Open and read the namelist
    !---------------------------------------------
    icontrol=0
-   open(namlst,file=bfm_init_fname,action='read',status='old',err=100)
+   NMLUNIT=GetLun()
+   open(NMLUNIT,file=bfm_init_fname,action='read',status='old',err=100)
    var_save=""
    ave_save=""
    var_ave=.false.
-   read(namlst,nml=bfm_save_nml,err=101)
-   close(namlst)
+   read(NMLUNIT,nml=bfm_save_nml,err=101)
+   close(NMLUNIT)
    icontrol=1
 100 if ( icontrol == 0 ) then
      LEVEL3 'I could not open ',trim(bfm_init_fname)

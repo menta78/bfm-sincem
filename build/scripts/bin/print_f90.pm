@@ -1433,6 +1433,7 @@ sub func_INIT_FUNC_CONST {
     my @constList = ();
     my @constNoCList = ();
     my @constOptionalList = ();
+    my @constOptListIndex = ();
     my @constOptionalRatioList = ();
 
     foreach my $const ( sort { $$LST_CONST{$a} cmp $$LST_CONST{$b} } keys %$LST_CONST ){
@@ -1440,16 +1441,19 @@ sub func_INIT_FUNC_CONST {
         if($const ne $constList[0]){
             push( @constNoCList, $const );
             push( @constOptionalList, $const . $constList[0] );
+            push( @constOptListIndex, 'pp' . $const );
             push( @constOptionalRatioList, $const . $constList[0] . '_ratio' );
         }
     }
 
-    $line .="   subroutine init_constituents( ". join(',',@constList)  . "," . join( ',', @constOptionalList )    . ")\n";
+    $line .="   subroutine init_constituents( ". join(',',@constList) . "," . join(',',@constOptListIndex) . "," 
+                                                                             . join( ',', @constOptionalList )    . ")\n";
     $line .="     use global_mem, only: RLEN,ZERO\n";
     $line .="     IMPLICIT NONE\n";
     $line .="     real(RLEN),dimension(:),intent(in)             :: " . $constList[0]                              . "\n";
     $line .="     real(RLEN),intent(in),optional                 :: " . join( ',', @constOptionalList )            . "\n";
     $line .="     real(RLEN),dimension(:),intent(inout),optional :: " . join( ',', @constList[1 .. $#constList]  ) . "\n";
+    $line .="     integer,intent(in),optional                    :: " . join( ',', @constOptListIndex )            . "\n";
     $line .="     real(RLEN)                                     :: " . join( ',', @constOptionalRatioList       ) . "\n";
     $line .="     \n";
 
@@ -1461,13 +1465,15 @@ sub func_INIT_FUNC_CONST {
     }
 
     foreach my $constNoC (@constNoCList){
-        $line .= "     " . "    if (present(" . $constNoC . ")) then\n";
+        $line .= "     " . "    if (present(" . $constNoC . ") .and. pp" . $constNoC . ">0) then\n";
         $line .= "     " . "      where (" . $constNoC . "==ZERO)\n";
         $line .= "     " . "        " . $constNoC . " = " . $constNoC . "c_ratio*c\n";
         $line .= "     " . "      end where\n";
         $line .= "     " . "    end if\n";
     }
 
+    $line .="   \n";
+    $line .="         return\n";
     $line .="   end subroutine init_constituents\n";
 
 
@@ -1485,9 +1491,9 @@ sub func_INIT_NAMELIST {
     if ( $subtype eq '_pel' ){ $subtype = '' } #fix because pel is default and vars has no suffix
 
     $line .= "${SPACE}icontrol=0\n";
-    $line .= "${SPACE}open(namlst,file=bfm_init_fname${subtype},action='read',status='old',err=${num1})\n";
-    $line .= "${SPACE}read(namlst,nml=bfm_init_nml${subtype},err=${num2})\n";
-    $line .= "${SPACE}close(namlst)\n";
+    $line .= "${SPACE}open(NMLUNIT,file=bfm_init_fname${subtype},action='read',status='old',err=${num1})\n";
+    $line .= "${SPACE}read(NMLUNIT,nml=bfm_init_nml${subtype},err=${num2})\n";
+    $line .= "${SPACE}close(NMLUNIT)\n";
     $line .= "${SPACE}icontrol=1\n";
     $line .= "${num1} if ( icontrol == 0 ) then\n";
     $line .= "${SPACE}  LEVEL3 'I could not open ',trim(bfm_init_fname${subtype})\n";
@@ -1650,7 +1656,8 @@ sub func_INIT_INTERNAL {
             my @temp_line;
             foreach my $const (@constNoC){
                 if( exists ${$$LST_GROUP{$groupname}->getComponents()}{$const} ){
-                    push( @temp_line, "    " . $const . "=D" . $dim . "STATE" . $SUBTYPE . "(pp" . $groupname . "(i,ii" . uc($const) . "),:)" );
+                    push( @temp_line, "    " . $const . "=D" . $dim . "STATE" . $SUBTYPE . "(pp" . $groupname . "(i,ii" . uc($const) . "),:), " 
+                          . "pp" . $const . "=pp" . $groupname . "(i,ii" . uc($const) . ")" );
                 }
             }
             my @temp_line2;
