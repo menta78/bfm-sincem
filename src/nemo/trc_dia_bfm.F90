@@ -11,7 +11,7 @@
 !
 ! !USES:
    use oce_trc
-   use global_mem, only: RLEN, LOGUNIT, bfm_lwp
+   use global_mem, only: RLEN, LOGUNIT, bfm_lwp, SkipBFMCore
    use netcdf_bfm, only: save_bfm, close_ncdf, ncid_bfm
    use api_bfm,    only: out_delta, save_delta, time_delta, &
                          update_save_delta, unpad_out
@@ -90,7 +90,7 @@
       call CloseCO2()
 #endif
       ! clear main memory
-      call ClearMem
+      IF ( .NOT. SkipBFMCore ) call ClearMem
 
       LEVEL1 ' '
       LEVEL1 '-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'

@@ -10,7 +10,7 @@ MODULE trcstp
    !!----------------------------------------------------------------------
    USE oce_trc          ! ocean dynamics and active tracers variables
    USE api_bfm,    ONLY: bio_calc
-   USe global_mem, ONLY: LOGUNIT
+   USE global_mem, ONLY: LOGUNIT
    USE iom
    USE in_out_manager
    USE trcsub
@@ -54,7 +54,7 @@ CONTAINS
           IF( (nn_dttrc /= 1 ) .AND. (kt == nit000) ) THEN
              ! this is now done in trcini.F90. may not be necessary here
              !CALL trc_sub_ini                              ! Initialize variables for substepping passive tracers
-             CALL trc_bc_read( kt )                        ! Read initial Boundary Conditions
+             !CALL trc_bc_read( kt )                        ! Read initial Boundary Conditions
           ENDIF
 
           IF ( nn_dttrc /= 1 )     CALL trc_sub_stp( kt )                    ! Averaging physical variables for sub-stepping

@@ -185,7 +185,7 @@ CONTAINS
          CALL prt_ctl_trc_info(charout)
          CALL prt_ctl_trc(tab4d=trn, mask=tmask, clinfo=ctrcnm)
       ENDIF
-
+      IF( nn_timing == 1 )  CALL timing_stop('trc_nxt_bfm')
 
    END SUBROUTINE trc_nxt_bfm
 

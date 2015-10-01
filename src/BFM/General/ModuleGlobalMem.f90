@@ -59,14 +59,19 @@
   integer, parameter :: sp = selected_real_kind(6, 37)  ! real 4 (6 digits)
   integer, parameter :: dp = selected_real_kind(12,307) ! real 8 (12 digits)
   integer, parameter :: RLEN = dp                       ! default
-  integer, parameter :: NMLUNIT=310
-  ! the unit of the LOG file is not a parameter to allow parallel writing
-  integer               ::LOGUNIT=0
-  logical               ::bfm_lwp = .TRUE. ! logical writing for proc 0
   real(RLEN), parameter ::ZERO=0.0_RLEN
   real(RLEN), parameter ::ONE=1.0_RLEN
   real(RLEN), parameter ::PI=3.14159265359_RLEN
   real(RLEN), parameter ::BASETEMP= 10.0_RLEN
+  !=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  ! Control logical units for files I/O
+  logical               :: bfm_lwp = .TRUE. ! logical writing for proc 0
+  integer, parameter    :: bfm_file_FirstUnit = 1000
+  integer               :: LOGUNIT
+  integer               :: NMLUNIT
+  !=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  ! Control BFM coupling with ocean models (skip BFM is NO ocean points)
+  logical               :: SkipBFMCore = .FALSE.
   !=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Next parameters are defined to control types of State variables
   integer,    parameter ::OFF=-100

@@ -14,7 +14,7 @@
 !  a "no transport" simulation is prescribed.
 !
 ! !USES:
-   use global_mem, only: RLEN,LOGUNIT
+   use global_mem, only: RLEN,LOGUNIT,SkipBFMCore
    use constants,  only: SEC_PER_DAY
    use mem, only: D3STATE,D3SOURCE,NO_D3_BOX_STATES, &
                   D3STATETYPE,NO_BOXES
@@ -63,6 +63,11 @@
 !EOP
 !-----------------------------------------------------------------------
 !BOC
+
+   !---------------------------------------------
+   ! Skip BFM computation if no ocean points
+   !---------------------------------------------
+   IF ( SkipBFMCore ) return
 
    !---------------------------------------------
    ! Biological timestep 

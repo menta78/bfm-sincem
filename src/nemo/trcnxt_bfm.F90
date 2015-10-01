@@ -117,6 +117,7 @@ CONTAINS
             tra(:,:,jk,jn) = 0.
       END DO
 
+      IF( nn_timing == 1 )  CALL timing_stop('trc_nxt_bfm')
 
    END SUBROUTINE trc_nxt_bfm
 

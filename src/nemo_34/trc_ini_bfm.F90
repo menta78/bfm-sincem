@@ -18,7 +18,7 @@
    use mem, only: NO_D3_BOX_STATES, NO_BOXES,          &
                   NO_BOXES_X, NO_BOXES_Y, NO_BOXES_Z,  &
                   NO_BOXES_XY, NO_D3_BOX_DIAGNOSS,     &
-                  NO_STATES,Depth,D3STATE,EPR
+                  NO_STATES,Depth,D3STATE,EPR,D3STATETYPE
 #ifdef INCLUDE_BEN
    use mem, only: NO_D2_BOX_STATES_BEN, D2STATE_BEN, &
                   NO_BOXES_Z_BEN, NO_BOXES_BEN, NO_STATES_BEN
@@ -36,7 +36,7 @@
    use mem_CO2,    only: AtmCO2, AtmSLP, AtmTDP
 #endif
    use global_mem, only: RLEN,ZERO,LOGUNIT,NML_OPEN,NML_READ, &
-                         error_msg_prn,ONE, bfm_lwp
+                         error_msg_prn,ONE, bfm_lwp,NMLUNIT, SkipBFMCore
    use constants,  only: SEC_PER_DAY
    use api_bfm, only: ZEROS, SEAmask, BOTmask, SRFmask, &
         btmp1D, rtmp3Da, rtmp3Db, &
@@ -55,9 +55,8 @@
    USE trcnam_trp, only: ln_trczdf_exp,ln_trcadv_cen2,ln_trcadv_tvd
    use trc, only : ln_trc_sbc, ln_trc_ini, ln_trc_obc, ln_trc_cbc, &
         ln_top_euler, areatot, cvol, &
-        trn
-   use oce_trc, only : ln_qsr_bio, nn_dttrc, &
-        glob_sum
+        trn, nn_dttrc, ln_trcdmp
+   use oce_trc, only : ln_qsr_bio, glob_sum
    use iom_def, only:jpdom_data
    use par_oce, only: jpi, jpj, jpk, &
         jpnij, &
@@ -69,6 +68,7 @@
    use dom_oce
    use lib_mpp, only : lk_mpp, mpp_max, mpp_min
    use in_out_manager, only: numout, nitend, nit000, lwp
+   USE iom,   only: iom_close
 
    IMPLICIT NONE
 !
@@ -83,7 +83,6 @@
 
    integer    :: i,j,k,ll,m
    integer    :: status, yy, mm, dd, hh, nn
-   integer,parameter    :: namlst=10,unit=11
    !integer,allocatable  :: ocepoint(:),surfpoint(:),botpoint(:),msktmp(:,:)
    integer,allocatable  :: msktmp(:,:)
    logical,allocatable  :: mask1d(:)
@@ -258,7 +257,7 @@
    ! Initialise ancillary arrays for output
    ! (also parallel initialisation is done here)
    !---------------------------------------------
-   call init_bfm(namlst)
+   call init_bfm
 
    !---------------------------------------------
    ! Initialise state variable names and diagnostics
@@ -269,6 +268,18 @@
    ! Allocate memory and give homogeneous initial values
    !-------------------------------------------------------
    call init_var_bfm(bio_setup)
+
+   !---------------------------------------------
+   ! Disable BFM coupling if no oceanpoints are
+   ! available in the domain (only land!)
+   !---------------------------------------------
+   if (NO_BOXES == 0 ) then
+     SkipBFMCore = .TRUE.
+     write (LOGUNIT,'(a,1x,i8,1x,a)') 'No ocean point in core :', parallel_rank, &
+           '. Disable BFM core computation.'
+     ! set to zero nemo passive tracers array
+     trn(:,:,:,1) = ZERO
+   endif
 
    !---------------------------------------------
    ! Set output stepping
@@ -353,8 +364,7 @@
    deallocate(rtmp3Da)
    deallocate(rtmp3Db)
 
-!   IF( nb_trcdta > 0 .AND. .NOT.ln_trcdmp ) THEN
-   IF( nb_trcdta > 0 ) THEN
+   IF( nb_trcdta > 0 .AND. .NOT. ln_trcdmp ) THEN
       !==   deallocate data structure   ==! 
       !        data used only for initialisation)
       IF(lwp) WRITE(numout,*) 'trc_dta: deallocate data arrays as they are only used to initialize the run'

@@ -17,13 +17,13 @@
 
 !
 ! !USE:
-   use global_mem, only:RLEN,ZERO,bfm_lwp,LOGUNIT
+   use global_mem, only:RLEN,ZERO,bfm_lwp,LOGUNIT,NMLUNIT,bfm_file_FirstUnit
    use mem,        only:NO_D3_BOX_STATES
    implicit none
 
 !
 ! !PUBLIC MEMBER FUNCTIONS:
-   public init_bfm, find, update_save_delta, printDEBUG
+   public init_bfm, find, update_save_delta, printDEBUG, GetLun
 !
 ! !PUBLIC DATA MEMBERS:
    logical                            :: bio_calc,bioshade_feedback,bfm_rstctl
@@ -315,7 +315,7 @@ contains
 ! !IROUTINE: Initialise the bfm module
 !
 ! !INTERFACE:
-   subroutine init_bfm(namlst)
+   subroutine init_bfm
 !
 ! !DESCRIPTION:
 !
@@ -344,7 +344,6 @@ contains
    IMPLICIT NONE
 !
 ! !INPUT PARAMETERS:
-   integer, intent(in)                 :: namlst
 !
 ! !REVISION HISTORY:
 !  Original author(s): Marcello Vichi
@@ -391,10 +390,12 @@ contains
    !---------------------------------------------
    !  Open and read the namelist
    !---------------------------------------------
-   open(namlst,file='BFM_General.nml',action='read',status='old',err=99)
-   read(namlst,nml=bfm_nml,err=98)
-   close(namlst)
+   NMLUNIT=GetLun()
+   open(NMLUNIT,file='BFM_General.nml',action='read',status='old',err=99)
+   read(NMLUNIT,nml=bfm_nml,err=98)
+   close(NMLUNIT)
 
+   LOGUNIT=GetLun()
    tmpname = TRIM(out_fname)
 #ifdef BFM_PARALLEL
    parallel = .TRUE.
@@ -402,7 +403,6 @@ contains
    ! in the coupling with the ocean model 
    ! check if logs have to be produced for each process
    ! and provide a different log file name 
-   LOGUNIT = 1069 + parallel_rank
    write(str,'(I4.4)') parallel_rank
     if (parallel_log) then
        if (parallel_rank == 0) then
@@ -439,7 +439,6 @@ contains
    out_fname=TRIM(out_fname)//'_'//TRIM(thistime)//'_'//TRIM(bfmtime%date0)//'_'//TRIM(bfmtime%dateEnd)//'_bfm_'//str
 
 #else
-   LOGUNIT = 1069
    logfname = 'bfm.log'
    bfm_lwp = .TRUE.
    open(LOGUNIT,file=logfname,action='write',  &
@@ -697,7 +696,6 @@ contains
    end subroutine  update_save_delta
 !EOC
 
-
 !-----------------------------------------------------------------------
 !BOP
 !
@@ -747,7 +745,32 @@ contains
    end function find
 
 !EOC
-   
+!-------------------------------------------------------------------------!
+!BOP
+!
+! !ROUTINE:
+!
+! !INTERFACE:
+ integer function GetLun ()
+! adapted from Lionel, Shepherd, Clodius, Page, Drummond.
+! and others as posed at comp.lang.fortran on 1997-09-01
+      implicit none
+      logical :: exs, opn
+      integer :: i
+      getlun = -1  ! returned if no units are available.
+      i = bfm_file_FirstUnit
+ L1:  do
+        inquire (unit=i,exist=exs,opened=opn)
+          if (exs .and. .not. opn) then
+            getlun = i
+            exit L1
+          end if
+        i = i + 1
+      end do L1
+      return
+      stop "There are no free Fortran logical units available."
+ end function GetLun
+!EOP
 !-----------------------------------------------------------------------
 !BOP
 !

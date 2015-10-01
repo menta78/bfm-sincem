@@ -19,7 +19,7 @@
 
    use global_mem,  only:RLEN,ZERO,bfm_lwp,LOGUNIT
    use constants, only: SEC_PER_DAY
-   use api_bfm, ONLY: SRFindices
+   use api_bfm, ONLY: SRFindices, GetLun
    use time
    use netcdf
 
@@ -408,28 +408,7 @@
    ENDIF
 
    return
- end subroutine 
-!-------------------------------------------------------------------------!
-!-------------------------------------------------------------------------!
- integer function GetLun ()
-! adapted from Lionel, Shepherd, Clodius, Page, Drummond.
-! and others as posed at comp.lang.fortran on 1997-09-01
-      implicit none
-      logical :: exs, opn
-      integer :: i
-      getlun = -1  ! returned if no units are available.
-      i = 1000
- L1:  do 
-        inquire (unit=i,exist=exs,opened=opn)
-          if (exs .and. .not. opn) then
-            getlun = i
-            exit L1
-          end if
-        i = i + 1
-      end do L1
-      return
-      stop "There are no free Fortran logical units available."
- end function getlun
+ end subroutine FieldClose
 !-------------------------------------------------------------------------!
 !-------------------------------------------------------------------------!
  subroutine halftime(Year, Month, Day, Hour)
@@ -456,7 +435,7 @@
      ! correct Day value when Floor of # < 1 gives 0 (like 0.5)
      if (Day == 0) Day = 1
      return
- end subroutine 
+ end subroutine halftime
 !-------------------------------------------------------------------------!
 !EOC
 !-------------------------------------------------------------------------!

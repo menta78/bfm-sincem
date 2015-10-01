@@ -13,7 +13,7 @@
 !
 !
 ! !USES:
-   use global_mem, only:RLEN,LOGUNIT,NML_OPEN,NML_READ,error_msg_prn
+   use global_mem, only:RLEN,LOGUNIT,NML_OPEN,NML_READ,error_msg_prn,NMLUNIT
    use api_bfm
    use time
    use envforcing
@@ -71,10 +71,12 @@
        botdep_n    = 0.0
        botdep_p    = 0.0
        botdep_si   = 0.0
-       open(namlst,file='Standalone.nml',status='old',action='read', &
+
+       NMLUNIT = GetLun()
+       open(NMLUNIT,file='Standalone.nml',status='old',action='read', &
             err=100)
-       read(namlst,nml=forcings_nml,err=102)
-       close(namlst)
+       read(NMLUNIT,nml=forcings_nml,err=102)
+       close(NMLUNIT)
     select case (forcing_method)
     case (1) ! analytical forcings
     case (2) ! input data

@@ -73,7 +73,6 @@
 !
 ! !PRIVATE DATA MEMBERS:
    real(RLEN),parameter :: PI=3.14159265,RFACTOR=PI/180.
-   integer,parameter    :: namlst=10,unit=11
 
 !
 ! !REVISION HISTORY:
@@ -118,7 +117,8 @@
                   NO_BOXES_XY, NO_D2_BOX_DIAGNOSS, &
                   NO_D3_BOX_DIAGNOSS, NO_STATES, Depth, D3STATE
    use mem,  only: Volume, Area, Area2d
-   use global_mem, only:RLEN,LOGUNIT,NML_OPEN,NML_READ,error_msg_prn
+   use global_mem, only: RLEN, LOGUNIT, NML_OPEN, NML_READ, &
+                         error_msg_prn, NMLUNIT
    use api_bfm
    use netcdf_bfm, only: init_netcdf_bfm,init_save_bfm,&
                          init_netcdf_rst_bfm,read_rst_bfm
@@ -143,7 +143,7 @@
 !
 ! !LOCAL VARIABLES:
    namelist /standalone_nml/ nboxes,indepth,maxdelt,    &
-            mindelt,endtim,method,latitude,longitude
+            mindelt,method,latitude,longitude
    namelist /time_nml/ timefmt,MaxN,start,stop,simdays
 !
 ! !LOCAL VARIABLES:
@@ -174,13 +174,14 @@
    mindelt     = 1.0
    endtim      = 360.0
    method      = 1
-
-   open(namlst,file='Standalone.nml',status='old',action='read',err=100)
-   read(namlst,nml=standalone_nml,err=101)
-   close(namlst)
-   open(namlst,file='Standalone.nml',status='old',action='read',err=100)
-   read(namlst,nml=time_nml,err=103)
-   close(namlst)
+   
+   NMLUNIT = GetLun()
+   open(NMLUNIT,file='Standalone.nml',status='old',action='read',err=100)
+   read(NMLUNIT,nml=standalone_nml,err=101)
+   close(NMLUNIT)
+   open(NMLUNIT,file='Standalone.nml',status='old',action='read',err=100)
+   read(NMLUNIT,nml=time_nml,err=103)
+   close(NMLUNIT)
 
    !---------------------------------------------
    ! set the dimensions
@@ -266,7 +267,7 @@
    !---------------------------------------------
    ! Initialise the BFM with standalone settings
    !---------------------------------------------
-   call init_bfm(namlst)
+   call init_bfm
    !---------------------------------------------
    ! Initialise state variable names and diagnostics
    !---------------------------------------------

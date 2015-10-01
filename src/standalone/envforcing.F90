@@ -27,7 +27,6 @@
    ! forcing function parameters
    !---------------------------------------------
    integer,public            :: forcing_method = 1
-   integer,parameter,public  :: namlst=10,unit=11
    !---------------------------------------------
    ! Parameters for analytical forcings
    ! Note: all read from namelist
