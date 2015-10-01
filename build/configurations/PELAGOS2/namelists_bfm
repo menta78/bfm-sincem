@@ -863,6 +863,19 @@ p_paMEZ(2,:)=   0.0,    1.0
 /
 
 !-------------------------------------------------------------------------!
+!NAMELIST namtrc_ice 
+! tracer concentration in sea ice 
+!    =-1 (no vvl: identical cc in ice and ocean / vvl: cc_ice = 0)
+!    = 0 (no vvl: cc_ice = zero / vvl: cc_ice = )
+!    = 1 prescribed to a namelist value (implemented in pisces only)
+!-------------------------------------------------------------------------!
+!-----------------------------------------------------------------------
+&namtrc_ice
+   nn_ice_tr   =  -1        !  tracer concentration in sea ice
+        filename_nml_conf = 'namelist_top_cfg',
+/
+
+!-------------------------------------------------------------------------!
 !NAMELIST namtrc_trd
 !-------------------------------------------------------------------------!
 !   Not used with BFM
