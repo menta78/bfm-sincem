@@ -65,11 +65,6 @@
 !BOC
 
    !---------------------------------------------
-   ! Skip BFM computation if no ocean points
-   !---------------------------------------------
-   IF ( SkipBFMCore ) return
-
-   !---------------------------------------------
    ! Biological timestep 
    !---------------------------------------------
    delt  = rdt*real(nn_dttrc,RLEN)
@@ -78,6 +73,12 @@
    ! BFM internal time
    !--------------------------------------------- 
    bfmtime%stepnow  = bfmtime%stepnow + nn_dttrc
+
+   !---------------------------------------------
+   ! Skip BFM computation if no ocean points
+   !---------------------------------------------
+   IF ( SkipBFMCore ) return
+
    !---------------------------------------------
    ! Compute external forcing functions
    !---------------------------------------------

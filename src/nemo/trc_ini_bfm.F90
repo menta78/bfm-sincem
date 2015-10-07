@@ -46,7 +46,7 @@
         lat_len, lon_len, out_delta, out_fname, out_title, parallel_rank, &
         D3STATEB, D3STATE_tot, &
         find, update_save_delta, init_bfm, &
-        ocepoint, surfpoint, botpoint
+        ocepoint, surfpoint, botpoint, bio_calc
    use netcdf_bfm, only: init_netcdf_bfm,init_save_bfm
    use netcdf_bfm, only: read_rst_bfm,read_rst_bfm_glo
    use time,       only: bfmtime, julian_day, calendar_date
@@ -369,7 +369,9 @@
 
    !-------------------------------------------------------
    ! READ restart file(s) and overwrite previous initialisation
+   ! if oceanpoints are availables for this subdomain
    !-------------------------------------------------------
+   IF( .NOT. SkipBFMCore) THEN
    if (bfm_init == 1) call read_rst_bfm(in_rst_fname)
    if (bfm_init == 2) call read_rst_bfm_glo(in_rst_fname, narea, jpnij, &
         jpiglo, jpjglo, jpk, &
@@ -378,6 +380,9 @@
         nleit, nlejt, &
         nimppt, njmppt, &
         SEAmask )
+   ELSE
+      D3STATE(:,:) = ZERO
+   ENDIF
    !-------------------------------------------------------
    ! compute and report global statistics in bfm.log
    !-------------------------------------------------------
@@ -496,6 +501,10 @@
    LEVEL1 '               EXPERIMENT START                '
    LEVEL1 '-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'
    LEVEL1 ' '
+
+   if ( .NOT. bio_calc ) then
+     LEVEL1 ' BFM is not active (bio_calc = .false. )'
+   endif
 
    return
 
