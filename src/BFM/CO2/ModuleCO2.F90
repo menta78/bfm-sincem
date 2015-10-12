@@ -88,6 +88,8 @@
   !                                                        -> atomic weight = 40.078 g / mol
   !                                 therefore, concentration = 10.279 mmol / l = 10.279 mol / m3
   ! Canorm          logical         Normalize Calcium ion concentration by sea water salinity
+  ! p_kdca          [d-1]           Calcite dissolution rate constant
+  ! p_nomega        [-]             Order of the dissolution rate dependence on Omega
   !              ---------  EXTERNAL DATA INPUT STRUCTURES -----------
   ! AtmCO2_N       structure        Read external data for atmospheric CO2 values
   ! AtmSLP_N       structure        Read external data for atmospheric sea level pressure
@@ -119,6 +121,8 @@
    integer      :: phscale = SWS
    real(RLEN)   :: Caconc0 = 10.279E0
    logical      :: Canorm = .TRUE.
+   real(RLEN)   :: p_kdca
+   integer      :: p_nomega
    logical      :: CalcBioAlkFlag = .FALSE.
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! SHARED PUBLIC FUNCTIONS (must be explicited below "contains")
@@ -141,7 +145,7 @@
     namelist /CO2_parameters/ AtmCO20,calcAtmpCO2,pCO2Method,K1K2,MethodCalcCO2,     &
                               phscale,phstart,M2XACC,M2PHDELT,M2MAXIT,         &
                               Caconc0,Canorm,AtmCO2_N,AtmSLP_N,AtmTDP_N, &
-                              CalcBioAlkFlag
+                              p_kdca, p_nomega, CalcBioAlkFlag
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   integer            ::error=0
   !---------------------------------------------------------------------------
@@ -227,7 +231,7 @@
          if (AtmSLP%init .eq. 2 ) &
             write(LOGUNIT,*) 'BFM reads atmospheric SLP from file: ', AtmSLP_N%filename
          if (AtmSLP%init .eq. 4 ) &
-            write(LOGUNIT,*) 'BFM receives atmospheric SLP from coupled model, using sbc forcing for O3h (TA)'
+            write(LOGUNIT,*) 'BFM receives atmospheric SLP from coupled model (see env_forcing)'
          write(LOGUNIT,*) ' '
        endif
 
@@ -237,7 +241,7 @@
          if (AtmTDP%init .eq. 2 ) &
             write(LOGUNIT,*) 'BFM reads Dew Point Temperature from file: ', AtmTDP_N%filename
          if (AtmTDP%init .eq. 4 ) &
-            write(LOGUNIT,*) 'BFM receives Dew Point Temperature from coupled model, using sbc forcing for N6r (Red. Equival.)'
+            write(LOGUNIT,*) 'BFM receives Dew Point Temperature from coupled model (see env_forcing)'
          write(LOGUNIT,*) ' '
        else
           pCO2Method = 1
