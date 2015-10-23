@@ -1,0 +1,187 @@
+#include "cppdefs.h"
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL
+!	   BFM - Biogeochemical Flux Model verion 2.0
+!
+! SUBROUTINE
+!   Ecology
+!
+! FILE
+!   Ecology
+!
+! DESCRIPTION
+!   %single%
+!	This submodel calls all other submodels
+!
+!
+!  
+!   This file is generated directly from OpenSesame model code, using a code 
+!   generator which transposes from the sesame meta language into F90.
+!   F90 code generator written by P. Ruardij
+!   structure of the code based on ideas of M. Vichi.
+!
+! AUTHORS
+!   ERSEM team	
+!
+!
+!
+! CHANGE_LOG
+!   !
+!
+! COPYING
+!   Copyright (C) 2004 P. Ruardij, the mfstep group, the ERSEM team 
+!   (rua@nioz.nl, vichi@bo.ingv.it)
+!
+!   This program is free software; you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation;
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+!   GNU General Public License for more details.
+!
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+!
+subroutine BFM0D_Output_EcologyDynamics(BFM0D_tra, BFM0D_sed, local_BFM0D_dia)
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! The following global constants are used: RLEN
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Modules (use of ONLY is strongly encouraged!)
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  use global_mem, ONLY:RLEN
+  use mem
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Implicit typing is never allowed
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  IMPLICIT NONE
+  real(RLEN), intent(out) :: BFM0D_sed( iiPhytoPlankton )
+  real(RLEN), intent(out) :: BFM0D_tra( NO_D3_BOX_STATES )
+  INTEGER, parameter :: jptra_var = %3d-diagnos-pel-nr
+  INTEGER, parameter :: jptra_flux = %3d-flux-pel-nr
+      
+  INTEGER, parameter :: jptra_dia = jptra_var + jptra_flux
+  real(RLEN), intent(out) :: local_BFM0D_dia(jptra_dia) 
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Local Variables
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  integer i
+
+  DO i=1,NO_D3_BOX_STATES
+     BFM0D_tra(i) = D3SOURCE(i,1)
+!    LEVEL1 'BFM0D_Output_EcologyDynamics:D3SOURCE(',i,')', D3SOURCE(i,1)
+  END DO
+
+  ! Sinking Velocity for Phytoplankton
+  BFM0D_sed(:) = sediPPY(:,1)
+!    LEVEL1 'BFM0D_Output_EcologyDynamics:BFM0D_sed', sediPPY(:,1)
+
+  local_BFM0D_dia = 0;
+
+  %3d-flux-coupled
+
+
+end subroutine BFM0D_Output_EcologyDynamics
+
+
+
+
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL
+!	   BFM - Biogeochemical Flux Model verion 2.0
+!
+! SUBROUTINE
+!   Ecology
+!
+! FILE
+!   Ecology
+!
+! DESCRIPTION
+!   %single%
+!	This submodel calls all other submodels
+!
+!
+!  
+!   This file is generated directly from OpenSesame model code, using a code 
+!   generator which transposes from the sesame meta language into F90.
+!   F90 code generator written by P. Ruardij
+!   structure of the code based on ideas of M. Vichi.
+!
+! AUTHORS
+!   ERSEM team	
+!
+!
+!
+! CHANGE_LOG
+!   !
+!
+! COPYING
+!   Copyright (C) 2004 P. Ruardij, the mfstep group, the ERSEM team 
+!   (rua@nioz.nl, vichi@bo.ingv.it)
+!
+!   This program is free software; you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation;
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+!   GNU General Public License for more details.
+!
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+!
+subroutine BFM0D_Output_EcologyDynamics_surf(BFM0D_tra, BFM0D_sed, local_BFM0D_dia,local_BFM0D_dia2D)
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! The following global constants are used: RLEN
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Modules (use of ONLY is strongly encouraged!)
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  use global_mem, ONLY:RLEN
+  use mem
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Implicit typing is never allowed
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  IMPLICIT NONE
+  real(RLEN), intent(out) :: BFM0D_sed( iiPhytoPlankton )
+  real(RLEN), intent(out) :: BFM0D_tra( NO_D3_BOX_STATES )
+  INTEGER, parameter :: jptra_var = %3d-diagnos-pel-nr
+  INTEGER, parameter :: jptra_flux = %3d-flux-pel-nr
+      
+  INTEGER, parameter :: jptra_dia = jptra_var + jptra_flux
+  INTEGER, parameter :: jptra_dia_2d_bfm = %2d-diagnos-pel-nr
+  INTEGER, parameter :: jptra = %3d-state-pel-nr
+  INTEGER, parameter :: jptra_dia_2d = jptra_dia_2d_bfm - 3*jptra  ! (surf,bot,riv)
+  real(RLEN), intent(out) :: local_BFM0D_dia2d(jptra_dia_2d)
+  real(RLEN), intent(out) :: local_BFM0D_dia(jptra_dia) 
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Local Variables
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  integer i
+
+  DO i=1,NO_D3_BOX_STATES
+     BFM0D_tra(i) = D3SOURCE(i,1)
+!    LEVEL1 'BFM0D_Output_EcologyDynamics_surf:D3SOURCE(',i,')', D3SOURCE(i,1)
+  END DO
+
+  ! Sinking Velocity for Phytoplankton
+  BFM0D_sed(:) = sediPPY(:,1)
+!    LEVEL1 'BFM0D_Output_EcologyDynamics_surf:BFM0D_sed', sediPPY(:,1)
+
+  local_BFM0D_dia = 0;
+
+  %3d-flux-coupled
+  
+  local_BFM0D_dia2d = 0; 
+  
+  %2d-flux-coupled
+
+end subroutine BFM0D_Output_EcologyDynamics_surf
+

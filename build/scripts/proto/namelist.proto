@@ -1,0 +1,14 @@
+
+&NATTRC
+   %3d-state-pel-string-ogstm
+/
+
+&NATTRC_DIAG   
+   %3d-diagnos-pel-string-ogstm
+/
+
+&NATTRC_DIAG_2D
+  %2d-diagnos-pel-string-ogstm
+/
+
+

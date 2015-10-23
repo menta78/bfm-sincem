@@ -1,0 +1,20 @@
+      INTEGER, parameter :: jptra = %3d-state-pel-nr
+      INTEGER, parameter :: jptra_var = %3d-diagnos-pel-nr
+      INTEGER, parameter :: jptra_flux = %3d-flux-pel-nr      
+      INTEGER, parameter :: jptra_dia = jptra_var + jptra_flux
+       
+      INTEGER, parameter :: jptra_dia_2d_bfm = %2d-diagnos-pel-nr
+      INTEGER, parameter :: jptra_dia_2d = jptra_dia_2d_bfm - 3*jptra  ! (surf,bot,riv)
+ 
+C State variables
+
+        integer,parameter :: %3d-state-pel-pp
+
+C       diagnostic indexes
+        integer,parameter :: %3d-total-diagnos-pel-pp
+
+c       flux indexes
+        integer, parameter:: %3d-flux-pel-pp
+
+c       variables 2d
+        integer, parameter:: %2d-diagnos-pel-pp       

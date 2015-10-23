@@ -140,12 +140,12 @@
   ! Check also Settling.F90
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   sediR2(:)     = ZERO
-  sediR2(BOTindices) = ZERO
+  if(BOTindices(1) .NE.0) sediR2(BOTindices) = ZERO
   sediR6(:)  =   p_rR6m
-  sediR6(BOTindices) = p_burvel_R6
+  if(BOTindices(1) .NE.0) sediR6(BOTindices) = p_burvel_R6
   do i = 1 , ( iiPhytoPlankton)
     sediPPY(i,:)  =   p_rPIm( i)
-    sediPPY(i,BOTindices)  =   p_burvel_PI
+    if(BOTindices(1) .NE.0) sediPPY(i,BOTindices)  =   p_burvel_PI
   end do
 
   end subroutine PelGlobalDynamics

@@ -126,6 +126,8 @@ IMPLICIT NONE
        if (AllocStatus  /= 0) stop "error allocating ScRatio"
     end if
 
+    if (SRFindices(1) .EQ. 0 )  return
+
     temp = ETW(SRFindices)
     salt = ESW(SRFindices)
     wind = EWIND(:)
