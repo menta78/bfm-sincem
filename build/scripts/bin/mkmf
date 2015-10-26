@@ -456,6 +456,7 @@ print MAKEFILE "tags: \$(SRC)\n\tctags \$(SRC)\n";
 ( $name, $path, $suffix ) = fileparse( $opt_p, @tgt_suffixes );
 if( $suffix eq '.a' ) {
    print MAKEFILE "$opt_p: \$(OBJ)\n\t\$(AR) \$(ARFLAGS) $opt_p \$(OBJ)\n";
+   print MAKEFILE "\tcp *mod ../../../include \n";
 } else {
 # opt_l is a new flag added to take care of libraries
    print MAKEFILE "$opt_p: \$(OBJ) $opt_l\n\t\$(LD) \$(OBJ) -o $opt_p $opt_l \$(LDFLAGS)\n";
