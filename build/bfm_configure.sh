@@ -18,7 +18,6 @@
 #   but WITHOUT ANY WARRANTY; without even the implied warranty of
 #   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #   GNU General Public License for more details.
-
 # -----------------------------------------------------
 
 #logging configuration
@@ -164,7 +163,7 @@ exec &> ${LOGDIR}/${LOGFILE}.pipe
 rm ${LOGDIR}/${LOGFILE}.pipe
 
 #get user options from commandline
-while getopts "hvgcdPp:m:k:N:S:a:fx:F:i:D:e:V:r:q:o:" opt; do
+while getopts "hvgcdPp:m:k:N:S:a:fx:F:i:D:e:V:r:q:o:R:" opt; do
     case $opt in
       h ) usage;            rm ${LOGDIR}/${LOGFILE}         ; exit             ;;
       v )                   echo "verbose mode"             ; VERBOSE=1        ;;
@@ -398,11 +397,15 @@ if [ ${GEN} ]; then
         fi
 
     elif [[ "$MODE" == "NEMO" || "$MODE" == "NEMO_3DVAR" ]]; then 
-        #Generate NEMO configuration with subdirs and copy cpp
+        #Generate NEMO configuration with subdirs
         if [ ! -d ${NEMODIR}/NEMOGCM/CONFIG/${PRESET} ]; then
             if [ "$NEMOSUB" ] ; then
                 ${NEMODIR}/NEMOGCM/CONFIG/${cmd_mknemo} -j0 -n ${PRESET} -m ${ARCH} -d "${NEMOSUB}"
-                cp "${presetdir}/cpp_${PRESET}.fcm" "${NEMODIR}/NEMOGCM/CONFIG/${PRESET}"
+	
+                if [ ! -f "${presetdir}/cpp_${PRESET}.fcm" ]; then
+                    echo "ERROR: cpp_${PRESET}.fcm must exist in ${presetdir}" 
+                    exit
+                fi
             else
                 echo "ERROR: NEMO configuration not exists. If you want to create a NEMO configuration, you have to specify NEMOSUB option"
                 echo ${ERROR_MSG}
@@ -410,6 +413,10 @@ if [ ${GEN} ]; then
             fi
         fi
 
+        #if cpp_PRESET exists in configuration folder => copy to nemo preset folder
+        if [ -f "${presetdir}/cpp_${PRESET}.fcm" ]; then 
+            cp "${presetdir}/cpp_${PRESET}.fcm" "${NEMODIR}/NEMOGCM/CONFIG/${PRESET}"
+        fi
         #substitute BFM/src/nemo path in cpp according to the version
         [ ${VERBOSE} ] && echo "Changing nemo version to: \"$VER\""
         sed -ie "s;inc.*;inc \$BFMDIR/src/nemo${VER}/bfm\.fcm;" ${NEMODIR}/NEMOGCM/CONFIG/${PRESET}/cpp_${PRESET}.fcm
