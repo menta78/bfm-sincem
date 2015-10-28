@@ -9,7 +9,7 @@
 #
 # COPYING
 #  
-#   Copyright (C) 2013 BFM System Team ( bfm_st@lists.cmcc.it )
+#   Copyright (C) 2015 BFM System Team ( bfm_st@lists.cmcc.it )
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 #   but WITHOUT ANY WARRANTY; without even the implied warranty of
 #   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #   GNU General Public License for more details.
+
 # -----------------------------------------------------
 
 #logging configuration
