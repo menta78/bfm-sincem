@@ -101,6 +101,7 @@ DESCRIPTION
                   Mode for compilation and deployment. Available models are: (Default: "STANDALONE")
                   - STANDALONE (without NEMO. Compile and run in local machine)
                   - POM1D
+                  - OGS
                   - NEMO (with NEMO)
                   - NEMO_3DVAR (with NEMO and 3DVAR)
        -k CPPDEFS
@@ -162,7 +163,7 @@ exec &> ${LOGDIR}/${LOGFILE}.pipe
 rm ${LOGDIR}/${LOGFILE}.pipe
 
 #get user options from commandline
-while getopts "hvgcdPp:m:k:N:S:a:fx:F:i:D:e:V:r:q:o:R:" opt; do
+while getopts "hvgcdPp:m:k:N:S:a:fx:F:i:D:e:V:r:q:o:" opt; do
     case $opt in
       h ) usage;            rm ${LOGDIR}/${LOGFILE}         ; exit             ;;
       v )                   echo "verbose mode"             ; VERBOSE=1        ;;
@@ -263,8 +264,8 @@ if [[ ! $NEMODIR && ( "$MODE" == "NEMO" || "$MODE" == "NEMO_3DVAR" ) ]]; then
     echo ${ERROR_MSG}
     exit
 fi
-if [[ "$MODE" != "STANDALONE" && "$MODE" != "POM1D" && "$MODE" != "NEMO" && "$MODE" != "NEMO_3DVAR" ]]; then 
-    echo "ERROR: MODE value not valid ($MODE). Available values are: STANDALONE or POM1D or NEMO or NEMO_3DVAR."
+if [[ "$MODE" != "STANDALONE" && "$MODE" != "POM1D" && "$MODE" != "OGS" && "$MODE" != "NEMO" && "$MODE" != "NEMO_3DVAR" ]]; then 
+    echo "ERROR: MODE value not valid ($MODE). Available values are: STANDALONE or OGS or POM1D or NEMO or NEMO_3DVAR."
     echo ${ERROR_MSG}
     exit
 fi
@@ -321,14 +322,17 @@ if [ ${GEN} ]; then
     fi
 
 
-    if [[ ${MODE} == "STANDALONE" || "$MODE" == "POM1D" ]]; then
+    if [[ ${MODE} == "STANDALONE" || "$MODE" == "POM1D"  || "$MODE" == "OGS" ]]; then
         # list files
         find ${BFMDIR}/src/BFM/General -name "*.?90" -print > BFM.lst
         if [[ ${MODE} == "STANDALONE" ]]; then
             find ${BFMDIR}/src/standalone -name "*.?90" -print >> BFM.lst
-        else
+        elif [[ ${MODE} == "POM1D" ]]; then
             find ${BFMDIR}/src/pom -name "*.?90"  -print >> BFM.lst
             find ${BFMDIR}/src/pom -name "*.[fF]" -print >> BFM.lst
+        elif [[ ${MODE} == "OGS" ]]; then
+            find ${BFMDIR}/src/standalone -name "*.?90" -print >> BFM.lst
+            find ${BFMDIR}/src/ogstm -name "*.?90"  -print >> BFM.lst
         fi
         find ${BFMDIR}/src/share -name "*.?90" -print >> BFM.lst
         find ${BFMDIR}/src/BFM/Pel -name "*.?90" -print >> BFM.lst
@@ -380,15 +384,24 @@ if [ ${GEN} ]; then
         mv ${BFMDIR}/src/BFM/General/init_var_bfm.F90 ${BFMDIR}/src/share
         cp ${blddir}/init_var_bfm.F90 ${BFMDIR}/src/share
         cp ${blddir}/INCLUDE.h ${BFMDIR}/src/BFM/include
+
+        if [[ "$MODE" == "OGS" ]]; then
+            gcc -cpp "${cppdefs}" -E ${BFMDIR}/build/scripts/proto/BFM_module_list.proto.F \
+                | grep -v "#" \
+                > ${BFMDIR}/include/BFM_module_list.h
+            rm -f ${BFMDIR}/src/ogstm/proto/BFM_module_list.proto.s
+            sed ':a;N;$!ba;s/, \&\n/,  /g' ${blddir}/BFM_var_list.h | sed -e "s/,    /,\n     \& /g" > ${BFMDIR}/include/BFM_var_list.h
+            #cp ${blddir}/BFM_var_list.h ${BFMDIR}/include/
+            mkdir -p ${BFMDIR}/namelists
+            cp ${BFMDIR}/build/tmp/${PRESET}/*.nml ${BFMDIR}/namelists
+        fi
+
     elif [[ "$MODE" == "NEMO" || "$MODE" == "NEMO_3DVAR" ]]; then 
-        #Generate NEMO configuration with subdirs
+        #Generate NEMO configuration with subdirs and copy cpp
         if [ ! -d ${NEMODIR}/NEMOGCM/CONFIG/${PRESET} ]; then
             if [ "$NEMOSUB" ] ; then
                 ${NEMODIR}/NEMOGCM/CONFIG/${cmd_mknemo} -j0 -n ${PRESET} -m ${ARCH} -d "${NEMOSUB}"
-                if [ ! -f "${presetdir}/cpp_${PRESET}.fcm" ]; then 
-                    echo "ERROR: cpp_${PRESET}.fcm must exist in ${presetdir}" 
-                    exit
-                fi
+                cp "${presetdir}/cpp_${PRESET}.fcm" "${NEMODIR}/NEMOGCM/CONFIG/${PRESET}"
             else
                 echo "ERROR: NEMO configuration not exists. If you want to create a NEMO configuration, you have to specify NEMOSUB option"
                 echo ${ERROR_MSG}
@@ -396,10 +409,6 @@ if [ ${GEN} ]; then
             fi
         fi
 
-        #if cpp_PRESET exists in configuration folder => copy to nemo preset folder
-        if [ -f "${presetdir}/cpp_${PRESET}.fcm" ]; then 
-            cp "${presetdir}/cpp_${PRESET}.fcm" "${NEMODIR}/NEMOGCM/CONFIG/${PRESET}"
-        fi
         #substitute BFM/src/nemo path in cpp according to the version
         [ ${VERBOSE} ] && echo "Changing nemo version to: \"$VER\""
         sed -ie "s;inc.*;inc \$BFMDIR/src/nemo${VER}/bfm\.fcm;" ${NEMODIR}/NEMOGCM/CONFIG/${PRESET}/cpp_${PRESET}.fcm
@@ -444,7 +453,7 @@ if [ ${CMP} ]; then
     fi
     cd ${blddir}
 
-    if [[ ${MODE} == "STANDALONE" || "$MODE" == "POM1D" ]]; then
+    if [[ ${MODE} == "STANDALONE" || "$MODE" == "POM1D"  || "$MODE" == "OGS" ]]; then
         if [ ${CLEAN} == 1 ]; then
             [ ${VERBOSE} ] && echo "Cleaning up ${PRESET}..."
             [ ${VERBOSE} ] && echo "Command: ${cmd_gmake} clean"
@@ -546,7 +555,7 @@ if [ ${DEP} ]; then
     fi
 
     #Copy executable and insert exe and valgrind commands
-    if [[ ${MODE} == "STANDALONE" || "$MODE" == "POM1D" ]]; then
+    if [[ ${MODE} == "STANDALONE" || "$MODE" == "POM1D"  || "$MODE" == "OGS" ]]; then
         ln -sf ${BFMDIR}/bin/${BFMEXE} ${exedir}/${BFMEXE}
         if [ "${EXECMD}" ]; then 
             execmd="${EXECMD} ${VALGRIND} ./${BFMEXE}"

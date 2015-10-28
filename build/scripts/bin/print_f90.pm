@@ -57,27 +57,28 @@ my $dispatch = {
     #COMMENT LINE FOR DEVELOPERS
     '\%\!.*' => \&func_COMMENT,
     #DESCRIPTION
-    '\%(3|2)d-(diagnos|state)-(pel|ben|ice)-desc(?:\s|\n)'=> \&func_DESC ,
-    '\%(3|2)d-(diaggrp)-(pel|ben|ice)-desc(?:\s|\n)' => \&func_DESC_DIAGG ,
+    '\%(3|2)d-(diagnos|state)-(pel|ben|ice)-desc(?:\s|\n)' => \&func_DESC ,
+    '\%(3|2)d-(diaggrp)-(pel|ben|ice)-desc(?:\s|\n)'       => \&func_DESC_DIAGG ,
     #NR
-    '([^\%]*)\%(3|2)d-(flux|diagnos|state)-(pel|ben|ice)-nr(?:\s|\n)'=> \&func_NR ,
+    '([^\%]*)\%(3|2)d-(flux|diagnos|state)-(pel|ben|ice)-nr(?:\s|\n)' => \&func_NR ,
     #ARRAY
-    '([^\%]*)\%(pel|ben|ice)-field-array\s*(\S*)(?:\s|\n)'=> \&func_ARRAY_FIELD ,
+    '([^\%]*)\%(pel|ben|ice)-field-array\s*(\S*)(?:\s|\n)' => \&func_ARRAY_FIELD ,
     #PP
-    '([^\%]*)\%(3|2)d-(diagnos|state)-(pel|ben|ice)-pp(?:\s|\n)'=> \&func_PP ,
-    '([^\%]*)\%(3|2)d-(diaggrp)-(pel|ben|ice)-pp(?:\s|\n)'=>       \&func_PP_DIAGG ,
-    '\%(3|2)d-(diaggrp)-(pel|ben|ice)-assign-pp(?:\s|\n)'=>        \&func_PP_ASSIGN ,
+    '([^\%]*)\%(3|2)d-(diagnos|state|flux)-(pel|ben|ice)-pp(?:\s|\n)' => \&func_PP ,
+    '([^\%]*)\%(3)d-total-(diagnos)-(pel)-pp(?:\s|\n)'                => \&func_PP_TOTAL_DIAGNOS,
+    '([^\%]*)\%(3|2)d-(diaggrp)-(pel|ben|ice)-pp(?:\s|\n)'            => \&func_PP_DIAGG ,
+    '\%(3|2)d-(diaggrp)-(pel|ben|ice)-assign-pp(?:\s|\n)'             => \&func_PP_ASSIGN ,
     #POINTER
-    '\%(3|2)d-(diagnos|state)-(pel|ben|ice)-pointer(?:\s|\n)'=>    \&func_POINT ,
-    '([^\%]*)\%(3|2)d-(diaggrp)-(pel|ben|ice)-pointer(?:\s|\n)'=>    \&func_POINT_DIAGG ,
-    '([^\%]*)\%(pel|ben|ice)-field-pointer\s*(\S*)(?:\s|\n)'=>    \&func_POINT_FIELD ,
-    '\%(3|2)d-(diagnos|state)-(pel|ben|ice)-alloc-pointer(?:\s|\n)' =>    \&func_POINT_ALLOC ,
-    '\%(3|2)d-(diaggrp)-(pel|ben|ice)-alloc-pointer(?:\s|\n)' =>    \&func_POINT_ALLOC_DIAGG ,
-    '\%(pel|ben|ice)-alloc-pointer-field\s*(\S*)(?:\s|\n)' =>    \&func_POINT_ALLOC_FIELD ,
+    '\%(3|2)d-(diagnos|state)-(pel|ben|ice)-pointer(?:\s|\n)'       => \&func_POINT ,
+    '([^\%]*)\%(3|2)d-(diaggrp)-(pel|ben|ice)-pointer(?:\s|\n)'     => \&func_POINT_DIAGG ,
+    '([^\%]*)\%(pel|ben|ice)-field-pointer\s*(\S*)(?:\s|\n)'        => \&func_POINT_FIELD ,
+    '\%(3|2)d-(diagnos|state)-(pel|ben|ice)-alloc-pointer(?:\s|\n)' => \&func_POINT_ALLOC ,
+    '\%(3|2)d-(diaggrp)-(pel|ben|ice)-alloc-pointer(?:\s|\n)'       => \&func_POINT_ALLOC_DIAGG ,
+    '\%(pel|ben|ice)-alloc-pointer-field\s*(\S*)(?:\s|\n)'          => \&func_POINT_ALLOC_FIELD ,
     #HEADER
-    '\%(3|2)d-(diagnos|state)-(pel|ben|ice)-header(?:\s|\n)' =>    \&func_HEADER ,
-    '\%(3|2)d-(diaggrp)-(pel|ben|ice)-header(?:\s|\n)' =>    \&func_HEADER_DIAGG ,
-    '\%(pel|ben|ice)-field-header\s*(\S*)(?:\s|\n)' =>    \&func_HEADER_FIELD ,
+    '\%(3|2)d-(diagnos|state)-(pel|ben|ice)-header(?:\s|\n)' => \&func_HEADER ,
+    '\%(3|2)d-(diaggrp)-(pel|ben|ice)-header(?:\s|\n)'       => \&func_HEADER_DIAGG ,
+    '\%(pel|ben|ice)-field-header\s*(\S*)(?:\s|\n)'          => \&func_HEADER_FIELD ,
     #STRING
     '\%(3|2)d-(diagnos|state|flux)-(pel|ben|ice)-string(?:\s|\n)'       => \&func_STRING ,
     '\%(3|2)d-(diaggrp)-(pel|ben|ice)-string(?:\s|\n)'                  => \&func_STRING_DIAGG ,
@@ -85,12 +86,13 @@ my $dispatch = {
     '\%(3|2)d-(diagnos|state|flux)-(pel|ben|ice)-string-index(?:\s|\n)' => \&func_STRING_INDEX ,
     '\%(pel|ben|ice)-string-index-field\s*(\S*)(?:\s|\n)'               => \&func_STRING_INDEX_FIELD ,
     '\%startend-string-index\s*(\S*)(?:\s|\n)'                          => \&func_STRING_INDEX_STARTEND ,
+    '\%(3|2)d-(diagnos|state|flux)-(pel|ben|ice)-string-ogstm(?:\s|\n)' => \&func_STRING_OGSTM,
     #ALLOC
-    '\%(3|2)d-(diagnos|state)-(pel|ben|ice)-alloc(?:\s|\n)' => \&func_ALLOC ,
-    '\%(1|3|2)d-(intvar|variable|variables)-(pel|ben|ice)-alloc(?:\s|\n)'=>    \&func_ALLOC_INTVAR ,
+    '\%(3|2)d-(diagnos|state)-(pel|ben|ice)-alloc(?:\s|\n)'               => \&func_ALLOC ,
+    '\%(1|3|2)d-(intvar|variable|variables)-(pel|ben|ice)-alloc(?:\s|\n)' => \&func_ALLOC_INTVAR ,
     #FLUX
     '\%(3|2)d-(flux)-(pel|ben|ice)-alloc(?:\s|\n)' => \&func_FLUX_ALLOC ,
-    '\%(3|2)d-(flux)-(pel|ben|ice)-fill(?:\s|\n)' => \&func_FLUX_FILL ,
+    '\%(3|2)d-(flux)-(pel|ben|ice)-fill(?:\s|\n)'  => \&func_FLUX_FILL ,
     #CONSTITUENT
     '([^\%]*)\%constituent(?:\s|\n)' => \&func_CONSTITUENT ,
     #GROUP    
@@ -104,7 +106,6 @@ my $dispatch = {
     #INIT
     '([^\%]*)\%value-init-calc-(pel|ben|ice)\s*(\S*)(?:\s|\n)' => \&func_INIT_VALUE_CALC ,
     '([^\%]*)\%(3|2)d-(state)-(pel|ben|ice)-Initpp(?:\s|\n)'   => \&func_INIT_PP ,
-    '\%init-ratiodefault-constituents(?:\s|\n)'                => \&func_INIT_RATIO_CONST ,
     '\%init-func-constituents(?:\s|\n)'                        => \&func_INIT_FUNC_CONST ,
     '\%init-(pel|ben|ice)-namelist\s*(\d*)\s*(\d*)(?:\s|\n)'   => \&func_INIT_NAMELIST ,
     '\%(3|2)d-init-(pel|ben|ice)-output-variables(?:\s|\n)'    => \&func_INIT_OUTPUT_VARIABLES ,
@@ -112,6 +113,8 @@ my $dispatch = {
     '\%(3|2)d-(state)-(pel|ben|ice)-InitSets(?:\s|\n)'         => \&func_INIT_SETS ,
     '\%(3|2)d-(state)-(pel|ben|ice)-InitInternal(?:\s|\n)'     => \&func_INIT_INTERNAL ,
     '\%(3|2)d-state-(pel|ben|ice)-func-zeroing(?:\s|\n)'       => \&func_INIT_FUNC_ZERO ,
+    #COUPLING
+    '\%(3|2)d-flux-coupled(?:\s|\n)'                           => \&func_FLUX_COUPLED ,
 };
 ########### REGULAR EXPRESSIONS ##########################
 
@@ -374,6 +377,69 @@ sub func_POINT_ALLOC  {
 
     if( $line ){ print $file $line; }
 }
+
+sub func_PP_TOTAL_DIAGNOS  {
+    my ( $file, $before, $dim, $type, $subt ) = @_;
+    if ( $DEBUG ){ print "AllocateMem -> FUNCTION CALLED func_PP_TOTAL_DIAGNOS: "; }
+    
+    my $TYPE = uc($type);
+
+    #calculate lenght
+    my $len=0;
+    my $index_group = 1;
+
+    my @line_par = ();
+
+    if( ! checkDimType($dim, $type, $subt)  ){ return; }
+
+    foreach my $name ( sort { $$LST_PARAM{$a}->getIndex() cmp $$LST_PARAM{$b}->getIndex() } keys %$LST_PARAM ){
+        my $param   = $$LST_PARAM{$name};
+        if( $dim == $param->getDim() 
+            && $type eq $param->getType() 
+            && $subt eq $param->getSubtype() ){
+            
+            if( $param->getComponents() && keys(%{$param->getComponents()}) != 0 ){
+                foreach my $const ( sort { $$LST_CONST{$a} cmp $$LST_CONST{$b} } keys %$LST_CONST ){
+                    if( exists ${$param->getComponents()}{$const} ){
+                        my $nameC = $name . $const;
+                        push( @line_par, "pp${nameC}=".$index_group++ );
+                    }
+                }
+                if( $param->getComponentsEx() && keys(%{$param->getComponentsEx()}) != 0 ){
+                    foreach my $const ( sort { $$LST_CONST{$a} cmp $$LST_CONST{$b} } keys %$LST_CONST ){
+                        if( exists ${$param->getComponentsEx()}{$const} ){
+                            my $nameC = $name . $const;
+                            push( @line_par, "pp${nameC}=0" );
+                        }
+                    }
+                }
+            }else{
+                push( @line_par, "pp${name}=".$index_group++);
+            }
+        }
+    }
+
+
+    #foreach my $root (sort keys %$LST_PARAM){
+    foreach my $root ( sort { $$LST_PARAM{$a}->getIndex() cmp $$LST_PARAM{$b}->getIndex() } keys %$LST_PARAM ){
+        my $param = $$LST_PARAM{$root};
+        if( $dim == $param->getDim() 
+            && $param->getQuota()
+            && $param->getSubtype eq $subt ){
+            #print $root . " -> " . $param->getQuota() . "\n";
+            foreach my $member ( sort { $$LST_PARAM{$a}->getIndex() cmp $$LST_PARAM{$b}->getIndex() } keys %$LST_PARAM ){
+                my $param2 = $$LST_PARAM{$member};
+                if( defined($param2->getGroup()) && $param2->getGroup() eq $param->getQuota() ){
+                    push( @line_par, "pp${root}_ii${member}=" . ($index_group)++ );
+                }
+            }
+        }
+    }
+
+    if( $#line_par >= 0 ){ printList($file, \@line_par, $before); print $file "\n"; }
+
+}
+
 
 sub func_PP_ASSIGN  {
     my ( $file, $dim, $type, $subt ) = @_;
@@ -744,7 +810,7 @@ sub func_PP  {
         if( $dim == $param->getDim() 
             && $type eq $param->getType() 
             && $subt eq $param->getSubtype() ){
-
+            
             if( $param->getComponents() && keys(%{$param->getComponents()}) != 0 ){
                 foreach my $const ( sort { $$LST_CONST{$a} cmp $$LST_CONST{$b} } keys %$LST_CONST ){
                     if( exists ${$param->getComponents()}{$const} ){
@@ -1337,6 +1403,107 @@ sub func_STRING_INDEX_STARTEND  {
 }
 
 
+sub func_STRING_OGSTM  {
+    my ( $file, $dim, $type, $subt ) = @_;
+    if ( $DEBUG ){ print "SET_VAR_INFO_BFM -> FUNCTION CALLED func_STRING_OGSTM: $dim, $type, $subt"; }
+
+    my $line  = "";
+    my $index = 1;
+    my $namevar  = 'ctrcnm';
+    my $unitvar  = 'ctrcun';
+
+    if( $type eq 'diagnos' ){ $namevar = 'dianm'; $unitvar = 'diaun'; }
+
+    foreach my $name ( sort { $$LST_PARAM{$a}->getIndex() cmp $$LST_PARAM{$b}->getIndex() } keys %$LST_PARAM ){
+        my $param = $$LST_PARAM{$name};
+        if( $dim == $param->getDim() 
+            && $type eq $param->getType() 
+            && $subt eq $param->getSubtype() ){
+
+            my $comm  = $param->getComment();
+            if( $param->getComponents() && keys(%{$param->getComponents()}) != 0 ){
+                foreach my $const ( sort { $$LST_CONST{$a} cmp $$LST_CONST{$b} } keys %$LST_CONST ){
+                    if( exists ${$param->getComponents()}{$const} ){
+                        my $nameC = $name . $const;
+                        my $unitC = ${$param->getComponents()}{$const};
+                        $line .= "${SPACE}${namevar}($index)=\"$nameC\"\n";
+                        $line .= "${SPACE}${unitvar}($index)=\"$unitC\"\n";
+                        if( $type eq 'diagnos' || $type eq 'state'){ $$LST_INDEX{"$nameC"} = "$index"; }
+                        $index++;
+                    }
+                }
+            }else{
+                my $unit  = $param->getUnit();
+                $line .= "${SPACE}${namevar}($index)=\"$name\"\n";
+                $line .= "${SPACE}${unitvar}($index)=\"$unit\"\n";
+                if( $type eq 'diagnos' || $type eq 'state'){ $$LST_INDEX{"$name"} = "$index"; }
+                $index++;
+            }
+        }
+    }
+
+
+    # if diagnos OGS, then add the diaggrp to the vector
+    if( $type eq 'diagnos' ){ $line .= "\n"; }
+    foreach my $name ( sort { $$LST_PARAM{$a}->getIndex() cmp $$LST_PARAM{$b}->getIndex() } keys %$LST_PARAM ){
+        my $param = $$LST_PARAM{$name};
+        if( $dim == $param->getDim() 
+            && $type eq 'diagnos'
+            && $param->getType() eq 'diaggrp'
+            && $subt eq $param->getSubtype()
+            ){
+
+            my $group_name = $param->getQuota();
+            my $unit       = $param->getUnit();
+            my $comm       = $param->getComment();
+            foreach my $name2 ( sort { $$LST_PARAM{$a}->getIndex() cmp $$LST_PARAM{$b}->getIndex() } keys %$LST_PARAM ){
+                my $param2 = $$LST_PARAM{$name2};
+                if ( $param2->getGroup() && $group_name eq $param2->getGroup() ){ 
+                    my $param_name = $param2->getSigla();
+                    my $nameP = $name . "_ii$param_name";
+
+                    $line .= "${SPACE}${namevar}($index)=\"$nameP\"\n";
+                    $line .= "${SPACE}${unitvar}($index)=\"$unit\"\n";
+
+                    $index++;
+                }
+            }
+        }
+    }
+    
+    # if diagnos OGS, then add the flux to the vector
+    if( $type eq 'diagnos' ){ $line .= "\n"; }
+    foreach my $name ( sort { $$LST_PARAM{$a}->getIndex() cmp $$LST_PARAM{$b}->getIndex() } keys %$LST_PARAM ){
+        my $param = $$LST_PARAM{$name};
+        if( $dim == $param->getDim() 
+            && $type eq 'diagnos'
+            && $param->getType() eq 'flux'
+            && $subt eq $param->getSubtype() ){
+            
+            my $comm  = $param->getComment();
+            if( $param->getComponents() && keys(%{$param->getComponents()}) != 0 ){
+                foreach my $const ( sort { $$LST_CONST{$a} cmp $$LST_CONST{$b} } keys %$LST_CONST ){
+                    if( exists ${$param->getComponents()}{$const} ){
+                        my $nameC = $name . $const;
+                        my $unitC = ${$param->getComponents()}{$const};
+                        $line .= "${SPACE}${namevar}($index)=\"$nameC\"\n";
+                        $line .= "${SPACE}${unitvar}($index)=\"$unitC\"\n";
+                        $index++;
+                    }
+                }
+            }else{
+                my $unit  = $param->getUnit();
+                $line .= "${SPACE}${namevar}($index)=\"$name\"\n";
+                $line .= "${SPACE}${unitvar}($index)=\"$unit\"\n";
+                $index++;
+            }
+        }
+    }
+
+    if( $line ){ print $file $line; }
+}
+
+
 
 ###########################################  INIT_VAR_BFM ######################
 
@@ -1393,38 +1560,6 @@ sub func_INIT_PP  {
     }
 }
 
-sub func_INIT_RATIO_CONST {
-    my ( $file ) = @_;
-    if ( $DEBUG ){ print "INIT_VAR_BFM -> FUNCTION CALLED func_INIT_RATIO_CONST: "; }
-
-    my $line = '';
-    my $defratio = '';
-    my @constList = ();
-    my @constNoCList = ();
-    my @constOptionalList = ();
-    my @constOptionalRatioList = ();
-
-    foreach my $const ( sort { $$LST_CONST{$a} cmp $$LST_CONST{$b} } keys %$LST_CONST ){
-        push(@constList, $const);
-        if($const ne $constList[0]){
-            push( @constNoCList, $const );
-            push( @constOptionalList, $const . $constList[0] );
-        }
-    }
-    foreach my $constOpt (@constOptionalList){
-     $defratio = "ZERO";
-     if($constOpt eq "nc") {$defratio = "0.0126_RLEN    ! Redfield" };
-     if($constOpt eq "pc") {$defratio = "0.7862e-3_RLEN ! Redfield" };
-     if($constOpt eq "sc") {$defratio = "0.0145_RLEN    ! Redfield" };
-     if($constOpt eq "lc") {$defratio = "0.03_RLEN      ! standard diatom value" };
-     if($constOpt eq "fc") {$defratio = "3.e-04_RLEN    ! standard diatom value" };
-     $line .="   real(RLEN),parameter :: " . $constOpt . "_ratio_default = " . $defratio . "\n";
-    }
-
-    if( $line ){ print $file $line; }
-}
-
-
 sub func_INIT_FUNC_CONST {
     my ( $file ) = @_;
     if ( $DEBUG ){ print "INIT_VAR_BFM -> FUNCTION CALLED func_INIT_FUNC_CONST: "; }
@@ -1433,7 +1568,6 @@ sub func_INIT_FUNC_CONST {
     my @constList = ();
     my @constNoCList = ();
     my @constOptionalList = ();
-    my @constOptListIndex = ();
     my @constOptionalRatioList = ();
 
     foreach my $const ( sort { $$LST_CONST{$a} cmp $$LST_CONST{$b} } keys %$LST_CONST ){
@@ -1441,19 +1575,16 @@ sub func_INIT_FUNC_CONST {
         if($const ne $constList[0]){
             push( @constNoCList, $const );
             push( @constOptionalList, $const . $constList[0] );
-            push( @constOptListIndex, 'pp' . $const );
             push( @constOptionalRatioList, $const . $constList[0] . '_ratio' );
         }
     }
 
-    $line .="   subroutine init_constituents( ". join(',',@constList) . "," . join(',',@constOptListIndex) . "," 
-                                                                             . join( ',', @constOptionalList )    . ")\n";
+    $line .="   subroutine init_constituents( ". join(',',@constList)  . "," . join( ',', @constOptionalList )    . ")\n";
     $line .="     use global_mem, only: RLEN,ZERO\n";
     $line .="     IMPLICIT NONE\n";
     $line .="     real(RLEN),dimension(:),intent(in)             :: " . $constList[0]                              . "\n";
     $line .="     real(RLEN),intent(in),optional                 :: " . join( ',', @constOptionalList )            . "\n";
     $line .="     real(RLEN),dimension(:),intent(inout),optional :: " . join( ',', @constList[1 .. $#constList]  ) . "\n";
-    $line .="     integer,intent(in),optional                    :: " . join( ',', @constOptListIndex )            . "\n";
     $line .="     real(RLEN)                                     :: " . join( ',', @constOptionalRatioList       ) . "\n";
     $line .="     \n";
 
@@ -1465,15 +1596,13 @@ sub func_INIT_FUNC_CONST {
     }
 
     foreach my $constNoC (@constNoCList){
-        $line .= "     " . "    if (present(" . $constNoC . ") .and. pp" . $constNoC . ">0) then\n";
+        $line .= "     " . "    if (present(" . $constNoC . ")) then\n";
         $line .= "     " . "      where (" . $constNoC . "==ZERO)\n";
         $line .= "     " . "        " . $constNoC . " = " . $constNoC . "c_ratio*c\n";
         $line .= "     " . "      end where\n";
         $line .= "     " . "    end if\n";
     }
 
-    $line .="   \n";
-    $line .="         return\n";
     $line .="   end subroutine init_constituents\n";
 
 
@@ -1491,9 +1620,9 @@ sub func_INIT_NAMELIST {
     if ( $subtype eq '_pel' ){ $subtype = '' } #fix because pel is default and vars has no suffix
 
     $line .= "${SPACE}icontrol=0\n";
-    $line .= "${SPACE}open(NMLUNIT,file=bfm_init_fname${subtype},action='read',status='old',err=${num1})\n";
-    $line .= "${SPACE}read(NMLUNIT,nml=bfm_init_nml${subtype},err=${num2})\n";
-    $line .= "${SPACE}close(NMLUNIT)\n";
+    $line .= "${SPACE}open(namlst,file=bfm_init_fname${subtype},action='read',status='old',err=${num1})\n";
+    $line .= "${SPACE}read(namlst,nml=bfm_init_nml${subtype},err=${num2})\n";
+    $line .= "${SPACE}close(namlst)\n";
     $line .= "${SPACE}icontrol=1\n";
     $line .= "${num1} if ( icontrol == 0 ) then\n";
     $line .= "${SPACE}  LEVEL3 'I could not open ',trim(bfm_init_fname${subtype})\n";
@@ -1629,9 +1758,6 @@ sub func_INIT_INTERNAL {
     my @constNoC          = ();
     my @constOptionalList = ();
 
-    my $SUBTYPE= '_' . uc($subt);
-    if ( $SUBTYPE eq '_PEL' ){ $SUBTYPE = '' } #fix because pel is default and vars has no suffix
-
     foreach my $const ( sort { $$LST_CONST{$a} cmp $$LST_CONST{$b} } keys %$LST_CONST ){
         push(@constList, $const);
         if($const ne $constList[0]){ 
@@ -1647,17 +1773,14 @@ sub func_INIT_INTERNAL {
         my $groupname_nml = $groupname; $groupname_nml =~ s/Plankton//; $groupname_nml .= "_parameters";
 
         if( $group->getDim() == $dim
-            && $subt eq $group->getSubtype()
-            && exists ${$$LST_GROUP{$groupname}->getComponents()}{'c'}
-            && ! ( keys %{$$LST_GROUP{$groupname}->getComponents()} == 2 && exists ${$$LST_GROUP{$groupname}->getComponents()}{'h'} ) ){
+            && $subt eq $group->getSubtype()){
 
             $line .= "${SPACE}do i = 1 , ( ii". $groupname ." )\n";
             $line .= "${SPACE}  call init_constituents( c=" . $groupname  . "(i,iiC), &\n${SPACE}";
             my @temp_line;
             foreach my $const (@constNoC){
                 if( exists ${$$LST_GROUP{$groupname}->getComponents()}{$const} ){
-                    push( @temp_line, "    " . $const . "=D" . $dim . "STATE" . $SUBTYPE . "(pp" . $groupname . "(i,ii" . uc($const) . "),:), " 
-                          . "pp" . $const . "=pp" . $groupname . "(i,ii" . uc($const) . ")" );
+                    push( @temp_line, "    " . $const . "=D3STATE(pp" . $groupname . "(i,ii" . uc($const) . "),:)" );
                 }
             }
             my @temp_line2;
@@ -1665,11 +1788,9 @@ sub func_INIT_INTERNAL {
                 #get the constituents active inside the group
                 if( exists ${$$LST_GROUP{$groupname}->getComponents()}{ (split('',$constOpt))[0] } ){
                     my $temp_compo = "p_q" . $constOpt . $groupAcro;
-                    #print $temp_compo . " " . $groupname_nml . " ";
                     #if the optional initialization element exists in the namelist => add to initialize constituents
                     foreach my $list (@$LST_NML){
-                        # search for namelists starting with groupname_paramters*
-                        if( $list->name() =~ m/^$groupname_nml/ ){
+                        if( $list->name() eq $groupname_nml ){
                             foreach my $param ( @{$list->slots()} ){
                                 if( $param eq $temp_compo){ 
                                     push( @temp_line2, $constOpt . "=" . $temp_compo . "(i)" );
@@ -1809,6 +1930,109 @@ sub func_HEADER_DIAGG  {
             $line .= "#define ${name}(A,B) D${dim}DIAGNOS${SUBTYPE}(pp${name}(A),B)\n";
         }
     }
+
+    if( $line ){ print $file $line; }
+}
+
+
+sub func_FLUX_COUPLED{
+    my ( $file, $dim ) = @_;
+    if ( $DEBUG ){ print "AllocateMem -> FUNCTION CALLED func_FLUX_COUPLED: "; }
+
+    #calculate lenght
+    my $len=0;
+    my $type = 'diagnos';
+    my $subt = 'pel';
+    my $index_group = 1;
+    
+    my $line = '';
+    my $localvarname ; 
+    if( ! checkDimType($dim, $type, $subt)  ){ return; }
+
+    foreach my $name ( sort { $$LST_PARAM{$a}->getIndex() cmp $$LST_PARAM{$b}->getIndex() } keys %$LST_PARAM ){
+        my $param   = $$LST_PARAM{$name};
+        if ( $dim == 2 ) { $localvarname = '  local_BFM0D_dia2d' ; }
+        if ( $dim == 3 ) { $localvarname = '  local_BFM0D_dia' ;  }
+        if( $dim == $param->getDim() 
+            && $type eq $param->getType() 
+            && $subt eq $param->getSubtype() ){
+            
+            if( $param->getComponents() && keys(%{$param->getComponents()}) != 0 ){
+                foreach my $const ( sort { $$LST_CONST{$a} cmp $$LST_CONST{$b} } keys %$LST_CONST ){
+                    if( exists ${$param->getComponents()}{$const} ){
+                        my $nameC = $name . $const;
+                        $line .= ${localvarname} .  "(" . $index_group++ . ") = D". $dim . "DIAGNOS(pp${nameC},1)\n";
+                    }
+                }
+                if( $param->getComponentsEx() && keys(%{$param->getComponentsEx()}) != 0 ){
+                    foreach my $const ( sort { $$LST_CONST{$a} cmp $$LST_CONST{$b} } keys %$LST_CONST ){
+                        if( exists ${$param->getComponentsEx()}{$const} ){
+                            my $nameC = $name . $const;
+                            $line .= ${localvarname} .  "(" . $index_group++ . ") = D". $dim . "DIAGNOS(pp${nameC},1)\n";
+                        }
+                    }
+                }
+            }else{
+                my $nameC = $name; #. $const;
+                $line .= ${localvarname} .  "(" . $index_group++ . ") = D". $dim . "DIAGNOS(pp${nameC},1)\n";
+            }
+        }
+    }
+
+    $line .= "! ***********************************  First Group Done \n" ; 
+
+    #foreach my $root (sort keys %$LST_PARAM){
+    foreach my $root ( sort { $$LST_PARAM{$a}->getIndex() cmp $$LST_PARAM{$b}->getIndex() } keys %$LST_PARAM ){
+        my $param = $$LST_PARAM{$root};
+        if( $dim == $param->getDim() 
+            && $param->getQuota()
+            && $param->getSubtype eq $subt ){
+            #print $root . " -> " . $param->getQuota() . "\n";
+            foreach my $member ( sort { $$LST_PARAM{$a}->getIndex() cmp $$LST_PARAM{$b}->getIndex() } keys %$LST_PARAM ){
+                my $param2 = $$LST_PARAM{$member};
+                if( defined($param2->getGroup()) && $param2->getGroup() eq $param->getQuota() ){
+                    $line .= "  local_BFM0D_dia(". $index_group++ . ") = D3DIAGNOS(pp${root}(ii${member}),1)\n"  ;
+                }
+            }
+        }
+    }
+
+    $line .= "! ***********************************  2nd Group Done\n" ;
+
+    $type = 'flux';
+    $subt = 'pel';
+
+
+    foreach my $name ( sort { $$LST_PARAM{$a}->getIndex() cmp $$LST_PARAM{$b}->getIndex() } keys %$LST_PARAM ){
+        my $param   = $$LST_PARAM{$name};
+        if( $dim == $param->getDim()
+            && $type eq $param->getType()
+            && $subt eq $param->getSubtype() ){
+
+            if( $param->getComponents() && keys(%{$param->getComponents()}) != 0 ){
+                foreach my $const ( sort { $$LST_CONST{$a} cmp $$LST_CONST{$b} } keys %$LST_CONST ){
+                    if( exists ${$param->getComponents()}{$const} ){
+                        my $nameC = $name . $const;
+                        $line .= "  local_BFM0D_dia(" . $index_group++ . ") =  D3FLUX_FUNC(pp${nameC},1)\n";
+                    }
+                }
+                if( $param->getComponentsEx() && keys(%{$param->getComponentsEx()}) != 0 ){
+                    foreach my $const ( sort { $$LST_CONST{$a} cmp $$LST_CONST{$b} } keys %$LST_CONST ){
+                        if( exists ${$param->getComponentsEx()}{$const} ){
+                            my $nameC = $name . $const;
+                            $line .= "  local_BFM0D_dia(". $index_group++ . ") = D3FLUX_FUNC(pp${nameC},1)\n";
+                        }
+                    }
+                }
+            }else{
+                $line .= "  local_BFM0D_dia(". $index_group++ . ") = D3FLUX_FUNC(pp${name},1)\n"  ;
+            }
+        }
+    }
+
+
+    $line .= "! ***********************************  3rd Group Done\n" ;
+
 
     if( $line ){ print $file $line; }
 }
