@@ -226,6 +226,13 @@
         integer,parameter,public                :: %3d-state-pel-pp
         real(RLEN),public,dimension(:),pointer  :: %3d-state-pel-pointer
 
+        !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+        !! GLOBAL definition of Pelagic (D3) Flux variables
+        !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+        integer,parameter,public                :: %3d-flux-pel-pp
+
+
 #ifdef INCLUDE_SEAICE
         !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
         !! GLOBAL definition of SeaIce (D2) state variables
