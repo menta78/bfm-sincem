@@ -123,6 +123,8 @@
    ! some material are particularly sticky
    !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+      if(BOTindices(1) .EQ. 0) return
+
       ! loop over the number of bottom boxes
       do BoxNumberXY = 1,NO_BOXES_XY 
          kbot = BOTindices(BoxNumberXY)

@@ -10,7 +10,7 @@ subroutine BFM0D_NO_BOXES(N,X,Y,Z,XY)
   use global_mem, ONLY:RLEN
   use mem, ONLY:NO_BOXES,NO_BOXES_X,NO_BOXES_Y,NO_BOXES_Z,NO_BOXES_XY, NO_STATES, &
        NO_D3_BOX_STATES
-  use api_bfm, ONLY: SRFindices
+  use api_bfm, ONLY: SRFindices,BOTindices
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Implicit typing is never allowed
@@ -36,6 +36,7 @@ subroutine BFM0D_NO_BOXES(N,X,Y,Z,XY)
   write(*,*) 'NO_BOXES_XY', XY
   write(*,*) 'allocating NO_BOXES_XY'
   allocate(SRFindices(NO_BOXES_XY))
+  allocate(BOTindices(NO_BOXES_XY))
   
   
   write(*,*) 'NO_STATES', NO_STATES
