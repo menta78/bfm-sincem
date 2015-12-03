@@ -9,6 +9,7 @@ subroutine BFM0D_Input_EcologyDynamics(sur,bot,BFM0D_trn,dim_BFM0D_trn,BFM0D_er)
   use global_mem, ONLY:RLEN
   use api_bfm, ONLY: SRFindices, BOTindices
   use mem
+  use mem_CO2
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Implicit typing is never allowed
@@ -53,7 +54,7 @@ subroutine BFM0D_Input_EcologyDynamics(sur,bot,BFM0D_trn,dim_BFM0D_trn,BFM0D_er)
   EICE   = BFM0D_er(4)
 ! LEVEL1 'BFM0D_Input_EcologyDynamics:EICE', EICE
 #ifdef INCLUDE_PELCO2
-  EPCO2air = BFM0D_er(5)
+  AtmCO2%fnow = BFM0D_er(5)
 ! LEVEL1 'BFM0D_Input_EcologyDynamics:EPCO2air', EPCO2air
 #endif
   EIR    = BFM0D_er(6)
