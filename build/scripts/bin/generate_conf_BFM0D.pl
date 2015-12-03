@@ -42,8 +42,8 @@ my ($input_mem, $input_nml, $proto_dir, $out_dir, @cpp_defs);
 my $VERBOSE = 0;
 my $DEBUG = 0;
 my $HELP    = 0;
-my @PROTOS_NAME = qw(ModuleMem AllocateMem set_var_info_bfm init_var_bfm INCLUDE );
-my @PROTOS_EXT  = qw(F90       F90         F90              F90          h       );
+my @PROTOS_NAME = qw(BFM_var_list BFM0D_Output_Ecology namelist);
+my @PROTOS_EXT  = qw(h            F90                  passivetrc );
 
 #structures to allocate the parameters read in memmory layour
 my @lst_nml   = ();

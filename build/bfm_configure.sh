@@ -306,12 +306,23 @@ if [ ${GEN} ]; then
     cppdefs=`echo ${CPPDEFS} | sed -e 's/\([a-zA-Z_0-9]*\)/-D\1/g'`
 
     # generate BFM Memory Layout files and namelists
+
     ${PERL} -I${BFMDIR}/${SCRIPTS_BIN}/ ${BFMDIR}/${SCRIPTS_BIN}/${cmd_gen} \
         ${cppdefs} \
         -r ${BFMDIR}/${CONFDIR}/${myGlobalMem}  \
         -n ${BFMDIR}/${CONFDIR}/${myGlobalNml}  \
         -f ${BFMDIR}/${SCRIPTS_PROTO} \
         -t ${blddir} || exit
+
+    if [[ "$MODE" == "OGS" ]]; then
+    ${PERL} -I${BFMDIR}/${SCRIPTS_BIN}/ ${BFMDIR}/${SCRIPTS_BIN}/generate_conf_BFM0D.pl \
+        ${cppdefs} \
+        -r ${BFMDIR}/${CONFDIR}/${myGlobalMem}  \
+        -n ${BFMDIR}/${CONFDIR}/${myGlobalNml}  \
+        -f ${BFMDIR}/${SCRIPTS_PROTO} \
+        -t ${blddir} || exit
+    fi
+
 
     # generate other namelists specified in the argument NMLLIST
     if [ "${NMLLIST}" ]; then
@@ -320,6 +331,7 @@ if [ ${GEN} ]; then
             -n "${NMLLIST}"  \
             -o ${blddir} || exit
     fi
+
 
 
     if [[ ${MODE} == "STANDALONE" || "$MODE" == "POM1D"  || "$MODE" == "OGS" ]]; then
