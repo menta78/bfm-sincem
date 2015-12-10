@@ -306,7 +306,6 @@ if [ ${GEN} ]; then
     cppdefs=`echo ${CPPDEFS} | sed -e 's/\([a-zA-Z_0-9]*\)/-D\1/g'`
 
     # generate BFM Memory Layout files and namelists
-
     ${PERL} -I${BFMDIR}/${SCRIPTS_BIN}/ ${BFMDIR}/${SCRIPTS_BIN}/${cmd_gen} \
         ${cppdefs} \
         -r ${BFMDIR}/${CONFDIR}/${myGlobalMem}  \
@@ -331,7 +330,6 @@ if [ ${GEN} ]; then
             -n "${NMLLIST}"  \
             -o ${blddir} || exit
     fi
-
 
 
     if [[ ${MODE} == "STANDALONE" || "$MODE" == "POM1D"  || "$MODE" == "OGS" ]]; then
@@ -429,6 +427,7 @@ if [ ${GEN} ]; then
         if [ -f "${presetdir}/cpp_${PRESET}.fcm" ]; then 
             cp "${presetdir}/cpp_${PRESET}.fcm" "${NEMODIR}/NEMOGCM/CONFIG/${PRESET}"
         fi
+
         #substitute BFM/src/nemo path in cpp according to the version
         [ ${VERBOSE} ] && echo "Changing nemo version to: \"$VER\""
         sed -ie "s;inc.*;inc \$BFMDIR/src/nemo${VER}/bfm\.fcm;" ${NEMODIR}/NEMOGCM/CONFIG/${PRESET}/cpp_${PRESET}.fcm
