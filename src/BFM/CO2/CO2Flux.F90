@@ -50,7 +50,7 @@
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! Modules (use of ONLY is strongly encouraged!)
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  use constants, ONLY: RLEN,HOURS_PER_DAY,ZERO_KELVIN,MW_C
+  use constants,  ONLY: HOURS_PER_DAY,ZERO_KELVIN,MW_C
   use global_mem, ONLY: RLEN,ZERO,ONE
 #ifdef NOPOINTERS
   use mem
