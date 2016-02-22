@@ -396,15 +396,8 @@ if [ ${GEN} ]; then
         cp ${blddir}/INCLUDE.h ${BFMDIR}/src/BFM/include
 
         if [[ "$MODE" == "OGS" ]]; then
-#           gcc -cpp "${cppdefs}" -E ${BFMDIR}/build/scripts/proto/BFM_module_list.proto.F \
-#               | grep -v "#" \
-#               > ${BFMDIR}/include/BFM_module_list.h
-#           rm -f ${BFMDIR}/src/ogstm/proto/BFM_module_list.proto.s
             cp ${BFMDIR}/include/BFM_module_list.proto.h ${BFMDIR}/build/tmp/${PRESET}/
             sed ':a;N;$!ba;s/, \&\n/,  /g' ${blddir}/BFM_var_list.h | sed -e "s/,    /,\n     \& /g" > ${BFMDIR}/include/BFM_var_list.h
-            #cp ${blddir}/BFM_var_list.h ${BFMDIR}/include/
-            mkdir -p ${BFMDIR}/namelists
-            cp ${BFMDIR}/build/tmp/${PRESET}/*.nml ${BFMDIR}/namelists
         fi
 
     elif [[ "$MODE" == "NEMO" || "$MODE" == "NEMO_3DVAR" ]]; then 
