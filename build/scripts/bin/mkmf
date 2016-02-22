@@ -458,6 +458,7 @@ print MAKEFILE "tags: \$(SRC)\n\tctags \$(SRC)\n";
 if( $suffix eq '.a' ) {
    print MAKEFILE "$opt_p: \$(OBJ)\n\t\$(AR) \$(ARFLAGS) $opt_p \$(OBJ)\n";
    print MAKEFILE "\tcp *mod ../../../include \n";
+   print MAKEFILE "\tcp BFM_module_list.proto.h  ../../../include/BFM_module_list.h \n";
 } else {
 # opt_l is a new flag added to take care of libraries
    print MAKEFILE "$opt_p: \$(OBJ) $opt_l\n\t\$(LD) \$(OBJ) -o $opt_p $opt_l \$(LDFLAGS)\n";
