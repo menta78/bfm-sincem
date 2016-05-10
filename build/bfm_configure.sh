@@ -314,6 +314,7 @@ if [ ${GEN} ]; then
         -t ${blddir} || exit
 
     if [[ "$MODE" == "OGS" ]]; then
+    # generate BFM0D output subroutines
     ${PERL} -I${BFMDIR}/${SCRIPTS_BIN}/ ${BFMDIR}/${SCRIPTS_BIN}/generate_conf_BFM0D.pl \
         ${cppdefs} \
         -r ${BFMDIR}/${CONFDIR}/${myGlobalMem}  \
@@ -396,8 +397,9 @@ if [ ${GEN} ]; then
         cp ${blddir}/INCLUDE.h ${BFMDIR}/src/BFM/include
 
         if [[ "$MODE" == "OGS" ]]; then
-            cp ${BFMDIR}/include/BFM_module_list.proto.h ${BFMDIR}/build/tmp/${PRESET}/
+            cp ${BFMDIR}/include/BFM_module_list.proto.h ${blddir}/
             sed ':a;N;$!ba;s/, \&\n/,  /g' ${blddir}/BFM_var_list.h | sed -e "s/,    /,\n     \& /g" > ${BFMDIR}/include/BFM_var_list.h
+            mv ${BFMDIR}/src/BFM/General/BFM0D_Output_Ecology.F90 ${BFMDIR}/src/ogstm/
         fi
 
     elif [[ "$MODE" == "NEMO" || "$MODE" == "NEMO_3DVAR" ]]; then 

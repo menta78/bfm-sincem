@@ -1,7 +1,7 @@
 #include "cppdefs.h"
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL
-!	   BFM - Biogeochemical Flux Model verion 2.0
+!	   BFM - Biogeochemical Flux Model verion 5.1
 !
 ! SUBROUTINE
 !   Ecology
@@ -29,6 +29,7 @@
 !   !
 !
 ! COPYING
+!   Copyright (C) 2015 BFM System Team (bfm_st@lists.cmcc.it)
 !   Copyright (C) 2004 P. Ruardij, the mfstep group, the ERSEM team 
 !   (rua@nioz.nl, vichi@bo.ingv.it)
 !
