@@ -28,7 +28,7 @@
   use mem
 #else
   use mem,  ONLY: iiPel,NO_BOXES,ETW,flux_vector
-  use mem,  ONLY: N7f,R6f,R1f,ppN7f,ppR6f,ppR1f
+  use mem,  ONLY: N7f,R6f,R1f,ppN7f,ppR6f,ppR1f,fscavN7f
 #endif
   use mem_Param,  ONLY: p_small
   use mem_PelChem
