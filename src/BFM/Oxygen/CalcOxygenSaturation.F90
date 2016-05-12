@@ -74,7 +74,7 @@
 
   ! calc absolute temperature divided by 100.0;
   ! input for the next empirical equation.
-  abt  =  ( ETW(:)- ZERO_KELVIN)/ 100.0_RLEN
+  abt  =  ( ETW(:) - ZERO_KELVIN) * 0.01_RLEN
 
   !   calc theoretical oxygen saturation for temp + salinity
   !   From WEISS 1970 DEEP SEA RES 17, 721-735.
@@ -84,13 +84,13 @@
     0.0017_RLEN* (abt)**(2.0_RLEN))
 
   ! convert units to ml(STP)/l
-  h  =   exp(h)
+  h  =  exp(h)
 
   ! convert ml/l to mMol/m3
   ! Use the volume of a mole of DO at STP : 22.391 l (ICES conversions)
   ! Conversion:  1 ml/l = 10^3/22.391 = 44.661 uMol/L [ = mMol/m3 ]
   cxoO2(:)  =   h * 44.661_RLEN
-  eO2mO2(:)  =   max(p_small,O2o(:))/ cxoO2(:)
+  eO2mO2(:) =   max(p_small,O2o(:))/ cxoO2(:)
 
   end subroutine CalcOxygenSaturation
 !EOC
