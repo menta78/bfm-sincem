@@ -53,23 +53,26 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   contains
-FUNCTION INSW_VECTOR(input)
+
+    FUNCTION INSW_VECTOR(input)
         real(RLEN),intent(IN) ::input(:)
         real(RLEN) ::INSW_VECTOR(size(input))
 
         INSW_VECTOR = ZERO
         where (input > ZERO ) INSW_VECTOR=ONE 
 
-        end function INSW_VECTOR
-FUNCTION MM_VECTOR(vector,param)
+    end function INSW_VECTOR
+
+    FUNCTION MM_VECTOR(vector,param)
         real(RLEN),intent(IN) ::param
         real(RLEN)            ::vector(:)
         real(RLEN)            ::MM_VECTOR(size(vector))
 
         MM_VECTOR= VECTOR / ( VECTOR+  PARAM)
 
-        end function MM_VECTOR
-FUNCTION MM_POWER_VECTOR(vector,param,pow)
+    end function MM_VECTOR
+
+    FUNCTION MM_POWER_VECTOR(vector,param,pow)
         real(RLEN),intent(IN) ::param
         integer               ::pow
         real(RLEN)            ::vector(:)
@@ -77,8 +80,9 @@ FUNCTION MM_POWER_VECTOR(vector,param,pow)
 
         MM_POWER_VECTOR= VECTOR**pow / ( VECTOR**pow+  PARAM**pow)
 
-        end function MM_POWER_VECTOR
-FUNCTION eramp_VECTOR(x, m)
+    end function MM_POWER_VECTOR
+
+    FUNCTION eramp_VECTOR(x, m)
         real(RLEN),intent(IN) ::x(:)
         real(RLEN),intent(IN) ::m
         real(RLEN)            ::eramp_VECTOR(size(x))
@@ -89,8 +93,9 @@ FUNCTION eramp_VECTOR(x, m)
            where (X< M) eramp_VECTOR=X/M;
         endwhere
 
-        end function
-FUNCTION PartQ_vector(p, d_a, d_b, d_m)
+    end function
+
+    FUNCTION PartQ_vector(p, d_a, d_b, d_m)
         real(RLEN),intent(IN) ::p(:)
         real(RLEN),intent(IN) ::d_a(:)
         real(RLEN),intent(IN) ::d_b(:)
@@ -122,8 +127,9 @@ FUNCTION PartQ_vector(p, d_a, d_b, d_m)
            PartQ_VECTOR =r
         endwhere
 
-        end function
-function eTq_VECTOR(temp,p_q10)
+    end function
+
+    function eTq_VECTOR(temp,p_q10)
 
         IMPLICIT NONE
         real(RLEN)            :: temp(:)
@@ -131,23 +137,25 @@ function eTq_VECTOR(temp,p_q10)
         real(RLEN)            ::eTq_VECTOR(size(temp))
 
         eTq_VECTOR=  exp(  log(  p_q10)*( temp- BASETEMP)/ BASETEMP)
-        end function eTq_VECTOR
-function IntegralExp(alfa,x)
+    end function eTq_VECTOR
+
+    function IntegralExp(alfa,x)
         IMPLICIT NONE
         real(RLEN),intent(IN)       :: alfa
         real(RLEN),intent(IN)       :: x
         real(RLEN)                 :: IntegralExp
         
         IntegralExp=(exp(alfa * x) -ONE)/alfa
-        end function IntegralExp
-FUNCTION INSW(input)
+    end function IntegralExp
+
+    FUNCTION INSW(input)
         real(RLEN),intent(IN) ::input
         real(RLEN) ::INSW
 
         INSW =ZERO
         if (input > ZERO ) INSW=ONE 
 
-        end function INSW
+    end function INSW
 
   end module mem_globalfun
 !EOC
