@@ -189,36 +189,39 @@ SUBROUTINE trc_trp_bfm( kstp )
             ELSE
                D3STATEB(m,:) = pack(trb(:,:,:,1),SEAmask)        ! Leap-frog scheme 
             END IF
-
-            !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-            ! compute global statistics
-            !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-            ztraf = glob_sum( trn(:,:,:,1) * cvol(:,:,:) )
-            zmin  = MINVAL( trn(:,:,:,1), mask= ((tmask*SPREAD(tmask_i,DIM=3,NCOPIES=jpk).NE.0.)) )
-            zmax  = MAXVAL( trn(:,:,:,1), mask= ((tmask*SPREAD(tmask_i,DIM=3,NCOPIES=jpk).NE.0.)) )
-            IF( lk_mpp ) THEN
-               CALL mpp_min( zmin )      ! min over the global domain
-               CALL mpp_max( zmax )      ! max over the global domain
-            END IF
-            zmean  = ztraf / areatot
-            zdrift = ( ( ztraf - D3STATE_tot(m) ) / ( D3STATE_tot(m) + 1.e-12_RLEN )  ) * 100._RLEN
-         ELSE ! non-trasported variables
             !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
             ! Time integration of benthic (non-transported) variables  
             ! is done, if active, with an ODE solver in trcbfm.F90
             !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-            ! Compute values from D3STATE to fill statistics
-            zmin = MINVAL(D3STATE(m,:))
-            zmax = MAXVAL(D3STATE(m,:))
-            zmean  = SUM(D3STATE(m,:)) / NO_BOXES
-            zdrift = 0.0_RLEN
          END IF ! transported
  
-         ! Print statistics into bfm.log file 
-         IF ( lwp .AND. ( kstp < 100 .OR. MOD(kstp,50) == 0 ) ) THEN
-           IF(m==1) WRITE(LOGUNIT,*) 'Statistics on tracer at step: ' , kstp
-           WRITE(LOGUNIT,9000) m, trim(var_names(stPelStateS+m-1)), zmean, zmin, zmax, zdrift
-           IF(m==NO_D3_BOX_STATES) WRITE(LOGUNIT,*)
+         !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+         ! compute global statistics of variables and 
+         ! print into bfm.log file
+         !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+         IF ( (kstp-nit000)<20 .OR. MOD(kstp,200)==0 .OR. kstp==nitend) THEN
+           IF (D3STATETYPE(m)>=ALLTRANSPORT) THEN
+              ztraf = glob_sum( trn(:,:,:,1) * cvol(:,:,:) )
+              zmin  = MINVAL( trn(:,:,:,1), mask= ((tmask*SPREAD(tmask_i,DIM=3,NCOPIES=jpk).NE.0.)) )
+              zmax  = MAXVAL( trn(:,:,:,1), mask= ((tmask*SPREAD(tmask_i,DIM=3,NCOPIES=jpk).NE.0.)) )
+              IF( lk_mpp ) THEN
+                 CALL mpp_min( zmin )      ! min over the global domain
+                 CALL mpp_max( zmax )      ! max over the global domain
+              END IF
+              zmean  = ztraf / areatot
+              zdrift = ( ( ztraf - D3STATE_tot(m) ) / ( D3STATE_tot(m) + 1.e-12_RLEN )  ) * 100._RLEN
+           ELSE ! non-trasported variables (values from D3STATE to fill in statistics)
+              zmin = MINVAL(D3STATE(m,:))
+              zmax = MAXVAL(D3STATE(m,:))
+              zmean  = SUM(D3STATE(m,:)) / NO_BOXES
+              zdrift = 0.0_RLEN
+           ENDIF
+           IF ( lwp ) THEN
+              IF( m==1 ) WRITE(LOGUNIT,*) 'Statistics on tracer at step: ' , kstp
+              WRITE(LOGUNIT,9000) m, trim(var_names(stPelStateS+m-1)), zmean, zmin, zmax, zdrift
+              IF(m==NO_D3_BOX_STATES) WRITE(LOGUNIT,*)
+              call FLUSH(LOGUNIT)
+           ENDIF
          ENDIF
 
       END DO ! over BFM state vars
