@@ -321,8 +321,8 @@ This document should be cited as:
 Vichi M., Lovato T., Lazzari P., Cossarini G., Gutierrez Mlot E., Mattia G., Masina
  S., McKiver W.
  J., Pinardi N., Solidoro C., Tedesco L., Zavatarelli M.
- (2015). The Biogeochemical Flux Model (BFM): Equation Description and User
- Manual.
+ (2015).
+ The Biogeochemical Flux Model (BFM): Equation Description and User Manual.
  BFM version 5.1.
  BFM Report series N.
  1, Release 1.1, August 2015, Bologna, Italy, http://bfm-community.eu, pp. 104
@@ -29008,19 +29008,24 @@ $BFMDIR/build/configurations
 ).
  All the ancillary F90 memory layout files (
 \family typewriter
-AllocateMem.F90, INCLUDE.h, ModuleMem.f90, set_var_info_bfm.f90
+ModuleMem.f90, AllocateMem.F90, set_var_info_bfm.f90, init_var_bfm.F90, INCLUDE.h
 \family default
-) are automatically generated from this meta-data structure by way of a
- perl script (
+) are automatically generated from this meta-data structure by a parsing
+ PERL script (
 \family typewriter
-$BFMDIR/build/script
+$BFMDIR/build/script/bin/generate_conf.pl
 \family default
 ).
  The prototypes of these files are found in directory 
 \family typewriter
 $BFMDIR/BFM/proto
 \family default
- and filled in with the user-defined state variables and diagnostics.
+ and filled in with the user-defined state variables and diagnostics declared
+ in the 
+\family typewriter
+layout
+\family default
+ file.
 \end_layout
 
 \begin_layout Standard
@@ -29061,7 +29066,7 @@ status open
 
 \begin_layout Plain Layout
 
-3d-state
+3d-state-pel
 \end_layout
 
 \begin_layout Plain Layout
@@ -29367,6 +29372,16 @@ ETW
 \end_layout
 
 \begin_layout Standard
+For all the 2- and 3-dimensional groups defined above it is also necessary
+ to specify the pertaining component among pelagic, seaice, and benthic
+ models (see 
+\family typewriter
+comp
+\family default
+ description below for coding rules).
+\end_layout
+
+\begin_layout Standard
 The syntax of the allowed layout elements is the following
 \end_layout
 
@@ -29378,7 +29393,7 @@ status open
 
 \begin_layout Plain Layout
 
-[dim]d-state [-if-exist]
+[dim]d-state-[comp] [-if-exist F90_MACRO]
 \end_layout
 
 \begin_layout Plain Layout
@@ -29402,7 +29417,7 @@ end
 
 \begin_layout Plain Layout
 
-[dim]d-variable [-if-exist]
+[dim]d-variable-[comp] [-if-exist F90_MACRO]
 \end_layout
 
 \begin_layout Plain Layout
@@ -29431,7 +29446,7 @@ end
 
 \begin_layout Plain Layout
 
-[dim]d-flux [-if-exist]
+[dim]d-flux-[comp] [-if-exist F90_MACRO]
 \end_layout
 
 \begin_layout Plain Layout
@@ -29612,6 +29627,54 @@ with the following fundamental elements
 
 \family typewriter
 \series bold
+\shape italic
+dim
+\family default
+\series default
+\shape default
+: dimension of the layout elements inside.
+ Allowed values are: 
+\shape italic
+1
+\shape default
+, 
+\shape italic
+2
+\shape default
+ and 
+\shape italic
+3
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+\series bold
+\shape italic
+comp
+\family default
+\series default
+\shape default
+: reference model component of the layout elements inside.
+ Allowed values are: 
+\shape italic
+pel
+\shape default
+ (pelagic), 
+\shape italic
+ben
+\shape default
+ (benthic) and 
+\shape italic
+ice 
+\shape default
+(seaice)
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+\series bold
 name
 \family default
 \series default
@@ -29772,32 +29835,9 @@ CAR
  (Inorganic)
 \end_layout
 
-\begin_layout Itemize
-
-\family typewriter
-\series bold
-\shape italic
-dim
-\family default
-\series default
-\shape default
-: dimension of the layout elements inside.
- Allowed values are: 
-\shape italic
-1
-\shape default
-, 
-\shape italic
-2
-\shape default
- and 
-\shape italic
-3
-\end_layout
-
 \begin_layout Standard
 The configuration can be also modified at compilation time by means of the
- set of macros listed in Sec.
+ set of fortran macros listed in Sec.
  
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -29823,7 +29863,7 @@ status open
 
 \begin_layout Plain Layout
 
-3d-variable -if-exist INCLUDE_PELCO2
+3d-variable-pel -if-exist INCLUDE_PELCO2
 \end_layout
 
 \begin_layout Plain Layout
@@ -30772,7 +30812,7 @@ status open
 
 \begin_layout Plain Layout
 
-3d-flux -if-exist INCLUDE_DIAG INCLUDE_PELCO2
+3d-flux-pel -if-exist INCLUDE_DIAG INCLUDE_PELCO2
 \end_layout
 
 \begin_layout Plain Layout
@@ -30806,7 +30846,7 @@ end
 
 \begin_layout Plain Layout
 
-3d-flux -if-exist INCLUDE_DIAG
+3d-flux-pel -if-exist INCLUDE_DIAG
 \end_layout
 
 \begin_layout Plain Layout
