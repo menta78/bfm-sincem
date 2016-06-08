@@ -1,15 +1,15 @@
 #!/usr/bin/perl -w
 
 # DESCRIPTION
-#   Generate .h .f90 and namelist files
+#   Generate fortran and namelist files
 #
 # AUTHORS
 #   Esteban Gutierrez esteban.gutierrez@cmcc.it
-#   Tomas Lovato toma.lovato@cmcc.it
+#   Tomas Lovato tomas.lovato@cmcc.it
 #
 # COPYING
 #  
-#   Copyright (C) 2013 BFM System Team ( bfm_st@lists.cmcc.it )
+#   Copyright (C) 2016 BFM System Team ( bfm_st@lists.cmcc.it )
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -29,14 +29,14 @@ use warnings;
 use Data::Dumper;
 use Getopt::Std;
 
-use process_memLayout; #reomve trailing white spaces
+use process_memLayout; #remove trailing white spaces
 use process_namelist; # get the namelist values in the hash
 use F90Namelist; #get the namelists
 use print_f90; # write the variables in the output file
 use classes;
 
 
-my ($input_mem, $input_nml, $proto_dir, $out_dir, @cpp_defs);
+my ($input_mem, $input_nml, $proto_dir, $out_dir, @cpp_defs, $addproto);
 
 #fix values
 my $VERBOSE = 0;
@@ -45,7 +45,7 @@ my $HELP    = 0;
 my @PROTOS_NAME = qw(ModuleMem AllocateMem set_var_info_bfm init_var_bfm INCLUDE );
 my @PROTOS_EXT  = qw(F90       F90         F90              F90          h       );
 
-#structures to allocate the parameters read in memmory layour
+#structures to allocate the parameters read in memory layout
 my @lst_nml   = ();
 my @lst_com   = ();
 my %lst_group = ();
@@ -56,14 +56,15 @@ my %lst_index = ();
 
 sub usage(){
     print "usage: $0 {-D[cpp_def] -r [mem_layout] -n [namelist] -f [prototype_dir] -t [output_dir]} [-v] [-d]\n\n";
-    print "This script generate .F90, .h and .nml files using templates based on configuration files\n\n";
+    print "This script generate fortran, .nml and .xml files using templates based on configuration files\n\n";
     print "MUST specify these OPTIONS:\n";
-    print "\t-D[cpp_def]          defines\n";
+    print "\t-D [cpp_def]         defines\n";
     print "\t-r [mem_layout]      memory layout\n";
     print "\t-n [namelist]        file containing namelists\n";
     print "\t-f [prototype_dir]   input dir for prototype files\n";
     print "\t-t [output_dir]      output dir for generated files\n";
-    print "alternative OPTIONS are:\n";
+    print "additional OPTIONS are:\n";
+    print "\t-a [list of files]   configuration dependent proto files\n";
     print "\t-v                   verbose mode\n";
     print "\t-d                   debug mode\n";
 }
@@ -75,12 +76,26 @@ GetOptions(
     'f=s'  => \$proto_dir,
     't=s'  => \$out_dir,  
     'D=s@' => \@cpp_defs,
+    'a=s'  => \$addproto,
     'v'    => \$VERBOSE,
     'd'    => \$DEBUG,
     'h'    => \$HELP,
     ) or &usage() && exit;
 if ( $HELP ){ &usage(); exit; }
 if ( !$input_mem || !$input_nml || !$proto_dir || !$out_dir || !@cpp_defs ){ &usage(); exit; }
+
+# Parse additional proto files and add to fixed value list
+if ( $addproto and length($addproto) ) { 
+    my @newproto = split(' ', $addproto, length($addproto));
+    foreach my $name (@newproto) { 
+        if ( -e $proto_dir . "/" . substr($name, 0, index($name, ".")) . ".proto" ) {
+             push @PROTOS_NAME, substr($name, 0, index($name, ".")); 
+             push @PROTOS_EXT,  substr($name, index($name, ".")+1, length($name)); 
+        }else{ 
+             print "WARNING: Proto file $name not in $proto_dir. \n" ;
+        }
+    } 
+}
 
 #read memory layout file
 if( $VERBOSE ){ print "Reading memory layout...\n"; }
@@ -90,8 +105,8 @@ process_memLayout($input_mem, \%lst_group, \%lst_param, \%lst_sta, \%lst_const, 
 if( $VERBOSE ){ print "Reading namelists...\n"; }
 process_namelist($input_nml, \@lst_nml, \@lst_com, $DEBUG);
 
-#write memory output files
-if( $VERBOSE ){ print "Printing memory layout...\n"; }
+#create memory related output files 
+if( $VERBOSE ){ print "Create memory related output files...\n"; }
 foreach my $idx ( 0 .. $#PROTOS_NAME ){
     my $name = $PROTOS_NAME[$idx];
     my $ext  = $PROTOS_EXT[$idx];

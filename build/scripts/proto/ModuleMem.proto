@@ -139,7 +139,7 @@
         real(RLEN),public,pointer,dimension(:,:) :: D2DIAGNOS_ICE
 
         type(ppFlux), public,dimension(:,:),allocatable :: D2FLUX_MATRIX_ICE
-        real(RLEN)  , public,dimension(:),allocatable :: D2FLUX_FUNC_ICE
+        real(RLEN)  , public,dimension(:,:),allocatable :: D2FLUX_FUNC_ICE
 #endif
 
 
@@ -162,7 +162,7 @@
         real(RLEN),public,pointer,dimension(:,:) :: D2DIAGNOS_BEN
 
         type(ppFlux), public,dimension(:,:),allocatable :: D2FLUX_MATRIX_BEN
-        real(RLEN)  , public,dimension(:),allocatable :: D2FLUX_FUNC_BEN
+        real(RLEN)  , public,dimension(:,:),allocatable :: D2FLUX_FUNC_BEN
 #endif
 
 

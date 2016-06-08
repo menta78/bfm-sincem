@@ -218,9 +218,9 @@
                if ( var_ave(i) ) then
                   k=k+1
                   if ( ave_count < 1.5 ) then
-                     D2ave_ice(k,1)=D2FLUX_FUNC_ICE(j)
+                     D2ave_ice(k,:)=D2FLUX_FUNC_ICE(j,:)
                   else
-                     D2ave_ice(k,1)=D2ave_ice(k,1)+D2FLUX_FUNC_ICE(j)
+                     D2ave_ice(k,:)=D2ave_ice(k,:)+D2FLUX_FUNC_ICE(j,:)
                   end if
                end if
             end do
@@ -265,9 +265,9 @@
                if ( var_ave(i) ) then
                   k=k+1
                   if ( ave_count < 1.5 ) then
-                     D2ave_ben(k,1)=D2FLUX_FUNC_BEN(j)
+                     D2ave_ben(k,:)=D2FLUX_FUNC_BEN(j,:)
                   else
-                     D2ave_ben(k,1)=D2ave_ben(k,1)+D2FLUX_FUNC_BEN(j)
+                     D2ave_ben(k,:)=D2ave_ben(k,:)+D2FLUX_FUNC_BEN(j,:)
                   end if
                end if
             end do

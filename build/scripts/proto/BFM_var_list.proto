@@ -3,7 +3,7 @@
       INTEGER, parameter :: jptra_flux = %3d-flux-pel-nr      
       INTEGER, parameter :: jptra_dia = jptra_var + jptra_flux
        
-      INTEGER, parameter :: jptra_dia_2d = %2d-diagnos-pel-nr  ! (surf,bot,riv)
+      INTEGER, parameter :: jptra_dia_2d = %2d-diagnos-pel-nrs
  
 C State variables
 

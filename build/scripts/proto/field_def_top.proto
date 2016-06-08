@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+    <!-- $id$ -->
+
+    <!--
+============================================================================================================
+=                                  definition of all existing variables                                    =
+=                                            DO NOT CHANGE                                                 =
+============================================================================================================
+    -->
+   <field_definition level="1" prec="4" operation="average" enabled=".TRUE." default_value="1.e20" > <!-- time step automaticaly defined -->
+
+    <!--
+============================================================================================================
+                                         BFM variables on T grid
+============================================================================================================
+    -->
+
+      <!-- PELAGIC variables -->
+
+%3d-state-pel-xmlstr
+%3d-diagnos-pel-xmlstr
+%3d-diaggrp-pel-xmlstr
+%3d-flux-pel-xmlstr
+
+%2d-diagnos-pel-xmlstr
+%2d-diagnos-pel-xmlstr surface
+%2d-diagnos-pel-xmlstr bottom
+%2d-diagnos-pel-xmlstr river
+
+      <!-- SEAICE variables -->
+
+%2d-state-ice-xmlstr
+%2d-diagnos-ice-xmlstr
+%2d-diaggrp-ice-xmlstr
+%2d-flux-ice-xmlstr
+
+      <!-- BENTHIC variables -->
+
+%2d-state-ben-xmlstr
+%2d-diagnos-ben-xmlstr
+%2d-diaggrp-ben-xmlstr
+%2d-flux-ben-xmlstr
+
+
+   </field_definition>

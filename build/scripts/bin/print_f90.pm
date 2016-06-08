@@ -9,7 +9,7 @@
 #
 # COPYING
 #  
-#   Copyright (C) 2013 BFM System Team ( bfm_st@lists.cmcc.it )
+#   Copyright (C) 2016 BFM System Team ( bfm_st@lists.cmcc.it )
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@ use Exporter;
 use F90Namelist;
 use List::Util qw[min max];
 use Data::Dumper;
+use Switch;
 
 use classes;
 
@@ -62,6 +63,7 @@ my $dispatch = {
     '\%(3|2)d-(diaggrp)-(pel|ben|ice)-desc(?:\s|\n)'       => \&func_DESC_DIAGG ,
     #NR
     '([^\%]*)\%(3|2)d-(flux|diagnos|state)-(pel|ben|ice)-nr(?:\s|\n)' => \&func_NR ,
+    '([^\%]*)\%(3|2)d-(flux|diagnos|state)-(pel|ben|ice)-nrs(?:\s|\n)' => \&func_NRS ,
     #ARRAY
     '([^\%]*)\%(pel|ben|ice)-field-array\s*(\S*)(?:\s|\n)' => \&func_ARRAY_FIELD ,
     #PP
@@ -117,6 +119,9 @@ my $dispatch = {
     '\%(3|2)d-state-(pel|ben|ice)-func-zeroing(?:\s|\n)'       => \&func_INIT_FUNC_ZERO ,
     #COUPLING
     '\%(3|2)d-flux-coupled(?:\s|\n)'                           => \&func_FLUX_COUPLED ,
+    #XIOS XML FILES
+    '\%(3|2)d-(diagnos|diaggrp|state|flux)-(pel|ben|ice)-xmlstr\s*(\S*)(?:\s|\n)' => \&func_XMLFIELD ,
+    '\%output-default-variables(?:\s|\n)'                      => \&func_XMLFILE
 };
 ########### REGULAR EXPRESSIONS ##########################
 
@@ -380,69 +385,6 @@ sub func_POINT_ALLOC  {
     if( $line ){ print $file $line; }
 }
 
-sub func_PP_TOTAL_DIAGNOS  {
-    my ( $file, $before, $dim, $type, $subt ) = @_;
-    if ( $DEBUG ){ print "AllocateMem -> FUNCTION CALLED func_PP_TOTAL_DIAGNOS: "; }
-    
-    my $TYPE = uc($type);
-
-    #calculate lenght
-    my $len=0;
-    my $index_group = 1;
-
-    my @line_par = ();
-
-    if( ! checkDimType($dim, $type, $subt)  ){ return; }
-
-    foreach my $name ( sort { $$LST_PARAM{$a}->getIndex() cmp $$LST_PARAM{$b}->getIndex() } keys %$LST_PARAM ){
-        my $param   = $$LST_PARAM{$name};
-        if( $dim == $param->getDim() 
-            && $type eq $param->getType() 
-            && $subt eq $param->getSubtype() ){
-            
-            if( $param->getComponents() && keys(%{$param->getComponents()}) != 0 ){
-                foreach my $const ( sort { $$LST_CONST{$a} cmp $$LST_CONST{$b} } keys %$LST_CONST ){
-                    if( exists ${$param->getComponents()}{$const} ){
-                        my $nameC = $name . $const;
-                        push( @line_par, "pp${nameC}=".$index_group++ );
-                    }
-                }
-                if( $param->getComponentsEx() && keys(%{$param->getComponentsEx()}) != 0 ){
-                    foreach my $const ( sort { $$LST_CONST{$a} cmp $$LST_CONST{$b} } keys %$LST_CONST ){
-                        if( exists ${$param->getComponentsEx()}{$const} ){
-                            my $nameC = $name . $const;
-                            push( @line_par, "pp${nameC}=0" );
-                        }
-                    }
-                }
-            }else{
-                push( @line_par, "pp${name}=".$index_group++);
-            }
-        }
-    }
-
-
-    #foreach my $root (sort keys %$LST_PARAM){
-    foreach my $root ( sort { $$LST_PARAM{$a}->getIndex() cmp $$LST_PARAM{$b}->getIndex() } keys %$LST_PARAM ){
-        my $param = $$LST_PARAM{$root};
-        if( $dim == $param->getDim() 
-            && $param->getQuota()
-            && $param->getSubtype eq $subt ){
-            #print $root . " -> " . $param->getQuota() . "\n";
-            foreach my $member ( sort { $$LST_PARAM{$a}->getIndex() cmp $$LST_PARAM{$b}->getIndex() } keys %$LST_PARAM ){
-                my $param2 = $$LST_PARAM{$member};
-                if( defined($param2->getGroup()) && $param2->getGroup() eq $param->getQuota() ){
-                    push( @line_par, "pp${root}_ii${member}=" . ($index_group)++ );
-                }
-            }
-        }
-    }
-
-    if( $#line_par >= 0 ){ printList($file, \@line_par, $before); print $file "\n"; }
-
-}
-
-
 sub func_PP_ASSIGN  {
     my ( $file, $dim, $type, $subt ) = @_;
     if ( $DEBUG ){ print "AllocateMem -> FUNCTION CALLED func_PP_ASSIGN: "; }
@@ -610,7 +552,7 @@ sub func_FLUX_ALLOC  {
         $line .= "  D${dim}FLUX_FUNC${SUBTYPE} = 0\n";
     }elsif( $dim == 2 ){
         $line .= "  allocate( D${dim}FLUX_MATRIX${SUBTYPE}(1:NO_D${dim}_BOX_STATES${SUBTYPE}, 1:NO_D${dim}_BOX_STATES${SUBTYPE}),stat=status )\n";
-        $line .= "  allocate( D${dim}FLUX_FUNC${SUBTYPE}(1:NO_D${dim}_BOX_FLUX${SUBTYPE}),stat=status )\n";
+        $line .= "  allocate( D${dim}FLUX_FUNC${SUBTYPE}(1:NO_D${dim}_BOX_FLUX${SUBTYPE}, 1:NO_BOXES_XY),stat=status )\n";
         $line .= "  D${dim}FLUX_FUNC${SUBTYPE} = 0\n";
     }
 
@@ -1234,7 +1176,7 @@ sub func_STRING_DIAGG  {
                 my $param2 = $$LST_PARAM{$name2};
                 if ( $param2->getGroup() && $group_name eq $param2->getGroup() ){ 
                     my $param_name = $param2->getSigla();
-                    my $nameP = $name . "(ii$param_name)";
+                    my $nameP = $name . "_ii$param_name";
                     my $commP = $comm;$commP =~ s/$group_name/$param_name\($group_name\)/;
 
                     $line .= "${SPACE}var_names($STRING_INDEX)=\"$nameP\"\n";
@@ -1257,7 +1199,7 @@ sub func_STRING_FIELD  {
     if ( $DEBUG ){ print "SET_VAR_INFO_BFM -> FUNCTION CALLED func_STRING_FIELD: $subt, $spec"; }
 
     my $line;
-    
+
     my $SPEC       = uc($spec);
     my $spec_short = substr($spec,0,3);
 
@@ -1402,107 +1344,6 @@ sub func_STRING_INDEX_STARTEND  {
 
     if( $line ){ print $file $line; }
     #print Dumper(\%STRING_INDEX_ARRAY) . "\n";
-}
-
-
-sub func_STRING_OGSTM  {
-    my ( $file, $dim, $type, $subt ) = @_;
-    if ( $DEBUG ){ print "SET_VAR_INFO_BFM -> FUNCTION CALLED func_STRING_OGSTM: $dim, $type, $subt"; }
-
-    my $line  = "";
-    my $index = 1;
-    my $namevar  = 'ctrcnm';
-    my $unitvar  = 'ctrcun';
-
-    if( $type eq 'diagnos' ){ $namevar = 'dianm'; $unitvar = 'diaun'; }
-
-    foreach my $name ( sort { $$LST_PARAM{$a}->getIndex() cmp $$LST_PARAM{$b}->getIndex() } keys %$LST_PARAM ){
-        my $param = $$LST_PARAM{$name};
-        if( $dim == $param->getDim() 
-            && $type eq $param->getType() 
-            && $subt eq $param->getSubtype() ){
-
-            my $comm  = $param->getComment();
-            if( $param->getComponents() && keys(%{$param->getComponents()}) != 0 ){
-                foreach my $const ( sort { $$LST_CONST{$a} cmp $$LST_CONST{$b} } keys %$LST_CONST ){
-                    if( exists ${$param->getComponents()}{$const} ){
-                        my $nameC = $name . $const;
-                        my $unitC = ${$param->getComponents()}{$const};
-                        $line .= "${SPACE}${namevar}($index)=\"$nameC\"\n";
-                        $line .= "${SPACE}${unitvar}($index)=\"$unitC\"\n";
-                        if( $type eq 'diagnos' || $type eq 'state'){ $$LST_INDEX{"$nameC"} = "$index"; }
-                        $index++;
-                    }
-                }
-            }else{
-                my $unit  = $param->getUnit();
-                $line .= "${SPACE}${namevar}($index)=\"$name\"\n";
-                $line .= "${SPACE}${unitvar}($index)=\"$unit\"\n";
-                if( $type eq 'diagnos' || $type eq 'state'){ $$LST_INDEX{"$name"} = "$index"; }
-                $index++;
-            }
-        }
-    }
-
-
-    # if diagnos OGS, then add the diaggrp to the vector
-    if( $type eq 'diagnos' ){ $line .= "\n"; }
-    foreach my $name ( sort { $$LST_PARAM{$a}->getIndex() cmp $$LST_PARAM{$b}->getIndex() } keys %$LST_PARAM ){
-        my $param = $$LST_PARAM{$name};
-        if( $dim == $param->getDim() 
-            && $type eq 'diagnos'
-            && $param->getType() eq 'diaggrp'
-            && $subt eq $param->getSubtype()
-            ){
-
-            my $group_name = $param->getQuota();
-            my $unit       = $param->getUnit();
-            my $comm       = $param->getComment();
-            foreach my $name2 ( sort { $$LST_PARAM{$a}->getIndex() cmp $$LST_PARAM{$b}->getIndex() } keys %$LST_PARAM ){
-                my $param2 = $$LST_PARAM{$name2};
-                if ( $param2->getGroup() && $group_name eq $param2->getGroup() ){ 
-                    my $param_name = $param2->getSigla();
-                    my $nameP = $name . "_ii$param_name";
-
-                    $line .= "${SPACE}${namevar}($index)=\"$nameP\"\n";
-                    $line .= "${SPACE}${unitvar}($index)=\"$unit\"\n";
-
-                    $index++;
-                }
-            }
-        }
-    }
-    
-    # if diagnos OGS, then add the flux to the vector
-    if( $type eq 'diagnos' ){ $line .= "\n"; }
-    foreach my $name ( sort { $$LST_PARAM{$a}->getIndex() cmp $$LST_PARAM{$b}->getIndex() } keys %$LST_PARAM ){
-        my $param = $$LST_PARAM{$name};
-        if( $dim == $param->getDim() 
-            && $type eq 'diagnos'
-            && $param->getType() eq 'flux'
-            && $subt eq $param->getSubtype() ){
-            
-            my $comm  = $param->getComment();
-            if( $param->getComponents() && keys(%{$param->getComponents()}) != 0 ){
-                foreach my $const ( sort { $$LST_CONST{$a} cmp $$LST_CONST{$b} } keys %$LST_CONST ){
-                    if( exists ${$param->getComponents()}{$const} ){
-                        my $nameC = $name . $const;
-                        my $unitC = ${$param->getComponents()}{$const};
-                        $line .= "${SPACE}${namevar}($index)=\"$nameC\"\n";
-                        $line .= "${SPACE}${unitvar}($index)=\"$unitC\"\n";
-                        $index++;
-                    }
-                }
-            }else{
-                my $unit  = $param->getUnit();
-                $line .= "${SPACE}${namevar}($index)=\"$name\"\n";
-                $line .= "${SPACE}${unitvar}($index)=\"$unit\"\n";
-                $index++;
-            }
-        }
-    }
-
-    if( $line ){ print $file $line; }
 }
 
 
@@ -1984,9 +1825,202 @@ sub func_HEADER_DIAGG  {
 }
 
 
+
+###########################################  BFM0D_var_list  FUNCTIONS  ############################
+
+sub func_PP_TOTAL_DIAGNOS  {
+    my ( $file, $before, $dim, $type, $subt ) = @_;
+    if ( $DEBUG ){ print "BFM0D_var_list -> FUNCTION CALLED func_PP_TOTAL_DIAGNOS: "; }
+    
+    my $TYPE = uc($type);
+
+    #calculate lenght
+    my $len=0;
+    my $index_group = 1;
+
+    my @line_par = ();
+
+    if( ! checkDimType($dim, $type, $subt)  ){ return; }
+
+    foreach my $name ( sort { $$LST_PARAM{$a}->getIndex() cmp $$LST_PARAM{$b}->getIndex() } keys %$LST_PARAM ){
+        my $param   = $$LST_PARAM{$name};
+        if( $dim == $param->getDim() 
+            && $type eq $param->getType() 
+            && $subt eq $param->getSubtype() ){
+            
+            if( $param->getComponents() && keys(%{$param->getComponents()}) != 0 ){
+                foreach my $const ( sort { $$LST_CONST{$a} cmp $$LST_CONST{$b} } keys %$LST_CONST ){
+                    if( exists ${$param->getComponents()}{$const} ){
+                        my $nameC = $name . $const;
+                        push( @line_par, "pp${nameC}=".$index_group++ );
+                    }
+                }
+                if( $param->getComponentsEx() && keys(%{$param->getComponentsEx()}) != 0 ){
+                    foreach my $const ( sort { $$LST_CONST{$a} cmp $$LST_CONST{$b} } keys %$LST_CONST ){
+                        if( exists ${$param->getComponentsEx()}{$const} ){
+                            my $nameC = $name . $const;
+                            push( @line_par, "pp${nameC}=0" );
+                        }
+                    }
+                }
+            }else{
+                push( @line_par, "pp${name}=".$index_group++);
+            }
+        }
+    }
+
+
+    #foreach my $root (sort keys %$LST_PARAM){
+    foreach my $root ( sort { $$LST_PARAM{$a}->getIndex() cmp $$LST_PARAM{$b}->getIndex() } keys %$LST_PARAM ){
+        my $param = $$LST_PARAM{$root};
+        if( $dim == $param->getDim() 
+            && $param->getQuota()
+            && $param->getSubtype eq $subt ){
+            #print $root . " -> " . $param->getQuota() . "\n";
+            foreach my $member ( sort { $$LST_PARAM{$a}->getIndex() cmp $$LST_PARAM{$b}->getIndex() } keys %$LST_PARAM ){
+                my $param2 = $$LST_PARAM{$member};
+                if( defined($param2->getGroup()) && $param2->getGroup() eq $param->getQuota() ){
+                    push( @line_par, "pp${root}_ii${member}=" . ($index_group)++ );
+                }
+            }
+        }
+    }
+
+    if( $#line_par >= 0 ){ printList($file, \@line_par, $before); print $file "\n"; }
+
+}
+
+# Modified func_NR to avoid counting diagnostics for surface, bottom, river
+sub func_NRS  {
+    my ( $file, $before, $dim, $type, $subt) = @_;
+    if ( $DEBUG ){ print "BFM0D files -> FUNCTION CALLED func_NRS: "; }
+    
+    my $title  = "${type} ${dim}d ${subt}";
+    my $number = 0;
+    if( exists $$LST_STA{$title} ){
+        if( $title eq "diagnos 2d ${subt}" ){
+            $number = $$LST_STA{"${title}"} + sizeGroup($dim, $subt);
+        }
+        elsif( $title eq "diagnos 3d ${subt}" ){
+            $number=sizeDimType($dim, $type, $subt);
+        }
+        else{
+            $number=$$LST_STA{$title};
+        }
+    }else{ $number = 0; }
+
+    print $file "$before${number}\n";
+}
+
+###########################################  BFM0D namelist  FUNCTIONS  ##########################
+
+sub func_STRING_OGSTM  {
+    my ( $file, $dim, $type, $subt ) = @_;
+    if ( $DEBUG ){ print "BFM0D namelist -> FUNCTION CALLED func_STRING_OGSTM: $dim, $type, $subt"; }
+
+    my $line  = "";
+    my $index = 1;
+    my $namevar  = 'ctrcnm';
+    my $unitvar  = 'ctrcun';
+
+    if( $type eq 'diagnos' ){ $namevar = 'dianm'; $unitvar = 'diaun'; }
+
+    foreach my $name ( sort { $$LST_PARAM{$a}->getIndex() cmp $$LST_PARAM{$b}->getIndex() } keys %$LST_PARAM ){
+        my $param = $$LST_PARAM{$name};
+        if( $dim == $param->getDim() 
+            && $type eq $param->getType() 
+            && $subt eq $param->getSubtype() ){
+
+            my $comm  = $param->getComment();
+            if( $param->getComponents() && keys(%{$param->getComponents()}) != 0 ){
+                foreach my $const ( sort { $$LST_CONST{$a} cmp $$LST_CONST{$b} } keys %$LST_CONST ){
+                    if( exists ${$param->getComponents()}{$const} ){
+                        my $nameC = $name . $const;
+                        my $unitC = ${$param->getComponents()}{$const};
+                        $line .= "${SPACE}${namevar}($index)=\"$nameC\"\n";
+                        $line .= "${SPACE}${unitvar}($index)=\"$unitC\"\n";
+                        if( $type eq 'diagnos' || $type eq 'state'){ $$LST_INDEX{"$nameC"} = "$index"; }
+                        $index++;
+                    }
+                }
+            }else{
+                my $unit  = $param->getUnit();
+                $line .= "${SPACE}${namevar}($index)=\"$name\"\n";
+                $line .= "${SPACE}${unitvar}($index)=\"$unit\"\n";
+                if( $type eq 'diagnos' || $type eq 'state'){ $$LST_INDEX{"$name"} = "$index"; }
+                $index++;
+            }
+        }
+    }
+
+
+    # if diagnos OGS, then add the diaggrp to the vector
+    if( $type eq 'diagnos' ){ $line .= "\n"; }
+    foreach my $name ( sort { $$LST_PARAM{$a}->getIndex() cmp $$LST_PARAM{$b}->getIndex() } keys %$LST_PARAM ){
+        my $param = $$LST_PARAM{$name};
+        if( $dim == $param->getDim() 
+            && $type eq 'diagnos'
+            && $param->getType() eq 'diaggrp'
+            && $subt eq $param->getSubtype()
+            ){
+
+            my $group_name = $param->getQuota();
+            my $unit       = $param->getUnit();
+            my $comm       = $param->getComment();
+            foreach my $name2 ( sort { $$LST_PARAM{$a}->getIndex() cmp $$LST_PARAM{$b}->getIndex() } keys %$LST_PARAM ){
+                my $param2 = $$LST_PARAM{$name2};
+                if ( $param2->getGroup() && $group_name eq $param2->getGroup() ){ 
+                    my $param_name = $param2->getSigla();
+                    my $nameP = $name . "_ii$param_name";
+
+                    $line .= "${SPACE}${namevar}($index)=\"$nameP\"\n";
+                    $line .= "${SPACE}${unitvar}($index)=\"$unit\"\n";
+
+                    $index++;
+                }
+            }
+        }
+    }
+    
+    # if diagnos OGS, then add the flux to the vector
+    if( $type eq 'diagnos' ){ $line .= "\n"; }
+    foreach my $name ( sort { $$LST_PARAM{$a}->getIndex() cmp $$LST_PARAM{$b}->getIndex() } keys %$LST_PARAM ){
+        my $param = $$LST_PARAM{$name};
+        if( $dim == $param->getDim() 
+            && $type eq 'diagnos'
+            && $param->getType() eq 'flux'
+            && $subt eq $param->getSubtype() ){
+            
+            my $comm  = $param->getComment();
+            if( $param->getComponents() && keys(%{$param->getComponents()}) != 0 ){
+                foreach my $const ( sort { $$LST_CONST{$a} cmp $$LST_CONST{$b} } keys %$LST_CONST ){
+                    if( exists ${$param->getComponents()}{$const} ){
+                        my $nameC = $name . $const;
+                        my $unitC = ${$param->getComponents()}{$const};
+                        $line .= "${SPACE}${namevar}($index)=\"$nameC\"\n";
+                        $line .= "${SPACE}${unitvar}($index)=\"$unitC\"\n";
+                        $index++;
+                    }
+                }
+            }else{
+                my $unit  = $param->getUnit();
+                $line .= "${SPACE}${namevar}($index)=\"$name\"\n";
+                $line .= "${SPACE}${unitvar}($index)=\"$unit\"\n";
+                $index++;
+            }
+        }
+    }
+
+    if( $line ){ print $file $line; }
+}
+
+
+
+###########################################  BFM0D_Output_Ecology  FUNCTIONS #####################
+
 sub func_FLUX_COUPLED{
     my ( $file, $dim ) = @_;
-    if ( $DEBUG ){ print "AllocateMem -> FUNCTION CALLED func_FLUX_COUPLED: "; }
+    if ( $DEBUG ){ print "BFM0D_Output_Ecology -> FUNCTION CALLED func_FLUX_COUPLED: "; }
 
     #calculate lenght
     my $len=0;
@@ -2084,4 +2118,124 @@ sub func_FLUX_COUPLED{
 
 
     if( $line ){ print $file $line; }
+}
+
+########################################### XIOS XML FUNCTIONS ######################
+
+sub func_XMLFIELD  {
+    my ( $file, $dim, $type, $subt, $spec ) = @_;
+    if ( $DEBUG ){ print "field_def_top.xml -> FUNCTION CALLED func_XMLFIELD: $dim, $type, $subt"; }
+
+    my $line  = "";
+    my $TAB4 = " " x 4  ;
+    my $TAB5 = "    \t" ;
+    my $TAB6 = " " x 6  ;
+
+    my $grpdim = $dim;
+    my $fldname = "" ;
+    my $spec_short = "" ;
+    #my $title = "${type}_${subt}_${dim}";
+
+    # control to generate pelagic surface, bottom, river diagnostics
+    if ($spec) { $grpdim = 3; $type = 'state'; $fldname = "_$spec" ; $spec_short = substr($spec,0,3);}
+    else { $spec = "";}
+
+    #print "Do ${title}${fldname}\n" ;
+
+    # field group definition header
+    $line .= "${TAB4}<field_group id=\"${subt}_${type}_${dim}D${fldname}\" grid_ref=\"grid_T_${dim}D\">\n";
+
+    foreach my $name ( sort { $$LST_PARAM{$a}->getIndex() cmp $$LST_PARAM{$b}->getIndex() } keys %$LST_PARAM ){
+        my $param = $$LST_PARAM{$name};
+        if( $grpdim == $param->getDim() 
+            && $type eq $param->getType() 
+            && $subt eq $param->getSubtype() ){
+
+            my $comm  = $param->getComment();
+            my $group_name = $param->getQuota();
+            my $unit       = $param->getUnit();
+
+            switch ($type) { case "diaggrp" {
+            # create diagnostics for groups
+              foreach my $name2 ( sort { $$LST_PARAM{$a}->getIndex() cmp $$LST_PARAM{$b}->getIndex() } keys %$LST_PARAM ){
+                  my $param2 = $$LST_PARAM{$name2};
+                  if ( $param2->getGroup() && $group_name eq $param2->getGroup() ){
+                      my $param_name = $param2->getSigla();
+                      my $nameP = $name . "_ii$param_name";
+                      my $commP = $comm;$commP =~ s/$group_name/$param_name\($group_name\)/;
+                      $line .= "${TAB6}<field id=\"${nameP}\"${TAB6}long_name=\"${commP}\"${TAB5}unit=\"${unit}\"/>\n";
+                  }
+              }
+            } else {
+            # create state, diagnos, flux group of data
+              if( $param->getComponents() && keys(%{$param->getComponents()}) != 0 ){
+                  foreach my $const ( sort { $$LST_CONST{$a} cmp $$LST_CONST{$b} } keys %$LST_CONST ){
+                      if( exists ${$param->getComponents()}{$const} ){
+                          my $nameC = $name . $const;
+                          my $unitC = ${$param->getComponents()}{$const};
+                          if (length($spec)) {
+                             $comm  = "flux of " . $name . $const . " at " . $spec ;
+                             $nameC = "j". $spec_short . $name . $const  ;
+                          }
+                          $line .= "${TAB6}<field id=\"${nameC}\"${TAB6}long_name=\"${comm}\"${TAB5}unit=\"${unitC}\"/>\n";
+                      }
+                  }
+              }else{
+                  my $unit  = $param->getUnit();
+                  if (length($spec)) {
+                     $comm  = "flux of " . $name . " at " . $spec ;
+                     $name = "j". $spec_short . $name ;
+                  }                
+                  $line .= "${TAB6}<field id=\"${name}\"${TAB6}long_name=\"${comm}\"${TAB5}unit=\"${unit}\"/>\n";
+              }
+            }}
+        }
+    }
+
+    $line .= "${TAB4}</field_group>\n\n" ;
+
+    if( $line ){ print $file $line; }
+}
+
+sub func_XMLFILE {
+    my ( $file ) = @_;
+    if ( $DEBUG ){ print "file_def_top.xml -> FUNCTION CALLED func_XMLFILE: "; }
+
+    my $line = '';
+    my $TAB8 = " " x 8 ;
+
+    my @meanvar = '' ;  my @instvar = '' ;  
+ 
+    #print "lst_nml:\n"   , Dumper(\@$LST_NML)   , "\n";
+    foreach my $list (@$LST_NML){ 
+      if( $list->name() eq "bfm_save_nml" ){
+         foreach my $element ( split(/\n/,$list->output) ) {
+           if( $element =~ "ave_save.*" )
+             { my $tmp = $element; $tmp =~ s/ave_save=//; $tmp =~ s/[ ']+//g; @meanvar = split (/,/, $tmp);}
+           if( $element =~ "var_save.*" )
+             { my $tmp = $element; $tmp =~ s/var_save=//; $tmp =~ s/[ ']+//g; @instvar = split (/,/, $tmp);}
+          }
+       } 
+    }  
+    #print Dumper(\@meanvar) , "\n";
+    $line .= "${TAB8}<file id=\"file20\" name_suffix=\"_bfm\" description=\"BFM variables\" >\n";
+
+    # Variables requested as time average
+    foreach my $name (@meanvar) {
+       my $addinst="";
+       if ( grep( /^$name$/, @instvar ) ) {$addinst=" operation=\"instant\" ";}
+          $line .= "${TAB8}  <field field_ref=\"${name}\"  ${addinst}    />\n";
+    }
+    # Add ivariables requested as inst values not inclueded before
+    foreach my $name (@instvar) {
+       my $addinst="";
+       if ( grep( /^$name$/, @meanvar ) == 0) {
+          $line .= "${TAB8}  <field field_ref=\"${name}\"  operation=\"instant\"   />\n";
+       }
+    }
+
+    $line .= "${TAB8}</file>\n";
+
+    if( $line ){ print $file $line; }
+
 }

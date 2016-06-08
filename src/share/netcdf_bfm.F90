@@ -1368,7 +1368,7 @@ end subroutine init_netcdf_rst_bfm
             ! Store snapshot of seaice 2D flux
             if ( n >= stIceFlux2dS .AND. n <= stIceFlux2dE ) then
                idx_tmp=n-stIceFlux2dS+1
-               iret = store_data(ncid_bfm,var_ids(n),SURFT_SHAPE,NO_BOXES_XY,garray=D2FLUX_FUNC_ICE(idx_tmp))
+               iret = store_data(ncid_bfm,var_ids(n),SURFT_SHAPE,NO_BOXES_XY,garray=D2FLUX_FUNC_ICE(idx_tmp),:)
             end if
          ELSE
             ! Store mean values of (any) 2D entity
@@ -1403,7 +1403,7 @@ end subroutine init_netcdf_rst_bfm
             ! Store snapshot of benthic 2D flux
             if ( n >= stBenFlux2dS .AND. n <= stBenFlux2dE ) then
                idx_tmp=n-stBenFlux2dS+1
-               iret = store_data(ncid_bfm,var_ids(n),BOTT_SHAPE,NO_BOXES_XY,garray=D2FLUX_FUNC_BEN(idx_tmp))
+               iret = store_data(ncid_bfm,var_ids(n),BOTT_SHAPE,NO_BOXES_XY,garray=D2FLUX_FUNC_BEN(idx_tmp,:))
             end if
          ELSE
             ! Store mean values of (any) 2D entity

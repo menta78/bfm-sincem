@@ -157,7 +157,7 @@ subroutine BFM0D_Output_EcologyDynamics_surf(BFM0D_tra, BFM0D_sed, local_BFM0D_d
       
   INTEGER, parameter :: jptra_dia = jptra_var + jptra_flux
   INTEGER, parameter :: jptra = %3d-state-pel-nr
-  INTEGER, parameter :: jptra_dia_2d =  %2d-diagnos-pel-nr  ! (surf,bot,riv)
+  INTEGER, parameter :: jptra_dia_2d =  %2d-diagnos-pel-nrs
   real(RLEN), intent(out) :: local_BFM0D_dia2d(jptra_dia_2d)
   real(RLEN), intent(out) :: local_BFM0D_dia(jptra_dia) 
 

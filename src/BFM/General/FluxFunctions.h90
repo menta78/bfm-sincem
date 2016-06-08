@@ -83,8 +83,8 @@
                   if( allocated( D2FLUX_MATRIX_ICE ) .AND. &
                        allocated( D2FLUX_MATRIX_ICE(origin,destination)%p ) ) then
                      do j=1, SIZE(D2FLUX_MATRIX_ICE(origin,destination)%p)
-                        D2FLUX_FUNC_ICE( ABS(D2FLUX_MATRIX_ICE(origin,destination)%p(j)) ) =      &
-                             D2FLUX_FUNC_ICE( ABS(D2FLUX_MATRIX_ICE(origin,destination)%p(j)) ) + &
+                        D2FLUX_FUNC_ICE( ABS(D2FLUX_MATRIX_ICE(origin,destination)%p(j)), : ) =      &
+                             D2FLUX_FUNC_ICE( ABS(D2FLUX_MATRIX_ICE(origin,destination)%p(j)), : ) + &
                              (SIGN( 1, D2FLUX_MATRIX_ICE(origin,destination)%p(j) ) * flux (1) )
                      end do
                   endif
@@ -98,8 +98,8 @@
                   if( allocated( D2FLUX_MATRIX_BEN ) .AND. &
                        allocated( D2FLUX_MATRIX_BEN(origin,destination)%p ) ) then
                      do j=1, SIZE(D2FLUX_MATRIX_BEN(origin,destination)%p)
-                        D2FLUX_FUNC_BEN( ABS(D2FLUX_MATRIX_BEN(origin,destination)%p(j)) ) =      &
-                             D2FLUX_FUNC_BEN( ABS(D2FLUX_MATRIX_BEN(origin,destination)%p(j)) ) + &
+                        D2FLUX_FUNC_BEN( ABS(D2FLUX_MATRIX_BEN(origin,destination)%p(j)), : ) =      &
+                             D2FLUX_FUNC_BEN( ABS(D2FLUX_MATRIX_BEN(origin,destination)%p(j)), : ) + &
                              (SIGN( 1, D2FLUX_MATRIX_BEN(origin,destination)%p(j) ) * flux (1) )
                      end do
                   endif
@@ -136,13 +136,13 @@
                      do j=1, SIZE(D2FLUX_MATRIX_ICE(origin,destination)%p)
                         if( D2FLUX_MATRIX_ICE(origin,destination)%dir(j) == 1 ) then ! "A->B" => (out flow) => flux < ZERO => D2SINK_ICE
                            if( flux(1) < ZERO ) then
-                              D2FLUX_FUNC_ICE( ABS(D2FLUX_MATRIX_ICE(origin,destination)%p(j)) ) =     &
-                                   D2FLUX_FUNC_ICE( ABS(D2FLUX_MATRIX_ICE(origin,destination)%p(j)) ) - flux(1)
+                              D2FLUX_FUNC_ICE( ABS(D2FLUX_MATRIX_ICE(origin,destination)%p(j)), : ) =     &
+                                   D2FLUX_FUNC_ICE( ABS(D2FLUX_MATRIX_ICE(origin,destination)%p(j)), : ) - flux(1)
                            end if
                         else ! "A<-B" => (in flow) => flux > ZERO => D2SOURCE_ICE
                            if( flux(1) > ZERO ) then
-                              D2FLUX_FUNC_ICE( ABS(D2FLUX_MATRIX_ICE(origin,destination)%p(j)) ) =     &
-                                   D2FLUX_FUNC_ICE( ABS(D2FLUX_MATRIX_ICE(origin,destination)%p(j)) ) + flux(1)
+                              D2FLUX_FUNC_ICE( ABS(D2FLUX_MATRIX_ICE(origin,destination)%p(j)), : ) =     &
+                                   D2FLUX_FUNC_ICE( ABS(D2FLUX_MATRIX_ICE(origin,destination)%p(j)), : ) + flux(1)
                            end if
                         end if
                      end do
@@ -157,13 +157,13 @@
                      do j=1, SIZE(D2FLUX_MATRIX_BEN(origin,destination)%p)
                         if( D2FLUX_MATRIX_BEN(origin,destination)%dir(j) == 1 ) then ! "A->B" => (out flow) => flux < ZERO => D2SINK_BEN
                            if( flux(1) < ZERO ) then
-                              D2FLUX_FUNC_BEN( ABS(D2FLUX_MATRIX_BEN(origin,destination)%p(j)) ) =     &
-                                   D2FLUX_FUNC_BEN( ABS(D2FLUX_MATRIX_BEN(origin,destination)%p(j)) ) - flux(1)
+                              D2FLUX_FUNC_BEN( ABS(D2FLUX_MATRIX_BEN(origin,destination)%p(j)), : ) =     &
+                                   D2FLUX_FUNC_BEN( ABS(D2FLUX_MATRIX_BEN(origin,destination)%p(j)), : ) - flux(1)
                            end if
                         else ! "A<-B" => (in flow) => flux > ZERO => D2SOURCE_BEN
                            if( flux(1) > ZERO ) then
-                              D2FLUX_FUNC_BEN( ABS(D2FLUX_MATRIX_BEN(origin,destination)%p(j)) ) =     &
-                                   D2FLUX_FUNC_BEN( ABS(D2FLUX_MATRIX_BEN(origin,destination)%p(j)) ) + flux(1)
+                              D2FLUX_FUNC_BEN( ABS(D2FLUX_MATRIX_BEN(origin,destination)%p(j)), : ) =     &
+                                   D2FLUX_FUNC_BEN( ABS(D2FLUX_MATRIX_BEN(origin,destination)%p(j)), : ) + flux(1)
                            end if
                         end if
                      end do

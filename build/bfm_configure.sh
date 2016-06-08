@@ -281,7 +281,16 @@ fi
 # -----------------------------------------------------
 # Memory and namelist files GENERATION
 # -----------------------------------------------------
-
+# Additional prototype filenames with real extension, 
+# all proto files must have .proto extension as default
+#
+addproto=""
+if [ "$MODE" == "OGS" ]; then
+   addproto="BFM_var_list.h BFM0D_Output_Ecology.F90 namelist.passivetrc"
+fi
+if [ "$MODE" == "NEMO" ]; then
+   addproto="field_def_top.xml file_def_top.xml"
+fi
 
 if [ ${GEN} ]; then
 
@@ -311,18 +320,8 @@ if [ ${GEN} ]; then
         -r ${BFMDIR}/${CONFDIR}/${myGlobalMem}  \
         -n ${BFMDIR}/${CONFDIR}/${myGlobalNml}  \
         -f ${BFMDIR}/${SCRIPTS_PROTO} \
-        -t ${blddir} || exit
-
-    if [[ "$MODE" == "OGS" ]]; then
-    # generate BFM0D output subroutines
-    ${PERL} -I${BFMDIR}/${SCRIPTS_BIN}/ ${BFMDIR}/${SCRIPTS_BIN}/generate_conf_BFM0D.pl \
-        ${cppdefs} \
-        -r ${BFMDIR}/${CONFDIR}/${myGlobalMem}  \
-        -n ${BFMDIR}/${CONFDIR}/${myGlobalNml}  \
-        -f ${BFMDIR}/${SCRIPTS_PROTO} \
-        -t ${blddir} || exit
-    fi
-
+        -t ${blddir} \
+        -a "${addproto}"  || exit
 
     # generate other namelists specified in the argument NMLLIST
     if [ "${NMLLIST}" ]; then
@@ -543,6 +542,7 @@ if [ ${DEP} ]; then
         #copy files from blddir to exedir
         cd ${blddir}
         cp *.nml ${exedir}/
+        if [ "$MODE" == "OGS" ] ; then cp namelist* ${exedir}/; fi
         if [ "${EXPFILES}" ]; then cp ${EXPFILES} ${exedir}/; fi
         if [ "${EXPDIR}"   ]; then cp ${EXPDIR}/* ${exedir}/; fi
 
@@ -563,7 +563,9 @@ if [ ${DEP} ]; then
         #link reference nemo files from the shared directory
         if [[ "$MODE" == "NEMO" || "$MODE" == "NEMO_3DVAR" ]] && [ -d ${NEMODIR}/NEMOGCM/CONFIG/SHARED ]; then 
            ln -sf ${NEMODIR}/NEMOGCM/CONFIG/SHARED/*_ref ${exedir}/;
-           ln -sf ${NEMODIR}/NEMOGCM/CONFIG/SHARED/*_def.xml ${exedir}/;
+           ln -sf ${NEMODIR}/NEMOGCM/CONFIG/SHARED/field_def.xml ${exedir}/;
+           ln -sf ${NEMODIR}/NEMOGCM/CONFIG/GYRE_XIOS/EXP00/domain_def.xml ${exedir}/;
+           cp *.xml ${exedir}/
         fi
     else
         echo "WARNING: directory ${exedir} exists (not overwriting namelists)"
