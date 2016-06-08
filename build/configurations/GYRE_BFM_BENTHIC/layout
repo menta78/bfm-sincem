@@ -32,7 +32,7 @@ end
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 #       Dimensional variables
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-3d-variable
+3d-variable-pel
   Depth : Gridpoint Depth: m
   Volume: Gridpoint Volume: m3
   Area  : Gridpoint Area: m2
@@ -51,7 +51,7 @@ end
   EICE  : Sea-ice fraction: -
   ETAUB : Bottom Stress : N m/s
 end
-3d-variable
+3d-variable-pel
   ETW   : temperature : C
   ESW   : Salinity : -
   ERHO  : Seawater Density : kg/m3
@@ -63,7 +63,7 @@ end
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 #       PELAGIC STATE VARIABLES (volume)
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-3d-state
+3d-state-pel
   #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   #	State variable for Oxygen
   #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -127,7 +127,7 @@ end
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 #       CO2 and Carbonate system variables
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-3d-state -if-exist INCLUDE_PELCO2
+3d-state-pel -if-exist INCLUDE_PELCO2
   group Inorganic[ch] (CAR): mg C/m3 : mmol eq/m3
      O3: Dissolved Inorganic Carbon: Alkalinity 
   end
@@ -138,7 +138,7 @@ end
   CO2airflux : Sea-air CO2 Flux : mmol/m2/d
 end
 
-3d-variable -if-exist INCLUDE_PELCO2
+3d-variable-pel -if-exist INCLUDE_PELCO2
     DIC        : Dissolved Inorganic Carbon : umol/kg
     CO2        : CO2(aq) : umol/kg
     pCO2       : Oceanic pCO2 : uatm
@@ -371,7 +371,7 @@ end
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 #       GENERAL DIAGNOSTICS
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-3d-variable
+3d-variable-pel
 
     #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     # Variables to check total mass in pelagic
@@ -453,14 +453,14 @@ end
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 #                       DIAGNOSTIC RATES
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-3d-flux -if-exist INCLUDE_DIAG INCLUDE_PELCO2
+3d-flux-pel -if-exist INCLUDE_DIAG INCLUDE_PELCO2
   ruPPYc=P.c <- O3c : Gross Primary Production : mg C/m3/d
   resPPYc=P.c -> O3c : Phytoplankton Respiration   : mg C/m3/d
   resPBAc=B.c -> O3c : Bacterial Respiration       : mg C/m3/d
   resZOOc=Z.c -> O3c : Zooplankton Respiration     : mg C/m3/d
 end
 
-3d-flux -if-exist INCLUDE_DIAG
+3d-flux-pel -if-exist INCLUDE_DIAG
   ruPPYn=P.n <- N3n+N4n: Net Nitrogen Uptake:mmol N/m3/d
   ruPPYp=P.p <- N1p : Net Phosphate Uptake : mmol P/m3/d
   ruPPYs=P.s <- N5s : Net Silicate Uptake : mmol Si/m3/d

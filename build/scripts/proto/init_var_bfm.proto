@@ -107,6 +107,8 @@ END MODULE init_var_bfm_local
 #ifndef NOT_STANDALONE
    use api_bfm
    use global_mem
+#else
+   use api_bfm, only: GetLun
 #endif
 #ifdef BFM_GOTM
    use bio_var
