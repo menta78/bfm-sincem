@@ -309,7 +309,7 @@ sub check_namelists{
                 if( $element eq "ave_save" ){
                     foreach my $value ( @{$list->get_values($element)} ){
                         my $tmp = $value;
-                        if ( $tmp =~ /(.*)\(ii(.*)\)/ ){
+                        if ( $tmp =~ /(.*)_ii(.*)/ ){
                             if( ! exists $$params_ref{$2} ){ print "WARNING: output $tmp does not exists\n"; }
                             $tmp = $1;
                         }
