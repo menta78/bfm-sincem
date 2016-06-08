@@ -1,4 +1,23 @@
 #include "cppdefs.h"
+MODULE trcdiabfm
+!   !!======================================================================
+!   !!                       ***  MODULE  trcdiabfm  ***
+!   !! Ocean passive tracers:  save output for passives tracers
+!   !!======================================================================
+
+   IMPLICIT NONE
+   
+   PRIVATE  
+
+   PUBLIC  trc_dia_bfm
+
+#if defined BFM_IOMPUT
+   LOGICAL,PUBLIC    :: bfm_iomput=.TRUE. ! use xios in nemo
+#else
+   LOGICAL,PUBLIC    :: bfm_iomput=.FALSE.
+#endif
+
+CONTAINS
 !-----------------------------------------------------------------------
 !BOP
 !
@@ -14,7 +33,8 @@
    use global_mem, only: RLEN, LOGUNIT, bfm_lwp, SkipBFMCore
    use netcdf_bfm, only: save_bfm, close_ncdf, ncid_bfm
    use api_bfm,    only: out_delta, save_delta, time_delta, &
-                         update_save_delta, unpad_out
+                         update_save_delta, unpad_out, &
+                         stStart, stEnd, var_names, var_ids
    use time,       only: bfmtime
 #ifdef INCLUDE_PELCO2
    use constants, ONLY:MW_C
@@ -25,6 +45,7 @@
   use mem, ONLY: O3h, O3c, DIC, ALK, ERHO
 #endif
 #endif
+  use iom, ONLY: iom_use
 
    implicit none
 !
@@ -41,13 +62,21 @@
 !
 ! !LOCAL VARIABLES:
    real(RLEN)             :: localtime  !time in seconds
+   integer                :: m
 !
 !EOP
 !-----------------------------------------------------------------------
 !BOC
 
    !---------------------------------------------
-   ! Update means
+   ! Re-initialize BFM var_ids values according to the XIOS file_def
+   IF ( bfm_iomput .and. kt == nit000 ) THEN
+      do m = stStart, stEnd
+         var_ids(m) = -1
+         !if ( iom_use( TRIM(var_names(m)) ) ) write(LOGUNIT,*) 'iomuse -> ' , TRIM(var_names(m))
+         if ( iom_use( TRIM(var_names(m)) ) ) var_ids(m) = 100
+      enddo
+    ENDIF
    !---------------------------------------------
 #ifdef INCLUDE_PELCO2
    ! Update DIC and alkalinity from model units to diagnostic output
@@ -57,19 +86,25 @@
    DIC(:) = O3c(:)/MW_C/ERHO(:)*1000.0_RLEN
    ALK(:)  = O3h(:)/ERHO(:)*1000.0_RLEN
 #endif
-   call calcmean_bfm(ACCUMULATE)
-
+   IF ( bfm_iomput ) THEN
+      call bfm_iom(kt) 
+   ELSE
+      ! Update means
+      call calcmean_bfm(ACCUMULATE)
+   ENDIF 
    !---------------------------------------------
    ! Write diagnostic output
    !---------------------------------------------
    if ( bfmtime%stepnow .eq. save_delta ) then
-      if ( lwp ) then
-         write(numout,*) 'trc_dia_bfm : write NetCDF passive tracer concentrations at ', kt, 'time-step'
-         write(numout,*) '~~~~~~ '
-      end if
       localtime = (time_delta - real(bfmtime%step0,RLEN)) * bfmtime%timestep
-      call calcmean_bfm(MEAN)
-      call save_bfm(localtime)
+      IF ( .NOT. bfm_iomput ) THEN
+         if ( lwp ) then
+            write(numout,*) 'trc_dia_bfm : write NetCDF passive tracer concentrations at ', kt, 'time-step'
+            write(numout,*) '~~~~~~ '
+         end if
+         call calcmean_bfm(MEAN)
+         call save_bfm(localtime)
+      ENDIF
       if ( unpad_out ) then
         localtime = real((bfmtime%stepnow - bfmtime%step0),RLEN) * bfmtime%timestep
         call write_rst_bfm(localtime)
@@ -83,7 +118,7 @@
       if ( .NOT. unpad_out ) then
         localtime = real((bfmtime%stepEnd - bfmtime%step0),RLEN) * bfmtime%timestep
         call write_rst_bfm(localtime)
-        call close_ncdf(ncid_bfm)
+        IF ( .NOT. bfm_iomput ) call close_ncdf(ncid_bfm)
       endif
      !close systemforcings
 #ifdef INCLUDE_PELCO2
@@ -170,7 +205,153 @@
   call close_ncdf(ncid_rst)
 
   LEVEL1 'write_rst_bfm: restart file creation ... DONE!'
-
+  
+  return
   end subroutine write_rst_bfm
 !EOC
 
+!-----------------------------------------------------------------------
+!BOP
+!
+! !ROUTINE: Save data using NEMO Xios infrastructure
+!           This require remapping data from BFM to NEMO memory structure
+!
+! !INTERFACE:
+  subroutine bfm_iom(kstp)
+! 
+! USES only 
+   use iom, only: iom_put
+
+   use mem, only: NO_BOXES,D3STATE,D3DIAGNOS,D3FLUX_FUNC,D2DIAGNOS
+#if defined INCLUDE_SEAICE
+   use mem, only: D2STATE_ICE,D2DIAGNOS_ICE,D2DIAGNOS_ICE,D2FLUX_FUNC_ICE
+#endif
+#if defined INCLUDE_BEN
+   use mem, only: D2STATE_BEN,D2DIAGNOS_BEN,D2DIAGNOS_BEN,D2FLUX_FUNC_BEN
+#endif
+   use global_mem, only: RLEN, LOGUNIT, bfm_lwp
+   use api_bfm, only: var_names, var_ids
+   use api_bfm, only: SEAmask, BOTmask, SRFmask, c1dim, ZEROS
+   use api_bfm, only: stStart, stEnd,                                &
+#if defined INCLUDE_SEAICE
+           & stIceStart, stIceEnd, stIceStateS, stIceStateE,         &
+           & stIceDiag2dS, stIceDiag2dE, stIceFlux2dS, stIceFlux2dE, &
+#endif
+#if defined INCLUDE_BEN
+           & stBenStart, stBenEnd, stBenStateS, stBenStateE,         &
+           & stBenDiag2dS, stBenDiag2dE, stBenFlux2dS, stBenFlux2dE, &
+#endif
+           &  stPelStart, stPelFluxE, stPelStateS, stPelStateE,      &
+           & stPelDiagS, stPelDiagE, stPelFluxS, stPelFluxE,         &
+           & stPelDiag2dS, stPelDiag2dE, stPelSurS, stPelSurE,       &
+           & stPelBotS, stPelRivE
+
+   IMPLICIT NONE
+
+   INTEGER,intent(in)    :: kstp
+
+   INTEGER               :: n, idx_tmp
+
+   !---------------------------------------------
+   ! Pelagic 3D variables
+   !---------------------------------------------
+   do n = stPelStart , stPelFluxE
+      if ( var_ids(n) > 0 ) then  
+         !-- Store pelagic state variables
+         if ( n >= stPelStateS .AND. n <= stPelStateE ) then
+            idx_tmp=n-stPelStateS+1
+            call iom_put ( TRIM(var_names(n)) , unpack(D3STATE(idx_tmp,:),SEAmask,ZEROS) )
+         end if
+         !-- Store pelagic diagnostics
+         if ( n >= stPelDiagS .AND. n <= stPelDiagE ) then
+            idx_tmp=n-stPelDiagS+1
+            call iom_put ( TRIM(var_names(n)) , unpack(D3DIAGNOS(idx_tmp,:),SEAmask,ZEROS) )
+         end if
+         !-- Store pelagic fluxes
+         if ( n >= stPelFluxS .AND. n <= stPelFluxE ) then
+            idx_tmp=n-stPelFluxS+1
+            call correct_flux_output(1,idx_tmp,1,NO_BOXES,c1dim)
+            call iom_put ( TRIM(var_names(n)) , unpack(c1dim,SEAmask,ZEROS) )
+         endif
+      endif
+   enddo
+
+   !---------------------------------------------
+   ! Pelagic 2D variables
+   !---------------------------------------------
+   do n = stPelDiag2dS , stPelRivE
+      if ( var_ids(n) > 0 ) then
+         ! Store pelagic 2D diagnostics
+         if ( n >= stPelDiag2dS .AND. n <= stPelDiag2dE ) then
+            idx_tmp=n-stPelDiag2dS+1
+            call iom_put ( TRIM(var_names(n)) , unpack(D2DIAGNOS(idx_tmp,:),SRFmask(:,:,1),ZEROS(:,:,1)) )
+         end if
+         ! Store pelagic 2D diagnostics at surface
+         if ( n >= stPelSurS .AND. n <= stPelSurE) then
+            idx_tmp=n-stPelDiag2dS+1
+            call iom_put ( TRIM(var_names(n)) , unpack(D2DIAGNOS(idx_tmp,:),SRFmask(:,:,1),ZEROS(:,:,1)) )
+         end if
+         ! Store pelagic 2D diagnostics at bottom
+         if ( n >= stPelBotS .AND. n <= stPelRivE) then
+            idx_tmp=n-stPelDiag2dS+1
+            call iom_put ( TRIM(var_names(n)) , unpack(D2DIAGNOS(idx_tmp,:),SRFmask(:,:,1),ZEROS(:,:,1)) )
+            !iret = store_data(ncid_bfm,var_ids(n),BOTT_SHAPE,NO_BOXES_XY,garray=D2DIAGNOS(idx_tmp,:))
+         end if
+      end if
+   end do
+
+#if defined INCLUDE_SEAICE
+   !---------------------------------------------
+   ! 2D Seaice variables
+   !---------------------------------------------
+   do n = stIceStart , stIceEnd
+      if ( var_ids(n) > 0 ) then
+         ! Store seaice 2D state
+         if ( n >= stIceStateS .AND. n <= stIceStateE) then
+            idx_tmp=n-stIceStateS+1
+            call iom_put( TRIM(var_names(n)) , unpack(D2STATE_ICE(idx_tmp,:),SRFmask(:,:,1),ZEROS(:,:,1)) )
+         end if
+         ! Store seaice 2D diagnostics
+         if ( n >= stIceDiag2dS .AND. n <= stIceDiag2dE ) then
+            idx_tmp=n-stIceDiag2dS+1
+            call iom_put( TRIM(var_names(n)) , unpack(D2DIAGNOS_ICE(idx_tmp,:),SRFmask(:,:,1),ZEROS(:,:,1)) )
+         end if
+         ! Store seaice 2D flux
+         if ( n >= stIceFlux2dS .AND. n <= stIceFlux2dE ) then
+            idx_tmp=n-stIceFlux2dS+1
+            call iom_put( TRIM(var_names(n)) , unpack(D2FLUX_FUNC_ICE(idx_tmp,:),SRFmask(:,:,1),ZEROS(:,:,1)) )
+         end if
+      end if
+   end do
+#endif
+
+#if defined INCLUDE_BEN
+   !---------------------------------------------
+   ! 2D Benthic variables
+   !---------------------------------------------
+   do n = stBenStart , stBenEnd
+      if ( var_ids(n) > 0 ) then
+         ! Store benthic 2D state
+         if ( n >= stBenStateS .AND. n <= stBenStateE) then
+            idx_tmp=n-stBenStateS+1
+            call iom_put( TRIM(var_names(n)) , unpack(D2STATE_BEN(idx_tmp,:),SRFmask(:,:,1),ZEROS(:,:,1)) )
+         end if
+         ! Store benthic 2D diagnostics
+         if ( n >= stBenDiag2dS .AND. n <= stBenDiag2dE ) then
+            idx_tmp=n-stBenDiag2dS+1
+            call iom_put( TRIM(var_names(n)) , unpack(D2DIAGNOS_BEN(idx_tmp,:),SRFmask(:,:,1),ZEROS(:,:,1)) )
+         end if
+         ! Store benthic 2D flux
+         if ( n >= stBenFlux2dS .AND. n <= stBenFlux2dE ) then
+            idx_tmp=n-stBenFlux2dS+1
+            call iom_put( TRIM(var_names(n)) , unpack(D2FLUX_FUNC_BEN(idx_tmp,:),SRFmask(:,:,1),ZEROS(:,:,1)) )
+         end if
+      end if
+   end do
+#endif
+
+  return
+  end subroutine bfm_iom
+!EOC
+
+END MODULE trcdiabfm

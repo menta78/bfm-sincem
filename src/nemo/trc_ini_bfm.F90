@@ -51,6 +51,8 @@
    use netcdf_bfm, only: read_rst_bfm,read_rst_bfm_glo
    use time,       only: bfmtime, julian_day, calendar_date
    use init_var_bfm_local
+   use trcdiabfm,  only: bfm_iomput
+
    ! NEMO modules
    USE trcnam_trp, only: ln_trczdf_exp,ln_trcadv_cen2,ln_trcadv_tvd
    use trc, only : ln_trc_sbc, ln_trc_ini, ln_trc_obc, ln_trc_cbc, &
@@ -201,7 +203,6 @@
    allocate(surfpoint(NO_BOXES_XY))
    mask1d = reshape(SRFmask,(/NO_BOXES_X*NO_BOXES_Y*NO_BOXES_Z/))
    surfpoint = find(mask1d,NO_BOXES_XY)
-
    allocate(msktmp(jpi,jpj)); msktmp = 0
    msktmp = unpack(surfpoint,SRFmask(:,:,1),0)
    allocate(botpoint(NO_BOXES_XY))
@@ -216,6 +217,22 @@
    allocate(btmp1D(NO_BOXES))
    btmp1D = pack(BOTmask,SEAmask)
    BOTindices = find(btmp1D,NO_BOXES_XY)
+
+   !-------------------------------------------------------
+   ! Reorder botpoint and BOTindices (sort by botpoint)
+   !-------------------------------------------------------
+   do i = 1 , NO_BOXES_XY - 1
+      do j  = i+1 , NO_BOXES_XY
+         if ( botpoint(i) .gt. botpoint(j) ) then
+            k = botpoint(i)
+            botpoint(i) = botpoint(j)
+            botpoint(j) = k
+            k = BOTindices(i)
+            BOTindices(i) = BOTindices(j)
+            BOTindices(j) = k
+         endif
+      enddo
+   enddo
 
    !-------------------------------------------------------
    ! Prepares the array containing the indices of the
@@ -418,26 +435,30 @@
    !-------------------------------------------------------
    ! Initialise DATA output netcdf file(s)
    !-------------------------------------------------------
-   call calcmean_bfm(INIT)
-   if (lk_c1d) then
-      call init_netcdf_bfm(out_fname,TRIM(bfmtime%datestring), &
-             TRIM(out_title) , 0 ,                     &
-             lat=gphit(2,2),lon=glamt(2,2),            &
-             roceanpoint=fsdept(1,1,1:NO_BOXES),       &
-             rsurfacepoint=fsdept(1,1,1),              &
-             rbottompoint=fsdept(1,1,NO_BOXES),        &
-             column=.true.)
-   else
-      call init_netcdf_bfm(out_fname,TRIM(bfmtime%datestring), &
-             TRIM(out_title) , 0 ,                     &
-             lat2d=gphit,lon2d=glamt,z=fsdept(1,1,:),  &
-             oceanpoint=ocepoint,                      &
-             surfacepoint=surfpoint,                   &
-             bottompoint=botpoint,                     &
-             mask3d=tmask)
-   end if
-   call init_save_bfm
-
+   IF ( bfm_iomput ) THEN
+      if (lwp) write(LOGUNIT,*) 'BFM uses XIOS output system via NEMO'
+      ! Set var_ids values according to the XIOS file_def is done in trc_dia_bfm
+   ELSE
+      call calcmean_bfm(INIT)
+      if (lk_c1d) then
+         call init_netcdf_bfm(out_fname,TRIM(bfmtime%datestring), &
+                TRIM(out_title) , 0 ,                     &
+                lat=gphit(2,2),lon=glamt(2,2),            &
+                roceanpoint=fsdept(1,1,1:NO_BOXES),       &
+                rsurfacepoint=fsdept(1,1,1),              &
+                rbottompoint=fsdept(1,1,NO_BOXES),        &
+                column=.true.)
+      else
+         call init_netcdf_bfm(out_fname,TRIM(bfmtime%datestring), &
+                TRIM(out_title) , 0 ,                     &
+                lat2d=gphit,lon2d=glamt,z=fsdept(1,1,:),  &
+                oceanpoint=ocepoint,                      &
+                surfacepoint=surfpoint,                   &
+                bottompoint=botpoint,                     &
+                mask3d=tmask)
+      end if
+      call init_save_bfm
+   ENDIF
    !---------------------------------------------
    ! Allocate and initialise additional
    ! integration arrays

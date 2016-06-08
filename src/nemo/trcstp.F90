@@ -15,6 +15,7 @@ MODULE trcstp
    USE in_out_manager
    USE trcsub
    USE trcbc,      ONLY: trc_bc_read
+   USE trcdiabfm,  ONLY: trc_dia_bfm
 
    IMPLICIT NONE
    PRIVATE
