@@ -54,7 +54,7 @@
 	  <field field_ref="saltflx"      name="sosflxdo" />
 	  <field field_ref="taum"                         />
 	  <field field_ref="wspd"         name="sowindsp" />
-      <field field_ref="precip"       name="soprecip" />
+          <field field_ref="precip"       name="soprecip" />
 	  <field field_ref="sbt"                          />
 	</file>
 

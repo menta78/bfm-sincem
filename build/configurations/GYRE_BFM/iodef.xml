@@ -54,7 +54,7 @@
 	  <field field_ref="saltflx"      name="sosflxdo" />
 	  <field field_ref="taum"                         />
 	  <field field_ref="wspd"         name="sowindsp" />
-      <field field_ref="precip"       name="soprecip" />
+          <field field_ref="precip"       name="soprecip" />
 	  <field field_ref="sbt"                          />
 	</file>
 
@@ -77,22 +77,6 @@
 	  <field field_ref="woce"         name="wo"     />
 	  <field field_ref="avt"          name="difvho" />
 	</file>
-
-	<file id="file6" name_suffix="_icemod" description="ice variables" >
-	  <field field_ref="ice_pres"   />
-	  <field field_ref="snowthic_cea" name="snd" />
-	  <field field_ref="icethic_cea"  name="sit" />
-	  <field field_ref="iceprod_cea"  name="sip" />
-	  <field field_ref="ist_ipa"    />
-	  <field field_ref="uice_ipa"   />
-	  <field field_ref="vice_ipa"   />
-	  <field field_ref="utau_ice"   />
-	  <field field_ref="vtau_ice"   />
-	  <field field_ref="qsr_io_cea" />
-	  <field field_ref="qns_io_cea" />
-	  <field field_ref="snowpre"    />
-	</file>
-
 
       </file_group>
 
