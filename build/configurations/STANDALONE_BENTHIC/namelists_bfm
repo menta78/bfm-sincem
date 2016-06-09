@@ -138,8 +138,6 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
                       p_qro = 0.5
                p_qon_dentri = 1.25
                 p_qon_nitri = 2.0
-                    p_poro0 = 0.7
-                    p_d_tot = 0.30
 	filename_nml_conf = 'BFM_General.nml',
 /
 
@@ -155,6 +153,8 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
         CalcBenOrganisms(5) = .FALSE.
          CalcBenBacteria(1) = .FALSE.
          CalcBenBacteria(2) = .FALSE.
+                    p_poro0 = 0.7
+                    p_d_tot = 0.30
                  p_InitSink = 100.0
                   p_d_tot_2 = 0.35
                   p_clD1D2m = 0.01
@@ -269,8 +269,8 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
           'R1n','R6n',
           'R1p','R6p',
           'P1s','R6s',
-          'eiPPY(iiP1)','eiPPY(iiP2)','eiPPY(iiP3)','eiPPY(iiP4)',
-          'sunPPY(iiP1)','sunPPY(iiP2)','sunPPY(iiP3)','sunPPY(iiP4)',
+          'eiPPY_iiP1','eiPPY_iiP2','eiPPY_iiP3','eiPPY_iiP4',
+          'sunPPY_iiP1','sunPPY_iiP2','sunPPY_iiP3','sunPPY_iiP4',
           'ruPTc','resPP','resZT','ruPTn','ruPTp','exPP','ruZTc','netZTc','rePTp','reBn','ruBn','fR2B1c','fP1Z4c', 'rrPTo'
 	filename_nml_conf = 'BFM_General.nml',
 /

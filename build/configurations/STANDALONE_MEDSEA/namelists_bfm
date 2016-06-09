@@ -197,8 +197,8 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
           'R1n','R6n',
           'R1p','R6p',
           'P1s','R6s',
-          'eiPPY(iiP1)','eiPPY(iiP2)','eiPPY(iiP3)','eiPPY(iiP4)',
-          'sunPPY(iiP1)','sunPPY(iiP2)','sunPPY(iiP3)','sunPPY(iiP4)',
+          'eiPPY_iiP1','eiPPY_iiP2','eiPPY_iiP3','eiPPY_iiP4',
+          'sunPPY_iiP1','sunPPY_iiP2','sunPPY_iiP3','sunPPY_iiP4',
           'ruPTc','ruZTc'
 	filename_nml_conf = 'BFM_General.nml',
 /
