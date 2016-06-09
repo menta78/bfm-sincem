@@ -11,7 +11,7 @@ MODULE trcdiabfm
 
    PUBLIC  trc_dia_bfm
 
-#if defined BFM_IOMPUT
+#if defined key_iomput
    LOGICAL,PUBLIC    :: bfm_iomput=.TRUE. ! use xios in nemo
 #else
    LOGICAL,PUBLIC    :: bfm_iomput=.FALSE.
