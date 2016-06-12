@@ -1,4 +1,8 @@
 #!/bin/sh
+THEDIR=$1
+if [ "${THEDIR}" = "" ]; then
+   THEDIR="rundir"
+fi
 
 ## ======================================================================
 ## Paths
@@ -13,8 +17,8 @@ DIR_ARCHI_FORC=${INPUTDIR}     # PATH for the forcing input files
 ## =======  Nothing to be changed below this line  =====================
 ## ======================================================================
 
-mkdir rundir
-cd rundir
+mkdir ${THEDIR}
+cd ${THEDIR}
 ## ======================================================================
 ## file needed for the run
 ## ======================================================================
@@ -28,8 +32,8 @@ cp ../nemo.exe         .
 ## ======================================================================
 ## Climatology of temperature and chlorophyll
 ## ======================================================================
-ln -s ${DIR_ARCHI_INIT}/init_PAPASTATION_m06d15.nc  ./init_PAPASTATION_m06d15.nc
-ln -s ${DIR_ARCHI_INIT}/chlorophyll_PAPASTATION.nc  ./chlorophyll.nc
+ln -s ${DIR_ARCHI_INIT}/init_PAPASTATION_m06d15.nc  ./
+ln -s ${DIR_ARCHI_INIT}/chlorophyll_PAPASTATION.nc  ./
 
 ## ======================================================================
 ## Atmospherical forcings

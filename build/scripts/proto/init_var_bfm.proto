@@ -108,7 +108,8 @@ END MODULE init_var_bfm_local
    use api_bfm
    use global_mem
 #else
-   use api_bfm, only: GetLun
+   use api_bfm, ONLY: GetLun
+   use global_mem, ONLY: NMLUNIT
 #endif
 #ifdef BFM_GOTM
    use bio_var

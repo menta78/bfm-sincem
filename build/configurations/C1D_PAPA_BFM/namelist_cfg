@@ -141,6 +141,9 @@
 !-----------------------------------------------------------------------
 &namtra_qsr    !   penetrative solar radiation
 !-----------------------------------------------------------------------
+!              !  file name  ! frequency (hours) ! variable  ! time interp. !  clim  ! 'yearly'/ ! weights  ! rotation ! land/sea mask !
+!              !             !  (if <0  months)  !   name    !   (logical)  !  (T/F) ! 'monthly' ! filename ! pairing  ! filename      !
+   sn_chl      ='chlorophyll_PAPASTATION', -1    , 'CHLA'    ,   .true.     , .true. , 'yearly'  , ''       , ''       , ''
 /
 !-----------------------------------------------------------------------
 &namsbc_rnf    !   runoffs namelist surface boundary condition

@@ -37,6 +37,7 @@
 ! !DESCRIPTION:
 !
 ! !USES:
+   use global_mem, ONLY:LOGUNIT
    IMPLICIT NONE
 !
 ! !INPUT PARAMETERS:
@@ -45,9 +46,10 @@
 !
 !-----------------------------------------------------------------------
 !BOC
-     FATAL "bfm_error: Called from: ",trim(sub)
-     FATAL "bfm_error: Message:     ",trim(msg)
-     stop  "bfm_error( see bfm.log !! )"
+     write(LOGUNIT,*) "bfm_error: Called from: ",trim(sub)
+     write(LOGUNIT,*) "bfm_error: Message:     ",trim(msg)
+     call flush(LOGUNIT)
+     stop  "bfm_error (see bfm.log)"
 
    return
    end subroutine bfm_error

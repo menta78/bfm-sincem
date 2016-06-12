@@ -12,3 +12,6 @@ The run directory is created in $BFMDIR_RUN/gyre_bfm just like all other
 BFM presets and the nemo executable are linked to there as well as
 the NEMO reference configurations
 
+The input data can be download from
+http://dods.idris.fr/reee451/NEMO/INPUTS_c1d_PAPA_v3.6.tar
+and the run script must be adjusted providing the proper input directory
