@@ -351,8 +351,8 @@
          case (2) ! from file
             ! mapping index
             ll = n_trc_index(m)
-            call trc_dta(nit000,sf_trcdta(ll))
-            D3STATE(m,:)  = pack( sf_trcdta(ll)%fnow(:,:,:)*rf_trfac(ll), SEAmask )
+            call trc_dta(nit000,sf_trcdta(ll),rf_trfac(ll))
+            D3STATE(m,:)  = pack( sf_trcdta(ll)%fnow(:,:,:), SEAmask )
             InitVar(m)%filename=sf_trcdta(ll)%clname
          end select
          Initvar(m)%varname=var_names(m)
