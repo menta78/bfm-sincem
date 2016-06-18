@@ -654,7 +654,7 @@ contains
  
    implicit none
    integer,intent(IN)     :: outdelta
-   integer,intent(OUT)    :: savedelta
+   integer,intent(INOUT)  :: savedelta
    real(RLEN),intent(OUT) :: timedelta
    real(RLEN)             :: julian1, julian2  
    integer                :: yyyy,mm,dd,hh,nn,tmptime
