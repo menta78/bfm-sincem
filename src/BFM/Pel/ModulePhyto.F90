@@ -178,7 +178,7 @@
   !
   !              --------- Sinking parameters -----------
   !  p_rPIm      [m/d]    Phytoplankton background sinking rate
-  real(RLEN)  :: p_rPIm(4)
+  real(RLEN)  :: p_rPIm(iiPhytoPlankton)
 #ifdef INCLUDE_PELFE
   !
   !              --------- Iron parameters -----------

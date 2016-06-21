@@ -120,11 +120,11 @@
      first=1
      allocate(eo(NO_BOXES),stat=AllocStatus)
      if (AllocStatus  /= 0) stop "error allocating eo"
-     allocate(PPYc(NO_BOXES,4),stat=AllocStatus)
+     allocate(PPYc(NO_BOXES,iiPhytoplankton),stat=AllocStatus)
      if (AllocStatus  /= 0) stop "error allocating PPYc"
-       allocate(MIZc(NO_BOXES,2),stat=AllocStatus)
+       allocate(MIZc(NO_BOXES,iiMicroZooPlankton),stat=AllocStatus)
      if (AllocStatus  /= 0) stop "error allocating MIZc"
-       allocate(MEZc(NO_BOXES,2),stat=AllocStatus)
+       allocate(MEZc(NO_BOXES,iiMesoZooPlankton),stat=AllocStatus)
      if (AllocStatus  /= 0) stop "error allocating MEZc"
        allocate(zooc(NO_BOXES),stat=AllocStatus)
      if (AllocStatus  /= 0) stop "error allocating zooc"
