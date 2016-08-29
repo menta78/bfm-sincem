@@ -38,7 +38,7 @@
 !
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
       REAL(RLEN) FUNCTION funcalc(mode,chterm,coeff,basis,x)
-        USE global_mem, ONLY:RLEN,ZERO,ONE
+        USE global_mem, ONLY:RLEN,ZERO,ONE,PI
         USE bennut_type
         USE constants
         USE bennut_interface,ONLY:BESSK1, BESSK0, BESSI1, BESSI0, &
@@ -50,7 +50,6 @@
         REAL(RLEN),intent(IN) ::basis      ! Specification
         REAL(RLEN),intent(IN) ::x          ! Specification
 
-        REAL(RLEN),parameter :: pi=3.141592_RLEN
         REAL(RLEN) ::r
         REAL(RLEN) ::rx
         REAL(RLEN) ::s

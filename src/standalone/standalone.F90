@@ -15,7 +15,7 @@
 !
 ! !USES:
 !  default: all is private.
-   use global_mem, only:RLEN,ONE
+   use global_mem, only:RLEN,ONE,PI
    use constants,  only:SEC_PER_DAY
    use init_var_bfm_local
 #ifdef INCLUDE_PELCO2
@@ -72,7 +72,7 @@
 
 !
 ! !PRIVATE DATA MEMBERS:
-   real(RLEN),parameter :: PI=3.14159265,RFACTOR=PI/180.
+   real(RLEN),parameter :: RFACTOR=PI/180._RLEN
 
 !
 ! !REVISION HISTORY:

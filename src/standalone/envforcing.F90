@@ -12,7 +12,7 @@
 !
 ! !USES:
 !  default: all is private.
-   use global_mem, only:RLEN,ONE
+   use global_mem, only:RLEN,ONE,PI
    use constants,  only:SEC_PER_DAY
    use mem, only: iiC,iiN,iiP,iiS
 
@@ -48,7 +48,7 @@
                                   data_file, event_file
 !
 ! !PRIVATE DATA MEMBERS:
-   real(RLEN),parameter :: PI=3.14159265,RFACTOR=PI/180.
+   real(RLEN),parameter :: RFACTOR=PI/180._RLEN
 !  pre-defined parameters
    integer, parameter,public   :: READ_SUCCESS=1
    integer, parameter,public   :: END_OF_FILE=-1
