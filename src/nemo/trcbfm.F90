@@ -91,11 +91,11 @@
 
    !---------------------------------------------
    ! Basic ODE solver for benthic variables or for 
-   ! 0D test simulations when coupled with NEMO
+   ! not transported pelagic variables (NOTRANSPORT)
    !---------------------------------------------
-   if (CalcPelagicFlag .AND. .NOT.CalcTransportFlag) then
+   if (CalcPelagicFlag ) then
       do j=1,NO_D3_BOX_STATES
-         if (D3STATETYPE(j).ge.0) then
+         if (D3STATETYPE(j) .eq. 0) then
 #ifndef EXPLICIT_SINK
             D3State(j,:) = D3STATE(j,:) + delt*D3SOURCE(j,:)
 #else
@@ -107,7 +107,7 @@
 #ifdef INCLUDE_BEN
    if (CalcBenthicFlag /= 0) then
       do j=1,NO_D2_BOX_STATES_BEN
-         if (D2STATETYPE_BEN(j).ge.0) then
+         if (D2STATETYPE_BEN(j) .ge. 0) then
 #ifndef EXPLICIT_SINK
             D2STATE_BEN(j,:) = D2STATE_BEN(j,:) + delt*D2SOURCE_BEN(j,:)
 #else

@@ -54,18 +54,7 @@
   ! Put D3STATETYPE(..)=NOTRANSPORT to exclude
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   D3STATETYPE(:)=ALLTRANSPORT
-  do i = 1,iiMicroZooPlankton
-     j = ppMicroZooPlankton(i,iiN)
-     if ( i == 0 ) D3STATETYPE(i)=NOTRANSPORT
-     j = ppMicroZooPlankton(i,iiP)
-     if ( i == 0 ) D3STATETYPE(i)=NOTRANSPORT
-  end do
-  do i = 1,iiMesoZooPlankton
-     j = ppMesoZooPlankton(i,iiN)
-     if ( i == 0 ) D3STATETYPE(i)=NOTRANSPORT
-     j = ppMesoZooPlankton(i,iiP)
-     if ( i == 0 ) D3STATETYPE(i)=NOTRANSPORT
-  end do
+
 #ifdef INCLUDE_BEN
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Setting of type for transport/integration  Benthic state variables

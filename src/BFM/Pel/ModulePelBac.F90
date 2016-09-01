@@ -14,7 +14,7 @@
 !
 ! !USES:
   use global_mem
-  use mem,  ONLY: iiPelBacteria
+  use mem,  ONLY: iiPelBacteria,D3STATETYPE,ppR2c,ppR3c
 !  
 !
 ! !AUTHORS
@@ -91,7 +91,7 @@
   ! p_ruep      [1/d]            Relaxation timescale for P uptake/remin.
   ! p_rec       [1/d]            Relaxation timescale for semi-labile excretion
   ! p_pu_ea_R3  [-]              Excretion of semi-refractory DOC
-  integer     :: p_version(iiPelBacteria)
+  integer     :: p_version(iiPelBacteria), itrp
   integer, parameter ::       BACT1=1,BACT2=2,BACT3=3
   real(RLEN)  :: p_q10(iiPelBacteria)
   real(RLEN)  :: p_chdo(iiPelBacteria)
@@ -150,13 +150,13 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Check consistency of parameters according to the parametrization
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  write(LOGUNIT,*) "#  using p_version=",p_version
   do i=1,iiPelBacteria
      write(LOGUNIT,*) "#  Checking PelBacteria parameters for group:",i
+     write(LOGUNIT,*) "#   Use formulation (p_version) -> ",p_version
      select case ( p_version(i) )
        case ( BACT3 ) ! Polimene et al. (2006)
          p_sulR1(i) = ZERO
-         write(LOGUNIT,*) "#  forcing p_sulR1=0"
+         write(LOGUNIT,*) "#   forcing p_sulR1=0"
          if (p_pu_ea_R3(i) + p_pu_ra(i) .GT. 0.3_RLEN) then
            write(LOGUNIT,*)"#  Warning: Bacterial growth efficiency is lower than 0.3!"
            write(LOGUNIT,*)"#  The release of capsular material is possibly larger than p_pu_ra/4"
@@ -165,13 +165,25 @@
          p_sulR1(i) = ZERO
          p_suR2(i) = ZERO
          p_suR3(i) = ZERO
-         write(LOGUNIT,*) "#  forcing p_sulR1,p_suR2,p_suR3=0"
+         write(LOGUNIT,*) "#   forcing p_sulR1, p_suR2, p_suR3=0"
        case ( BACT2 ) ! Vichi et al. 2004
          p_suR3(i) = ZERO
-         write(LOGUNIT,*) "#  forcing p_suR3=0"
+         write(LOGUNIT,*) "#   forcing p_suR3=0"
      end select
   end do
-
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Check across bacterial groups if R2 and R3 must be kept in transport
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  itrp=maxval(p_version)
+  if ( itrp < 3 ) then
+     D3STATETYPE(ppR3c)=NOTRANSPORT
+     write(LOGUNIT,*) " Disable R3c transport as no bacterial group use it "
+  endif
+  if ( itrp < 2 ) then
+     D3STATETYPE(ppR2c)=NOTRANSPORT
+     write(LOGUNIT,*) " Disable R2c transport as no bacterial group use it "
+  endif
+   write(LOGUNIT,*) ""
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Write parameter list to the log
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=

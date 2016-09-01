@@ -18,6 +18,7 @@
 !
 ! !USES:
   use global_mem
+  use mem,        only: D3STATETYPE, ppO4n
 !  
 !
 ! !AUTHORS
@@ -135,6 +136,9 @@
 #ifdef INCLUDE_PELFE
   write(LOGUNIT,nml=PelChem_parameters_iron)
 #endif
+  ! Disable the transport of O4n as it is only a sink of nitrogen (NO3 -> N2)
+  D3STATETYPE(ppO4n)=NOTRANSPORT
+  write(LOGUNIT,*) " Disable O4n transport as it used only for mass balance"
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   !END compute

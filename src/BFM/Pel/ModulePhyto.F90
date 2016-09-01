@@ -15,7 +15,7 @@
 ! !USES:
 
   use global_mem
-  use mem,  ONLY: iiPhytoPlankton
+  use mem,  ONLY: iiPhytoPlankton,D3STATETYPE,ppR2c
   use bfm_error_msg
 !  
 !
@@ -200,7 +200,7 @@
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   subroutine InitPhyto()
-  integer :: i
+  integer :: i, itrp
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   namelist /Phyto_parameters/ p_q10, p_sum, p_srs, p_sdmo, p_seo, p_pu_ea, &
                               p_temp, p_netgrowth,p_limnut, &
@@ -260,6 +260,12 @@
      end if
      write(LOGUNIT,*) "#  OK"
   end do
+  ! Check if R2 has to be a transported tracer
+  itrp = maxval(p_switchDOC)
+  if ( itrp > 1 ) then
+     D3STATETYPE(ppR2c)=ALLTRANSPORT
+     write(LOGUNIT,*) " Use R2c transport as a pytho group use it (p_switchDOC>1))"
+  endif
 
   write(LOGUNIT,*) "#  Namelist is:"
   write(LOGUNIT,nml=Phyto_parameters)
