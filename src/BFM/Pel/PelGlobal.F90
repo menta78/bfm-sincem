@@ -129,7 +129,9 @@
   ! Compute nutrient quota in Pelagic Bacteria
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   do i = 1, (iiPelBacteria)
+    if ( ppPelBacteria(i,iiP) > 0 ) &
     qpcPBA(i,:)  =   PelBacteria(i,iiP)/( p_small+ PelBacteria(i,iiC))
+    if ( ppPelBacteria(i,iiN) > 0 ) &
     qncPBA(i,:)  =   PelBacteria(i,iiN)/( p_small+ PelBacteria(i,iiC))
   end do
 

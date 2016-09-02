@@ -1662,8 +1662,7 @@ sub func_INIT_INTERNAL {
             && exists ${$$LST_GROUP{$groupname}->getComponents()}{'c'}
             && ! ( keys %{$$LST_GROUP{$groupname}->getComponents()} == 2 && exists ${$$LST_GROUP{$groupname}->getComponents()}{'h'} ) ){
 
-            $line .= "${SPACE}do i = 1 , ( ii". $groupname ." )\n";
-            $line .= "${SPACE}  call init_constituents( c=" . $groupname  . "(i,iiC), &\n${SPACE}";
+            # create initialization for components other than Carbon 
             my @temp_line;
             foreach my $const (@constNoC){
                 if( exists ${$$LST_GROUP{$groupname}->getComponents()}{$const} ){
@@ -1671,6 +1670,7 @@ sub func_INIT_INTERNAL {
                           . "pp" . $const . "=pp" . $groupname . "(i,ii" . uc($const) . ")" );
                 }
             }
+            # Set initialization to Redfield ratios from namelists
             my @temp_line2;
             foreach my $constOpt (@constOptionalList){
                 #get the constituents active inside the group
@@ -1692,9 +1692,34 @@ sub func_INIT_INTERNAL {
             }
             if( scalar(@temp_line2) ){ push( @temp_line, "    " . join(",  ", @temp_line2 ) ); }
 
-            $line .= join(",  &\n${SPACE}", @temp_line );
-            $line .= " )\n";
-            $line .= "${SPACE}end do\n";
+            $line .= "${SPACE}do i = 1 , ( ii". $groupname ." )\n";
+
+            if ( $#temp_line == -1 ) {
+                $line .= "${SPACE}  call init_constituents( c=" . $groupname  . "(i,iiC) )\n";
+            } else {
+                $line .= "${SPACE}  call init_constituents( c=" . $groupname  . "(i,iiC), &\n${SPACE}";
+                $line .= join(",  &\n${SPACE}", @temp_line );
+                $line .= " )\n";
+            }
+        }
+        # Set initial quota values
+        my @temp_line;
+        foreach my $root ( sort { $$LST_PARAM{$a}->getIndex() cmp $$LST_PARAM{$b}->getIndex() } keys %$LST_PARAM ){
+            my $param = $$LST_PARAM{$root};
+            if( $dim == $param->getDim() && $param->getQuota() && $subt eq $param->getSubtype() ){
+                my $temp_group = $param->getQuota() ;
+                if ( $temp_group eq $groupname && $root  =~ /^q.*$groupAcro$/) {
+                    if ( $groupAcro eq "OMT" ) {
+                        push( @temp_line, $root . "(i,:)=" . (substr $root, 1, 2) . "_ratio_default ;" );
+                    } else {
+                        push( @temp_line, $root . "(i,:)=p_" . $root . "(i) ;" );
+                    }
+                }
+            }
+        }
+        if( $#temp_line != -1) {
+            $line .= "${SPACE}${SPACE} " . join(" " , @temp_line) . "\n";
+            $line .= "${SPACE}end do\n\n";
         }
     }
 
@@ -2218,7 +2243,7 @@ sub func_XMLFILE {
        } 
     }  
     #print Dumper(\@meanvar) , "\n";
-    $line .= "${TAB8}<file id=\"file20\" name_suffix=\"_bfm\" description=\"BFM variables\" >\n";
+    $line .= "${TAB8}<file id=\"file20\" name_suffix=\"_grid_bfm\" description=\"BFM variables\" >\n";
 
     # Variables requested as time average
     foreach my $name (@meanvar) {
