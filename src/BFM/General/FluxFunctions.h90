@@ -45,13 +45,17 @@
             destination = iidestination
             fluxsign    = .FALSE. 
 
-            if ( destination == 0 ) then
+            if ( origin == 0 .AND. destination == 0 ) then
+               ! Skip non Carbon elements in fixed stoichiometry case
+               ! (Avoid dealing with unallocated memory in target pointers)
+               return
+            elseif ( destination == 0 ) then
                ! call (iiSub,origin,origin,-flux)
                destination = origin
                flux        = -flux
                fluxsign    = .TRUE.
             elseif ( origin == 0 ) then
-              ! call (iiSub,destination,destination,flux)
+               ! call (iiSub,destination,destination,flux)
                origin = destination
             endif
 

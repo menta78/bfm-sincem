@@ -224,9 +224,10 @@
   ppzooc = ppMesoZooPlankton(zoo,iiC)
   ppzoon = ppMesoZooPlankton(zoo,iiN)
   ppzoop = ppMesoZooPlankton(zoo,iiP)
+
   zooc = D3STATE(ppzooc,:)
-  zoon = D3STATE(ppzoon,:)
-  zoop = D3STATE(ppzoop,:)
+  zoon = zooc * qncMEZ(zoo,:)
+  zoop = zooc * qpcMEZ(zoo,:)
 
   ! temporary variables in case check_fixed_quota=1
   tfluxc = ZERO

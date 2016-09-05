@@ -252,13 +252,13 @@
   ppphytos = ppPhytoPlankton(phyto,iiS)
   ppphytol = ppPhytoPlankton(phyto,iiL)
   phytoc(:) = D3STATE(ppphytoc,:)
-  phyton(:) = D3STATE(ppphyton,:)
-  phytop(:) = D3STATE(ppphytop,:)
-  phytol(:) = D3STATE(ppphytol,:)
-  if ( ppphytos > 0 )  phytos(:) = D3STATE(ppphytos,:)
+  phyton(:) = phytoc(:) * qncPPY(phyto,:)
+  phytop(:) = phytoc(:) * qpcPPY(phyto,:)
+  phytol(:) = phytoc(:) * qlcPPY(phyto,:)
+  if ( ppphytos > 0 )  phytos(:) = phytoc(:) * qscPPY(phyto,:)
 #ifdef INCLUDE_PELFE
   ppphytof = ppPhytoPlankton(phyto,iiF)
-  if ( ppphytof > 0 ) phytof(:) = D3STATE(ppphytof,:)
+  if ( ppphytof > 0 ) phytof(:) = phytoc(:) * qfcPPY(phyto,:)
 #endif
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
