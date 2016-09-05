@@ -31,7 +31,7 @@
     ppPhytoPlankton, ppMicroZooPlankton, ppMesoZooPlankton, ETW, &
     qncPPY, qpcPPY, qlcPPY, qscPPY, qncMIZ, qpcMIZ, qncMEZ, qpcMEZ, iiPhytoPlankton, &
     iiMicroZooPlankton, iiMesoZooPlankton, iiC, iiN, iiP, iiL, iiS, NO_BOXES, &
-    iiBen, iiPel, flux_vector,fixed_quota_flux_vector
+    iiBen, iiPel, flux_vector
 #ifdef INCLUDE_PELCO2
   use mem, ONLY: ppO3c
 #endif
@@ -42,7 +42,7 @@
 #ifdef BFM_GOTM
   use mem, ONLY: jnetMeZc
 #endif
-  use mem_Param,  ONLY: p_small,check_fixed_quota
+  use mem_Param,  ONLY: p_small
   use constants,ONLY: MIN_VAL_EXPFUN, MW_C
   use mem_MesoZoo
 
@@ -103,8 +103,7 @@
                                        ru_n,ru_p,pu_e_n,pu_e_p,prI,pe_R6c
 
   real(RLEN),allocatable,save,dimension(:) :: pe_N1p,pe_N4n,ruPPYc,ruMIZc,ruMEZc,rq6c, &
-                                       rq6n,rq6p,rrc,ren,rep,tfluxc,tfluxn,    &
-                                       tfluxp,zooc,zoop,zoon
+                                       rq6n,rq6p,rrc,ren,rep,zooc,zoop,zoon
   real(RLEN),allocatable,save,dimension(:,:) :: PPYc,MIZc,MEZc
   real(RLEN),allocatable,save,dimension(:) :: net,r
   integer :: AllocStatus, DeallocStatus
@@ -132,12 +131,6 @@
      if (AllocStatus  /= 0) stop "error allocating zoop"
        allocate(zoon(NO_BOXES),stat=AllocStatus)
      if (AllocStatus  /= 0) stop "error allocating zoon"
-     allocate(tfluxp(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating tfluxp"
-     allocate(tfluxn(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating tfluxn"
-     allocate(tfluxc(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating tfluxc"
      allocate(rep(NO_BOXES),stat=AllocStatus)
      if (AllocStatus  /= 0) stop "error allocating rep"
      allocate(ren(NO_BOXES),stat=AllocStatus)
@@ -229,11 +222,6 @@
   zoon = zooc * qncMEZ(zoo,:)
   zoop = zooc * qpcMEZ(zoo,:)
 
-  ! temporary variables in case check_fixed_quota=1
-  tfluxc = ZERO
-  tfluxn = ZERO
-  tfluxp = ZERO
-
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Physiological temperature and oxygen response
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -272,15 +260,13 @@
   rut_c = ZERO
   rut_n = ZERO
   rut_p = ZERO
+
   ! Phytoplankton
   do i = 1, iiPhytoPlankton
     ruPPYc = sut*PPYc(:,i)
-    call fixed_quota_flux_vector(check_fixed_quota, iiPel, ppzooc, &
-                ppPhytoPlankton(i,iiC), ppzooc, ruPPYc          , tfluxc)
-    call fixed_quota_flux_vector(check_fixed_quota, iiPel, ppzoon, &
-                ppPhytoPlankton(i,iiN), ppzoon, ruPPYc*qncPPY(i,:), tfluxn)
-    call fixed_quota_flux_vector(check_fixed_quota, iiPel, ppzoop, &
-                ppPhytoPlankton(i,iiP), ppzoop, ruPPYc*qpcPPY(i,:), tfluxp)
+    call flux_vector(iiPel, ppPhytoPlankton(i,iiC), ppzooc, ruPPYc)
+    call flux_vector(iiPel, ppPhytoPlankton(i,iiN), ppzoon, ruPPYc*qncPPY(i,:))
+    call flux_vector(iiPel, ppPhytoPlankton(i,iiP), ppzoop, ruPPYc*qpcPPY(i,:))
     rut_c = rut_c + ruPPYc
     rut_n = rut_n + ruPPYc*qncPPY(i,:)
     rut_p = rut_p + ruPPYc*qpcPPY(i,:)
@@ -296,30 +282,26 @@
        call flux_vector(iiPel, ppPhytoPlankton(i,iiF), ppR6f, ruPPYc*qfcPPY(i,:))
 #endif
   end do
+
   ! Microzooplankton
   do i = 1, iiMicroZooPlankton
     ruMIZc = sut*MIZc(:,i)
-    call fixed_quota_flux_vector(check_fixed_quota, iiPel, ppzooc, &
-               ppMicroZooPlankton(i,iiC), ppzooc, ruMIZc           , tfluxc )
-    call fixed_quota_flux_vector(check_fixed_quota, iiPel, ppzoon, &
-               ppMicroZooPlankton(i,iiN), ppzoon, ruMIZc*qncMIZ(i,:), tfluxn)
-    call fixed_quota_flux_vector(check_fixed_quota, iiPel, ppzoop, &
-               ppMicroZooPlankton(i,iiP), ppzoop, ruMIZc*qpcMIZ(i,:), tfluxp)
+    call flux_vector(iiPel, ppMicroZooPlankton(i,iiC), ppzooc, ruMIZc)
+    call flux_vector(iiPel, ppMicroZooPlankton(i,iiN), ppzoon, ruMIZc*qncMIZ(i,:))
+    call flux_vector(iiPel, ppMicroZooPlankton(i,iiP), ppzoop, ruMIZc*qpcMIZ(i,:))
     rut_c = rut_c + ruMIZc
     rut_n = rut_n + ruMIZc*qncMIZ(i,:)
     rut_p = rut_p + ruMIZc*qpcMIZ(i,:)
   end do
+
   ! Mesozooplankton
   do i = 1, iiMesoZooPlankton
     ruMEZc = sut*MEZc(:, i)
     ! Note that intra-group predation (cannibalism) is not added as a flux
     if ( i/= zoo ) then
-      call fixed_quota_flux_vector(check_fixed_quota, iiPel, ppzooc, &
-                 ppMesoZooPlankton(i,iiC), ppzooc, ruMEZc          , tfluxc )
-      call fixed_quota_flux_vector( check_fixed_quota, iiPel, ppzoon, &
-                 ppMesoZooPlankton(i,iiN), ppzoon, ruMEZc*qncMEZ(i,:), tfluxn)
-      call fixed_quota_flux_vector( check_fixed_quota, iiPel, ppzoop, &
-                 ppMesoZooPlankton(i,iiP), ppzoop, ruMEZc*qpcMEZ(i,:), tfluxp)
+      call flux_vector(iiPel, ppMesoZooPlankton(i,iiC), ppzooc, ruMEZc)
+      call flux_vector(iiPel, ppMesoZooPlankton(i,iiN), ppzoon, ruMEZc*qncMEZ(i,:))
+      call flux_vector(iiPel, ppMesoZooPlankton(i,iiP), ppzoop, ruMEZc*qpcMEZ(i,:))
     end if
     rut_c = rut_c + ruMEZc
     rut_n = rut_n + ruMEZc*qncMEZ(i,:)
@@ -334,8 +316,7 @@
   prI = ONE - p_puI(zoo) - p_peI(zoo)
   rrc = prI*rut_c + p_srs(zoo)*et*zooc
   call flux_vector(iiPel, ppO2o, ppO2o, -rrc/MW_C)
-  call fixed_quota_flux_vector(check_fixed_quota, iiPel, ppzooc, &
-                               ppzooc, ppO3c, rrc, tfluxc )
+  call flux_vector(iiPel, ppzooc, ppO3c, rrc)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Specific rates of low oxygen mortality
@@ -409,10 +390,8 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ren = p_srs(zoo)*et*eo*zoon + pe_N4n
   rep = p_srs(zoo)*et*eo*zoop + pe_N1p
-  call fixed_quota_flux_vector(check_fixed_quota, iiPel, ppzoop, &
-                               ppzoop, ppN1p, rep, tfluxp)
-  call fixed_quota_flux_vector(check_fixed_quota, iiPel, ppzoon, &
-                               ppzoon, ppN4n, ren, tfluxn)
+  call flux_vector(iiPel, ppzoop, ppN1p, rep)
+  call flux_vector(iiPel, ppzoon, ppN4n, ren)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Fluxes to particulate organic matter
@@ -420,25 +399,9 @@
   ! nutrient limitation
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   rq6c = rq6c + pe_R6c
-  call fixed_quota_flux_vector( check_fixed_quota, iiPel, ppzooc, &
-                             ppzooc,ppR6c, rq6c ,tfluxc )
-  call fixed_quota_flux_vector( check_fixed_quota, iiPel, ppzoop, &
-                             ppzoop,ppR6p, rq6p ,tfluxp)
-  call fixed_quota_flux_vector( check_fixed_quota, iiPel, ppzoon, &
-                             ppzoon,ppR6n, rq6n ,tfluxn)
-
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  ! The following part is computed only if zooplankton has fixed 
-  ! nutrient quota and check_fixed_quota is set to 1
-  ! It controls all nutrient imbalances and gives a warning in case 
-  ! there are nutrient leaks
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  if ( check_fixed_quota == 1 ) then
-     ren = tfluxC*p_qncMEZ(zoo)
-     call fixed_quota_flux_vector( check_fixed_quota,-iiN,0,0,0,ren,tfluxN)
-     rep = tfluxC*p_qpcMEZ(zoo)
-     call fixed_quota_flux_vector( check_fixed_quota,-iiP,0,0,0,rep,tfluxP)
-  end if
+  call flux_vector(iiPel, ppzooc,ppR6c, rq6c)
+  call flux_vector(iiPel, ppzoop,ppR6p, rq6p)
+  call flux_vector(iiPel, ppzoon,ppR6n, rq6n)
 
   end subroutine MesoZooDynamics
 !EOC

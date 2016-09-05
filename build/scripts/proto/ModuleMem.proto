@@ -418,8 +418,7 @@
         !! SHARED GLOBAL FUNCTIONS (pel) (must be below contains)
         !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-        public flux, flux_vector, Source, Source_D3_vector, &
-               fixed_quota_flux_vector
+        public flux, flux_vector, Source, Source_D3_vector
 
         public %3d-group-pel-function-name
         public %2d-group-pel-function-name

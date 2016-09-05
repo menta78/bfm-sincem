@@ -86,7 +86,6 @@
   !                                           (Ebenhoeh et al 1995, ERSEM-II)
   !                                       2 = state variable, constituent of
   !                                           phytoplankton
-  ! check_fixed_quota             numeric Check whether zooplankton have fixed quota
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   logical   :: CalcPelagicFlag=.TRUE.  
   integer   :: CalcBenthicFlag=0      ! Switch for Benthic system
@@ -98,7 +97,6 @@
   logical   :: AssignPelBenFluxesInBFMFlag=.TRUE.
   logical   :: AssignAirPelFluxesInBFMFlag=.TRUE.
   integer   :: ChlDynamicsFlag=2
-  integer   :: check_fixed_quota=0
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Global Parameters : used throughout the model and not related 
@@ -195,7 +193,7 @@
     AssignPelBenFluxesInBFMFlag, AssignAirPelFluxesInBFMFlag,                 &
     slp0,                                                                     &
     p_pe_R1c, p_pe_R1n, p_pe_R1p, p_pe_R1s,                                   &
-    ChlDynamicsFlag, check_fixed_quota
+    ChlDynamicsFlag
 #ifdef INCLUDE_BEN
   namelist /Param_parameters_ben/                                             &
     p_sedlevels, p_sedsigma,p_d_tot, p_poro0,                                 &

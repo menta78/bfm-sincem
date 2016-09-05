@@ -507,55 +507,6 @@
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 
-      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-      subroutine fixed_quota_flux_vector(mode,iiSub,which,origin, &
-                                          destination,flux,collect)
-      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-      use global_mem, only: LOGUNIT
-      use constants, only: RLEN
-      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-      ! Implicit typing is never allowed
-      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-      implicit none
-      integer,intent(IN) :: mode
-      integer,intent(IN) :: iiSub
-      integer,intent(IN) :: which
-      integer,intent(IN) :: origin
-      integer,intent(IN) :: destination
-      real(RLEN),intent(IN),dimension(:) :: flux
-      real(RLEN),intent(INOUT),dimension(:) :: collect
-      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-      !BEGIN compute
-      if ( origin> 0 .and.destination >0) then
-         call flux_vector(iiSub,origin, destination,flux)
-      else if ( origin > 0 ) then
-         call flux_vector(iiSub,origin, origin,-flux)
-      elseif ( destination > 0 ) then
-         call flux_vector(iiSub,destination, destination,flux)
-      elseif (iiSub < 0 ) then
-         if ( mode==0)  return
-         if ( sum(abs(flux)/(1.0D-80+abs(collect))-1.0D+00)> 1.0D-6) then
-              if ( iiSub==-iiN) then
-                write(LOGUNIT,'(''Warning: N:C quotum not fixed'')')
-              elseif (iiSub==-iiP) then
-                write(LOGUNIT,'(''Warning: P:C quotum not fixed'')')
-              endif
-              return
-         endif
-      endif      
-      if ( mode==1 ) then
-        if ( (which == origin) .and.(origin.ne.destination)) then
-           collect=collect-flux
-        else
-           collect=collect+flux
-        endif
-      endif
-      !END compute
-      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-      end subroutine fixed_quota_flux_vector
-      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-
-
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 ! NaN-check routines
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=

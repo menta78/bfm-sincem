@@ -29,9 +29,9 @@
     ppU1n, ppU6n, ppU1p, ppU6p, ppI4n, ppI1p, ppSeaiceAlgae, ppSeaiceZoo, ppSeaiceBacteria, &
     ETB, qncSBA, qpcSBA, qncSAL, qpcSAL, qncSZO, qpcSZO, qlcSAL, qscSAL, &
     iiSeaiceBacteria, iiSeaiceAlgae, iiSeaiceZoo, iiS, iiC, iiN, iiP, iiL, &
-    NO_BOXES_ICE, iiIce, iiIce, flux_vector,fixed_quota_flux_vector
+    NO_BOXES_ICE, iiIce, iiIce, flux_vector
 #endif
-  use mem_Param,  ONLY: p_pe_R1c, p_pe_R1n, p_pe_R1p, p_small,check_fixed_quota
+  use mem_Param,  ONLY: p_pe_R1c, p_pe_R1n, p_pe_R1p, p_small
   use mem_SeaiceZoo
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -116,9 +116,6 @@
   real(RLEN),dimension(NO_BOXES_ICE)  :: ren, r
   real(RLEN),dimension(NO_BOXES_ICE,iiSeaiceAlgae)  :: SALc
   real(RLEN),dimension(NO_BOXES_ICE,iiSeaiceZoo)  :: SZOc
-  real(RLEN),dimension(NO_BOXES_ICE)  :: tfluxc
-  real(RLEN),dimension(NO_BOXES_ICE)  :: tfluxn
-  real(RLEN),dimension(NO_BOXES_ICE)  :: tfluxp
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   !  Copy  state var. object in local var
@@ -183,24 +180,18 @@
 
   do i = 1 , iiSeaiceBacteria
     ruSBAc =  sut* SBAc(:, i)
-    call fixed_quota_flux_vector(check_fixed_quota,iiIce,ppzooc, &
-               ppSeaiceBacteria(i,iiC),ppzooc,ruSBAc,tfluxC)
-    call fixed_quota_flux_vector(check_fixed_quota,iiIce,ppzoon, &
-               ppSeaiceBacteria(i,iiN),ppzoon,ruSBAc*qncSBA(i,:),tfluxN)
-    call fixed_quota_flux_vector(check_fixed_quota,iiIce,ppzoop, &
-               ppSeaiceBacteria(i,iiP),ppzoop,ruSBAc*qpcSBA(i,:),tfluxP)
+    call flux_vector(iiIce, ppSeaiceBacteria(i,iiC),ppzooc,ruSBAc)
+    call flux_vector(iiIce, ppSeaiceBacteria(i,iiN),ppzoon,ruSBAc*qncSBA(i,:))
+    call flux_vector(iiIce, ppSeaiceBacteria(i,iiP),ppzoop,ruSBAc*qpcSBA(i,:))
     rugn = rugn + ruSBAc*qncSBA(i,:)
     rugp = rugp + ruSBAc*qpcSBA(i,:)
   end do
 
   do i = 1, iiSeaiceAlgae
     ruSALc = sut*SALc(:,i)
-    call fixed_quota_flux_vector(check_fixed_quota,iiIce,ppzooc, &
-                ppSeaiceAlgae(i,iiC),ppzooc,ruSALc,tfluxC)
-    call fixed_quota_flux_vector(check_fixed_quota,iiIce,ppzoon, &
-                ppSeaiceAlgae(i,iiN),ppzoon,ruSALc*qncSAL(i,:),tfluxN)
-    call fixed_quota_flux_vector(check_fixed_quota,iiIce,ppzoop, &
-                ppSeaiceAlgae(i,iiP),ppzoop,ruSALc*qpcSAL(i,:),tfluxP)
+    call flux_vector(iiIce, ppSeaiceAlgae(i,iiC),ppzooc,ruSALc)
+    call flux_vector(iiIce, ppSeaiceAlgae(i,iiN),ppzoon,ruSALc*qncSAL(i,:))
+    call flux_vector(iiIce, ppSeaiceAlgae(i,iiP),ppzoop,ruSALc*qpcSAL(i,:))
     rugn = rugn + ruSALc*qncSAL(i,:)
     rugp = rugp + ruSALc*qpcSAL(i,:)
     ! Chl is transferred to the infinite sink
@@ -215,12 +206,9 @@
     ruSZOc = sut* SZOc(:,i)
     ! Note that intra-group predation (cannibalism) is not added as a flux
     if ( i/= zoo) then
-      call fixed_quota_flux_vector(check_fixed_quota,iiIce,ppzooc, &
-                                   ppSeaiceZoo(i,iiC),ppzooc,ruSZOc,tfluxC)
-      call fixed_quota_flux_vector(check_fixed_quota,iiIce,ppzoon, &
-                                   ppSeaiceZoo(i,iiN),ppzoon,ruSZOc*qncSZO(i,:),tfluxN)
-      call fixed_quota_flux_vector(check_fixed_quota,iiIce,ppzoop, &
-                                   ppSeaiceZoo(i,iiP),ppzoop,ruSZOc*qpcSZO(i,:),tfluxP)
+      call flux_vector(iiIce, ppSeaiceZoo(i,iiC),ppzooc,ruSZOc)
+      call flux_vector(iiIce, ppSeaiceZoo(i,iiN),ppzoon,ruSZOc*qncSZO(i,:))
+      call flux_vector(iiIce, ppSeaiceZoo(i,iiP),ppzoop,ruSZOc*qpcSZO(i,:))
     end if
     rugn = rugn + ruSZOc*qncSZO(i,:)
     rugp = rugp + ruSZOc*qpcSZO(i,:)
@@ -242,8 +230,7 @@
   ! the activity respiration is derived from the other constant parameters
   rrac = rugc*(ONE - p_pu(zoo) - p_pu_ea(zoo))
   rrtc = rrsc + rrac
-  call fixed_quota_flux_vector(check_fixed_quota, iiIce, ppzooc, &
-                               ppzooc, ppF3c, rrtc, tfluxC)
+  call flux_vector(iiIce, ppzooc, ppF3c, rrtc)
   call flux_vector(iiIce, ppF2o, ppF2o, -rrtc/MW_C)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -255,10 +242,8 @@
   rric = reac + rdc
   rr1c = rric*p_pe_R1c
   rr6c = rric*(ONE - p_pe_R1c)
-  call fixed_quota_flux_vector(check_fixed_quota, iiIce, ppzooc, ppzooc, &
-                               ppU1c, rr1c, tfluxC)
-  call fixed_quota_flux_vector(check_fixed_quota, iiIce, ppzooc, ppzooc, &
-                               ppU6c, rr6c, tfluxC)
+  call flux_vector(iiIce, ppzooc, ppU1c, rr1c)
+  call flux_vector(iiIce, ppzooc, ppU6c, rr6c)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   !     Nutrient dynamics in microzooplankton
@@ -270,10 +255,8 @@
   rrin = rugn*p_pu_ea(zoo) + rdc*qncSZO(zoo,:)
   rr1n = rrin*p_pe_R1n
   rr6n = rrin - rr1n
-  call fixed_quota_flux_vector(check_fixed_quota, iiIce,ppzoon, &
-                               ppzoon, ppU1n, rr1n ,tfluxN)
-  call fixed_quota_flux_vector(check_fixed_quota, iiIce,ppzoon, &
-                               ppzoon, ppU6n, rr6n ,tfluxN)
+  call flux_vector(iiIce, ppzoon, ppU1n, rr1n)
+  call flux_vector(iiIce, ppzoon, ppU6n, rr6n)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Organic Phosphorus dynamics
@@ -281,10 +264,8 @@
   rrip = rugp*p_pu_ea(zoo) + rdc*qpcSZO(zoo,:)
   rr1p = rrip*p_pe_R1p
   rr6p = rrip - rr1p
-  call fixed_quota_flux_vector(check_fixed_quota, iiIce,ppzoop, &
-                               ppzoop, ppU1p, rr1p ,tfluxP)
-  call fixed_quota_flux_vector(check_fixed_quota, iiIce,ppzoop, &
-                               ppzoop, ppU6p, rr6p ,tfluxP)
+  call flux_vector(iiIce, ppzoop, ppU1p, rr1p)
+  call flux_vector(iiIce, ppzoop, ppU6p, rr6p)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Dissolved nutrient dynamics
@@ -295,23 +276,8 @@
   runp = max(ZERO, rugp*(ONE - p_pu_ea(zoo)) + rrsc*qpcSZO(zoo,:))
   ren = max(ZERO,  runn/(p_small + runc) - p_qncSZO(zoo))* runc
   rep = max(ZERO,  runp/(p_small + runc) - p_qpcSZO(zoo))* runc
-  call fixed_quota_flux_vector(check_fixed_quota, iiIce, ppzoon, &
-                               ppzoon, ppI4n, ren ,tfluxN)
-  call fixed_quota_flux_vector(check_fixed_quota, iiIce, ppzoop, &
-                               ppzoop, ppI1p, rep ,tfluxP)
-
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  ! The following part is computed only if zooplankton has fixed 
-  ! nutrient quota and check_fixed_quota is set to 1
-  ! It controls all nutrient imbalances and gives a warning in case 
-  ! there are nutrient leaks
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  if ( check_fixed_quota == 1 ) then
-     r=tfluxC*p_qncSZO(zoo)
-     call fixed_quota_flux_vector( check_fixed_quota,-iiN,0,0,0,r,tfluxN)
-     r=tfluxC*p_qpcSZO(zoo)
-     call fixed_quota_flux_vector( check_fixed_quota,-iiP,0,0,0,r,tfluxP)
-  end if
+  call flux_vector(iiIce, ppzoon, ppI4n, ren)
+  call flux_vector(iiIce, ppzoop, ppI1p, rep)
 
   end subroutine SeaiceZooDynamics
 !EOC
