@@ -364,7 +364,7 @@ module CO2System
   !
   ! DOE(1994) eq 7.2.26 with footnote using data from Millero (1974)
   ! ---------------------------------------------------------------------
-  lnK = -3070.75_RLEN*invtk - 18.126_RLEN + &
+  lnK = -3070.75_RLEN*invtk - 18.141_RLEN + &
        (17.27039_RLEN*invtk + 2.81197_RLEN) *   &
        dsqrts + (-44.99486_RLEN*invtk - 0.09984_RLEN) * s
   Kp(3) = exp(lnK)
@@ -392,7 +392,7 @@ module CO2System
      intercept = 148.9802_RLEN
   case (TOTAL)
      ! DOE (1994)
-     intercept = 148.96502_RLEN
+     intercept = 148.9652_RLEN
   end select
   lnK = intercept -13847.26_RLEN*invtk - 23.6521_RLEN * dlogtk + &
        (118.67_RLEN*invtk - 5.977_RLEN + 1.0495_RLEN * dlogtk) *          &

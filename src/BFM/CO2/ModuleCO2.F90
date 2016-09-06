@@ -254,7 +254,7 @@
 
     ! Check consistency of input parameters
     select case (K1K2)
-    case (1) 
+    case (1,3) 
         phscale = TOTAL
     case (2) 
         phscale = SWS
