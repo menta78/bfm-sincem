@@ -173,6 +173,8 @@
 !-----------------------------------------------------------------------
 &nameos        !   ocean physical parameters
 !-----------------------------------------------------------------------
+   nn_eos      = 0     !  type of equation of state and Brunt-Vaisala frequency
+   ln_useCT    = .false.  ! use of Conservative Temp. ==> surface CT converted in Pot. Temp. in sbcssm
 /
 !-----------------------------------------------------------------------
 &namtra_adv    !   advection scheme for tracer

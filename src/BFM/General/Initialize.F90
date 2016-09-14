@@ -103,7 +103,6 @@
       ! Read all data files:(namelist files)
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
       call InitParam
-      call InitPelGlobal
       call InitPelChem
       call InitPelBac
       call InitMesoZoo
@@ -111,6 +110,7 @@
       call InitPhyto
       call InitPAR
       call InitSettling
+      call InitPelGlobal
 #ifdef INCLUDE_BEN
       ! Benthic initialization is done only if there is an active model
       ! When INCLUDE_BEN is defined, 

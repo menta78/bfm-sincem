@@ -211,11 +211,6 @@
    logical,allocatable,dimension(:,:,:),public     :: SRFmask
 
    !---------------------------------------------
-   ! 3D Indices of the wet points
-   !---------------------------------------------
-   integer,allocatable,dimension(:),public         :: iwet,jwet,kwet
-
-   !---------------------------------------------
    ! Additional integration arrays
    ! for leapfrog scheme
    !---------------------------------------------

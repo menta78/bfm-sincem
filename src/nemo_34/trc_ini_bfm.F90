@@ -177,29 +177,6 @@
 #endif
 
    !-------------------------------------------------------
-   ! Allocate and build the indices of ocean points in
-   ! the 3D nemo arrays
-   !-------------------------------------------------------
-#ifdef NOPACK
-   allocate (iwet(NO_BOXES))
-   allocate (jwet(NO_BOXES))
-   allocate (kwet(NO_BOXES))
-   ll=0
-   do k = 1, jpk
-      do j = 1, jpj
-         do i = 1, jpi
-            if (SEAmask(i,j,k)) then
-               ll=ll+1
-               iwet(ll)=i
-               jwet(ll)=j
-               kwet(ll)=k
-            endif
-         enddo
-      enddo
-    enddo
-#endif
-
-   !-------------------------------------------------------
    ! Compressed coordinates for netcdf output
    !-------------------------------------------------------
    lon_len = NO_BOXES_X
