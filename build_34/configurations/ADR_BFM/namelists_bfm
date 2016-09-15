@@ -92,7 +92,6 @@
 !                                (Ebenhoeh et al 1995, ERSEM-II)
 !                            2 = state variable, constituent of
 !                                phytoplankton
-! check_fixed_quota             numeric Check whether zooplankton have fixed quota
 !
 ! Global Parameters : used throughout the model and not related 
 !                     to a specific component
@@ -128,7 +127,6 @@
 AssignPelBenFluxesInBFMFlag = .TRUE.
 AssignAirPelFluxesInBFMFlag = .TRUE.
             ChlDynamicsFlag = 3
-          check_fixed_quota = 0
 ! Parameters : 
                     p_small = 1.0e-30
                        slp0 = 1013.25E0

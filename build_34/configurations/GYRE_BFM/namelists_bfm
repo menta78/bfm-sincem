@@ -92,7 +92,6 @@
 !                                (Ebenhoeh et al 1995, ERSEM-II)
 !                            2 = state variable, constituent of
 !                                phytoplankton
-! check_fixed_quota             numeric Check whether zooplankton have fixed quota
 !
 ! Global Parameters : used throughout the model and not related 
 !                     to a specific component
@@ -128,7 +127,6 @@
 AssignPelBenFluxesInBFMFlag = .FALSE.
 AssignAirPelFluxesInBFMFlag = .TRUE.
             ChlDynamicsFlag = 2
-          check_fixed_quota = 0
 ! Parameters : 
                     p_small = 1.0e-20
                        slp0 = 1013.25E0
@@ -528,10 +526,11 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
 /
 
 &Phyto_parameters_iron
-       p_qflc = 0.1e-3, 0.1e-3, 0.83e-10,0.25e-3
-       p_qfcPPY = 0.3e-3, 0.3e-3, 0.18e-4, 0.5e-3
-        p_xqf = 1.0,    1.0,    1.0,     1.0
-        p_quf = 2.0e-4, 2.0e-4, 2.0e-4,  2.0e-4
+!                  P1      P2      P3      P4
+       p_qflc = 0.1e-3, 0.1e-3, 0.83e-10, 0.25e-3
+     p_qfcPPY = 0.3e-3, 0.3e-3, 0.18e-4,  0.5e-3
+        p_xqf = 1.0,    1.0,    1.0,      1.0
+        p_quf = 2.0e-4, 2.0e-4, 2.0e-4,   2.0e-4
 	filename_nml_conf = 'Pelagic_Ecology.nml',
 /
 

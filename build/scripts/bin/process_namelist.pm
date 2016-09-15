@@ -194,7 +194,7 @@ sub check_namelists{
 
     foreach my $list (@$lists_ref){
         #check _parameters lists
-        if( $list->name =~ /(.*)_parameters$/ ){
+        if( $list->name =~ /(.*)_parameters(.*)/ ){
             if ( $debug ){ print "\tLIST: " . $list->name . "\n"; }
             my $nml_name = $1;
             my $grp_name = "${nml_name}Plankton";

@@ -549,10 +549,11 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
 /
 
 &Phyto_parameters_iron
-       p_qflc = 0.1e-3, 0.1e-3, 0.83e-10,0.25e-3
-       p_qfcPPY = 0.3e-3, 0.3e-3, 0.18e-4, 0.5e-3
-        p_xqf = 1.0,    1.0,    1.0,     1.0
-        p_quf = 2.0e-4, 2.0e-4, 2.0e-4,  2.0e-4
+!                  P1      P2      P3      P4
+       p_qflc = 0.1e-3, 0.1e-3, 0.83e-10, 0.25e-3
+     p_qfcPPY = 0.3e-3, 0.3e-3, 0.18e-4,  0.5e-3
+        p_xqf = 1.0,    1.0,    1.0,      1.0
+        p_quf = 2.0e-4, 2.0e-4, 2.0e-4,   2.0e-4
 	filename_nml_conf = 'Pelagic_Ecology.nml',
 /
 
