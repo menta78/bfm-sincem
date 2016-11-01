@@ -34,7 +34,11 @@ SCRIPTS_PROTO="${SCRIPTSDIR}/proto"
 
 #programs
 MKMF="mkmf"
-GMAKE="gmake"
+if [[ `uname` == 'Linux' ]]; then
+   GMAKE="make"
+else
+   GMAKE="gmake"
+fi
 PERL="perl"
 GENCONF="generate_conf"
 GENNML="generate_namelist"
@@ -595,6 +599,6 @@ if [ ${DEP} ]; then
         -e "s,_PRESET_,${PRESET},g"   \
         -e "s,_QUEUE_,${QUEUE},g"     \
         -e "s,_PROC_,${PROC},g"     ${BFMDIR}/${SCRIPTS_PROTO}/${RUNPROTO} > ${exedir}/${RUNPROTO}_${EXP}
-    printf "Go to ${exedir} and execute command:\n\tbsub < ./${RUNPROTO}_${EXP}\n"
+    printf "Go to ${exedir} and execute command:\n\t./${BFMEXE}\n\tor use the template script ${RUNPROTO}_${EXP}\n"
 
 fi
