@@ -22,6 +22,7 @@
                          NO_BOXES, NO_BOXES_XY
    use api_bfm
    use SystemForcing, only : FieldRead
+   use sw_tool, only: sw_t_from_pt
 #ifdef INCLUDE_PELCO2
    use mem,        only: ppO3c, ppO3h, ppN6r
    use mem_CO2,    only: AtmCO20, AtmCO2, AtmSLP, AtmTDP
@@ -30,6 +31,8 @@
 ! OPA modules
    use oce_trc
    use trc_oce, only: etot3
+   use eosbn2,  only: nn_eos
+
 
 IMPLICIT NONE
 ! OPA domain substitutions
@@ -58,7 +61,13 @@ IMPLICIT NONE
    !---------------------------------------------
    ETW(:) = pack(tsn(:,:,:,jp_tem),SEAmask)
    ESW(:) = pack(tsn(:,:,:,jp_sal),SEAmask)
-   ERHO(:) = pack(rhop(:,:,:),SEAmask)
+   ERHO(:) = pack( (rhd(:,:,:) + 1._RLEN) * rau0, SEAmask)
+
+   ! convert to in-situ temperature and practical salinity
+   ! TEOS-10 conversions not yet available
+   if ( nn_eos .eq. 0 ) then
+      ETW(:)  = sw_t_from_pt(ESW,ETW,EPR,EPR*0.)
+   endif
    !---------------------------------------------
    ! Assign wind speed
    !---------------------------------------------

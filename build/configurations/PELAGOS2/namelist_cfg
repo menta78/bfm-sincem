@@ -5,6 +5,7 @@
 !-----------------------------------------------------------------------
 &namrun        !   parameters of the run
 !-----------------------------------------------------------------------
+   nn_no       =       0   !  job number (no more used...)
    nn_it000    =       1   !  first time step
    nn_itend    =    5475   !  last  time step (std 5475)
    nn_write    =    5475   !  frequency of write in the output file   (modulo referenced to nn_it000)
@@ -13,6 +14,7 @@
    nn_date0    =  20000101 !  date at nit_0000 (format yyyymmdd) used if ln_rstart=F or (ln_rstart=T and nn_rstctl=0 or 1)
    nn_leapy    =       0   !  Leap year calendar (1) or not (0)
    ln_rstart   = .false.   !  start from rest (F) or from a restart file (T)
+   nn_istate   =       0   !  output the initial state (1) or not (0)
 /
 !-----------------------------------------------------------------------
 &namcfg        !   parameters of the configuration
@@ -31,7 +33,7 @@
 !-----------------------------------------------------------------------
 &namzgr        !   vertical coordinate
 !-----------------------------------------------------------------------
-/
+
 !-----------------------------------------------------------------------
 &namzgr_sco    !   s-coordinate or hybrid z-s-coordinate
 !-----------------------------------------------------------------------
@@ -73,21 +75,24 @@
 &namsbc        !   Surface Boundary Condition (surface module)
 !-----------------------------------------------------------------------
    nn_fsbc     = 5         !  frequency of surface boundary condition computation
+   nn_fwb      = 1         !  FreshWater Budget: =0 unchecked
    ln_dm2dc    = .false.   !  daily mean to diurnal cycle on short wave
 /
 !-----------------------------------------------------------------------
 &namsbc_core   !   namsbc_core  CORE bulk formulae
 !-----------------------------------------------------------------------
-!              !  file name                    ! frequency (hours) ! variable  ! time interp. !  clim  ! 'yearly'/ !      ! rotation ! land/sea mask !
-!              !                               !  (if <0  months)  !   name    !   (logical)  !  (T/F) ! 'monthly' !      ! pairing  ! filename      !
-   sn_wndi     = 'u_10.15JUNE2009_orca2'        ,         6         , 'U_10_MOD',   .false.    , .true. , 'yearly'  , ''  , 'Uwnd'   , ''
-   sn_wndj     = 'v_10.15JUNE2009_orca2'        ,         6         , 'V_10_MOD',   .false.    , .true. , 'yearly'  , ''  , 'Vwnd'   , ''
-   sn_qsr      = 'ncar_rad.15JUNE2009_orca2'    ,        24         , 'SWDN_MOD',   .false.    , .true. , 'yearly'  , ''  , ''       , ''
-   sn_qlw      = 'ncar_rad.15JUNE2009_orca2'    ,        24         , 'LWDN_MOD',   .false.    , .true. , 'yearly'  , ''  , ''       , ''
-   sn_tair     = 't_10.15JUNE2009_orca2'        ,         6         , 'T_10_MOD',   .false.    , .true. , 'yearly'  , ''  , ''       , ''
-   sn_humi     = 'q_10.15JUNE2009_orca2'        ,         6         , 'Q_10_MOD',   .false.    , .true. , 'yearly'  , ''  , ''       , ''
-   sn_prec     = 'ncar_precip.15JUNE2009_orca2' ,        -1         , 'PRC_MOD1',   .false.    , .true. , 'yearly'  , ''  , ''       , ''
-   sn_snow     = 'ncar_precip.15JUNE2009_orca2' ,        -1         , 'SNOW'    ,   .false.    , .true. , 'yearly'  , ''  , ''       , ''
+!              !  file name                    ! frequency (hours) ! variable  ! time interp. !  clim  ! 'yearly'/ ! weights                               ! rotation ! land/sea mask !
+!              !                               !  (if <0  months)  !   name    !   (logical)  !  (T/F) ! 'monthly' ! filename                              ! pairing  ! filename      !
+   sn_wndi     = 'u_10.15JUNE2009_fill'        ,         6         , 'U_10_MOD',   .false.    , .true. , 'yearly'  , 'weights_core_orca2_bicubic_noc.nc'   , 'Uwnd'   , ''
+   sn_wndj     = 'v_10.15JUNE2009_fill'        ,         6         , 'V_10_MOD',   .false.    , .true. , 'yearly'  , 'weights_core_orca2_bicubic_noc.nc'   , 'Vwnd'   , ''
+   sn_qsr      = 'ncar_rad.15JUNE2009_fill'    ,        24         , 'SWDN_MOD',   .false.    , .true. , 'yearly'  , 'weights_core_orca2_bilinear_noc.nc'  , ''       , ''
+   sn_qlw      = 'ncar_rad.15JUNE2009_fill'    ,        24         , 'LWDN_MOD',   .false.    , .true. , 'yearly'  , 'weights_core_orca2_bilinear_noc.nc'  , ''       , ''
+   sn_tair     = 't_10.15JUNE2009_fill'        ,         6         , 'T_10_MOD',   .false.    , .true. , 'yearly'  , 'weights_core_orca2_bilinear_noc.nc'  , ''       , ''
+   sn_humi     = 'q_10.15JUNE2009_fill'        ,         6         , 'Q_10_MOD',   .false.    , .true. , 'yearly'  , 'weights_core_orca2_bilinear_noc.nc'  , ''       , ''
+   sn_prec     = 'ncar_precip.15JUNE2009_fill' ,        -1         , 'PRC_MOD1',   .false.    , .true. , 'yearly'  , 'weights_core_orca2_bilinear_noc.nc'  , ''       , ''
+   sn_snow     = 'ncar_precip.15JUNE2009_fill' ,        -1         , 'SNOW'    ,   .false.    , .true. , 'yearly'  , 'weights_core_orca2_bilinear_noc.nc'  , ''       , ''
+   sn_tdif     = 'taudif_core'                 ,        24         , 'taudif'  ,   .false.    , .true. , 'yearly'  , 'weights_core_orca2_bilinear_noc.nc'  , ''       , ''
+
 
    cn_dir      = './'      !  root directory for the location of the bulk files
    ln_taudif   = .false.   !  HF tau contribution: use "mean of stress module - module of the mean stress" data

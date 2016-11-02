@@ -52,6 +52,7 @@
    use time,       only: bfmtime, julian_day, calendar_date
    use init_var_bfm_local
    use trcdiabfm,  only: bfm_iomput
+   use sw_tool,    only: gsw_p_from_z
 
    ! NEMO modules
    USE trcnam_trp, only: ln_trczdf_exp,ln_trcadv_cen2,ln_trcadv_tvd
@@ -72,6 +73,7 @@
    use in_out_manager, only: numout, nitend, nit000, lwp
    USE iom,   only: iom_close
    use c1d, only : lk_c1d
+   use eosbn2,  only: nn_eos
 
    IMPLICIT NONE
 !
@@ -307,9 +309,8 @@
    Volume = pack(rtmp3Da*rtmp3Db,SEAmask)
    !thickness at each sea gridpoint (Depth(NO_BOXES))
    Depth  = pack(rtmp3Da,SEAmask)
-   ! Water column pressure
-   ! (need better approximation to convert from m to dbar)
-   EPR = pack(fsdept(:,:,:),SEAmask)
+   ! Water column pressure form TEOS-10 [dbar]
+   EPR = pack( gsw_p_from_z(-fsdept(:,:,:),SPREAD(gphit,DIM=3,NCOPIES=jpk)) , SEAmask)
 
    !-------------------------------------------------------
    ! Initialization from analytical profiles or data
@@ -516,6 +517,13 @@
      stop
    endif
 #endif
+
+   ! control consistency with NEMO EOS and BFM available conversions
+   if ( nn_eos .eq. -1 ) then
+      LEVEL1 'Conversions for NEMO TEOS-10 not available. Use directly CT and SA as state variables'
+   elseif ( nn_eos .eq. 0 ) then
+      LEVEL1 'Convert potential temperature to in-situ using UNESCO 1983 equations (Seawater 3.3.1)'
+   endif
 
    LEVEL1 ' '
    LEVEL1 '-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'
