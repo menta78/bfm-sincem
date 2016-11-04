@@ -86,14 +86,16 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   integer       :: i
   integer       :: ppzooc, ppzoon, ppzoop
+  integer,dimension(NO_BOXES)  :: nut_lim
   integer, save :: first =0
   integer       :: AllocStatus, DeallocStatus
   real(RLEN),allocatable,save,dimension(:) :: sut,et,eO2,rumc,rumn,rump,  &
                                          rugc,rugn,rugp,runc,runn,runp, &
                                          rrsc,rrac,reac,rdc,rrtc,ruPBAc,ruPPYc,  &
                                          ruMIZc,rric,rr1c,rr6c,rr1p,rr1n, &
-                                         rrip,rr6p,rep,rrin,zooc
+                                         rrip,rr6p,rep,rrin,zooc, tfluxc, tfluxn, tfluxp
   real(RLEN),allocatable,save,dimension(:)    :: rr6n,ren,pu_ra,r
+  real(RLEN),allocatable,save,dimension(:)    :: pe_N1p, pe_N4n, pe_R6c, temp_p, temp_n, pu_e_p, pu_e_n
   real(RLEN),allocatable,save,dimension(:,:)  :: PBAc,PPYc,MIZc
 #ifndef INCLUDE_PELCO2
   integer,parameter :: ppO3c = 0
@@ -102,6 +104,26 @@
 
   if (first==0) then
      first=1
+     allocate(tfluxc(NO_BOXES),stat=AllocStatus)
+     if (AllocStatus  /= 0) stop "error allocating eo"
+     allocate(tfluxn(NO_BOXES),stat=AllocStatus)
+     if (AllocStatus  /= 0) stop "error allocating eo"
+     allocate(tfluxp(NO_BOXES),stat=AllocStatus)
+     if (AllocStatus  /= 0) stop "error allocating eo"
+     allocate(pe_N4n(NO_BOXES),stat=AllocStatus)
+     if (AllocStatus  /= 0) stop "error allocating pe_N4n"
+     allocate(pe_N1p(NO_BOXES),stat=AllocStatus)
+     if (AllocStatus  /= 0) stop "error allocating pe_N1p"
+     allocate(pe_R6c(NO_BOXES),stat=AllocStatus)
+     if (AllocStatus  /= 0) stop "error allocating pe_R6c"
+     allocate(temp_p(NO_BOXES),stat=AllocStatus)
+     if (AllocStatus  /= 0) stop "error allocating temp_p"
+     allocate(temp_n(NO_BOXES),stat=AllocStatus)
+     if (AllocStatus  /= 0) stop "error allocating temp_n"
+     allocate(pu_e_p(NO_BOXES),stat=AllocStatus)
+     if (AllocStatus  /= 0) stop "error allocating pu_e_p"
+     allocate(pu_e_n(NO_BOXES),stat=AllocStatus)
+     if (AllocStatus  /= 0) stop "error allocating pu_e_n"
      allocate(PBAc(NO_BOXES,iiPelBacteria),stat=AllocStatus)
      if (AllocStatus  /= 0) stop "error allocating PBAc"
      allocate(PPYc(NO_BOXES,iiPhytoPlankton),stat=AllocStatus)
@@ -185,6 +207,11 @@
   ppzoon = ppMicroZooPlankton(zoo,iiN)
   ppzoop = ppMicroZooPlankton(zoo,iiP)
   zooc = D3STATE(ppzooc,:)
+  ! temporary variables in case check_fixed_quota=1
+  tfluxc = ZERO
+  tfluxn = ZERO
+  tfluxp = ZERO
+
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Temperature effect
@@ -248,6 +275,11 @@
     call flux_vector(iiPel, ppPelBacteria(i,iiP), ppzoop, ruPBAc*qpcPBA(i,:)) 
     rugn = rugn + ruPBAc*qncPBA(i,:)
     rugp = rugp + ruPBAc*qpcPBA(i,:)
+    ! temporary variables in case check_fixed_quota=1
+     tfluxc = tfluxc + ruPBAc
+     tfluxn = tfluxn + ruPBAc*qncPBA(i,:)
+     tfluxp = tfluxp + ruPBAc*qpcPBA(i,:) 
+
   end do
   ! Phytoplankton
   do i = 1, iiPhytoPlankton
@@ -268,6 +300,9 @@
     if ( ppPhytoPlankton(i,iiF) .gt. 0 ) & 
        call flux_vector(iiPel, ppPhytoPlankton(i,iiF), ppR6f, ruPPYc*qfcPPY(i,:))
 #endif
+     tfluxc = tfluxc + ruPPYc
+     tfluxn = tfluxn + ruPPYc*qncPPY(i,:)
+     tfluxp = tfluxp + ruPPYc*qpcPPY(i,:) 
   end do
   ! Microzooplankton
   do i = 1, iiMicroZooPlankton
@@ -277,6 +312,9 @@
        call flux_vector(iiPel, ppMicroZooPlankton(i,iiC), ppzooc, ruMIZc)
        call flux_vector(iiPel, ppMicroZooPlankton(i,iiN), ppzoon, ruMIZc*qncMIZ(i,:))
        call flux_vector(iiPel, ppMicroZooPlankton(i,iiP), ppzoop, ruMIZc*qpcMIZ(i,:))
+     tfluxc = tfluxc + ruMIZc
+     tfluxn = tfluxn + ruMIZc*qncMIZ(i,:)
+     tfluxp = tfluxp + ruMIZc*qpcMIZ(i,:) 
     end if
     rugn = rugn + ruMIZc*qncMIZ(i,:)
     rugp = rugp + ruMIZc*qpcMIZ(i,:)
@@ -300,6 +338,7 @@
   rrtc = rrsc + rrac
   call flux_vector(iiPel, ppzooc, ppO3c, rrtc)
   call flux_vector(iiPel, ppO2o, ppO2o, -rrtc/MW_C)
+  tfluxc = tfluxc - rrtc
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Mortality (rdc) + Activity Excretion (reac)
@@ -312,6 +351,7 @@
   rr6c = rric*(ONE - p_pe_R1c)
   call flux_vector(iiPel, ppzooc, ppR1c, rr1c)
   call flux_vector(iiPel, ppzooc, ppR6c, rr6c)
+  tfluxc = tfluxc - rric
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   !     Nutrient dynamics in microzooplankton
@@ -325,6 +365,7 @@
   rr6n = rrin - rr1n
   call flux_vector(iiPel, ppzoon, ppR1n, rr1n)
   call flux_vector(iiPel, ppzoon, ppR6n, rr6n)
+  tfluxn = tfluxn - rrin
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Organic Phosphorus dynamics
@@ -334,6 +375,7 @@
   rr6p = rrip - rr1p
   call flux_vector(iiPel, ppzoop, ppR1p, rr1p)
   call flux_vector(iiPel, ppzoop, ppR6p, rr6p)
+  tfluxp = tfluxp - rrip
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Dissolved nutrient dynamics
@@ -346,6 +388,138 @@
   rep  = max(ZERO, runp/(p_small + runc) - p_qpcMIZ(zoo))* runc
   call flux_vector(iiPel, ppzoon, ppN4n, ren)
   call flux_vector(iiPel, ppzoop, ppN1p, rep)
+  tfluxn = tfluxn - ren
+  tfluxp = tfluxp - rep
+
+ !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  ! Eliminate the excess of the non-limiting constituent
+  ! Determine whether C, P or N is the limiting element and assign the
+  ! value to variable nut_lim
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  nut_lim = iiC
+! Configurations
+! ------ tfluxc --- tfluxn --- tfluxp 
+!   1      <0        <0         <0
+!   2      <0        <0         >0
+!   3      <0        >0         <0
+!   4      <0        >0         >0
+!   5      >0        <0         <0
+!   6      >0        <0         >0
+!   7      >0        >0         <0
+!   8      >0        >0         >0
+  pu_e_p  =   tfluxp/( p_small+ tfluxc)
+  pu_e_n  =   tfluxn/( p_small+ tfluxc)
+
+  temp_p  = pu_e_p/qpcMIZ(zoo,:)
+  temp_n  = pu_e_n/qncMIZ(zoo,:)
+
+!!!1
+     WHERE ((tfluxc< 0) .AND. (tfluxn<0) .AND.(tfluxp <0) )
+      WHERE ( temp_p>temp_n .OR. abs(temp_p-temp_n)<p_small ) 
+          WHERE ( abs(pu_e_p) > qpcMIZ(zoo,:))
+            nut_lim = iiP
+          END WHERE
+      ELSEWHERE
+          WHERE ( abs(pu_e_n) > qncMIZ(zoo,:))
+            nut_lim = iiN
+          END WHERE
+      END WHERE
+    END WHERE
+!!!2
+     WHERE ((tfluxc< 0) .AND. (tfluxn<0) .AND.(tfluxp >0) )
+          WHERE ( abs(pu_e_n) > qncMIZ(zoo,:))
+            nut_lim = iiN
+          END WHERE
+    END WHERE
+!!!3
+     WHERE ((tfluxc< 0) .AND. (tfluxn>0) .AND.(tfluxp <0) )
+          WHERE ( abs(pu_e_p) > qpcMIZ(zoo,:))
+            nut_lim = iiP
+          END WHERE
+    END WHERE
+!!!4
+     WHERE ((tfluxc< 0) .AND. (tfluxn>0) .AND.(tfluxp >0) )
+            nut_lim = iiC
+    END WHERE
+!!!5
+     WHERE ((tfluxc> 0) .AND. (tfluxn<0) .AND.(tfluxp <0) )
+         WHERE ( temp_p<temp_n .OR. abs(temp_p-temp_n)<p_small ) 
+            nut_lim = iiP
+         ELSEWHERE
+            nut_lim = iiN
+         END WHERE
+    END WHERE
+!!!6
+     WHERE ((tfluxc> 0) .AND. (tfluxn<0) .AND.(tfluxp >0) )
+            nut_lim = iiN
+     END WHERE
+!!!7
+     WHERE ((tfluxc> 0) .AND. (tfluxn>0) .AND.(tfluxp <0) )
+            nut_lim = iiP
+     END WHERE
+!!!8
+     WHERE ((tfluxc> 0) .AND. (tfluxn>0) .AND.(tfluxp >0))
+      WHERE ( temp_p<temp_n .OR. abs(temp_p-temp_n)<p_small )
+          WHERE ( pu_e_p < qpcMIZ(zoo,:))
+            nut_lim = iiP
+          END WHERE
+      ELSEWHERE
+          WHERE (pu_e_n < qncMIZ(zoo,:))
+            nut_lim = iiN
+          END WHERE
+      END WHERE
+    END WHERE
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  ! Compute the correction terms depending on the limiting constituent
+  ! Eq. 42 Vichi et al 2007 for a combination of N and P limitation
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  write(*,*) '+++++++++++++++'
+  WHERE     ( nut_lim==iiC )
+      pe_R6c = ZERO
+      pe_N1p = max(ZERO,tfluxp  - p_qpcMIZ(zoo)* tfluxc)
+      pe_N4n = max(ZERO,tfluxn  - p_qncMIZ(zoo)* tfluxc)
+  ELSEWHERE ( nut_lim==iiP )
+      pe_N1p = ZERO
+      pe_R6c = max(ZERO, tfluxc  - tfluxp/p_qpcMIZ(zoo))
+      pe_N4n = max(ZERO, tfluxn  - tfluxp/p_qpcMIZ(zoo)*p_qncMIZ(zoo) )
+  ELSEWHERE ( nut_lim==iiN )
+      pe_N4n = ZERO
+      pe_R6c = max(ZERO, tfluxc  - tfluxn/p_qncMIZ(zoo))
+      pe_N1p = max(ZERO, tfluxp  - tfluxn/p_qncMIZ(zoo)*p_qpcMIZ(zoo))
+  END WHERE
+
+  if ( nut_lim(1)==iiC ) then
+  write(*,*) 'tfluxp', tfluxp,'pe_N1p', tfluxp  - p_qpcMIZ(zoo)* tfluxc 
+  write(*,*) 'tfluxn', tfluxn,'pe_N4n', tfluxn  - p_qncMIZ(zoo)* tfluxc
+  write(*,*) 'tfluxc', tfluxc,'pe_R6c', ZERO 
+  write(*,*) 'ooooooooooooooo'
+  endif
+
+  if ( nut_lim(1)==iiP ) then
+  write(*,*) 'tfluxp', tfluxp,'pe_N1p', ZERO 
+  write(*,*) 'tfluxn', tfluxn,'pe_N4n', tfluxn - tfluxp/p_qpcMIZ(zoo)*p_qncMIZ(zoo)
+  write(*,*) 'tfluxc', tfluxc,'pe_R6c', tfluxc - tfluxp/p_qpcMIZ(zoo)
+  write(*,*) 'ooooooooooooooo'
+  endif
+
+  if ( nut_lim(1)==iiN ) then
+  write(*,*) 'tfluxp', tfluxp,'pe_N1p', tfluxp  - tfluxn/p_qncMIZ(zoo)*p_qpcMIZ(zoo)
+  write(*,*) 'tfluxn', tfluxn,'pe_N4n', ZERO
+  write(*,*) 'tfluxc', tfluxc,'pe_R6c', tfluxc  - tfluxn/p_qncMIZ(zoo) 
+  endif
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  ! Nutrient remineralization 
+  ! basal metabolism + excess of non-limiting nutrients
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+  write(*,*) '+++++++++++++++'
+
+  call flux_vector(iiPel, ppzooc, ppR6c, pe_R6c)
+  call flux_vector(iiPel, ppzoop, ppN1p, pe_N1p)
+  call flux_vector(iiPel, ppzoon, ppN4n, pe_N4n)
+
+
 
   end subroutine MicroZooDynamics
 !EOC

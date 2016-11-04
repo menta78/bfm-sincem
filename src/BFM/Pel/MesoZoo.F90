@@ -103,7 +103,8 @@
                                        ru_n,ru_p,pu_e_n,pu_e_p,prI,pe_R6c
 
   real(RLEN),allocatable,save,dimension(:) :: pe_N1p,pe_N4n,ruPPYc,ruMIZc,ruMEZc,rq6c, &
-                                       rq6n,rq6p,rrc,ren,rep,zooc,zoop,zoon
+                                       rq6n,rq6p,rrc,ren,rep,zooc,zoop,zoon, tfluxc, tfluxn, tfluxp 
+
   real(RLEN),allocatable,save,dimension(:,:) :: PPYc,MIZc,MEZc
   real(RLEN),allocatable,save,dimension(:) :: net,r
   integer :: AllocStatus, DeallocStatus
@@ -117,6 +118,12 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   if (first==0) then
      first=1
+     allocate(tfluxc(NO_BOXES),stat=AllocStatus)
+     if (AllocStatus  /= 0) stop "error allocating eo"
+     allocate(tfluxn(NO_BOXES),stat=AllocStatus)
+     if (AllocStatus  /= 0) stop "error allocating eo"
+     allocate(tfluxp(NO_BOXES),stat=AllocStatus)
+     if (AllocStatus  /= 0) stop "error allocating eo"
      allocate(eo(NO_BOXES),stat=AllocStatus)
      if (AllocStatus  /= 0) stop "error allocating eo"
      allocate(PPYc(NO_BOXES,iiPhytoplankton),stat=AllocStatus)
@@ -222,6 +229,11 @@
   zoon = zooc * qncMEZ(zoo,:)
   zoop = zooc * qpcMEZ(zoo,:)
 
+  ! temporary variables in case check_fixed_quota=1
+  tfluxc = ZERO
+  tfluxn = ZERO
+  tfluxp = ZERO
+
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Physiological temperature and oxygen response
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -308,6 +320,10 @@
     rut_p = rut_p + ruMEZc*qpcMEZ(i,:)
   end do
 
+  tfluxc = tfluxc + rut_c 
+  tfluxn = tfluxn + rut_n
+  tfluxp = tfluxp + rut_p
+
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Activity respiration and basal metabolism
   ! First compute the the energy cost of ingestion
@@ -317,6 +333,8 @@
   rrc = prI*rut_c + p_srs(zoo)*et*zooc
   call flux_vector(iiPel, ppO2o, ppO2o, -rrc/MW_C)
   call flux_vector(iiPel, ppzooc, ppO3c, rrc)
+
+  tfluxc = tfluxc - rrc
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Specific rates of low oxygen mortality
@@ -341,67 +359,165 @@
   ! Eq 41 in Vichi et al. 2007 (there is an error in the denominator,
   ! the \Iota_c should be \Iota_i, with i=n,p)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  ru_c = p_puI(zoo)*rut_c
-  ru_n = (p_puI(zoo) + prI)* rut_n
-  ru_p = (p_puI(zoo) + prI)* rut_p
-  pu_e_n  =   ru_n/( p_small+ ru_c)
-  pu_e_p  =   ru_p/( p_small+ ru_c)
+! ru_c = p_puI(zoo)*rut_c
+! ru_n = (p_puI(zoo) + prI)* rut_n
+! ru_p = (p_puI(zoo) + prI)* rut_p
+! pu_e_n  =   ru_n/( p_small+ ru_c)
+! pu_e_p  =   ru_p/( p_small+ ru_c)
 
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  ! Eliminate the excess of the non-limiting constituent
-  ! Determine whether C, P or N is the limiting element and assign the
-  ! value to variable nut_lim
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  nut_lim = iiC
-  temp_p  = pu_e_p/qpcMEZ(zoo,:)
-  temp_n  = pu_e_n/qncMEZ(zoo,:)
-
-  WHERE ( temp_p<temp_n .OR. abs(temp_p-temp_n)<p_small ) 
-      WHERE ( pu_e_p< qpcMEZ(zoo,:) )
-        nut_lim = iiP
-      END WHERE
-  ELSEWHERE
-      WHERE ( pu_e_n<qncMEZ(zoo,:) )
-        nut_lim = iiN
-      END WHERE
-  END WHERE
-
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  ! Compute the correction terms depending on the limiting constituent
-  ! Eq. 42 Vichi et al 2007 for a combination of N and P limitation
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  WHERE     ( nut_lim==iiC )
-      pe_R6c = ZERO
-      pe_N1p = max(ZERO, (ONE - p_peI(zoo))*rut_p - p_qpcMEZ(zoo)*ru_c)
-      pe_N4n = max(ZERO, (ONE - p_peI(zoo))*rut_n - p_qncMEZ(zoo)*ru_c)
-  ELSEWHERE ( nut_lim==iiP )
-      pe_N1p = ZERO
-      pe_R6c = max(ZERO, ru_c - (ONE - p_peI(zoo))*rut_p/p_qpcMEZ(zoo))
-      pe_N4n = max( ZERO, (ONE - p_peI(zoo))*rut_n - p_qncMEZ(zoo)*(ru_c - pe_R6c))
-  ELSEWHERE ( nut_lim==iiN )
-      pe_N4n = ZERO
-      pe_R6c = max(ZERO, ru_c - (ONE - p_peI(zoo))*rut_n/p_qncMEZ(zoo))
-      pe_N1p = max(ZERO, (ONE - p_peI(zoo))*rut_p - p_qpcMEZ(zoo)*(ru_c - pe_R6c))
-  END WHERE
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Nutrient remineralization 
   ! basal metabolism + excess of non-limiting nutrients
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  ren = p_srs(zoo)*et*eo*zoon + pe_N4n
-  rep = p_srs(zoo)*et*eo*zoop + pe_N1p
+  ren = p_srs(zoo)*et*eo*zoon 
+  rep = p_srs(zoo)*et*eo*zoop 
   call flux_vector(iiPel, ppzoop, ppN1p, rep)
   call flux_vector(iiPel, ppzoon, ppN4n, ren)
+
+  tfluxn = tfluxn - ren
+  tfluxp = tfluxp - rep
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Fluxes to particulate organic matter
   ! Add the correction term for organic carbon release in case of
   ! nutrient limitation
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  rq6c = rq6c + pe_R6c
   call flux_vector(iiPel, ppzooc,ppR6c, rq6c)
   call flux_vector(iiPel, ppzoop,ppR6p, rq6p)
   call flux_vector(iiPel, ppzoon,ppR6n, rq6n)
+
+  tfluxc = tfluxc - rq6c
+  tfluxn = tfluxn - rq6n
+  tfluxp = tfluxp - rq6p
+
+ !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  ! Eliminate the excess of the non-limiting constituent
+  ! Determine whether C, P or N is the limiting element and assign the
+  ! value to variable nut_lim
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  nut_lim = iiC
+! Configurations
+! ------ tfluxc --- tfluxn --- tfluxp 
+!   1      <0        <0         <0
+!   2      <0        <0         >0
+!   3      <0        >0         <0
+!   4      <0        >0         >0
+!   5      >0        <0         <0
+!   6      >0        <0         >0
+!   7      >0        >0         <0
+!   8      >0        >0         >0
+  pu_e_p  =   tfluxp/( p_small+ tfluxc)
+  pu_e_n  =   tfluxn/( p_small+ tfluxc)
+
+  temp_p  = pu_e_p/qpcMEZ(zoo,:)
+  temp_n  = pu_e_n/qncMEZ(zoo,:)
+
+!!!1
+     WHERE ((tfluxc< 0) .AND. (tfluxn<0) .AND.(tfluxp <0) )
+      WHERE ( temp_p>temp_n .OR. abs(temp_p-temp_n)<p_small ) 
+          WHERE ( abs(pu_e_p) > qpcMEZ(zoo,:))
+            nut_lim = iiP
+          END WHERE
+      ELSEWHERE
+          WHERE ( abs(pu_e_n) > qncMEZ(zoo,:))
+            nut_lim = iiN
+          END WHERE
+      END WHERE
+    END WHERE
+!!!2
+     WHERE ((tfluxc< 0) .AND. (tfluxn<0) .AND.(tfluxp >0) )
+          WHERE ( abs(pu_e_n) > qncMEZ(zoo,:))
+            nut_lim = iiN
+          END WHERE
+    END WHERE
+!!!3
+     WHERE ((tfluxc< 0) .AND. (tfluxn>0) .AND.(tfluxp <0) )
+          WHERE ( abs(pu_e_p) > qpcMEZ(zoo,:))
+            nut_lim = iiP
+          END WHERE
+    END WHERE
+!!!4
+     WHERE ((tfluxc< 0) .AND. (tfluxn>0) .AND.(tfluxp >0) )
+            nut_lim = iiC
+    END WHERE
+!!!5
+     WHERE ((tfluxc> 0) .AND. (tfluxn<0) .AND.(tfluxp <0) )
+         WHERE ( temp_p<temp_n .OR. abs(temp_p-temp_n)<p_small ) 
+            nut_lim = iiP
+         ELSEWHERE
+            nut_lim = iiN
+         END WHERE
+    END WHERE
+!!!6
+     WHERE ((tfluxc> 0) .AND. (tfluxn<0) .AND.(tfluxp >0) )
+            nut_lim = iiN
+     END WHERE
+!!!7
+     WHERE ((tfluxc> 0) .AND. (tfluxn>0) .AND.(tfluxp <0) )
+            nut_lim = iiP
+     END WHERE
+!!!8
+     WHERE ((tfluxc> 0) .AND. (tfluxn>0) .AND.(tfluxp >0))
+      WHERE ( temp_p<temp_n .OR. abs(temp_p-temp_n)<p_small )
+          WHERE ( pu_e_p < qpcMEZ(zoo,:))
+            nut_lim = iiP
+          END WHERE
+      ELSEWHERE
+          WHERE (pu_e_n < qncMEZ(zoo,:))
+            nut_lim = iiN
+          END WHERE
+      END WHERE
+    END WHERE
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  ! Compute the correction terms depending on the limiting constituent
+  ! Eq. 42 Vichi et al 2007 for a combination of N and P limitation
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  write(*,*) '+++++++++++++++'
+  WHERE     ( nut_lim==iiC )
+      pe_R6c = ZERO
+      pe_N1p = max(ZERO,tfluxp  - p_qpcMEZ(zoo)* tfluxc)
+      pe_N4n = max(ZERO,tfluxn  - p_qncMEZ(zoo)* tfluxc)
+  ELSEWHERE ( nut_lim==iiP )
+      pe_N1p = ZERO
+      pe_R6c = max(ZERO, tfluxc  - tfluxp/p_qpcMEZ(zoo))
+      pe_N4n = max(ZERO, tfluxn  - tfluxp/p_qpcMEZ(zoo)*p_qncMEZ(zoo) )
+  ELSEWHERE ( nut_lim==iiN )
+      pe_N4n = ZERO
+      pe_R6c = max(ZERO, tfluxc  - tfluxn/p_qncMEZ(zoo))
+      pe_N1p = max(ZERO, tfluxp  - tfluxn/p_qncMEZ(zoo)*p_qpcMEZ(zoo))
+  END WHERE
+
+  if ( nut_lim(1)==iiC ) then
+  write(*,*) 'tfluxp', tfluxp,'pe_N1p', tfluxp  - p_qpcMEZ(zoo)* tfluxc 
+  write(*,*) 'tfluxn', tfluxn,'pe_N4n', tfluxn  - p_qncMEZ(zoo)* tfluxc
+  write(*,*) 'tfluxc', tfluxc,'pe_R6c', ZERO 
+  write(*,*) 'ooooooooooooooo'
+  endif
+
+  if ( nut_lim(1)==iiP ) then
+  write(*,*) 'tfluxp', tfluxp,'pe_N1p', ZERO 
+  write(*,*) 'tfluxn', tfluxn,'pe_N4n', tfluxn - tfluxp/p_qpcMEZ(zoo)*p_qncMEZ(zoo)
+  write(*,*) 'tfluxc', tfluxc,'pe_R6c', tfluxc - tfluxp/p_qpcMEZ(zoo)
+  write(*,*) 'ooooooooooooooo'
+  endif
+
+  if ( nut_lim(1)==iiN ) then
+  write(*,*) 'tfluxp', tfluxp,'pe_N1p', tfluxp  - tfluxn/p_qncMEZ(zoo)*p_qpcMEZ(zoo)
+  write(*,*) 'tfluxn', tfluxn,'pe_N4n', ZERO
+  write(*,*) 'tfluxc', tfluxc,'pe_R6c', tfluxc  - tfluxn/p_qncMEZ(zoo) 
+  endif
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  ! Nutrient remineralization 
+  ! basal metabolism + excess of non-limiting nutrients
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+  write(*,*) '+++++++++++++++'
+
+  call flux_vector(iiPel, ppzooc, ppR6c, pe_R6c)
+  call flux_vector(iiPel, ppzoop, ppN1p, pe_N1p)
+  call flux_vector(iiPel, ppzoon, ppN4n, pe_N4n)
 
   end subroutine MesoZooDynamics
 !EOC
