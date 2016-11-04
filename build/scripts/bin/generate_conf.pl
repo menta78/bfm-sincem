@@ -35,7 +35,6 @@ use F90Namelist; #get the namelists
 use print_f90; # write the variables in the output file
 use classes;
 
-
 my ($input_mem, $input_nml, $proto_dir, $out_dir, @cpp_defs, $addproto);
 
 #fix values
@@ -85,6 +84,7 @@ if ( $HELP ){ &usage(); exit; }
 if ( !$input_mem || !$input_nml || !$proto_dir || !$out_dir || !@cpp_defs ){ &usage(); exit; }
 
 # Parse additional proto files and add to fixed value list
+if( $VERBOSE ){ print "Parse list of proto files...\n"; }
 if ( $addproto and length($addproto) ) { 
     my @newproto = split(' ', $addproto, length($addproto));
     foreach my $name (@newproto) { 

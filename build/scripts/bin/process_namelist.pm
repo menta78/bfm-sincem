@@ -227,9 +227,10 @@ sub check_namelists{
                 my %pred_cols    = ();
                 my %pred_comm    = ();
                 my $last_comment = ''; 
+                my @elementlist  = @{$list->get_all_parameters()};
 
                 #check every element of the namelist
-                foreach my $element ( @{$list->get_all_parameters()} ){
+                foreach my $element ( @elementlist ){
                     #get the number of values inside the line
                     my $found_group = 0;
                     my $columns = 0;
@@ -243,13 +244,15 @@ sub check_namelists{
                         my $prename_index = "$1$2$3";
                         my $acro = $2;
                         my $index_num = $3;
+                        my $removed = 0;
 
                         #print "$prename - $prename_index - $acro - $index_num\n";
                         if ( $index_num > $grp_size ){ 
                             print "WARNING: ($index_num > $grp_size) removing element $element in namelist $nml_name\n";
                             $list->remove($element);  
+                            $removed = 1;
                         }
-                        
+
                         #search for the components which belongs to the group
                         my $params_grp_inside = getGroupComponents($groups_ref, $params_ref, $acro);
                         if ( scalar(@$params_grp_inside) > 0 ){
@@ -264,8 +267,9 @@ sub check_namelists{
                             #check if the comment of the group exists
                             if( ! $pred_comm{$prename} ){ print "ERROR: Commentary is missing in $element in namelist $nml_name\n"; exit 1; }
 
-
-                            check_cols($element, $list, $params_grp_inside, $pred_comm{$prename}, $list->get_values($element) );
+                            if ( $removed == 0 ) {
+                               check_cols($element, $list, $params_grp_inside, $pred_comm{$prename}, $list->get_values($element) );
+                            }
                         }else{
                             print "WARNING: in param $element not found group for acronym $acro\n"; last; 
                         }
@@ -280,7 +284,6 @@ sub check_namelists{
                         check_cols($element, $list, \@params_grp, $last_comment, $list->get_values($element) );
                     }
                 }
-
                 #check the number of arrays inside the namelist
                 #should be the number of elements of the subgroup
                 foreach my $pred (keys %pred_line){
