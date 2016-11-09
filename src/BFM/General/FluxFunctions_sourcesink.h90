@@ -506,6 +506,41 @@
       end subroutine unicflux
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
+      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+      subroutine quota_flux(iiSub,which,origin,destination,flux,collect)
+      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+      use constants, only: RLEN
+      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+      ! Implicit typing is never allowed
+      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+      implicit none
+      integer,intent(IN) :: iiSub
+      integer,intent(IN) :: which                      ! pointer to Zoo carbon
+      integer,intent(IN) :: origin
+      integer,intent(IN) :: destination
+      real(RLEN),intent(IN),dimension(:) :: flux
+      real(RLEN),intent(INOUT),dimension(:) :: collect ! save fluxes
+      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+      !BEGIN compute
+      if ( origin > 0 .and. destination > 0 ) then
+         call flux_vector(iiSub,origin, destination,flux)
+      else if ( origin > 0 ) then
+         call flux_vector(iiSub,origin, origin,-flux)
+      elseif ( destination > 0 ) then
+         call flux_vector(iiSub,destination, destination,flux)
+      endif
+
+      ! collect flux for fixed quota case
+      if ( (which .eq. origin) .and. (origin .ne. destination) ) then
+         collect=collect-flux
+      else
+         collect=collect+flux
+      endif
+      !END compute
+      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+      end subroutine quota_flux
+      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
 
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 ! NaN-check routines
