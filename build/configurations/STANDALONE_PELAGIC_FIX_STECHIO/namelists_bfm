@@ -199,8 +199,8 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
           'sunPPY_iiP1','sunPPY_iiP2','sunPPY_iiP3','sunPPY_iiP4',
           'ruPPYc','resPBAc','resZOOc',
           'ruPPYn','ruPPYp','ruPPYs','exPPYc',
-          'ruZOOc','remZOOn','remZOOp','remPBAn','remPBAp', 'qpcMEZ(iiZ3)', 'qncMEZ(iiZ3)',
-          'qpcMEZ(iiZ4)', 'qncMEZ(iiZ4)','qpcMIZ(iiZ5)', 'qncMIZ(iiZ5)','qpcMIZ(iiZ6)', 'qncMIZ(iiZ6)'
+          'ruZOOc','remZOOn','remZOOp','remPBAn','remPBAp', 'qpcMEZ_iiZ3', 'qncMEZ_iiZ3',
+          'qpcMEZ_iiZ4', 'qncMEZ_iiZ4','qpcMIZ_iiZ5', 'qncMIZ_iiZ5','qpcMIZ_iiZ6', 'qncMIZ_iiZ6'
 
 	filename_nml_conf = 'BFM_General.nml',
 /
