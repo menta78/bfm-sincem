@@ -37,14 +37,14 @@
   use mem, ONLY: iiF, qfcPPY, ppR6f
 #endif
 #endif
-  use mem_Param,  ONLY: p_pe_R1c, p_pe_R1n, p_pe_R1p, p_small
+  use mem_Param,     ONLY: p_pe_R1c, p_pe_R1n, p_pe_R1p, p_small
   use bfm_error_msg, ONLY: bfm_error
   use mem_MicroZoo
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! The following vector functions are used:eTq_vector, MM_vector
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  use mem_globalfun,   ONLY: eTq_vector, MM_vector,MM_power_vector
+  use mem_globalfun,   ONLY: eTq_vector, MM_vector,MM_power_vector,nutlim
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Implicit typing is never allowed
@@ -90,7 +90,7 @@
   integer, save :: first =0
   integer       :: AllocStatus, DeallocStatus
   integer,dimension(NO_BOXES)  :: limit
-  real(RLEN),allocatable,save,dimension(:) :: sut,et,eO2,rumc,rumn,rump,  &
+  real(RLEN),allocatable,save,dimension(:) :: sut,et,eO2,rumc,  &
                                          rugc,rugn,rugp,runc,runn,runp, &
                                          rrsc,rrac,reac,rdc,rrtc,ruPBAc,ruPPYc,  &
                                          ruMIZc,rric,rr1c,rr6c,rr1p,rr1n, &
@@ -102,13 +102,15 @@
   integer,parameter :: ppO3c = 0
 #endif
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! Allocate local arrays
+  
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Allocate local memory
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   if (first==0) then
      ALLOCATE ( PBAc(NO_BOXES,iiPelBacteria),   PPYc(NO_BOXES,iiPhytoPlankton),  &
         &       MIZc(NO_BOXES,iiMicroZooPlankton),               &
         &       sut(NO_BOXES), et(NO_BOXES), eO2(NO_BOXES),      &
-        &       rumc(NO_BOXES), rumn(NO_BOXES), rump(NO_BOXES),  &
+        &       rumc(NO_BOXES),  &
         &       rugc(NO_BOXES), rugn(NO_BOXES), rugp(NO_BOXES),  &
         &       runc(NO_BOXES), runn(NO_BOXES), runp(NO_BOXES),  &
         &       rrsc(NO_BOXES), rrac(NO_BOXES), reac(NO_BOXES),  &
@@ -153,30 +155,22 @@
   ! and capture efficiency with loops over all LFGs.
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   rumc   = ZERO
-  rumn   = ZERO
-  rump   = ZERO
   do i = 1 ,iiPelBacteria
      PBAc(:,i) = p_paPBA(zoo,i)*PelBacteria(i,iiC)* &
                  MM_vector(PelBacteria(i,iiC), p_minfood(zoo))
      rumc = rumc + PBAc(:,i)
-     rumn = rumn + PBAc(:,i)*qncPBA(i,:)
-     rump = rump + PBAc(:,i)*qpcPBA(i,:)
   end do
 
   do i = 1 ,iiPhytoPlankton
      PPYc(:,i) = p_paPPY(zoo,i)*PhytoPlankton(i,iiC)* &
                    MM_vector(PhytoPlankton(i,iiC), p_minfood(zoo))
     rumc = rumc + PPYc(:,i)
-    rumn = rumn + PPYc(:,i)*qncPPY(i,:)
-    rump = rump + PPYc(:,i)*qpcPPY(i,:)
   end do
 
   do i = 1, iiMicroZooPlankton
      MIZc(:,i) = p_paMIZ(zoo,i)*MicroZooPlankton(i,iiC)* &
                    MM_vector(MicroZooPlankton(i,iiC), p_minfood(zoo))
     rumc = rumc + MIZc(:,i)
-    rumn = rumn + MIZc(:,i)*qncMIZ(i,:)
-    rump = rump + MIZc(:,i)*qpcMIZ(i,:)
   end do
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -184,7 +178,7 @@
   ! specific uptake rate considering potentially available food (sut)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   rugc  = et*p_sum(zoo)*MM_vector(rumc, p_chuc(zoo))*zooc
-  sut = rugc/rumc
+  sut = rugc / (p_small + rumc)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Total Gross Uptakes from every LFG
@@ -302,7 +296,7 @@
   if ( ppzoon == 0 .and. ppzoop == 0 ) then
      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
      ! Eliminate the excess of the non-limiting constituent under fixed quota
-     ! Determine whether C, P or N is the limiting element
+     ! Determine whether C, P or N is limiting (Total Fluxes Formulation)
      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
      limit = nutlim(tfluxc,tfluxn,tfluxp,qncMIZ(zoo,:),qpcMIZ(zoo,:),iiC,iiN,iiP)
 
@@ -310,17 +304,17 @@
      ! Compute the correction terms depending on the limiting constituent
      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
      WHERE     ( limit == iiC )
-         pe_N1p = max(ZERO,tfluxp  - qpcMIZ(zoo,:)* tfluxc)
-         pe_N4n = max(ZERO,tfluxn  - qncMIZ(zoo,:)* tfluxc)
+         pe_N1p = max(ZERO,tfluxp  - p_qpcMIZ(zoo)* tfluxc)
+         pe_N4n = max(ZERO,tfluxn  - p_qncMIZ(zoo)* tfluxc)
          pe_R6c = ZERO
      ELSEWHERE ( limit == iiP )
          pe_N1p = ZERO
-         pe_N4n = max(ZERO, tfluxn  - tfluxp/qpcMIZ(zoo,:)*qncMIZ(zoo,:) )
-         pe_R6c = max(ZERO, tfluxc  - tfluxp/qpcMIZ(zoo,:))
+         pe_N4n = max(ZERO, tfluxn  - tfluxp/p_qpcMIZ(zoo)*p_qncMIZ(zoo) )
+         pe_R6c = max(ZERO, tfluxc  - tfluxp/p_qpcMIZ(zoo))
      ELSEWHERE ( limit == iiN )
-         pe_N1p = max(ZERO, tfluxp  - tfluxn/qncMIZ(zoo,:)*qpcMIZ(zoo,:))
+         pe_N1p = max(ZERO, tfluxp  - tfluxn/p_qncMIZ(zoo)*p_qpcMIZ(zoo))
          pe_N4n = ZERO
-         pe_R6c = max(ZERO, tfluxc  - tfluxn/qncMIZ(zoo,:))
+         pe_R6c = max(ZERO, tfluxc  - tfluxn/p_qncMIZ(zoo))
      END WHERE
 
      call flux_vector(iiPel, ppzooc, ppR6c, pe_R6c)
@@ -329,23 +323,23 @@
 
      write(*,*) '+++++++++++++++'
      if ( limit(1)==iiC ) then
-     write(*,*) 'tfluxp', tfluxp,'pe_N1p', tfluxp  - qpcMIZ(zoo,:)* tfluxc 
-     write(*,*) 'tfluxn', tfluxn,'pe_N4n', tfluxn  - qncMIZ(zoo,:)* tfluxc
+     write(*,*) 'tfluxp', tfluxp,'pe_N1p', tfluxp  - p_qpcMIZ(zoo)* tfluxc 
+     write(*,*) 'tfluxn', tfluxn,'pe_N4n', tfluxn  - p_qncMIZ(zoo)* tfluxc
      write(*,*) 'tfluxc', tfluxc,'pe_R6c', ZERO 
      write(*,*) 'ooooooooooooooo'
      endif
 
      if ( limit(1)==iiP ) then
      write(*,*) 'tfluxp', tfluxp,'pe_N1p', ZERO 
-     write(*,*) 'tfluxn', tfluxn,'pe_N4n', tfluxn - tfluxp/qpcMIZ(zoo,:)*qncMIZ(zoo,:)
-     write(*,*) 'tfluxc', tfluxc,'pe_R6c', tfluxc - tfluxp/qpcMIZ(zoo,:)
+     write(*,*) 'tfluxn', tfluxn,'pe_N4n', tfluxn - tfluxp/p_qpcMIZ(zoo)*p_qncMIZ(zoo)
+     write(*,*) 'tfluxc', tfluxc,'pe_R6c', tfluxc - tfluxp/p_qpcMIZ(zoo)
      write(*,*) 'ooooooooooooooo'
      endif
 
      if ( limit(1)==iiN ) then
-     write(*,*) 'tfluxp', tfluxp,'pe_N1p', tfluxp  - tfluxn/qncMIZ(zoo,:)*qpcMIZ(zoo,:)
+     write(*,*) 'tfluxp', tfluxp,'pe_N1p', tfluxp  - tfluxn/p_qncMIZ(zoo)*p_qpcMIZ(zoo)
      write(*,*) 'tfluxn', tfluxn,'pe_N4n', ZERO
-     write(*,*) 'tfluxc', tfluxc,'pe_R6c', tfluxc  - tfluxn/qncMIZ(zoo,:) 
+     write(*,*) 'tfluxc', tfluxc,'pe_R6c', tfluxc  - tfluxn/p_qncMIZ(zoo) 
      endif
      write(*,*) '+++++++++++++++'
 
