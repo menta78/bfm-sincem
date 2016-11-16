@@ -365,7 +365,8 @@
          pe_R6c = max(ZERO, tfluxc  - tfluxn/p_qncMEZ(zoo))
          pe_N1p = max(ZERO, tfluxp  - tfluxn/p_qncMEZ(zoo)*p_qpcMEZ(zoo))
      END WHERE
-   
+
+#ifdef DEBUG
      write(*,*) '+++++++++++++++'
      if ( limit(1)==iiC ) then
      write(*,*) 'tfluxp', tfluxp,'pe_N1p', tfluxp  - p_qpcMEZ(zoo)* tfluxc 
@@ -387,6 +388,7 @@
      write(*,*) 'tfluxc', tfluxc,'pe_R6c', tfluxc  - tfluxn/p_qncMEZ(zoo) 
      endif
      write(*,*) '+++++++++++++++'
+#endif
    
   endif
 

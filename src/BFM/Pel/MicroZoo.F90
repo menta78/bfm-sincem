@@ -88,7 +88,7 @@
   integer       :: i
   integer       :: ppzooc, ppzoon, ppzoop
   integer, save :: first =0
-  integer       :: AllocStatus, DeallocStatus
+  integer       :: AllocStatus
   integer,dimension(NO_BOXES)  :: limit
   real(RLEN),allocatable,save,dimension(:) :: sut,et,eO2,rumc,  &
                                          rugc,rugn,rugp,runc,runn,runp, &
@@ -321,6 +321,7 @@
      call flux_vector(iiPel, ppzoop, ppN1p, pe_N1p)
      call flux_vector(iiPel, ppzoon, ppN4n, pe_N4n)
 
+#ifdef DEBUG
      write(*,*) '+++++++++++++++'
      if ( limit(1)==iiC ) then
      write(*,*) 'tfluxp', tfluxp,'pe_N1p', tfluxp  - p_qpcMIZ(zoo)* tfluxc 
@@ -342,6 +343,7 @@
      write(*,*) 'tfluxc', tfluxc,'pe_R6c', tfluxc  - tfluxn/p_qncMIZ(zoo) 
      endif
      write(*,*) '+++++++++++++++'
+#endif
 
   endif
 

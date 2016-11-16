@@ -82,7 +82,7 @@ end
   #	State Variable(s) for Bacteria
   #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
    group PelBacteria[cnp] (PBA) : mg C/m3 : mmol N/m3 : mmol P/m3
-     B1	: Aerobic and Anaerobic Bacteria 
+     B1[-np]	: Aerobic and Anaerobic Bacteria 
    end
 
   #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
