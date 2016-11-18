@@ -44,6 +44,11 @@ module mod_chlsat
    character(LEN=100) :: gpp_fname,rsp_fname
    character(LEN=20)  :: gpp_name,rsp_name
 
+   ! default names of input NetCDF dimensions and coordinates variables
+   character(LEN=50)  :: xyzname(3), coorname(3)
+   data xyzname  /'x','y','depth'/
+   data coorname /'lon','lat','depth'/
+
    public 
    contains 
 !

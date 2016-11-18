@@ -34,12 +34,12 @@ subroutine read_create
   integer           :: IDgpp, IDrsp, ncrspid, ncgppid
   real, allocatable, dimension(:) :: time
   integer           :: npoints
-  character(len = NF90_MAX_NAME) :: fname1,fname2,attname
+  character(len = NF90_MAX_NAME) :: fname1,fname2,attname,timename
   integer,parameter    :: namlst=10
-  namelist /chlsat_nml/ inp_dir,out_dir,out_fname,chla_fname,eps_fname,      &
+  namelist /chlsat_nml/ inp_dir,out_dir,out_fname,chla_fname,xyzname,eps_fname,      &
   &                     chla_name,eps_name,mask_fname,tolerance,compute_eps, &
   &                     p_eps0,p_epsChla,gpp_fname,rsp_fname,gpp_name,rsp_name, &
-  &                     compute_intpp,compute_chlsat
+  &                     compute_intpp,compute_chlsat,coorname
 
      ! Reading directory names and file name specifications
      open(namlst,file=trim(cf_nml),action='read',status='old',err=99)
@@ -49,27 +49,38 @@ subroutine read_create
 
      ! open input files, read dimensions and get data 
      fname1 = trim(inp_dir)//"/"//trim(chla_fname)
+     write(*,*) "Open Chla input file: ",trim(fname1)
+
      call handle_err( nf90_open(path = fname1, mode = NF90_WRITE, ncid = ncchlid), &
      &                errstring="Error opening "//trim(chla_fname))
+     ! EPS file
      fname2 = trim(inp_dir)//"/"//trim(eps_fname)
      if ((fname1 .eq. fname2) .or. compute_eps) then
         ncepsid = ncchlid
      else
+        write(*,*) "Open eps input file: ",trim(fname2)
         call handle_err(nf90_open(path = fname2, mode = NF90_WRITE, ncid = ncepsid), &
         &               "Error opening "//trim(eps_fname))
      end if
+
+     write(*,*) ""
+     write(*,*) "Read input XYZ dimnames: ", &
+             TRIM(xyzname(1))//" , ", TRIM(xyzname(2))//" , ", TRIM(xyzname(3))
      call handle_err( nf90_inquire(ncchlid, nDims, nVars, nGlobalAtts, IDunlimdim), "0" )
+     call handle_err( nf90_inquire_dimension(ncchlid, IDunlimdim, name=timename, len=ntime), "1" )
+     call handle_err( nf90_inq_dimid(ncchlid, TRIM(xyzname(1)), IDx), "2" )
+     call handle_err( nf90_inq_dimid(ncchlid, TRIM(xyzname(2)), IDy), "3" )
+     call handle_err( nf90_inq_dimid(ncchlid, TRIM(xyzname(3)), IDz), "4" )
+     ! get dimensions value
      call handle_err( nf90_inquire_dimension(ncchlid, IDunlimdim, len = ntime), "1" )
-     call handle_err( nf90_inq_dimid(ncchlid, "x", IDx), "2" )
-     call handle_err( nf90_inq_dimid(ncchlid, "y", IDy), "3" )
-     call handle_err( nf90_inq_dimid(ncchlid, "depth", IDz), "4" )
      call handle_err( nf90_inquire_dimension(ncchlid, IDx, len = jpi), "5" )
      call handle_err( nf90_inquire_dimension(ncchlid, IDy, len = jpj), "6" )
      call handle_err( nf90_inquire_dimension(ncchlid, IDz, len = jpk), "7" )
-#ifdef DEBUG
-     write(*,*) "Input file dimensions (X,Y,Z,Time) : ", jpi, jpj, jpk, ntime
-     write(*,*)
-#endif
+
+     write(*,*) " X dim - name: ",   TRIM(xyzname(1)), " size:",jpi
+     write(*,*) " Y dim - name: ",   TRIM(xyzname(2)), " size:",jpj
+     write(*,*) " Z dim - name: ",   TRIM(xyzname(3)), " size:",jpk
+     write(*,*) " Unlim dim - name: ", TRIM(timename), " size:",ntime
 
      ! open mesh_mask file, get mask and vertical length scale
      fname1 = trim(mask_fname)
@@ -89,14 +100,14 @@ subroutine read_create
 
      ! get coordinates
      allocate(lon(jpi,jpj))
-     call handle_err( nf90_inq_varid(ncchlid, "lon", IDvar) )
-     call handle_err( nf90_get_var(ncchlid, IDvar, lon),errstring="variable: lon" )
+     call handle_err( nf90_inq_varid(ncchlid, TRIM(coorname(1)), IDvar) )
+     call handle_err( nf90_get_var(ncchlid, IDvar, lon),errstring="variable: "//TRIM(coorname(1)) )
      allocate(lat(jpi,jpj))
-     call handle_err( nf90_inq_varid(ncchlid, "lat", IDvar) )
-     call handle_err( nf90_get_var(ncchlid, IDvar, lat), errstring="variable: lat")
+     call handle_err( nf90_inq_varid(ncchlid, TRIM(coorname(2)), IDvar) )
+     call handle_err( nf90_get_var(ncchlid, IDvar, lat), errstring="variable: "//TRIM(coorname(2)))
      allocate(depth(jpk))
-     call handle_err( nf90_inq_varid(ncchlid, "depth", IDvar) )
-     call handle_err( nf90_get_var(ncchlid, IDvar, depth),errstring="variable: depth" )
+     call handle_err( nf90_inq_varid(ncchlid, TRIM(coorname(3)), IDvar) )
+     call handle_err( nf90_get_var(ncchlid, IDvar, depth),errstring="variable: "//TRIM(coorname(3)) )
 
      ! get chl data
      allocate(chla(jpi,jpj,jpk,ntime))
@@ -160,7 +171,7 @@ subroutine read_create
 
      ! create the output file
      call handle_err( nf90_create(trim(out_dir)//"/"//trim(out_fname), NF90_NOCLOBBER, ncid), &
-     &                errstring="A file named "//trim(out_fname)//".nc already exists!" )
+     &                errstring="A file named "//trim(out_fname)//" already exists!" )
      ! Define the dimensions
      call handle_err( nf90_def_dim(ncid, "time", NF90_UNLIMITED, IDtime) )
      call handle_err( nf90_def_dim(ncid, "x", jpi, IDx) )
@@ -187,7 +198,7 @@ subroutine read_create
         &                errstring="copying attribute "//trim(attname))
      end do
      ! copy time variable and attributes
-     call handle_err( nf90_inq_varid(ncchlid, "time", IDtimetmp), errstring="inquiring time var in "//fname1)
+     call handle_err( nf90_inq_varid(ncchlid, TRIM(timename), IDtimetmp), errstring="inquiring time var in "//fname1)
      allocate(time(ntime))
      call handle_err( nf90_get_var(ncchlid, IDtimetmp, time, start = (/ 1 /), count = (/ ntime /)) )
      call handle_err( nf90_def_var(ncid, "time", NF90_REAL, (/ IDtime /), IDvartime) )

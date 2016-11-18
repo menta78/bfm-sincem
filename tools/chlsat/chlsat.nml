@@ -10,6 +10,8 @@
 !mask_fname       string        Full path to NEMO mesh_mask file
 !chla_fname       string        Name of data file containing 3D Chl
 !chla_name        string        Name of Chl variable in file
+!xyzname          string        Name of xyz dimensions in file (provide 3 fields)
+!coorname         string        Name of xyz coordinate variables in file (provide 3 fields)
 !compute_chlsat   logical       Compute chlsat (true by default useful only for NPP)
 !compute_eps      logical       Use attenuation coefficient from output
 !                               or computed using the BFM formula from Chl 
@@ -29,13 +31,15 @@
 !
 !------------------------------------------------------------------------------------!
 &chlsat_nml
-   out_fname='chlsat_output.nc'
-   inp_dir='/path/to/inp_dir'
-   out_dir='/path/to/out_dir'
+   out_fname='chlsat.nc'
+   inp_dir='.'
+   out_dir='.'
    compute_chlsat=.true.
    mask_fname='chlmask.nc'
    chla_fname='bfm_output.nc'
    chla_name='Chla'
+   xyzname= 'x' 'y' 'deptht'
+   coorname= 'nav_lon' 'nav_lat' 'deptht' 
    compute_eps=.true.
    p_eps0=0.0435
    p_epsChla=0.03
