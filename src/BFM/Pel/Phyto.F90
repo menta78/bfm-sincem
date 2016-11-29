@@ -27,7 +27,7 @@
   use mem, ONLY: ppR1c, ppR6c, ppO2o, ppR2c, ppN3n, ppN4n, ppN1p, ppR1n, &
     ppR6n, ppR1p, ppR6p, ppN5s, ppR6s, SUNQ, ThereIsLight, ETW, EIR, &
     xEPS, Depth, eiPPY, sediPPY, sunPPY, qpcPPY, qncPPY, qscPPY, qlcPPY, NO_BOXES, &
-    iiBen, iiPel, flux_vector
+    iiBen, iiPel, flux_vector, quota_flux
   use mem, ONLY: ppPhytoPlankton
 #ifdef INCLUDE_PELCO2
   use mem, ONLY: ppO3c
@@ -40,7 +40,7 @@
   use mem_Param,  ONLY: p_small, ChlDynamicsFlag
   use mem_PAR,    ONLY: LightPeriodFlag, LightLocationFlag
   use mem_Phyto
-  use mem_globalfun,   ONLY: eTq_vector, MM_vector, insw_vector
+  use mem_globalfun,   ONLY: eTq_vector, MM_vector, insw_vector, nutlim
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Implicit typing is never allowed
@@ -83,6 +83,7 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   integer, save :: first=0
   integer :: ppphytoc, ppphyton, ppphytop, ppphytos, ppphytol 
+  integer,dimension(NO_BOXES)  :: limit
   real(RLEN),allocatable,save,dimension(:) :: phytoc,phyton,phytop,phytos,phytol
                                                                                                                                                              
   real(RLEN),allocatable,save,dimension(:) :: r,tmp,et,sum,sadap,sea,sdo,rugc,  &
@@ -94,6 +95,7 @@
                                        runn4,runp,runs,Irr,rho_Chl,rate_Chl,seo,&
                                        flPIR2c,iNIn,eN5s,rrc,rr1c
   real(RLEN),allocatable,save,dimension(:) :: iN5s,chl_opt
+  real(RLEN),allocatable,save,dimension(:) :: tfluxC, tfluxN, tfluxP, pe_R1n, pe_R1p, pe_R1c
 #ifndef INCLUDE_PELCO2
   integer,parameter :: ppO3c = 0
 #endif
@@ -223,6 +225,18 @@
      if (AllocStatus  /= 0) stop "error allocating iN5s"
      allocate(chl_opt(NO_BOXES),stat=AllocStatus)
      if (AllocStatus  /= 0) stop "error allocating chl_opt"
+     allocate(tfluxC(NO_BOXES),stat=AllocStatus)
+     if (AllocStatus  /= 0) stop "error allocating tfluxC"
+     allocate(tfluxN(NO_BOXES),stat=AllocStatus)
+     if (AllocStatus  /= 0) stop "error allocating tfluxN"
+     allocate(tfluxP(NO_BOXES),stat=AllocStatus)
+     if (AllocStatus  /= 0) stop "error allocating tfluxP"
+     allocate(pe_R1n(NO_BOXES),stat=AllocStatus)
+     if (AllocStatus  /= 0) stop "error allocating pe_R1n"
+     allocate(pe_R1p(NO_BOXES),stat=AllocStatus)
+     if (AllocStatus  /= 0) stop "error allocating pe_R1p"
+     allocate(pe_R1c(NO_BOXES),stat=AllocStatus)
+     if (AllocStatus  /= 0) stop "error allocating pe_R1c"
 #ifdef INCLUDE_PELFE
      allocate(phytof(NO_BOXES),stat=AllocStatus)
      if (AllocStatus  /= 0) stop "error allocating phytof"
@@ -260,7 +274,10 @@
   ppphytof = ppPhytoPlankton(phyto,iiF)
   if ( ppphytof > 0 ) phytof(:) = phytoc(:) * qfcPPY(phyto,:)
 #endif
-
+  ! Quota collectors
+  tfluxC = ZERO
+  tfluxN = ZERO
+  tfluxP = ZERO
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
@@ -438,11 +455,11 @@
        ! Activity and Nutrient-stress excretions are assigned to R2
        flPIR2c  =  seo*phytoc + sea*phytoc
   end select
-  call flux_vector( iiPel, ppO3c,ppphytoc, rugc )  
-  call flux_vector( iiPel, ppphytoc,ppR1c, rr1c )
-  call flux_vector( iiPel, ppphytoc,ppR6c, rr6c )
+  call quota_flux( iiPel, ppphytoc ,ppO3c,ppphytoc, rugc, tfluxC )  
+  call quota_flux( iiPel, ppphytoc, ppphytoc,ppR1c, rr1c, tfluxC )
+  call quota_flux( iiPel, ppphytoc, ppphytoc,ppR6c, rr6c, tfluxC )
 
-  call flux_vector( iiPel, ppphytoc,ppO3c, rrc )
+  call quota_flux( iiPel, ppphytoc, ppphytoc,ppO3c, rrc, tfluxC )
   call flux_vector( iiPel, ppO2o,ppO2o,-( rrc/ MW_C) )
   call flux_vector( iiPel, ppO2o,ppO2o, rugc/ MW_C ) 
 
@@ -486,7 +503,7 @@
       run  =   netgrowth
   end if
 
-  call flux_vector( iiPel, ppphytoc,ppR2c, flPIR2c )
+  call quota_flux( iiPel, ppphytoc, ppphytoc,ppR2c, flPIR2c, tfluxC )
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Specific net growth rate (d-1)
@@ -503,10 +520,10 @@
   r  =   insw_vector(  runn)
   runn3  =   r* runn* rumn3/( p_small+ rumn)  ! actual uptake of Nn
   runn4  =   r* runn* rumn4/( p_small+ rumn)  ! actual uptake of Nn
-  call flux_vector( iiPel, ppN3n,ppphyton, runn3 )  ! source/sink.n
-  call flux_vector( iiPel, ppN4n,ppphyton, runn4 )  ! source/sink.n
+  call quota_flux( iiPel, ppphyton, ppN3n,ppphyton, runn3, tfluxN )  ! source/sink.n
+  call quota_flux( iiPel, ppphyton, ppN4n,ppphyton, runn4, tfluxN )  ! source/sink.n
   tmp = - runn*( ONE- r)
-  call flux_vector(iiPel, ppphyton,ppR1n,tmp)  ! source/sink.n
+  call quota_flux( iiPel, ppphyton, ppphyton,ppR1n,tmp, tfluxN)  ! source/sink.n
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Nuttrient dynamics: PHOSPHORUS
@@ -520,9 +537,9 @@
 
   r  =   insw_vector(  runp)
   tmp = runp*r
-  call flux_vector( iiPel, ppN1p,ppphytop, tmp )  ! source/sink.p
+  call quota_flux(iiPel, ppphytop, ppN1p,ppphytop, tmp, tfluxP)  ! source/sink.p
   tmp = - runp*( ONE- r)
-  call flux_vector(iiPel, ppphytop,ppR1p, tmp)  ! source/sink.p
+  call quota_flux(iiPel, ppphytop, ppphytop,ppR1p, tmp, tfluxP)  ! source/sink.p
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Excretion of N and P to PON and POP
@@ -533,11 +550,12 @@
      rr6p  =  pe_R6* sdo* phytop
      rr1p  =  sdo* phytop- rr6p
 
-  call flux_vector( iiPel, ppphyton,ppR6n, rr6n )  ! source/sink.n
-  call flux_vector( iiPel, ppphyton,ppR1n, rr1n )  ! source/sink.n
+  call quota_flux( iiPel, ppphyton, ppphyton,ppR6n, rr6n, tfluxN )  ! source/sink.n
+  call quota_flux( iiPel, ppphyton, ppphyton,ppR1n, rr1n, tfluxN )  ! source/sink.n
 
-  call flux_vector( iiPel, ppphytop,ppR6p, rr6p )  ! source/sink.p
-  call flux_vector( iiPel, ppphytop,ppR1p, rr1p )  ! source/sink.p
+
+  call quota_flux( iiPel, ppphytop, ppphytop,ppR6p, rr6p, tfluxP )  ! source/sink.p
+  call quota_flux( iiPel, ppphytop, ppphytop,ppR1p, rr1p, tfluxP )  ! source/sink.p
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Nutrient dynamics: SILICATE
@@ -643,6 +661,37 @@
                    + p_res(phyto)* max( ZERO, ( p_esNI(phyto)-tN))
   end if
 
+
+   if ( ppphyton .EQ.  0 .and. ppphytop .EQ.  0 ) then
+    
+     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+     ! Eliminate the excess of the non-limiting constituent under fixed quota
+     ! Determine whether C, P or N is limiting (Total Fluxes Formulation)
+     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+     limit = nutlim(tfluxC,tfluxN,tfluxP,qncPPY(phyto,:),qpcPPY(phyto,:),iiC,iiN,iiP)
+
+     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+     ! Compute the correction terms depending on the limiting constituent
+     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+     WHERE     ( limit == iiC )
+         pe_R1p = max(ZERO,tfluxp  - p_qpcPPY(phyto)* tfluxc)
+         pe_R1n = max(ZERO,tfluxn  - p_qncPPY(phyto)* tfluxc)
+         pe_R1c = ZERO
+     ELSEWHERE ( limit == iiP )
+         pe_R1p = ZERO
+         pe_R1n = max(ZERO, tfluxn  - tfluxp/p_qpcPPY(phyto)*p_qncPPY(phyto) )
+         pe_R1c = max(ZERO, tfluxc  - tfluxp/p_qpcPPY(phyto))
+     ELSEWHERE ( limit == iiN )
+         pe_R1p = max(ZERO, tfluxp  - tfluxn/p_qncPPY(phyto)*p_qpcPPY(phyto))
+         pe_R1n = ZERO
+         pe_R1c = max(ZERO, tfluxc  - tfluxn/p_qncPPY(phyto))
+     END WHERE
+
+     call flux_vector(iiPel, ppphytoc, ppR1c, pe_R1c)
+     call flux_vector(iiPel, ppphytop, ppR1p, pe_R1p)
+     call flux_vector(iiPel, ppphyton, ppR1n, pe_R1n)
+
+endif
 
   ! End of computation section for process PhytoDynamics
 
