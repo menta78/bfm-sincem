@@ -2201,15 +2201,17 @@ sub func_XMLFIELD  {
                           if (length($spec)) {
                              $comm  = "flux of " . $name . $const . " at " . $spec ;
                              $nameC = "j". $spec_short . $name . $const  ;
+                             $unitC = decreaseUnit( ${$param->getComponents()}{$const} );
                           }
                           $line .= "${TAB6}<field id=\"${nameC}\"${TAB6}long_name=\"${comm}\"${TAB5}unit=\"${unitC}\"/>\n";
                       }
                   }
               }else{
-                  my $unit  = $param->getUnit();
+                  my $unit = $param->getUnit();
                   if (length($spec)) {
-                     $comm  = "flux of " . $name . " at " . $spec ;
+                     $comm = "flux of " . $name . " at " . $spec ;
                      $name = "j". $spec_short . $name ;
+                     $unit = decreaseUnit($param->getUnit());
                   }                
                   $line .= "${TAB6}<field id=\"${name}\"${TAB6}long_name=\"${comm}\"${TAB5}unit=\"${unit}\"/>\n";
               }
