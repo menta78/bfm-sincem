@@ -38,8 +38,8 @@
    mask_fname='chlmask.nc'
    chla_fname='bfm_output.nc'
    chla_name='Chla'
-   xyzname= 'x' 'y' 'deptht'
-   coorname= 'nav_lon' 'nav_lat' 'deptht' 
+   dimsname= 'x' 'y' 'deptht' 'time_counter'
+   coorname= 'nav_lon' 'nav_lat' 'deptht' 'time_counter'
    compute_eps=.true.
    p_eps0=0.0435
    p_epsChla=0.03
