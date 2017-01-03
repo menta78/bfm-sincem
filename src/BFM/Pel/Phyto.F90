@@ -87,14 +87,11 @@
   real(RLEN),allocatable,save,dimension(:) :: phytoc,phyton,phytop,phytos,phytol
                                                                                                                                                              
   real(RLEN),allocatable,save,dimension(:) :: r,tmp,et,sum,sadap,sea,sdo,rugc,  &
-                                       srt,slc,run,pe_R6,rupp,rump,misp,rupn,   &
-                                       rumn3,rumn4,rumn,netgrowth,misn,cqun3,   &
-                                       sra,srs
-  real(RLEN),allocatable,save,dimension(:) :: rums,rups,miss,tN,fpplim,iN,iN1p, &
-                                       rr1n,rr1p,rr6c,rr6n,rr6p,rr6s,runn,runn3,&
-                                       runn4,runp,runs,Irr,rho_Chl,rate_Chl,seo,&
-                                       flPIR2c,iNIn,eN5s,rrc,rr1c
-  real(RLEN),allocatable,save,dimension(:) :: iN5s,chl_opt
+        & srt,slc,run,pe_R6,rupp,rump,misp,rupn,rumn3,rumn4,rumn,netgrowth,     &
+        & misn,cqun3,sra,srs,rums,rups,miss,tN,fpplim,iN,iN1p,rr1n,rr1p,rr6c,   &
+        & rr6n,rr6p,rr6s,runn,runn3,runn4,runp,runs,Irr,rho_Chl,rate_Chl,seo,   &
+        & flPIR2c,iNIn,eN5s,rrc,rr1c,iN5s,chl_opt
+
   real(RLEN),allocatable,save,dimension(:) :: tfluxC, tfluxN, tfluxP, pe_R1n, pe_R1p, pe_R1c
 #ifndef INCLUDE_PELCO2
   integer,parameter :: ppO3c = 0
@@ -107,154 +104,37 @@
   integer :: AllocStatus, DeallocStatus
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Allocate local memory
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   if (first==0) then
-     first=1
-     allocate(phytoc(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating phytoc"
-     allocate(phyton(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating phyton"
-     allocate(phytop(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating phytop"
-     allocate(phytos(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating phytos"
-     allocate(phytol(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating phytol"
-     allocate(r(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating r"
-     allocate(tmp(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating tmp"
-     allocate(et(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating et"
-     allocate(sum(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating sum"
-     allocate(sadap(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating sadap"
-     allocate(sea(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating sea"
-     allocate(sdo(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating sdo"
-     allocate(rugc(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rugc"
-     allocate(sra(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating sra"
-     allocate(srs(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating srs"
-     allocate(srt(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating srt"
-     allocate(slc(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating slc"
-     allocate(run(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating run"
-     allocate(pe_R6(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating pe_R6"
-     allocate(rupp(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rupp"
-     allocate(rump(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rump"
-     allocate(misp(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating misp"
-     allocate(rupn(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rupn"
-     allocate(rumn3(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rumn3"
-     allocate(rumn4(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rumn4"
-     allocate(rumn(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rumn"
-     allocate(netgrowth(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating netgrowth"
-     allocate(misn(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating misn"
-     allocate(cqun3(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating cqun3"
-     allocate(rums(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rums"
-     allocate(rups(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rups"
-     allocate(miss(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating miss"
-     allocate(tN(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating tN"
-     allocate(fpplim(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating fpplim"
-     allocate(iN(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating iN"
-     allocate(iN1p(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating iN1p"
-     allocate(iNIn(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating iNIn"
-     allocate(eN5s(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating eN5s"
-     allocate(rrc(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rrc"
-     allocate(rr1c(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rr1c"
-     allocate(rr1n(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rr1n"
-     allocate(rr1p(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rr1p"
-     allocate(rr6c(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rr6c"
-     allocate(rr6n(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rr6n"
-     allocate(rr6p(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rr6p"
-     allocate(rr6s(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rr6s"
-     allocate(runn(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating runn"
-     allocate(runn3(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating runn3"
-     allocate(runn4(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating runn4"
-     allocate(runp(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating runp"
-     allocate(runs(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating runs"
-     allocate(Irr(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating Irr"
-     allocate(rho_Chl(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rho_Chl"
-     allocate(rate_Chl(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rate_Chl"
-     allocate(flPIR2c(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating flPIR2c"
-     allocate(seo(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating seo"
-     allocate(iN5s(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating iN5s"
-     allocate(chl_opt(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating chl_opt"
-     allocate(tfluxC(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating tfluxC"
-     allocate(tfluxN(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating tfluxN"
-     allocate(tfluxP(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating tfluxP"
-     allocate(pe_R1n(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating pe_R1n"
-     allocate(pe_R1p(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating pe_R1p"
-     allocate(pe_R1c(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating pe_R1c"
+     ALLOCATE ( phytoc(NO_BOXES), phyton(NO_BOXES), phytop(NO_BOXES),           &
+        &       phytos(NO_BOXES), phytol(NO_BOXES), r(NO_BOXES), tmp(NO_BOXES), &
+        &       et(NO_BOXES), sum(NO_BOXES), sadap(NO_BOXES),                   &
+        &       sdo(NO_BOXES), rugc(NO_BOXES), sra(NO_BOXES), srs(NO_BOXES),    &
+        &       srt(NO_BOXES), slc(NO_BOXES), run(NO_BOXES), pe_R6(NO_BOXES),   &
+        &       rupp(NO_BOXES), rump(NO_BOXES), misp(NO_BOXES), rupn(NO_BOXES), & 
+        &       rumn3(NO_BOXES), rumn4(NO_BOXES), rumn(NO_BOXES),               & 
+        &       netgrowth(NO_BOXES), misn(NO_BOXES), cqun3(NO_BOXES),           &
+        &       rums(NO_BOXES), rups(NO_BOXES), miss(NO_BOXES), tN(NO_BOXES),   &
+        &       fpplim(NO_BOXES), iN(NO_BOXES), iN1p(NO_BOXES), iNIn(NO_BOXES), &
+        &       eN5s(NO_BOXES), iN5s(NO_BOXES), rrc(NO_BOXES),                  &
+        &       rr1c(NO_BOXES), rr1n(NO_BOXES), rr1p(NO_BOXES),                 &
+        &       rr6c(NO_BOXES), rr6n(NO_BOXES), rr6p(NO_BOXES), rr6s(NO_BOXES), &
+        &       runn(NO_BOXES), runn3(NO_BOXES), runn4(NO_BOXES),               &
+        &       runp(NO_BOXES), runs(NO_BOXES), Irr(NO_BOXES),                  &
+        &       flPIR2c(NO_BOXES), seo(NO_BOXES), sea(NO_BOXES),                &
+        &       rate_Chl(NO_BOXES), rho_Chl(NO_BOXES), chl_opt(NO_BOXES),       & 
+        &       tfluxC(NO_BOXES), tfluxN(NO_BOXES), tfluxP(NO_BOXES),           &
+        &       pe_R1n(NO_BOXES), pe_R1p(NO_BOXES), pe_R1c(NO_BOXES),           &
 #ifdef INCLUDE_PELFE
-     allocate(phytof(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating phytof"
-     allocate(misf(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating misf"
-     allocate(iN7f(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating iN7f"
-     allocate(rr1f(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rr1f"
-     allocate(rr6f(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rr6f"
-     allocate(rupf(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rupf"
-     allocate(rumf(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rumf"
-     allocate(runf(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating runf"
+        &       phytof(NO_BOXES), misf(NO_BOXES), iN7f(NO_BOXES),               &
+        &       rr1f(NO_BOXES), rr6f(NO_BOXES),                                 &
+        &       rupf(NO_BOXES), rumf(NO_BOXES), runf(NO_BOXES),                 &
 #endif
+        &      STAT = AllocStatus )
+     IF( AllocStatus /= 0 ) call bfm_error('PhytoDynamics','Error allocating arrays')
+     first=1
   end if
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
