@@ -1704,6 +1704,7 @@ sub func_INIT_INTERNAL {
         }
         # Set initial quota values
         my @temp_line;
+        my $cnt = 0;
         foreach my $root ( sort { $$LST_PARAM{$a}->getIndex() cmp $$LST_PARAM{$b}->getIndex() } keys %$LST_PARAM ){
             my $param = $$LST_PARAM{$root};
             if( $dim == $param->getDim() && $param->getQuota() && $subt eq $param->getSubtype() ){
@@ -1714,6 +1715,9 @@ sub func_INIT_INTERNAL {
                     } else {
                         push( @temp_line, $root . "(i,:)=p_" . $root . "(i) ;" );
                     }
+                    # avoid too long rows by adding a carriage every 3 elements
+                    $cnt = $cnt + 1 ;
+                    if ( $cnt % 3 == 0 ) { push( @temp_line, "\n${SPACE}${SPACE}");}
                 }
             }
         }
