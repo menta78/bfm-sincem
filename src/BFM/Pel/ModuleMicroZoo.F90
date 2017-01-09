@@ -62,6 +62,7 @@
   ! p_sd         [1/d]           Temperature independent mortality rate
   ! p_pu         [-]             Assimilation efficiency
   ! p_pu_ea      [-]             Fraction of activity excretion
+  ! p_pecaco3    [-]             Portion of egested calcified shells during grazing
   ! p_chro       [mmolO2/m3]     Half-saturation oxygen concentration 
   ! p_chuc       [mgC/m3]        Half-saturation Food concentration for Type II
   ! p_minfood    [mgC/m3]        Half-saturation food concentration for
@@ -82,6 +83,7 @@
   real(RLEN)  :: p_sd(iiMicroZooPlankton)
   real(RLEN)  :: p_pu(iiMicroZooPlankton)
   real(RLEN)  :: p_pu_ea(iiMicroZooPlankton)
+  real(RLEN)  :: p_pecaco3(iiMicroZooPlankton)
   real(RLEN)  :: p_chro(iiMicroZooPlankton)
   real(RLEN)  :: p_chuc(iiMicroZooPlankton)
   real(RLEN)  :: p_minfood(iiMicroZooPlankton)
@@ -101,7 +103,8 @@
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   namelist /MicroZoo_parameters/ p_q10, p_srs, p_sum, p_sdo, p_sd, p_pu, &
-    p_pu_ea, p_chro, p_chuc, p_minfood, p_qncMIZ, p_qpcMIZ,p_paPPY, p_paMIZ, p_paPBA
+    p_pu_ea, p_chro, p_chuc, p_minfood, p_qncMIZ, p_qpcMIZ,p_paPPY, p_paMIZ, &
+    p_paPBA, p_pecaco3
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
   !BEGIN compute

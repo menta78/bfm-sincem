@@ -33,7 +33,7 @@
     iiMicroZooPlankton, iiMesoZooPlankton, iiC, iiN, iiP, iiL, iiS, NO_BOXES, &
     iiBen, iiPel, flux_vector
 #ifdef INCLUDE_PELCO2
-  use mem, ONLY: ppO3c
+  use mem, ONLY: ppO3c, ppO5c, ppO3h, qccPPY
 #endif
 #ifdef INCLUDE_PELFE
   use mem, ONLY: iiF, qfcPPY, ppR6f
@@ -43,7 +43,7 @@
   use mem, ONLY: jnetMeZc
 #endif
   use mem_Param,  ONLY: p_small
-  use constants,ONLY: MIN_VAL_EXPFUN, MW_C
+  use constants,ONLY: MIN_VAL_EXPFUN, MW_C, C2ALK
   use mem_MesoZoo
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -276,11 +276,25 @@
     ! silicon constituent is transferred to biogenic silicate
     if ( ppPhytoPlankton(i,iiS) .gt. 0 ) & 
        call flux_vector(iiPel, ppPhytoPlankton(i,iiS), ppR6s, ruPPYc*qscPPY(i,:))
+
 #ifdef INCLUDE_PELFE
     ! Fe constituent is transferred to particulate iron
     if ( ppPhytoPlankton(i,iiF) .gt. 0 ) & 
        call flux_vector(iiPel, ppPhytoPlankton(i,iiF), ppR6f, ruPPYc*qfcPPY(i,:))
 #endif
+
+#if defined INCLUDE_PELCO2
+    ! PIC (calcite/aragonite) production associated to the grazed biomass
+    ! The idea in PISCES is that the calcite flux exists only when associated
+    ! to a carbon release from phytoplankton (there is no calcite storage in phyto)
+    ! Use the realized rain ratio for each phytoplankton species and assume
+    ! that only a portion is egested
+    ! Calcite production is parameterized as a flux between DIC and PIC
+    ! that affects alkalinity
+    call flux_vector( iiPel, ppO3c,ppO5c, p_pecaco3(zoo)*ruPPYc*qccPPY(i,:))
+    call flux_vector( iiPel, ppO3h,ppO3h, -C2ALK*p_pecaco3(zoo)*ruPPYc*qccPPY(i,:))
+#endif
+
   end do
 
   ! Microzooplankton

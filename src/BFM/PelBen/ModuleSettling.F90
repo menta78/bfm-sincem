@@ -62,10 +62,17 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Settling PARAMETERS (read from nml)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  !  All parameter names and values were copied from the .p-file:
-  real(RLEN)  :: p_burvel_R6=0.0  ! Burial Velocity (m/d)
-  real(RLEN)  :: p_burvel_R2=0.0  ! Burial Velocity (m/d)
-  real(RLEN)  :: p_burvel_PI=0.0  ! Burial Velocity (m/d)
+  ! BURIAL VELOCITIES into the sediment
+  ! NAME         [UNIT]/KIND            DESCRIPTION
+  ! p_burvel_R6     [m/d]              Bottom Burial Velocity for detritus
+  ! p_burvel_R2     [m/d]              Bottom Burial Velocity for dissolved
+  ! p_burvel_PI     [m/d]              Bottom Burial Velocity for plankton
+  ! p_burvel_O5     [m/d]              Bottom Burial Velocity for calcite
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  real(RLEN)  :: p_burvel_R6=0.0_RLEN
+  real(RLEN)  :: p_burvel_R2=0.0_RLEN
+  real(RLEN)  :: p_burvel_PI=0.0_RLEN
+  real(RLEN)  :: p_burvel_O5=0.0_RLEN
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! SHARED PUBLIC FUNCTIONS (must be explicited below "contains")
 
@@ -76,7 +83,7 @@
   subroutine InitSettling()
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  namelist /Settling_parameters/ p_burvel_R6,p_burvel_R2,p_burvel_PI
+  namelist /Settling_parameters/ p_burvel_R6,p_burvel_R2,p_burvel_PI,p_burvel_O5
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
   !BEGIN compute

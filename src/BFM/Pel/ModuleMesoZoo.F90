@@ -73,6 +73,7 @@
   ! p_vum        [m3/mgC/d]      Specific search volume
   ! p_puI        [-]             Assimilation efficiency
   ! p_peI        [-]             Fraction of Faeces production
+  ! p_pecaco3    [-]             Portion of egested calcified shells during grazing
   ! p_sdo        [m3/mgC/d]      Specific density-dependent mortality
   ! p_sds        [-]             Exponent of density-dependent mortality
   ! p_qpcMEZ     [mmolP/mgC]     Maximum quotum P:C
@@ -91,6 +92,7 @@
   real(RLEN)  :: p_vum(iiMesoZooPlankton)
   real(RLEN)  :: p_puI(iiMesoZooPlankton)
   real(RLEN)  :: p_peI(iiMesoZooPlankton)
+  real(RLEN)  :: p_pecaco3(iiMesoZooPlankton)
   real(RLEN)  :: p_sdo(iiMesoZooPlankton)
   real(RLEN)  :: p_sds(iiMesoZooPlankton)
   real(RLEN)  :: p_qpcMEZ(iiMesoZooPlankton)
@@ -109,7 +111,8 @@
   subroutine InitMesoZoo()
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   namelist /MesoZoo_parameters/ p_q10, p_srs, p_paPPY, p_paMIZ, p_paMEZ, p_sd, &
-    p_sum, p_vum, p_puI, p_peI, p_sdo, p_sds, p_qpcMEZ, p_qncMEZ, p_clO2o
+    p_sum, p_vum, p_puI, p_peI, p_sdo, p_sds, p_qpcMEZ, p_qncMEZ, p_clO2o,     &
+    p_pecaco3
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   !BEGIN compute
 

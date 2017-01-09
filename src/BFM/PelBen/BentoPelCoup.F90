@@ -52,8 +52,11 @@
 #ifdef INCLUDE_PELFE
   use mem, ONLY: iiF,R6f,ppR6f,jbotR6f,R1f,ppR1f,jbotR1f
 #endif
-#if defined INCLUDE_PELCO2 && defined INCLUDE_BENCO2
+#if defined INCLUDE_PELCO2
+  use mem, ONLY: ppO5c, jbotO5c
+#if defined INCLUDE_BENCO2
   use mem, ONLY: ppO3h, ppO3c,jbotO3c,jbotO3h
+#endif
 #endif
 #endif
 
@@ -231,12 +234,16 @@
           Depth(kbot) )
         call flux(kbot, iiPel, ppN6r, ppN6r, jbotN6r(BoxNumberXY)/ &
           Depth(kbot) )
-#if defined INCLUDE_PELCO2 && defined INCLUDE_BENCO2
+#if defined INCLUDE_PELCO2
+        call flux(kbot, iiPel, ppO5c, ppO5c, jbotO5c(BoxNumberXY)/ &
+          Depth(kbot))
+#if defined INCLUDE_BENCO2
         call flux(kbot, iiPel, ppO3c, ppO3c, jbotO3c(BoxNumberXY)/ &
           Depth(kbot) )
         ! convert the units from mmol/m3/d to umol/kg/d
         call flux(kbot, iiPel, ppO3h, ppO3h, jbotO3h(BoxNumberXY)/&
           Depth(kbot))
+#endif
 #endif
 
         ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

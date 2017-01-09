@@ -80,7 +80,7 @@
   ! M2PHDELT       [pH]             Delta of pH for the root search (realized pH+/-DELT)
   !                                 in the OCMIP scheme (default 0.5)
   ! M2MAXIT        integer          Maximum number of iterations for OCMIP (default 100 )
-  !              ----------------------------------------------------- 
+  !              ---------  Parameters for calcium and calcite ---------
   ! Caconc0        [mol/m3]         Calcium ion concentration 
   !                                 ["Seawater : Its composition, properties and behaviour" 
   !                                 (2nd Edition), Open University Course Team, 1995]
@@ -142,10 +142,11 @@
   use api_bfm, ONLY: bfm_init
   use mem_Param, ONLY: slp0
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-    namelist /CO2_parameters/ AtmCO20,calcAtmpCO2,pCO2Method,K1K2,MethodCalcCO2,     &
-                              phscale,phstart,M2XACC,M2PHDELT,M2MAXIT,         &
-                              Caconc0,Canorm,AtmCO2_N,AtmSLP_N,AtmTDP_N, &
-                              p_kdca, p_nomega, CalcBioAlkFlag
+    namelist /CO2_parameters/ AtmCO20,calcAtmpCO2,pCO2Method,K1K2,MethodCalcCO2, &
+                              phscale,phstart,M2XACC,M2PHDELT,M2MAXIT,           &
+                              Caconc0,Canorm,p_kdca, p_nomega,                   &
+                              AtmCO2_N,AtmSLP_N,AtmTDP_N,                        &
+                              CalcBioAlkFlag
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   integer            ::error=0
   !---------------------------------------------------------------------------

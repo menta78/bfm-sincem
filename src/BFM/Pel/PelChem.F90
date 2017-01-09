@@ -35,7 +35,7 @@
     flN3O4n, ETW, flPTN6r, NO_BOXES, iiBen, iiPel, flN4N3n, &
     flux_vector
 #ifdef INCLUDE_PELCO2
-  use mem, ONLY: ppO3c
+  use mem, ONLY: ppO3c, ppO5c
 #endif
 #endif
   use mem_Param,  ONLY: p_qon_nitri, p_qro, p_qon_dentri, p_small
@@ -155,6 +155,7 @@
   ! Corrections of nitrogen cycle biogeochemistry on Total Alkalinity
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   if ( ppO3c > 0 .and. CalcBioAlkFlag)  call AlkalinityDynamics( )
+  if ( ppO5c > 0 )  call PelPICDynamics( )
 #endif
 
 #ifdef INCLUDE_PELFE

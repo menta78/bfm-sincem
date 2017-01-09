@@ -30,7 +30,7 @@
 #ifdef NOPOINTERS
   use mem
 #else
-  use mem,  ONLY: R1c, R2c, R6c, R1n, R6n, R1p, R6p, R6s, PhytoPlankton, D3STATE
+  use mem, ONLY: R1c, R2c, R6c, R1n, R6n, R1p, R6p, R6s, PhytoPlankton, D3STATE
   use mem, ONLY: ppR1c, ppR6c, ppR1n, ppR6n, ppR1p, ppR6p, &
     ppR6s, ppPhytoPlankton, &
     NO_BOXES_XY, BoxNumberXY, Depth, jbotR6c, jbotR6n, jbotR6p, &
@@ -39,6 +39,10 @@
 #ifdef INCLUDE_PELFE
   use mem, ONLY: iiF,R6f,ppR6f,jbotR6f
 #endif
+#ifdef INCLUDE_PELCO2
+  use mem, ONLY: sediO5, O5c , jbotO5c
+#endif
+
 #endif
   use mem_Param,  ONLY: p_pe_R1c, p_pe_R1n, p_pe_R1p
   use mem_Settling
@@ -106,6 +110,9 @@
   real(RLEN)  :: ruQ6p
   real(RLEN)  :: ruQIl
   real(RLEN)  :: ruQ6s
+#ifdef INCLUDE_PELCO2
+  real(RLEN)  :: ruO5c
+#endif
 #ifdef INCLUDE_PELFE
   real(RLEN)  :: ruQ6f
 #endif
@@ -214,6 +221,11 @@
 #ifdef INCLUDE_PELFE
          ruQ6f  =   sediR6(kbot)* R6f(kbot)
          jbotR6f(BoxNumberXY)  =   jbotR6f(BoxNumberXY)- ruQ6f
+#endif
+#ifdef INCLUDE_PELCO2
+         ! burial rate of PIC (calcite)
+         ruO5c  =   sediO5(kbot) * O5c(kbot)
+         jbotO5c(BoxNumberXY)  =   jbotO5c(BoxNumberXY)- ruO5c
 #endif
       end do
 
