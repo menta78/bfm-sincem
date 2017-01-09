@@ -56,6 +56,9 @@
 	  <field field_ref="wspd"         name="sowindsp" />
           <field field_ref="precip"       name="soprecip" />
 	  <field field_ref="sbt"                          />
+          <field field_ref="ice_cover"    name="sic"             long_name="sea_ice_area_fraction"                  />
+          <field field_ref="hc300"        name="sohtc300"  />
+          <field field_ref="mldr0_1"      name="somxl001"  />
 	</file>
 
 	<file id="file3" name_suffix="_grid_U" description="ocean U grid variables" >
