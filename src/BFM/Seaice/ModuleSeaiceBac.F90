@@ -104,8 +104,8 @@
   subroutine InitSeaiceBac()
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  namelist /SeaiceBac_parameters/ p_version, p_q10, p_chdo, p_sd, p_sd2, p_suhU1, &
-    p_sulU1, p_suU6, p_sum, p_pu_ra, p_pu_ra_o, p_srs, p_qpcSBA, &
+  namelist /SeaiceBacteria_parameters/ p_version, p_q10, p_chdo, p_sd, p_sd2, &
+    p_suhU1, p_sulU1, p_suU6, p_sum, p_pu_ra, p_pu_ra_o, p_srs, p_qpcSBA, &
     p_qncSBA, p_chn, p_chp, p_ruen, p_ruep
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
@@ -117,10 +117,10 @@
   write(LOGUNIT,*) "#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
   write(LOGUNIT,*) "#  Reading SeaiceBac parameters.."
   open(NMLUNIT,file='Seaice_Ecology.nml',status='old',action='read',err=100)
-  read(NMLUNIT,nml=SeaiceBac_parameters,err=101)
+  read(NMLUNIT,nml=SeaiceBacteria_parameters,err=101)
   close(NMLUNIT)
   write(LOGUNIT,*) "#  Namelist is:"
-  write(LOGUNIT,nml=SeaiceBac_parameters)
+  write(LOGUNIT,nml=SeaiceBacteria_parameters)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   !END compute
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -129,7 +129,7 @@
   ! Local Error Messages
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 100 call error_msg_prn(NML_OPEN,"ModuleSeaiceBac.f90","Seaice_Ecology.nml")
-101 call error_msg_prn(NML_READ,"ModuleSeaiceBac.f90","SeaiceBac_parameters")
+101 call error_msg_prn(NML_READ,"ModuleSeaiceBac.f90","SeaiceBacteria_parameters")
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   end  subroutine InitSeaiceBac
 

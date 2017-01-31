@@ -125,7 +125,7 @@
   subroutine InitSeaiceAlgae()
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  namelist /Seaicealgae_parameters/ p_q10, p_sum, p_srs, p_sdmo, p_pu_ea, &
+  namelist /SeaiceAlgae_parameters/ p_q10, p_sum, p_srs, p_sdmo, p_pu_ea, &
     p_pu_ra, p_qnlc, p_qplc, p_qncSAL, p_qpcSAL, p_qscSAL, p_qun, p_qup, &
     p_xqn, p_xqp, p_thdo, p_lN4, p_chsSAL, &
     p_limnut, p_alpha_chl, p_qlcSAL, p_epsSAL
@@ -138,10 +138,10 @@
     write(LOGUNIT,*) "#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
     write(LOGUNIT,*) "#  Reading Sea ice algae parameters.."
     open(NMLUNIT,file='Seaice_Ecology.nml',status='old',action='read',err=100)
-    read(NMLUNIT,nml=Seaicealgae_parameters,err=101)
+    read(NMLUNIT,nml=SeaiceAlgae_parameters,err=101)
     close(NMLUNIT)
     write(LOGUNIT,*) "#  Namelist is:"
-    write(LOGUNIT,nml=Seaicealgae_parameters)
+    write(LOGUNIT,nml=SeaiceAlgae_parameters)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   !END compute
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -150,7 +150,7 @@
   ! Local Error Messages
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 100 call error_msg_prn(NML_OPEN,"ModuleSeaiceAlgae.f90","Seaice_Ecology.nml")
-101 call error_msg_prn(NML_READ,"ModuleSeaiceAlgae.f90","Seaicealgae_parameters")
+101 call error_msg_prn(NML_READ,"ModuleSeaiceAlgae.f90","SeaiceAlgae_parameters")
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   end  subroutine InitSeaiceAlgae
   end module mem_SeaiceAlgae

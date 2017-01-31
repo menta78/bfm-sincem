@@ -890,7 +890,7 @@ p_paMEZ(2,:)=   0.0,    1.0
 !  p_qlcSAL:    Maximum quotum Chla:C
 !  p_chlNI:       Nutrient stress threshold for chlorophyll
 !
-&Seaicealgae_parameters
+&SeaiceAlgae_parameters
 !           	S1	S2
       p_q10 = 2.0,	2.0,
       p_sum = 1.5,	2.0,
@@ -918,7 +918,7 @@ p_alpha_chl = 1.4e-4,	1.6e-5,
 /
 
 !-------------------------------------------------------------------------!
-!NAMELIST SeaiceBac_parameters
+!NAMELIST SeaiceBacteria_parameters
 !-------------------------------------------------------------------------!
 ! NAME         [UNIT]/KIND            DESCRIPTION
 ! p_version   integer         Switch for bacteria parameterization
@@ -941,7 +941,8 @@ p_alpha_chl = 1.4e-4,	1.6e-5,
 ! p_chp       [mmolP/m2]       Half saturation phosphate conc. for uptake
 ! p_ruen      [1/d]            Relaxation timescale for N uptake/remin.
 ! p_ruep      [1/d]            Relaxation timescale for P uptake/remin.
-&SeaiceBac_parameters
+&SeaiceBacteria_parameters
+!                T1
    p_version = 1,
    p_q10 = 2.95,
    p_chdo = 3.0,

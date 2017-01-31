@@ -1710,7 +1710,7 @@ sub func_INIT_INTERNAL {
             if( $dim == $param->getDim() && $param->getQuota() && $subt eq $param->getSubtype() ){
                 my $temp_group = $param->getQuota() ;
                 if ( $temp_group eq $groupname && $root  =~ /^q.*$groupAcro$/) {
-                    if ( $groupAcro eq "OMT" ) {
+                    if ( $groupAcro eq "OMT" || $groupAcro eq "SOM" ) {
                         push( @temp_line, $root . "(i,:)=" . (substr $root, 1, 2) . "_ratio_default ;" );
                     } else {
                         push( @temp_line, $root . "(i,:)=p_" . $root . "(i) ;" );
