@@ -375,25 +375,25 @@
   ! Calculation of nutrient release and correction of C:N:P
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-  ren  =   rtyn- rtyc* p_qn(y)
-  rep  =   rtyp- rtyc* p_qp(y)
+  ren  =   rtyn- rtyc* p_qncBOS(y)
+  rep  =   rtyp- rtyc* p_qpcBOS(y)
 
   where ( ren< ZERO)
-    rq6c  =  - ren/ p_qn(y)
+    rq6c  =  - ren/ p_qncBOS(y)
     rqt6c  =   rqt6c+ rq6c
     rtyc  =   rtyc- rq6c
 
-    ren  =   rtyn- rtyc* p_qn(y)
-    rep  =   rtyp- rtyc* p_qp(y)
+    ren  =   rtyn- rtyc* p_qncBOS(y)
+    rep  =   rtyp- rtyc* p_qpcBOS(y)
   end where
 
   where ( rep< ZERO)
-    rq6c  =  - rep/ p_qp(y)
+    rq6c  =  - rep/ p_qpcBOS(y)
     rqt6c  =   rqt6c+ rq6c
     rtyc  =   rtyc- rq6c
 
-    ren  =   rtyn- rtyc* p_qn(y)
-    rep  =   rtyp- rtyc* p_qp(y)
+    ren  =   rtyn- rtyc* p_qncBOS(y)
+    rep  =   rtyp- rtyc* p_qpcBOS(y)
   end where
 
 
@@ -402,8 +402,8 @@
   ! Redfield C:N:P. In this way the C:N:P does not become too extreme
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-  ren = min( max( ZERO, ren), max( ZERO, ren-( p_qn(y)* yc- yn)))
-  rep = min( max( ZERO, rep), max( ZERO, rep-( p_qp(y)* yc- yp)))
+  ren = min( max( ZERO, ren), max( ZERO, ren-( p_qncBOS(y)* yc- yn)))
+  rep = min( max( ZERO, rep), max( ZERO, rep-( p_qpcBOS(y)* yc- yp)))
 
 
   call flux_vector( iiBen, ppyn,ppK4n, ren )

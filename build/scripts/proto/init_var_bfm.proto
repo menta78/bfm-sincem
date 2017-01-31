@@ -43,11 +43,17 @@ MODULE init_var_bfm_local
                         CalcSeaiceFlag,   &
                         CalcPelChemistry, &
                         CalcTransportFlag
+#ifdef INCLUDE_BEN
+   use mem_BenBac
+   use mem_BenOrganism
+#endif
+
 #ifdef INCLUDE_SEAICE
    use mem_SeaiceAlgae
    use mem_SeaiceBac
    use mem_SeaiceZoo
 #endif
+
    IMPLICIT NONE
 !
 ! !INPUT PARAMETERS:

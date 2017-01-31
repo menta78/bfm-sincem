@@ -201,7 +201,7 @@
   ! Growth is controlled by quality of detritus (N and P content):
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-  eN  =   eramp_vector(qnQ6c, p_qnc(hx))* eramp_vector(qpQ6c, p_qpc(hx))
+  eN  =   eramp_vector(qnQ6c, p_qncBBA(hx))* eramp_vector(qpQ6c, p_qpcBBA(hx))
 
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -268,13 +268,13 @@
    
   ! a too high nutrient content of food is related to the food upake ( r < 0) 
   ! a too low nutrient content of food is related to net growth of the organisms   ( r > 0)
-  r=p_qnc(hx)* hxc(:)-hxn(:)
+  r=p_qncBBA(hx)* hxc(:)-hxn(:)
   misn = (run*r*insw_vector(r)+max(rrc,rug)*r*insw_vector(-r))/hxc(:)
-  r=p_qpc(hx)* hxc(:)-hxp(:)
+  r=p_qpcBBA(hx)* hxc(:)-hxp(:)
   misp = (run*r*insw_vector(r)+max(rrc,rug)*r*insw_vector(-r))/hxc(:)
    
-  rupn=run*p_qnc(hx)
-  rupp=run*p_qpc(hx)
+  rupn=run*p_qncBBA(hx)
+  rupp=run*p_qpcBBA(hx)
 
   runn=min(rumn-min(ZERO,misn),rupn+max(ZERO,misn))
   runp=min(rump-min(ZERO,misp),rupp+max(ZERO,misp))
@@ -291,8 +291,8 @@
   call flux_vector( iiBen, pphxc,pphxc,-( run- netgrowth) )
   run  =   netgrowth
 
-  ren  =   max(ruQ6n+ruQ1n-run*p_qnc(hx),-runn) *insw_vector(run) -min(ZERO,misn)
-  rep  =   max(ruQ6p+ruQ1p-run*p_qpc(hx),-runp) *insw_vector(run) -min(ZERO,misp)
+  ren  =   max(ruQ6n+ruQ1n-run*p_qncBBA(hx),-runn) *insw_vector(run) -min(ZERO,misn)
+  rep  =   max(ruQ6p+ruQ1p-run*p_qpcBBA(hx),-runp) *insw_vector(run) -min(ZERO,misp)
 
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

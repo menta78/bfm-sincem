@@ -1639,6 +1639,7 @@ sub func_INIT_INTERNAL {
     my @constList         = ();
     my @constNoC          = ();
     my @constOptionalList = ();
+    my $endloop = '';
 
     my $SUBTYPE= '_' . uc($subt);
     if ( $SUBTYPE eq '_PEL' ){ $SUBTYPE = '' } #fix because pel is default and vars has no suffix
@@ -1679,7 +1680,7 @@ sub func_INIT_INTERNAL {
                     #print $temp_compo . " " . $groupname_nml . " ";
                     #if the optional initialization element exists in the namelist => add to initialize constituents
                     foreach my $list (@$LST_NML){
-                        # search for namelists starting with groupname_paramters*
+                        # search for namelists starting with groupname_parameters*
                         if( $list->name() =~ m/^$groupname_nml/ ){
                             foreach my $param ( @{$list->slots()} ){
                                 if( $param eq $temp_compo){ 
@@ -1693,6 +1694,7 @@ sub func_INIT_INTERNAL {
             if( scalar(@temp_line2) ){ push( @temp_line, "    " . join(",  ", @temp_line2 ) ); }
 
             $line .= "${SPACE}do i = 1 , ( ii". $groupname ." )\n";
+            $endloop = "1";
 
             if ( $#temp_line == -1 ) {
                 $line .= "${SPACE}  call init_constituents( c=" . $groupname  . "(i,iiC) )\n";
@@ -1710,7 +1712,7 @@ sub func_INIT_INTERNAL {
             if( $dim == $param->getDim() && $param->getQuota() && $subt eq $param->getSubtype() ){
                 my $temp_group = $param->getQuota() ;
                 if ( $temp_group eq $groupname && $root  =~ /^q.*$groupAcro$/) {
-                    if ( $groupAcro eq "OMT" || $groupAcro eq "SOM" ) {
+                    if ( $groupAcro eq "OMT" || $groupAcro eq "SOM" || $groupAcro eq "BOM") {
                         push( @temp_line, $root . "(i,:)=" . (substr $root, 1, 2) . "_ratio_default ;" );
                     } else {
                         push( @temp_line, $root . "(i,:)=p_" . $root . "(i) ;" );
@@ -1721,10 +1723,13 @@ sub func_INIT_INTERNAL {
                 }
             }
         }
-        if( $#temp_line != -1) {
+        if( $#temp_line != -1 ) {
             $line .= "${SPACE}${SPACE} " . join(" " , @temp_line) . "\n";
-            $line .= "${SPACE}end do\n\n";
         }
+        if( $endloop ne '') {
+            $line .= "${SPACE}end do\n\n";
+            $endloop = '';
+        } 
     }
 
     if( $line ){ print $file $line; }

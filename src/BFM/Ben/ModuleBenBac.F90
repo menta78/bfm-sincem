@@ -65,8 +65,8 @@
   ! BenBac PARAMETERS (read from nml)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   real(RLEN)  :: p_cdm(iiBenBacteria)  ! Half mortality layer        (m)
-  real(RLEN)  :: p_qnc(iiBenBacteria)  ! Optimal Internal N quota
-  real(RLEN)  :: p_qpc(iiBenBacteria)  ! Optimal Internal P quota
+  real(RLEN)  :: p_qncBBA(iiBenBacteria)  ! Optimal Internal N quota
+  real(RLEN)  :: p_qpcBBA(iiBenBacteria)  ! Optimal Internal P quota
   real(RLEN)  :: p_qlnc(iiBenBacteria)  ! Optimal Internal N quota
   real(RLEN)  :: p_qlpc(iiBenBacteria)  ! Optimal Internal P quota
   real(RLEN)  :: p_q10(iiBenBacteria)  ! Q10
@@ -93,7 +93,7 @@
   subroutine InitBenBac()
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  namelist /BenBac_parameters/ p_cdm, p_qpc, p_qlpc, p_qnc, p_qlnc, p_q10, &
+  namelist /BenBac_parameters/ p_cdm, p_qpcBBA, p_qlpc, p_qncBBA, p_qlnc, p_q10, &
     p_suhQ6, p_sulQ6, p_sum, p_pue, p_suQ1, p_pur, p_srr, p_sumKIn, p_sumKIp, &
     p_sd, p_iK4, p_iK1, p_iQ1
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
