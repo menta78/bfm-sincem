@@ -278,140 +278,134 @@
   ! Update the total rate of formation of reduction equivalent
   flPTN6r(:) = flPTN6r(:) + flN6rPBA
 
-  if ( ppbacn >  0 .and. ppbacp >  0 ) then
-     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-     !             Fluxes from bacteria
-     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-     select case ( p_version(bac))
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  !             Fluxes from bacteria
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  select case ( p_version(bac))
 
-       case ( BACT3 ) ! Polimene et al. (2006)
-   
-         !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-         ! Carbon excretion as Semi-Labile (R2) and Semi-Refractory (R3) DOC 
-         ! The R2 rate is assumed to occur with a timescale of 1 day
-         ! (eq 8 Polimene et al., 2006)
-         ! The renewal of capsular material is a constant rate, equivalent
-         ! to about 1/4 of the respiration rate, ~5% of uptake 
-         ! (Stoderegger and Herndl, 1998)
-         !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-         reR2c = max((ONE-(qpcPBA(bac,:)/p_qpcPBA(bac))), &
-                 (ONE-(qncPBA(bac,:)/p_qncPBA(bac))))*p_rec(bac)
-         reR2c = max(ZERO,reR2c)*bacc
-         reR3c = rug*(ONE-p_pu_ra(bac))*(p_pu_ra(bac)*p_pu_ea_R3(bac))
-   
-         !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-         ! Dissolved Nitrogen dynamics
-         ! Direct uptake of ammonium if N excretion rate is negative (ren < 0)
-         ! This rate is assumed to occur with a timescale p_ruen=1 day
-         ! and controlled with a Michaelis-Menten function
-         !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-         ren = (qncPBA(bac,:) - p_qncPBA(bac))*bacc*p_ruen(bac)
-         call flux_vector(iiPel, ppbacn, ppN4n,       ren*insw_vector( ren))
-         call flux_vector(iiPel, ppN4n, ppbacn, -eN4n*ren*insw_vector(-ren))
-   
-         !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-         ! Dissolved Phosphorus dynamics
-         ! Direct uptake of phosphate if P excretion rate is negative (rep < 0)
-         ! This rate is assumed to occur with a timescale of p_ruep=1 day
-         ! and controlled with a Michaelis-Menten function
-         !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-         rep  =  (qpcPBA(bac,:) - p_qpcPBA(bac))*bacc*p_ruep(bac)
-         call flux_vector(iiPel, ppbacp, ppN1p,       rep*insw_vector( rep))
-         call flux_vector(iiPel, ppN1p, ppbacp, -eN1p*rep*insw_vector(-rep))
-   
-       case ( BACT1 ) ! Vichi et al. 2007
-   
-         !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-         ! There is no Carbon excretion in Vichi et al. 2007
-         !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-         reR2c = ZERO
-         reR3c = ZERO
-   
-         !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-         ! Dissolved Nitrogen dynamics
-         ! Direct uptake of ammonium if N excretion rate is negative (ren < 0)
-         ! This rate is assumed to occur with a timescale p_ruen=1 day
-         ! and controlled with a Michaelis-Menten function
-         !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-         ren  =  (qncPBA(bac,:) - p_qncPBA(bac))*bacc*p_ruen(bac)
-         call flux_vector(iiPel, ppbacn, ppN4n,       ren*insw_vector( ren))
-         call flux_vector(iiPel, ppN4n, ppbacn, -eN4n*ren*insw_vector(-ren))
-   
-         !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-         ! Dissolved Phosphorus dynamics
-         ! Direct uptake of phosphate if P excretion rate is negative (rep < 0)
-         ! This rate is assumed to occur with a timescale of p_ruep=1 day
-         ! and controlled with a Michaelis-Menten function
-         !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-         rep  =  (qpcPBA(bac,:) - p_qpcPBA(bac))*bacc*p_ruep(bac)
-         call flux_vector(iiPel, ppbacp, ppN1p,       rep*insw_vector( rep))
-         call flux_vector(iiPel, ppN1p, ppbacp, -eN1p*rep*insw_vector(-rep))
-   
-       case ( BACT2 ) ! Vichi et al. 2004
-         !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-         ! Net Production
-         !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-         run = rug - rrc
-   
-         !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-         ! Ammonium remineralization  (Eq. 28 Vichi et al. 2004, note that there 
-         ! is a bug in the paper as there should be no division by B1c)
-         !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-         huln = (ruR6n + ruR1n) - p_qncPBA(bac)*run
-         ren  = huln*insw_vector(huln)
-         call flux_vector(iiPel, ppbacn, ppN4n, ren)
-   
-         !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-         ! Inorganic Nitrogen uptake  (Eq. 29 Vichi et al. 2004, there is a bug
-         ! here as well, the min should be a max as the numbers are negative!)
-         ! from Ammonium and Nitrate when N is not balanced (huln<0)
-         ! (nitrate uptake with ammonium inhibition)
-         !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-         rumn3 = p_qun(bac)*N3n(:)*bacc*(ONE-eN4n)
-         rumn4 = p_qun(bac)*N4n(:)*bacc
-         rumn  = rumn3 + rumn4
-         ren   = max(-rumn,huln)*insw_vector(-huln)
-         call flux_vector(iiPel, ppN4n, ppbacn, -ren*rumn4/rumn)
-         call flux_vector(iiPel, ppN3n, ppbacn, -ren*rumn3/rumn)
-   
-         !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-         ! Phosphate remineralization  (Eq. 28 Vichi et al. 2004, note that there 
-         ! is an error in the paper as there should be no division by B1c)
-         !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-         hulp = (ruR6p + ruR1p) - p_qpcPBA(bac)*run
-         rep  = hulp*insw_vector(hulp)
-         call flux_vector(iiPel, ppbacp, ppN1p, rep)
-   
-         !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-         ! Inorganic Phosphorus uptake  (Eq. 29 Vichi et al. 2004, there is a bug
-         ! here as well, the min should be a max as the numbers are negative!)
-         ! from dissolved phosphate whene P is not balanced (hulp<0)
-         !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-         rump = p_qup(bac)*N1p(:)*bacc
-         rep  = max(-rump,hulp)*insw_vector(-hulp)
-         call flux_vector(iiPel, ppN1p, ppbacp, -rep)
-   
-         !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-         ! Excess carbon (also considering dissolved nutrient uptake ren and rep) 
-         ! is released as R3c, no other excretion (reR2c=0)
-         ! (eq. 30 Vichi et al. 2004, unfortunately there is another error in 
-         ! the paper, the flux of dissolved nutrient is not written)
-         !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-         r     = min(run, (ruR6n+ruR1n-ren)/p_qlnc(bac))
-         reR3c = run - min(r, (ruR6p+ruR1p-rep)/p_qlpc(bac))
-         reR3c = max(ZERO, reR3c)
-         reR2c = ZERO
-   
-     end select
-   
-     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-     ! Excretion fluxes (only losses to R2 and R3)
-     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-     call flux_vector( iiPel, ppbacc,ppR2c, reR2c )
-     call flux_vector( iiPel, ppbacc,ppR3c, reR3c )
-   
-  else
+    case ( BACT1 ) ! Vichi et al. 2007
+      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+      ! There is no Carbon excretion in Vichi et al. 2007
+      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  
+      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+      ! Dissolved Nitrogen dynamics
+      ! Direct uptake of ammonium if N excretion rate is negative (ren < 0)
+      ! This rate is assumed to occur with a timescale p_ruen=1 day
+      ! and controlled with a Michaelis-Menten function
+      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+      ren  =  (qncPBA(bac,:) - p_qncPBA(bac))*bacc*p_ruen(bac)
+      call quota_flux(iiPel, ppbacn, ppbacn, ppN4n,       ren*insw_vector( ren), tfluxN)
+      call quota_flux(iiPel, ppbacn, ppN4n, ppbacn, -eN4n*ren*insw_vector(-ren), tfluxN)
+  
+      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+      ! Dissolved Phosphorus dynamics
+      ! Direct uptake of phosphate if P excretion rate is negative (rep < 0)
+      ! This rate is assumed to occur with a timescale of p_ruep=1 day
+      ! and controlled with a Michaelis-Menten function
+      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+      rep  =  (qpcPBA(bac,:) - p_qpcPBA(bac))*bacc*p_ruep(bac)
+      call quota_flux(iiPel, ppbacp, ppbacp, ppN1p,       rep*insw_vector( rep), tfluxP)
+      call quota_flux(iiPel, ppbacp, ppN1p, ppbacp, -eN1p*rep*insw_vector(-rep), tfluxP)
+  
+    case ( BACT2 ) ! Vichi et al. 2004
+      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+      ! Net Production
+      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+      run = rug - rrc
+  
+      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+      ! Ammonium remineralization  (Eq. 28 Vichi et al. 2004, note that there 
+      ! is a bug in the paper as there should be no division by B1c)
+      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+      huln = (ruR6n + ruR1n) - p_qncPBA(bac)*run
+      ren  = huln*insw_vector(huln)
+      call quota_flux(iiPel, ppbacn, ppbacn, ppN4n, ren, tfluxN)
+  
+      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+      ! Inorganic Nitrogen uptake  (Eq. 29 Vichi et al. 2004, there is a bug
+      ! here as well, the min should be a max as the numbers are negative!)
+      ! from Ammonium and Nitrate when N is not balanced (huln<0)
+      ! (nitrate uptake with ammonium inhibition)
+      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+      rumn3 = p_qun(bac)*N3n(:)*bacc*(ONE-eN4n)
+      rumn4 = p_qun(bac)*N4n(:)*bacc
+      rumn  = rumn3 + rumn4
+      ren   = max(-rumn,huln)*insw_vector(-huln)
+      call quota_flux(iiPel, ppbacn, ppN4n, ppbacn, -ren*rumn4/rumn, tfluxN)
+      call quota_flux(iiPel, ppbacn, ppN3n, ppbacn, -ren*rumn3/rumn, tfluxN)
+  
+      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+      ! Phosphate remineralization  (Eq. 28 Vichi et al. 2004, note that there 
+      ! is an error in the paper as there should be no division by B1c)
+      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+      hulp = (ruR6p + ruR1p) - p_qpcPBA(bac)*run
+      rep  = hulp*insw_vector(hulp)
+      call quota_flux(iiPel, ppbacp, ppbacp, ppN1p, rep, tfluxP)
+  
+      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+      ! Inorganic Phosphorus uptake  (Eq. 29 Vichi et al. 2004, there is a bug
+      ! here as well, the min should be a max as the numbers are negative!)
+      ! from dissolved phosphate whene P is not balanced (hulp<0)
+      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+      rump = p_qup(bac)*N1p(:)*bacc
+      rep  = max(-rump,hulp)*insw_vector(-hulp)
+      call quota_flux(iiPel, ppbacp, ppN1p, ppbacp, -rep, tfluxP)
+  
+      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+      ! Excess carbon (also considering dissolved nutrient uptake ren and rep) 
+      ! is released as R3c, no other excretion (reR2c=0)
+      ! (eq. 30 Vichi et al. 2004, unfortunately there is another error in 
+      ! the paper, the flux of dissolved nutrient is not written)
+      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+      r     = min(run, (ruR6n+ruR1n-ren)/p_qlnc(bac))
+      reR3c = run - min(r, (ruR6p+ruR1p-rep)/p_qlpc(bac))
+      reR3c = max(ZERO, reR3c)
+      call quota_flux( iiPel, ppbacc, ppbacc,ppR3c, reR3c ,tfluxC)
 
+    case ( BACT3 ) ! Polimene et al. (2006)
+      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+      ! Carbon excretion as Semi-Labile (R2) and Semi-Refractory (R3) DOC
+      ! The R2 rate is assumed to occur with a timescale of 1 day
+      ! (eq 8 Polimene et al., 2006)
+      ! The renewal of capsular material is a constant rate, equivalent
+      ! to about 1/4 of the respiration rate, ~5% of uptake
+      ! (Stoderegger and Herndl, 1998)
+      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+      reR2c = max((ONE-(qpcPBA(bac,:)/p_qpcPBA(bac))), &
+              (ONE-(qncPBA(bac,:)/p_qncPBA(bac))))*p_rec(bac)
+      reR2c = max(ZERO,reR2c)*bacc
+      reR3c = rug*(ONE-p_pu_ra(bac))*(p_pu_ra(bac)*p_pu_ea_R3(bac))
+
+      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+      ! Dissolved Nitrogen dynamics
+      ! Direct uptake of ammonium if N excretion rate is negative (ren < 0)
+      ! This rate is assumed to occur with a timescale p_ruen=1 day
+      ! and controlled with a Michaelis-Menten function
+      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+      ren = (qncPBA(bac,:) - p_qncPBA(bac))*bacc*p_ruen(bac)
+      call quota_flux(iiPel, ppbacn, ppbacn, ppN4n,       ren*insw_vector( ren), tfluxN)
+      call quota_flux(iiPel, ppbacn, ppN4n, ppbacn, -eN4n*ren*insw_vector(-ren), tfluxN)
+
+      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+      ! Dissolved Phosphorus dynamics
+      ! Direct uptake of phosphate if P excretion rate is negative (rep < 0)
+      ! This rate is assumed to occur with a timescale of p_ruep=1 day
+      ! and controlled with a Michaelis-Menten function
+      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+      rep  =  (qpcPBA(bac,:) - p_qpcPBA(bac))*bacc*p_ruep(bac)
+      call quota_flux(iiPel, ppbacp, ppbacp, ppN1p,       rep*insw_vector( rep), tfluxP)
+      call quota_flux(iiPel, ppbacp, ppN1p, ppbacp, -eN1p*rep*insw_vector(-rep), tfluxP)
+
+      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+      ! Excretion fluxes (only losses to R2 and R3)
+      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+      call quota_flux( iiPel, ppbacc, ppbacc, ppR2c, reR2c, tfluxC)
+      call quota_flux( iiPel, ppbacc, ppbacc, ppR3c, reR3c, tfluxC)
+  
+  end select
+   
+  if ( ppbacn == 0 .or. ppbacp == 0 ) then
      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
      ! Eliminate the excess of the non-limiting constituent under fixed quota
      ! Determine whether C, P or N is limiting (Total Fluxes Formulation)
@@ -435,33 +429,34 @@
          pe_R6c = max(ZERO, tfluxc  - tfluxn/p_qncPBA(bac))
      END WHERE
 
-     call flux_vector(iiPel, ppbacc, ppR6c, pe_R6c)
+     call flux_vector(iiPel, ppbacc, ppR6c, pe_R6c*(ONE-p_pe_R1c))
+     call flux_vector(iiPel, ppbacc, ppR1c, pe_R6c*(p_pe_R1c)    )
      call flux_vector(iiPel, ppbacp, ppN1p, pe_N1p)
      call flux_vector(iiPel, ppbacn, ppN4n, pe_N4n)
 
 #ifdef DEBUG
-  write(*,*) '++++++  BAC  +++++'
-     write(*,*) 'limit', limit
-     if ( limit(1)==iiC ) then
-     write(*,*) 'tfluxc', tfluxc,'pe_R6c', ZERO
-     write(*,*) 'tfluxn', tfluxn,'pe_N4n', tfluxn  - p_qncPBA(bac)* tfluxc
-     write(*,*) 'tfluxp', tfluxp,'pe_N1p', tfluxp  - p_qpcPBA(bac)* tfluxc
-     write(*,*) 'ooooooooooooooo'
-     endif
-
-     if ( limit(1)==iiP ) then
-     write(*,*) 'tfluxc', tfluxc,'pe_R6c', tfluxc - tfluxp/p_qpcPBA(bac)
-     write(*,*) 'tfluxn', tfluxn,'pe_N4n', tfluxn - tfluxp/p_qpcPBA(bac)*p_qncPBA(bac)
-     write(*,*) 'tfluxp', tfluxp,'pe_N1p', ZERO
-     write(*,*) 'ooooooooooooooo'
-     endif
-
-     if ( limit(1)==iiN ) then
-     write(*,*) 'tfluxc', tfluxc,'pe_R6c', tfluxc  - tfluxn/p_qncPBA(bac)
-     write(*,*) 'tfluxn', tfluxn,'pe_N4n', ZERO
-     write(*,*) 'tfluxp', tfluxp,'pe_N1p', tfluxp  - tfluxn/p_qncPBA(bac)*p_qpcPBA(bac)
-     endif
-  write(*,*) '++++++  BAC  +++++'
+     write(*,*) '++++++  BAC  +++++'
+        write(*,*) 'limit', limit
+        if ( limit(1)==iiC ) then
+        write(*,*) 'tfluxc', tfluxc,'pe_R6c', ZERO
+        write(*,*) 'tfluxn', tfluxn,'pe_N4n', tfluxn  - p_qncPBA(bac)* tfluxc
+        write(*,*) 'tfluxp', tfluxp,'pe_N1p', tfluxp  - p_qpcPBA(bac)* tfluxc
+        write(*,*) 'ooooooooooooooo'
+        endif
+   
+        if ( limit(1)==iiP ) then
+        write(*,*) 'tfluxc', tfluxc,'pe_R6c', tfluxc - tfluxp/p_qpcPBA(bac)
+        write(*,*) 'tfluxn', tfluxn,'pe_N4n', tfluxn - tfluxp/p_qpcPBA(bac)*p_qncPBA(bac)
+        write(*,*) 'tfluxp', tfluxp,'pe_N1p', ZERO
+        write(*,*) 'ooooooooooooooo'
+        endif
+   
+        if ( limit(1)==iiN ) then
+        write(*,*) 'tfluxc', tfluxc,'pe_R6c', tfluxc  - tfluxn/p_qncPBA(bac)
+        write(*,*) 'tfluxn', tfluxn,'pe_N4n', ZERO
+        write(*,*) 'tfluxp', tfluxp,'pe_N1p', tfluxp  - tfluxn/p_qncPBA(bac)*p_qpcPBA(bac)
+        endif
+     write(*,*) '++++++  BAC  +++++'
 #endif
 
   endif

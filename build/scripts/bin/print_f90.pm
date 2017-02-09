@@ -116,6 +116,7 @@ my $dispatch = {
     '\%(3|2)d-(state)-(pel|ben|ice)-InitDefault(?:\s|\n)'      => \&func_INIT_DEFAULT ,
     '\%(3|2)d-(state)-(pel|ben|ice)-InitSets(?:\s|\n)'         => \&func_INIT_SETS ,
     '\%(3|2)d-(state)-(pel|ben|ice)-InitInternal(?:\s|\n)'     => \&func_INIT_INTERNAL ,
+    '\%(3|2)d-(state)-(pel|ben|ice)-UpdInternal(?:\s|\n)'      => \&func_UPD_INTERNAL ,
     '\%(3|2)d-state-(pel|ben|ice)-func-zeroing(?:\s|\n)'       => \&func_INIT_FUNC_ZERO ,
     #COUPLING
     '\%(3|2)d-flux-coupled(?:\s|\n)'                           => \&func_FLUX_COUPLED ,
@@ -1692,7 +1693,7 @@ sub func_INIT_INTERNAL {
             }
             if( scalar(@temp_line2) ){ push( @temp_line, "    " . join(",  ", @temp_line2 ) ); }
 
-            $line .= "${SPACE}do i = 1 , ( ii". $groupname ." )\n";
+            $line .= "${SPACE}do i = 1 , ii". $groupname ."\n";
 
             if ( $#temp_line == -1 ) {
                 $line .= "${SPACE}  call init_constituents( c=" . $groupname  . "(i,iiC) )\n";
@@ -1730,7 +1731,57 @@ sub func_INIT_INTERNAL {
     if( $line ){ print $file $line; }
 }
 
+sub func_UPD_INTERNAL {
+    my ( $file, $dim, $type, $subt ) = @_;
+    if ( $DEBUG ){ print "INIT_VAR_BFM -> FUNCTION CALLED func_UPD_INTERNAL: "; }
 
+    my $line = '';
+    my @constList         = ();
+    my @constNoC          = ();
+    my @constOptionalList = ();
+
+    my $SUBTYPE= '_' . uc($subt);
+    if ( $SUBTYPE eq '_PEL' ){ $SUBTYPE = '' } #fix because pel is default and vars has no suffix
+
+    foreach my $const ( sort { $$LST_CONST{$a} cmp $$LST_CONST{$b} } keys %$LST_CONST ){
+        push(@constList, $const);
+        if($const ne $constList[0]){
+            push( @constNoC         , $const                 );
+            push( @constOptionalList, $const . $constList[0] );
+        }
+    }
+
+    foreach my $groupname ( sort { $$LST_GROUP{$a}->getIndex() cmp $$LST_GROUP{$b}->getIndex() } keys %$LST_GROUP ){
+        my $group         = $$LST_GROUP{$groupname};
+        my $groupAcro     = $$LST_GROUP{$groupname}->getAcro();
+        my $groupname_nml = $groupname; $groupname_nml =~ s/Plankton//; $groupname_nml .= "_parameters";
+
+        if( $group->getDim() == $dim
+            && $subt eq $group->getSubtype()
+            && exists ${$$LST_GROUP{$groupname}->getComponents()}{'c'}
+            && ! ( keys %{$$LST_GROUP{$groupname}->getComponents()} == 2 && exists ${$$LST_GROUP{$groupname}->getComponents()}{'h'} ) ){
+
+            # Check and update the ratios to Carbon for other components
+            my @temp_line;
+            foreach my $const (@constNoC){
+                if( exists ${$$LST_GROUP{$groupname}->getComponents()}{$const} ){
+                    push( @temp_line, "if ( pp".$groupname. "(i,ii" . uc($const) . ")  > 0) &\n${SPACE}${SPACE}  " 
+                        . "q" . $const . "c" . $groupAcro . "(i,:) = " . $groupname . "(i,ii" . uc($const) . ")/( p_small + ". $groupname . "(i,iiC))" ); 
+                }
+            }
+            $line .= "${SPACE}do i = 1 , ii". $groupname ."\n${SPACE}  ";
+
+            if ( $#temp_line == -1 ) {
+                $line .= "\n${SPACE}end do\n\n";
+            } else {
+                $line .= join("\n${SPACE}  ", @temp_line );
+                $line .= "\n${SPACE}end do\n\n";
+            }
+        }
+    }
+
+    if( $line ){ print $file $line; }
+}
 
 ###########################################  INCLUDE ######################
 

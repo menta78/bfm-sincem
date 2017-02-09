@@ -307,7 +307,7 @@
   call quota_flux(iiPel, ppzoon, ppzoon, ppN4n, ren, tfluxN)
   call quota_flux(iiPel, ppzoop, ppzoop, ppN1p, rep, tfluxP)
 
-  if ( ppzoon == 0 .and. ppzoop == 0 ) then
+  if ( ppzoon == 0 .or. ppzoop == 0 ) then
      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
      ! Eliminate the excess of the non-limiting constituent under fixed quota
      ! Determine whether C, P or N is limiting (Total Fluxes Formulation)
@@ -331,7 +331,8 @@
          pe_R6c = max(ZERO, tfluxc  - tfluxn/p_qncMIZ(zoo))
      END WHERE
 
-     call flux_vector(iiPel, ppzooc, ppR6c, pe_R6c)
+     call flux_vector(iiPel, ppzooc, ppR6c, pe_R6c*(ONE-p_pe_R1c) )
+     call flux_vector(iiPel, ppzooc, ppR1c, pe_R6c*(p_pe_R1c))
      call flux_vector(iiPel, ppzoop, ppN1p, pe_N1p)
      call flux_vector(iiPel, ppzoon, ppN4n, pe_N4n)
 

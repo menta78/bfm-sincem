@@ -49,6 +49,7 @@
 
    use global_mem, only: RLEN,ZERO,LOGUNIT,bfm_lwp
    use constants, ONLY: SEC_PER_DAY
+   use init_var_bfm_local
    use netcdf
    implicit none
 !
@@ -914,6 +915,11 @@ end subroutine init_netcdf_rst_bfm
    LEVEL2 ' '
    call check_err(NF90_CLOSE(ncid_rst_in), fname)
 
+   !---------------------------------------------
+   ! Update quotas of non- and living organic components
+   !---------------------------------------------
+   call upd_organic_quotas()
+
   end subroutine read_rst_bfm
 !EOC
 
@@ -1098,6 +1104,11 @@ end subroutine init_netcdf_rst_bfm
 
    LEVEL2 'read_rst_bfm_glo: READ single restart file ... DONE! '
    LEVEL2 ' '
+
+   !---------------------------------------------
+   ! Update quotas of non- and living organic components
+   !---------------------------------------------
+   call upd_organic_quotas()
 
    if(allocated(array_3d)) deallocate(array_3d)
 

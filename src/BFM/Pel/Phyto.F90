@@ -561,8 +561,7 @@
   call flux_vector( iiPel, ppO3h,ppO3h, -C2ALK*qccPPY(phyto, :)*rr6c )
 #endif
 
-   if ( ppphyton .EQ.  0 .and. ppphytop .EQ.  0 ) then
-    
+   if ( ppphyton .EQ.  0 .or. ppphytop .EQ.  0 ) then
      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
      ! Eliminate the excess of the non-limiting constituent under fixed quota
      ! Determine whether C, P or N is limiting (Total Fluxes Formulation)
