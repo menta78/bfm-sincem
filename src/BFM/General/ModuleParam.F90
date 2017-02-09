@@ -217,9 +217,11 @@
    open(NMLUNIT,file='BFM_General.nml',status='old',action='read',err=100)
    read(NMLUNIT,nml=Param_parameters,err=101)
 #ifdef INCLUDE_BEN
+   rewind(NMLUNIT)
    read(NMLUNIT,nml=Param_parameters_ben,err=102)
 #endif
 #ifdef INCLUDE_SEAICE
+   rewind(NMLUNIT)
    read(NMLUNIT,nml=Param_parameters_ice,err=103)
 #endif
    close(NMLUNIT)
