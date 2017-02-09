@@ -1704,6 +1704,7 @@ sub func_INIT_INTERNAL {
         }
         # Set initial quota values
         my @temp_line;
+        my $cnt = 0;
         foreach my $root ( sort { $$LST_PARAM{$a}->getIndex() cmp $$LST_PARAM{$b}->getIndex() } keys %$LST_PARAM ){
             my $param = $$LST_PARAM{$root};
             if( $dim == $param->getDim() && $param->getQuota() && $subt eq $param->getSubtype() ){
@@ -1714,6 +1715,9 @@ sub func_INIT_INTERNAL {
                     } else {
                         push( @temp_line, $root . "(i,:)=p_" . $root . "(i) ;" );
                     }
+                    # avoid too long rows by adding a carriage every 3 elements
+                    $cnt = $cnt + 1 ;
+                    if ( $cnt % 3 == 0 ) { push( @temp_line, "\n${SPACE}${SPACE}");}
                 }
             }
         }
@@ -2201,15 +2205,17 @@ sub func_XMLFIELD  {
                           if (length($spec)) {
                              $comm  = "flux of " . $name . $const . " at " . $spec ;
                              $nameC = "j". $spec_short . $name . $const  ;
+                             $unitC = decreaseUnit( ${$param->getComponents()}{$const} );
                           }
                           $line .= "${TAB6}<field id=\"${nameC}\"${TAB6}long_name=\"${comm}\"${TAB5}unit=\"${unitC}\"/>\n";
                       }
                   }
               }else{
-                  my $unit  = $param->getUnit();
+                  my $unit = $param->getUnit();
                   if (length($spec)) {
-                     $comm  = "flux of " . $name . " at " . $spec ;
+                     $comm = "flux of " . $name . " at " . $spec ;
                      $name = "j". $spec_short . $name ;
+                     $unit = decreaseUnit($param->getUnit());
                   }                
                   $line .= "${TAB6}<field id=\"${name}\"${TAB6}long_name=\"${comm}\"${TAB5}unit=\"${unit}\"/>\n";
               }

@@ -34,12 +34,12 @@ subroutine read_create
   integer           :: IDgpp, IDrsp, ncrspid, ncgppid
   real, allocatable, dimension(:) :: time
   integer           :: npoints
-  character(len = NF90_MAX_NAME) :: fname1,fname2,attname
+  character(len = NF90_MAX_NAME) :: fname1,fname2,attname,timename,coorlabel
   integer,parameter    :: namlst=10
   namelist /chlsat_nml/ inp_dir,out_dir,out_fname,chla_fname,eps_fname,      &
   &                     chla_name,eps_name,mask_fname,tolerance,compute_eps, &
   &                     p_eps0,p_epsChla,gpp_fname,rsp_fname,gpp_name,rsp_name, &
-  &                     compute_intpp,compute_chlsat
+  &                     compute_intpp,compute_chlsat,dimsname,coorname
 
      ! Reading directory names and file name specifications
      open(namlst,file=trim(cf_nml),action='read',status='old',err=99)
@@ -49,27 +49,36 @@ subroutine read_create
 
      ! open input files, read dimensions and get data 
      fname1 = trim(inp_dir)//"/"//trim(chla_fname)
+     write(*,*) "Open Chla input file: ",trim(fname1)
+
      call handle_err( nf90_open(path = fname1, mode = NF90_WRITE, ncid = ncchlid), &
      &                errstring="Error opening "//trim(chla_fname))
+     ! EPS file
      fname2 = trim(inp_dir)//"/"//trim(eps_fname)
      if ((fname1 .eq. fname2) .or. compute_eps) then
         ncepsid = ncchlid
      else
+        write(*,*) "Open eps input file: ",trim(fname2)
         call handle_err(nf90_open(path = fname2, mode = NF90_WRITE, ncid = ncepsid), &
         &               "Error opening "//trim(eps_fname))
      end if
+
      call handle_err( nf90_inquire(ncchlid, nDims, nVars, nGlobalAtts, IDunlimdim), "0" )
+     call handle_err( nf90_inquire_dimension(ncchlid, IDunlimdim, name=timename, len=ntime), "1" )
+     call handle_err( nf90_inq_dimid(ncchlid, TRIM(dimsname(1)), IDx), "2" )
+     call handle_err( nf90_inq_dimid(ncchlid, TRIM(dimsname(2)), IDy), "3" )
+     call handle_err( nf90_inq_dimid(ncchlid, TRIM(dimsname(3)), IDz), "4" )
+     ! get dimensions value
      call handle_err( nf90_inquire_dimension(ncchlid, IDunlimdim, len = ntime), "1" )
-     call handle_err( nf90_inq_dimid(ncchlid, "x", IDx), "2" )
-     call handle_err( nf90_inq_dimid(ncchlid, "y", IDy), "3" )
-     call handle_err( nf90_inq_dimid(ncchlid, "depth", IDz), "4" )
      call handle_err( nf90_inquire_dimension(ncchlid, IDx, len = jpi), "5" )
      call handle_err( nf90_inquire_dimension(ncchlid, IDy, len = jpj), "6" )
      call handle_err( nf90_inquire_dimension(ncchlid, IDz, len = jpk), "7" )
-#ifdef DEBUG
-     write(*,*) "Input file dimensions (X,Y,Z,Time) : ", jpi, jpj, jpk, ntime
-     write(*,*)
-#endif
+
+     write(*,*) " Input file dimensions :"
+     write(*,*) " X dim - name: ",   TRIM(dimsname(1)), ", size:",jpi
+     write(*,*) " Y dim - name: ",   TRIM(dimsname(2)), ", size:",jpj
+     write(*,*) " Z dim - name: ",   TRIM(dimsname(3)), ", size:",jpk
+     write(*,*) " Unlim dim - name: ", TRIM(dimsname(4)), ", size:",ntime
 
      ! open mesh_mask file, get mask and vertical length scale
      fname1 = trim(mask_fname)
@@ -81,22 +90,26 @@ subroutine read_create
      call handle_err(nf90_get_var(ncmaskid, IDmask,mask), &
      &               errstring="Error in getting tmask values")
      allocate(e3t(jpi,jpj,jpk))
-     call handle_err(nf90_inq_varid(ncmaskid, "e3t", IDe3t), &
-     &               errstring="Error inquiring e3t values")
+     call handle_err(nf90_inq_varid(ncmaskid, "e3t_0", IDe3t), &
+     &               errstring="Error inquiring e3t_0 values")
      call handle_err(nf90_get_var(ncmaskid, IDe3t,e3t), &
-     &               errstring="Error in getting e3t values")
+     &               errstring="Error in getting e3t_0 values")
      call handle_err( nf90_close(ncmaskid) )
 
+     write(*,*) ""
+     write(*,*) "Read I/O coordinates: ", TRIM(coorname(1))//" , ", TRIM(coorname(2))//" , " &
+                                        , TRIM(coorname(3))//" , ", TRIM(coorname(4))
+     coorlabel=TRIM(coorname(1))//" "//TRIM(coorname(2))
      ! get coordinates
      allocate(lon(jpi,jpj))
-     call handle_err( nf90_inq_varid(ncchlid, "lon", IDvar) )
-     call handle_err( nf90_get_var(ncchlid, IDvar, lon),errstring="variable: lon" )
+     call handle_err( nf90_inq_varid(ncchlid, TRIM(coorname(1)), IDvar) )
+     call handle_err( nf90_get_var(ncchlid, IDvar, lon),errstring="variable: "//TRIM(coorname(1)) )
      allocate(lat(jpi,jpj))
-     call handle_err( nf90_inq_varid(ncchlid, "lat", IDvar) )
-     call handle_err( nf90_get_var(ncchlid, IDvar, lat), errstring="variable: lat")
+     call handle_err( nf90_inq_varid(ncchlid, TRIM(coorname(2)), IDvar) )
+     call handle_err( nf90_get_var(ncchlid, IDvar, lat), errstring="variable: "//TRIM(coorname(2)) )
      allocate(depth(jpk))
-     call handle_err( nf90_inq_varid(ncchlid, "depth", IDvar) )
-     call handle_err( nf90_get_var(ncchlid, IDvar, depth),errstring="variable: depth" )
+     call handle_err( nf90_inq_varid(ncchlid, TRIM(coorname(3)), IDvar) )
+     call handle_err( nf90_get_var(ncchlid, IDvar, depth),errstring="variable: "//TRIM(coorname(3)) )
 
      ! get chl data
      allocate(chla(jpi,jpj,jpk,ntime))
@@ -160,18 +173,18 @@ subroutine read_create
 
      ! create the output file
      call handle_err( nf90_create(trim(out_dir)//"/"//trim(out_fname), NF90_NOCLOBBER, ncid), &
-     &                errstring="A file named "//trim(out_fname)//".nc already exists!" )
+     &                errstring="A file named "//trim(out_fname)//" already exists!" )
      ! Define the dimensions
-     call handle_err( nf90_def_dim(ncid, "time", NF90_UNLIMITED, IDtime) )
-     call handle_err( nf90_def_dim(ncid, "x", jpi, IDx) )
-     call handle_err( nf90_def_dim(ncid, "y", jpj, IDy) )
-     call handle_err( nf90_def_dim(ncid, "depth", jpk, IDz) )
+     call handle_err( nf90_def_dim(ncid, TRIM(dimsname(1)) , jpi, IDx) )
+     call handle_err( nf90_def_dim(ncid, TRIM(dimsname(2)) , jpj, IDy) )
+     call handle_err( nf90_def_dim(ncid, TRIM(dimsname(3)) , jpk, IDz) )
+     call handle_err( nf90_def_dim(ncid, TRIM(dimsname(4)) , NF90_UNLIMITED, IDtime) )
      ! define geographic variables
-     call handle_err (nf90_def_var(ncid, "lat", NF90_REAL, (/ IDx, IDy /), IDtarget))
+     call handle_err (nf90_def_var(ncid, TRIM(coorname(2)), NF90_REAL, (/ IDx, IDy /), IDtarget))
      call handle_err (nf90_put_att(ncid, IDtarget, "units", "degrees_north"))
-     call handle_err (nf90_def_var(ncid, "lon", NF90_REAL, (/ IDx, IDy /), IDtarget))
+     call handle_err (nf90_def_var(ncid, TRIM(coorname(1)), NF90_REAL, (/ IDx, IDy /), IDtarget))
      call handle_err (nf90_put_att(ncid, IDtarget, "units", "degrees_east"))
-     call handle_err (nf90_def_var(ncid, "depth", NF90_REAL, (/ IDz /), IDtarget))
+     call handle_err (nf90_def_var(ncid, TRIM(coorname(3)), NF90_REAL, (/ IDz /), IDtarget))
      call handle_err (nf90_put_att(ncid, IDtarget, "long_name", "depth_below_sea"))
      call handle_err (nf90_put_att(ncid, IDtarget, "units", "m"))
      call handle_err (nf90_put_att(ncid, IDtarget, "positive", "down"))
@@ -187,15 +200,15 @@ subroutine read_create
         &                errstring="copying attribute "//trim(attname))
      end do
      ! copy time variable and attributes
-     call handle_err( nf90_inq_varid(ncchlid, "time", IDtimetmp), errstring="inquiring time var in "//fname1)
+     call handle_err( nf90_inq_varid(ncchlid, TRIM(timename), IDtimetmp), errstring="inquiring time var in "//fname1)
      allocate(time(ntime))
      call handle_err( nf90_get_var(ncchlid, IDtimetmp, time, start = (/ 1 /), count = (/ ntime /)) )
-     call handle_err( nf90_def_var(ncid, "time", NF90_REAL, (/ IDtime /), IDvartime) )
+     call handle_err( nf90_def_var(ncid, TRIM(coorname(4)) , NF90_REAL, (/ IDtime /), IDvartime) )
      call handle_err( nf90_copy_att(ncchlid, IDtimetmp, "units", ncid, IDvartime) )
 
      if (compute_chlsat) then
      ! define the output variable: chlsat
-     call handle_err( nf90_def_var(ncid, "Chlsat_od", NF90_REAL, (/ IDx, IDy, IDtime /), IDvar) )
+     call handle_err( nf90_def_var(ncid, TRIM(chla_name)//"sat_od", NF90_REAL, (/ IDx, IDy, IDtime /), IDvar) )
      ! add attributes
      call handle_err( nf90_put_att(ncid, IDvar, "units", "mg Chla/m3") )
      call handle_err( nf90_put_att(ncid, IDvar, "long_name", "Satellite-like Chl (1st optical depth)") )
@@ -203,7 +216,7 @@ subroutine read_create
      ! Add fill value
      call handle_err( nf90_put_att(ncid, IDvar, "_FillValue", NF90_FILL_REAL) )
      ! Add reference coordinate names (needed with CDO)
-     call handle_err( nf90_put_att(ncid, IDvar, "coordinates", "lon lat") )
+     call handle_err( nf90_put_att(ncid, IDvar, "coordinates", TRIM(coorlabel) ) )
      ! define the output variable: depth
      call handle_err( nf90_def_var(ncid, "PZdepth_od", NF90_REAL, (/ IDx, IDy, IDtime /), IDvar) )
      ! add attributes
@@ -212,26 +225,26 @@ subroutine read_create
      ! Add fill value
      call handle_err( nf90_put_att(ncid, IDvar, "_FillValue", NF90_FILL_REAL) )
      ! Add reference coordinate names (needed with CDO)
-     call handle_err( nf90_put_att(ncid, IDvar, "coordinates", "lon lat") )
+     call handle_err( nf90_put_att(ncid, IDvar, "coordinates", TRIM(coorlabel) ) )
 
      ! define the output variable: chlsat
-     call handle_err( nf90_def_var(ncid, "Chlsat_01", NF90_REAL, (/ IDx, IDy, IDtime /), IDvar) )
+     call handle_err( nf90_def_var(ncid, TRIM(chla_name)//"sat_01", NF90_REAL, (/ IDx, IDy, IDtime /), IDvar) )
      ! add attributes
      call handle_err( nf90_put_att(ncid, IDvar, "units", "mg Chla/m3") )
      call handle_err( nf90_put_att(ncid, IDvar, "long_name", "Satellite-like Chl (1% light)") )
      ! Add fill value
      call handle_err( nf90_put_att(ncid, IDvar, "_FillValue", NF90_FILL_REAL) )
      ! Add reference coordinate names (needed with CDO)
-     call handle_err( nf90_put_att(ncid, IDvar, "coordinates", "lon lat") )
+     call handle_err( nf90_put_att(ncid, IDvar, "coordinates", TRIM(coorlabel) ) )
      ! define the output variable: chlsat
-     call handle_err( nf90_def_var(ncid, "Chlsat_001", NF90_REAL, (/ IDx, IDy, IDtime /), IDvar) )
+     call handle_err( nf90_def_var(ncid, TRIM(chla_name)//"sat_001", NF90_REAL, (/ IDx, IDy, IDtime /), IDvar) )
      ! add attributes
      call handle_err( nf90_put_att(ncid, IDvar, "units", "mg Chla/m3") )
      call handle_err( nf90_put_att(ncid, IDvar, "long_name", "Satellite-like Chl (0.1% light)") )
      ! Add fill value
      call handle_err( nf90_put_att(ncid, IDvar, "_FillValue", NF90_FILL_REAL) )
      ! Add reference coordinate names (needed with CDO)
-     call handle_err( nf90_put_att(ncid, IDvar, "coordinates", "lon lat") )
+     call handle_err( nf90_put_att(ncid, IDvar, "coordinates", TRIM(coorlabel) ) )
      end if
 
      ! define the output variable: depth
@@ -242,7 +255,7 @@ subroutine read_create
      ! Add fill value
      call handle_err( nf90_put_att(ncid, IDvar, "_FillValue", NF90_FILL_REAL) )
      ! Add reference coordinate names (needed with CDO)
-     call handle_err( nf90_put_att(ncid, IDvar, "coordinates", "lon lat") )
+     call handle_err( nf90_put_att(ncid, IDvar, "coordinates", TRIM(coorlabel) ) )
      ! define the output variable: depth
      call handle_err( nf90_def_var(ncid, "PZdepth_001", NF90_REAL, (/ IDx, IDy, IDtime /), IDvar) )
      ! add attributes
@@ -251,7 +264,7 @@ subroutine read_create
      ! Add fill value
      call handle_err( nf90_put_att(ncid, IDvar, "_FillValue", NF90_FILL_REAL) )
      ! Add reference coordinate names (needed with CDO)
-     call handle_err( nf90_put_att(ncid, IDvar, "coordinates", "lon lat") )
+     call handle_err( nf90_put_att(ncid, IDvar, "coordinates", TRIM(coorlabel) ) )
 
      if (compute_intpp) then
         ! define the output variable: gpp
@@ -262,7 +275,7 @@ subroutine read_create
         ! Add fill value
         call handle_err( nf90_put_att(ncid, IDvar, "_FillValue", NF90_FILL_REAL) )
         ! Add reference coordinate names (needed with CDO)
-        call handle_err( nf90_put_att(ncid, IDvar, "coordinates", "lon lat") )
+        call handle_err( nf90_put_att(ncid, IDvar, "coordinates", TRIM(coorlabel) ) )
         !
         call handle_err( nf90_def_var(ncid, "gpp_001", NF90_REAL, (/ IDx, IDy, IDtime /), IDvar) )
         ! add attributes
@@ -271,7 +284,7 @@ subroutine read_create
         ! Add fill value
         call handle_err( nf90_put_att(ncid, IDvar, "_FillValue", NF90_FILL_REAL) )
         ! Add reference coordinate names (needed with CDO)
-        call handle_err( nf90_put_att(ncid, IDvar, "coordinates", "lon lat") )
+        call handle_err( nf90_put_att(ncid, IDvar, "coordinates", TRIM(coorlabel) ) )
    
         ! define the output variable: npp
         call handle_err( nf90_def_var(ncid, "npp_01", NF90_REAL, (/ IDx, IDy, IDtime /), IDvar) )
@@ -281,7 +294,7 @@ subroutine read_create
         ! Add fill value
         call handle_err( nf90_put_att(ncid, IDvar, "_FillValue", NF90_FILL_REAL) )
         ! Add reference coordinate names (needed with CDO)
-        call handle_err( nf90_put_att(ncid, IDvar, "coordinates", "lon lat") )
+        call handle_err( nf90_put_att(ncid, IDvar, "coordinates", TRIM(coorlabel) ) )
         !
         call handle_err( nf90_def_var(ncid, "npp_001", NF90_REAL, (/ IDx, IDy, IDtime /), IDvar) )
         ! add attributes
@@ -290,7 +303,7 @@ subroutine read_create
         ! Add fill value
         call handle_err( nf90_put_att(ncid, IDvar, "_FillValue", NF90_FILL_REAL) )
         ! Add reference coordinate names (needed with CDO)
-        call handle_err( nf90_put_att(ncid, IDvar, "coordinates", "lon lat") )
+        call handle_err( nf90_put_att(ncid, IDvar, "coordinates", TRIM(coorlabel) ) )
      end if
 
      ! close the input netcdf files
@@ -304,30 +317,30 @@ subroutine read_create
      call handle_err( nf90_put_var(ncid, IDvartime, time, &
      &               start = (/ 1 /), count = (/ ntime /)), errstring="variable: time")
      ! Latitude
-     call handle_err( nf90_inq_varid(ncid, "lat", IDvar), &
+     call handle_err( nf90_inq_varid(ncid, TRIM(coorname(2)), IDvar), &
      &                       errstring="inquiring variable: lat")
      call handle_err( nf90_put_var(ncid, IDvar, real(lat,4), start = (/ 1, 1 /),     &
      &                      count = (/ jpi, jpj/)), errstring="Writing: lat")
      ! Longitude
-     call handle_err( nf90_inq_varid(ncid, "lon", IDvar), &
+     call handle_err( nf90_inq_varid(ncid, TRIM(coorname(1)), IDvar), &
      &                       errstring="inquiring variable: lon")
      call handle_err( nf90_put_var(ncid, IDvar, real(lon,4), start = (/ 1, 1 /),     &
      &                      count = (/ jpi, jpj/)), errstring="Writing: lon")
      ! Depth levels
-     call handle_err(nf90_inq_varid(ncid, "depth", IDvar))
+     call handle_err(nf90_inq_varid(ncid, TRIM(coorname(3)), IDvar))
      call handle_err(nf90_put_var(ncid, IDvar, real(depth,4)),errstring="Writing: depth")
 
      if (compute_chlsat) then
         ! Write chl
-        call handle_err( nf90_inq_varid(ncid, "Chlsat_od", IDvar), &
+        call handle_err( nf90_inq_varid(ncid, TRIM(chla_name)//"sat_od", IDvar), &
         &                       errstring="inquiring variable: chlsat")
         call handle_err( nf90_put_var(ncid, IDvar, real(chlsat_od,4), start = (/ 1, 1, 1 /),     &
         &                      count = (/ jpi, jpj, ntime/)), errstring="Writing: chlsat")
-        call handle_err( nf90_inq_varid(ncid, "Chlsat_01", IDvar), &
+        call handle_err( nf90_inq_varid(ncid, TRIM(chla_name)//"sat_01", IDvar), &
         &                       errstring="inquiring variable: chlsat")
         call handle_err( nf90_put_var(ncid, IDvar, real(chlsat_01,4), start = (/ 1, 1, 1 /),     &
         &                      count = (/ jpi, jpj, ntime/)), errstring="Writing: chlsat")
-        call handle_err( nf90_inq_varid(ncid, "Chlsat_001", IDvar), &
+        call handle_err( nf90_inq_varid(ncid, TRIM(chla_name)//"sat_001", IDvar), &
         &                       errstring="inquiring variable: chlsat")
         call handle_err( nf90_put_var(ncid, IDvar, real(chlsat_001,4), start = (/ 1, 1, 1 /),     &
         &                      count = (/ jpi, jpj, ntime/)), errstring="Writing: chlsat")

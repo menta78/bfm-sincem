@@ -145,6 +145,10 @@
   if(BOTindices(1) .NE.0) sediR2(BOTindices) = ZERO
   sediR6(:)  =   p_rR6m
   if(BOTindices(1) .NE.0) sediR6(BOTindices) = p_burvel_R6
+#if defined INCLUDE_PELCO2
+  sediO5(:)  =   p_rO5m
+  if(BOTindices(1) .NE.0) sediO5(BOTindices) = p_burvel_O5
+#endif
   do i = 1 , ( iiPhytoPlankton)
     sediPPY(i,:)  =   p_rPIm( i)
     if(BOTindices(1) .NE.0) sediPPY(i,BOTindices)  =   p_burvel_PI

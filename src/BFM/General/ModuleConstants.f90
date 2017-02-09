@@ -71,6 +71,7 @@
   real(RLEN),   parameter :: MW_N=14.0_RLEN  ! Molecular weight Nitrogen
   real(RLEN),   parameter :: MW_P=31.0_RLEN  ! Molecular weight Phosphorus
   real(RLEN),   parameter :: MW_SI=28.0_RLEN  ! Molecular weight Silica
+  real(RLEN),   parameter :: C2ALK=2.0_RLEN/MW_C ! Conversion factor between inorganic carbon and alkalinity
   real(RLEN),   parameter :: E2W=0.217_RLEN  ! Conversion factor Einstein->W
   real(RLEN),   parameter :: SEC_PER_DAY=86400.0_RLEN  ! Seconds in day
   real(RLEN)              :: DAY_PER_SEC=ZERO  ! Inverse of Seconds in day

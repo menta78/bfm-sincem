@@ -17,7 +17,7 @@
 !
 ! !USES:
   use global_mem, ONLY:RLEN,ZERO,ONE
-  use constants, ONLY: MW_C
+  use constants, ONLY: MW_C,C2ALK
 #ifdef NOPOINTERS
   use mem
 #else
@@ -30,7 +30,7 @@
     iiBen, iiPel, flux_vector, quota_flux
   use mem, ONLY: ppPhytoPlankton
 #ifdef INCLUDE_PELCO2
-  use mem, ONLY: ppO3c
+  use mem, ONLY: ppO3c, ppO5c, ppO3h, qccPPY
 #endif
 #ifdef INCLUDE_PELFE
   use mem, ONLY: iiF,N7f,qfcPPY,ppN7f,ppR6f,ppR1f
@@ -541,6 +541,25 @@
                    + p_res(phyto)* max( ZERO, ( p_esNI(phyto)-tN))
   end if
 
+#if defined INCLUDE_PELCO2
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  ! PIC (calcite/aragonite) production
+  ! The idea in PISCES is that the calcite flux exists only when associated
+  ! to a carbon release from phytoplankton (there is no calcite storage in phyto)
+  ! First compute the realized rain ratio for each phytoplankton species
+  ! The presence of PIC in phytoplankton group is controlled by p_caco3r
+  ! with the following regulating factors:
+  !  - nutrient limitation
+  !  - temperature enhancement
+  !  - density enhancement
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  qccPPY(phyto, :) = min(0.8_RLEN,p_caco3r(phyto)*tN*et*MM_vector(phytoc, p_sheo(phyto)))
+  qccPPY(phyto, :) = max(0.02_RLEN,qccPPY(phyto, :))
+  ! Calcite production is parameterized as a flux between DIC and PIC
+  ! that affects alkalinity
+  call flux_vector( iiPel, ppO3c,ppO5c, qccPPY(phyto, :)*rr6c )
+  call flux_vector( iiPel, ppO3h,ppO3h, -C2ALK*qccPPY(phyto, :)*rr6c )
+#endif
 
    if ( ppphyton .EQ.  0 .and. ppphytop .EQ.  0 ) then
     

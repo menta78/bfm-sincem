@@ -128,7 +128,8 @@ end
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 3d-state-pel -if-exist INCLUDE_PELCO2
   group Inorganic[ch] (CAR): mg C/m3 : mmol eq/m3
-     O3: Dissolved Inorganic Carbon: Alkalinity 
+     O3     : Dissolved Inorganic Carbon: Alkalinity
+     O5[-h] : Calcite
   end
 end
 
@@ -175,9 +176,9 @@ end
     #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     # Water column diagnostic rates
     #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    flPTN6r : Pelagic Anaerobic Mineralization Rate : mmol O2/m3/d
-    flN3O4n : Pelagic Denitrification Rate : mmol N/m3/d
-    flN4N3n : Pelagic Nitrification Rate   : mmol N/m3/d
+    flPTN6r  : Pelagic Anaerobic Mineralization Rate : mmol O2/m3/d
+    flN3O4n  : Pelagic Denitrification Rate : mmol N/m3/d
+    flN4N3n  : Pelagic Nitrification Rate   : mmol N/m3/d
     fscavN7f : Pelagic Fe Scavenging Rate   : umol Fe/m3/d
 
     #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -188,6 +189,7 @@ end
     qscPPY(PhytoPlankton)	: Quotum Si/C in Phytoplankton : mmol Si/mg C 
     qlcPPY(PhytoPlankton)	: Quotum Chl/C in Phytoplankton : mg Chl /mg C
     qfcPPY(PhytoPlankton)	: Quotum Fe/C in Phytoplankton : umol Fe/mg C
+    qccPPY(PhytoPlankton)   : Quotum PIC/POC in Phytoplankton : mg C/mg C
 
     qpcMEZ(MesoZooPlankton)	: Quotum P/C in Mesozooplankton :mmol P/mg C 
     qncMEZ(MesoZooPlankton)	: Quotum N/C in Mesozooplankton :mmol N/mg C 
@@ -206,11 +208,12 @@ end
    #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
    # Sinking rates of phytoplankton and detritus
    #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    sediPPY(PhytoPlankton)     : PhytoPlankton sedimentation rate :m/d
+    sediPPY(PhytoPlankton)    : PhytoPlankton sedimentation rate   :m/d
     sediMIZ(MicroZooPlankton) : MicroZooPlankton sedimentation rate:m/d
     sediMEZ(MesoZooPlankton)  : MesoZooPlankton sedimentation rate :m/d
-    sediR2                    : Detritus sedimentation rate        :m/d
+    sediR2                    : Colloidal OMT sedimentation rate   :m/d
     sediR6                    : Detritus sedimentation rate        :m/d
+    sediO5                    : Calcite sedimentation rate         :m/d
 
    #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
    # Light diagnostics
@@ -236,10 +239,11 @@ end
 #                       DIAGNOSTIC RATES
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 3d-flux-pel -if-exist INCLUDE_DIAG INCLUDE_PELCO2
-  ruPPYc=P.c <- O3c : Gross Primary Production : mg C/m3/d
+  ruPPYc=P.c  <- O3c : Gross Primary Production    : mg C/m3/d
   resPPYc=P.c -> O3c : Phytoplankton Respiration   : mg C/m3/d
   resPBAc=B.c -> O3c : Bacterial Respiration       : mg C/m3/d
   resZOOc=Z.c -> O3c : Zooplankton Respiration     : mg C/m3/d
+  rcalCARc=O5c <- O3c: Calcification rate          : mg C/m3/d
 end
 
 3d-flux-pel -if-exist INCLUDE_DIAG

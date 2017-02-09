@@ -181,6 +181,7 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
    N7f0 = 0.3,
    O3c0 = 27060.00,
    O3h0 = 2660.0,
+   O5c0 = 1.0e-3,
    O4n0 = 200.0,
    P1c0 = 1.0, 
    P2c0 = 1.0, 
@@ -223,6 +224,7 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
 &bfm_save_nml
    var_save = ''
    ave_save = 'O2o','O3h','DIC','ALK','pCO2','pH',
+          'O5c','OCalc','OArag',
           'N1p','N3n','N4n','N5s','N7f',
           'P1c','P1l','P1f','P2c','P2l','P3c','P3l',
           'Z4c','Z5c','Z6c','B1c',
@@ -248,9 +250,11 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
 ! p_burvel_R6     [m/d]              Bottom Burial Velocity for detritus 
 ! p_burvel_R2     [m/d]              Bottom Burial Velocity for dissolved
 ! p_burvel_PI     [m/d]              Bottom Burial Velocity for plankton 
+! p_burvel_O5     [m/d]              Bottom Burial Velocity for calcite
 !-------------------------------------------------------------------------!
 &Settling_parameters
   p_burvel_R6 = 1.5,
+  p_burvel_O5 = 30.0,
   p_burvel_R2 = 0.0,
   p_burvel_PI = 0.0
 	filename_nml_conf = 'Benthic_Environment.nml',
@@ -293,6 +297,8 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
 !                                                        -> atomic weight = 40.078 g / mol
 !                                 therefore, concentration = 10.279 mmol / l = 10.279 mol / m3
 ! Canorm          logical         Normalize Calcium ion concentration by sea water salinity
+! p_kdca          [d-1]           Calcite dissolution rate constant
+! p_nomega        [-]             Order of the dissolution rate dependence on Omega
 !              ---------  EXTERNAL DATA INPUT STRUCTURES -----------
 ! AtmCO2_N       structure        Read external data for atmospheric CO2 values
 ! AtmSLP_N       structure        Read external data for atmospheric sea level pressure
@@ -326,6 +332,8 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
          M2MAXIT = 100
          Caconc0 = 10.279E0
          Canorm  = .TRUE.
+          p_kdca = 10.9
+        p_nomega = 1
 	filename_nml_conf = 'Carbonate_Dynamics.nml',
 /
 
@@ -453,6 +461,8 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
 !                   ---- nutrient stressed sinking ----
 !  p_esNI      [-]            Nutrient stress threshold for sinking
 !  p_res       [m/d]          Maximum Sinking vel city (m/d)
+!                   ---- Calcification ----
+!  p_caco3r    [-]            Reference PIC:POC (rain) ratio
 !              --------- Chlorophyll parameters -----------
 !  p_switchChl [1-4]          Switch for Chla-a synthesis 
 !  p_sdchl     [1/d]          Specific turnover rate for Chla 
@@ -509,6 +519,7 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
      p_qscPPY = 0.01,   0.0,    0.0,    0.0
        p_esNI = 0.1,    0.00,   0.00,   0.00
        p_res  = 5.0,    0.0,    0.0,    0.0
+     p_caco3r = 0.0,    0.3,    0.0,    0.0
   p_switchChl = 1,      1,      1,      1
       p_sdchl = 0.2,    0.2,    0.2,    0.2
   p_alpha_chl = 1.38e-5, 0.46e-5, 1.52e-5, 0.68e-5
@@ -589,6 +600,7 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
 ! p_chuc       [mgC/m3]        Half-saturation Food concentration for Type II
 ! p_minfood    [mgC/m3]        Half-saturation food concentration for
 !                              preference factor
+! p_pecaco3    [-]             Portion of egested calcified shells during grazing
 ! p_qncMIZ     [mmolN/mgC]     Maximum quotum P:C
 ! p_qpcMIZ     [mmolN/mgC]     Maximum quotum N:C
 ! p_paPBA(z,b) [-]             Availability of pelagic Bacteria group b 
@@ -610,6 +622,7 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
       p_chro =  0.5,    0.5
       p_chuc =  20.0,   20.0
    p_minfood =  20.0,   20.0
+   p_pecaco3 =  0.5,    0.5
     p_qpcMIZ =  1.85d-3,1.85d-3
     p_qncMIZ =  1.67d-2,1.67d-2
 ! Food matrix parameters: take care of the notation
@@ -642,6 +655,7 @@ p_paMIZ(2,:) =  0.0,    0.2
 ! p_peI        [-]             Fraction of Faeces production
 ! p_sdo        [m3/mgC/d]      Specific density-dependent mortality
 ! p_sds        [-]             Exponent of density-dependent mortality
+! p_pecaco3    [-]             Portion of egested calcified shells during grazing
 ! p_qpcMEZ     [mmolP/mgC]     Maximum quotum P:C
 ! p_qncMEZ     [mmolN/mgC]     Maximum quotum N:C
 ! p_clO2o      [mmolO2/m3]     Half-saturation oxygen concentration
@@ -663,6 +677,7 @@ p_paMIZ(2,:) =  0.0,    0.2
        p_sdo =  0.01,   0.01
         p_sd =  0.02,   0.02
        p_sds =  2.0,    2.0
+   p_pecaco3 =  0.75,   0.75
     p_qpcMEZ =  1.67d-3,1.67d-3
     p_qncMEZ =  0.015,  0.015
      p_clO2o =  30.0,   30.0
@@ -739,6 +754,7 @@ p_paMEZ(2,:)=   0.0,    1.0
 !  : for mem_PelGlobal filled by InitPelGlobal
 ! NAME           UNIT      DESCRIPTION
 ! p_rR6m         [m/d]   detritus sinking rate
+! p_rO5m         [m/d]   calcite sinking rate
 ! KSINK_rPPY      [m]    prescribe sinking rate for phytoplankton below this
 !                        depth threshold to p_rR6m value. Use 0.0 to disable.
 ! AggregateSink  logic   use aggregation = true to enhance the sink rate
@@ -747,6 +763,7 @@ p_paMEZ(2,:)=   0.0,    1.0
 !-------------------------------------------------------------------------!
 &PelGlobal_parameters
   p_rR6m         = 5.0
+  p_rO5m         = 30.0
   KSINK_rPPY     = 150.0
   AggregateSink  = .FALSE.
   depth_factor   = 2000.0

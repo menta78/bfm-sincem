@@ -24,8 +24,8 @@
                             AggregateSink, depth_factor,     &
                             SINKD3STATE 
    use mem
+   use mem_Settling
    use constants,    only: SEC_PER_DAY
-   use mem_settling, only: p_burvel_R6,p_burvel_R2,p_burvel_PI
    use api_bfm
 !
 !
@@ -76,28 +76,23 @@
    !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
    if ( SINKD3STATE(m)%dosink ) then 
 
-      iistate = SINKD3STATE(m)%group
- 
       ! Phytoplankton group 
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-      if ( iistate > 0 ) then
+      if ( SINKD3STATE(m)%group == 1 ) then
 
          ! Prescribe sinking velocity below depth threshold KSINK_rPPY
          ! (usually below 150m). This accelerate diatoms sinking to balance
-         ! the reduction occruing in deeper layers where nutrient concen-
+         ! the reduction occurring in deeper layers where nutrient concen-
          ! tration is high. It is alternatevly done by AggregationSink
          !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
          if ( KSINK_rPPY > 0 .AND. .NOT. AggregateSink ) &
-            where( EPR > KSINK_rPPY ) sediPPY(iistate,:) = p_rR6m
-         wbio = -unpack(sediPPY(iistate,:),SEAmask,ZEROS)
+            where( EPR > KSINK_rPPY ) SINKD3STATE(m)%sedi = p_rR6m
 
-      else
+         ! Prescribe burial velocity at the bottom
+         SINKD3STATE(m)%sedi(BOTindices) = p_burvel_PI
+      endif 
 
-      ! Detritus (and others)
-      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-         wbio = -unpack(sediR6(:),SEAmask,ZEROS)
-
-      endif
+      wbio = -unpack(SINKD3STATE(m)%sedi,SEAmask,ZEROS)
 
       ! Sinking speeds increase with depth below the turbocline depth due
       ! to aggregation. Velocity is limited according to the depth of the 

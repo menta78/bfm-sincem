@@ -116,10 +116,12 @@
   !  p_Contois   [>=0]          If >0, use Contois formulation
   !  p_qus       [m3/mgC/d]     Membrane affinity for Si
   !  p_qslc      [mmolSi/mgC]   Minimum quotum Si:C 
-  !  p_qscPPY      [mmolSi/mgC]   Reference quotum Si:C
+  !  p_qscPPY    [mmolSi/mgC]   Reference quotum Si:C
   !                   ---- nutrient stressed sinking ----
   !  p_esNI      [-]            Nutrient stress threshold for sinking
   !  p_res       [m/d]          Maximum Sinking velocity (m/d)
+  !                   ---- Calcification ----
+  !  p_caco3r    [-]            Reference PIC:POC (rain) ratio
   logical     :: p_netgrowth(iiPhytoPlankton)=.FALSE.
   integer     :: p_limnut(iiPhytoPlankton) 
   real(RLEN)  :: p_qun(iiPhytoPlankton)
@@ -139,6 +141,7 @@
   real(RLEN)  :: p_qscPPY(iiPhytoPlankton)
   real(RLEN)  :: p_esNI(iiPhytoPlankton)
   real(RLEN)  :: p_res(iiPhytoPlankton)
+  real(RLEN)  :: p_caco3r(iiPhytoPlankton)
   !
   !              --------- Chlorophyll parameters -----------
   !  p_switchChl [1-4]          Switch for Chla-a synthesis
@@ -179,6 +182,11 @@
   !              --------- Sinking parameters -----------
   !  p_rPIm      [m/d]    Phytoplankton background sinking rate
   real(RLEN)  :: p_rPIm(iiPhytoPlankton)
+#ifdef INCLUDE_PELCO2
+  !              --------- Calcite -----------
+  !  p_qccPPY    [mgC/mgC]    Reference quotum PIC:POC
+  real(RLEN)  :: p_qccPPY(iiPhytoPlankton)
+#endif
 #ifdef INCLUDE_PELFE
   !
   !              --------- Iron parameters -----------
@@ -203,7 +211,7 @@
   integer :: i, itrp
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   namelist /Phyto_parameters/ p_q10, p_sum, p_srs, p_sdmo, p_seo, p_pu_ea, &
-                              p_temp, p_netgrowth,p_limnut, &
+                              p_temp, p_netgrowth,p_limnut, p_caco3r, &
                               p_pu_ra, p_qnlc, p_qplc, p_qslc, &
                               p_qncPPY, p_qpcPPY, p_qscPPY, p_qlcPPY, &
                               p_qun, p_qup, p_qus, &
@@ -213,6 +221,9 @@
                               p_switchDOC,p_switchSi,p_switchChl,  &
                               p_alpha_chl, p_sdchl, p_epsChla, p_iswLtyp, &
                               p_addepth, p_chELiPPY, p_clELiPPY, &
+#ifdef INCLUDE_PELCO2
+                              p_qccPPY, &
+#endif
                               p_ruELiPPY, p_rPIm
 
 #ifdef INCLUDE_PELFE
@@ -221,6 +232,10 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   !BEGIN compute
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+#ifdef INCLUDE_PELCO2
+   p_qccPPY(:) = 0._RLEN
+#endif
+
   !  Open the namelist file(s)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
