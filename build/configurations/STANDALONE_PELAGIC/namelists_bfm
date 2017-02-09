@@ -207,12 +207,10 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
 !-------------------------------------------------------------------------!
 &bfm_save_nml
    var_save = ''
-   ave_save = 'ETW','O2o','DIC',
-          'O5c','OCalc','OArag',
-          'EIR',
-          'xEPS',
+   ave_save = 'ETW','EIR','xEPS',
+          'DIC','O5c','OCalc','OArag',
           'Chla',
-          'N1p','N3n','N4n','N5s',
+          'O2o','N1p','N3n','N4n','N5s',
           'B1c',
           'P1c','P2c','P3c','P4c',
           'P1l','P2l','P3l','P4l',
@@ -223,11 +221,14 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
           'R1n','R6n',
           'R1p','R6p',
           'P1s','R6s',
-          'eiPPY_iiP1','eiPPY_iiP2','eiPPY_iiP3','eiPPY_iiP4',
-          'sunPPY_iiP1','sunPPY_iiP2','sunPPY_iiP3','sunPPY_iiP4',
           'ruPPYc','resPBAc','resZOOc',
           'ruPPYn','ruPPYp','ruPPYs','exPPYc',
-          'ruZOOc','remZOOn','remZOOp','remPBAn','remPBAp'
+          'ruZOOc','remZOOn','remZOOp','remPBAn','remPBAp',
+          'qpcPBA_iiB1', 'qncPBA_iiB1',
+          'qpcMEZ_iiZ3', 'qncMEZ_iiZ3', 'qpcMEZ_iiZ4', 'qncMEZ_iiZ4',
+          'qpcMIZ_iiZ5', 'qncMIZ_iiZ5', 'qpcMIZ_iiZ6', 'qncMIZ_iiZ6'
+          'qpcPPY_iiP1', 'qncPPY_iiP1', 'qlcPPY_iiP1', 'qpcPPY_iiP2', 'qncPPY_iiP2', 'qlcPPY_iiP2',
+          'qpcPPY_iiP3', 'qncPPY_iiP3', 'qlcPPY_iiP3', 'qpcPPY_iiP4', 'qncPPY_iiP4', 'qlcPPY_iiP4',
 
 	filename_nml_conf = 'BFM_General.nml',
 /

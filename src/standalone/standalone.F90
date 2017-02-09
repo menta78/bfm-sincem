@@ -280,7 +280,7 @@
    !---------------------------------------------
    ! Initialize internal constitutents of functional groups
    !---------------------------------------------
-   call init_organic_constituents()
+   call ini_organic_quotas()
    !---------------------------------------------
    ! Set output stepping
    !---------------------------------------------

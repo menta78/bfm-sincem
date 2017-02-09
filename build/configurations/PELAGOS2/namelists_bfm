@@ -229,7 +229,6 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
           'P1c','P1l','P1f','P2c','P2l','P3c','P3l',
           'Z4c','Z5c','Z6c','B1c',
           'R1c','R2c','R6c','R6f','Chla','R1n','R1p',
-          'eiPPY_iiP1','eiPPY_iiP2','eiPPY_iiP3',
           'P1n','P2n','P3n',
           'P1p','P2p','P3p',
           'jbotR6c','jsurO2o','jsurO3c',
@@ -955,19 +954,22 @@ p_paMEZ(2,:)=   0.0,    1.0
    sn_trcsbc(N7f)  = 'FEDEP_INCA-ORCA2_monthly', -1     , 'fedep'   ,  .false. , .true.  , 'yearly'   , ''       , ''
    rn_trsfac(N3n)  = 1.0
    rn_trsfac(N7f)  =  2.0e-02        ! umol/m2/day, dissolution fraction 2%
-   sn_trccbc(N1p)  = 'RIVER_DACUNHA-ORCA2_annual' , -12 ,  'RIVERPHOS'  ,  .false.  , .true.  , 'yearly'   , ''       , ''
-   sn_trccbc(N3n)  = 'RIVER_DACUNHA-ORCA2_annual' , -12 ,  'RIVERNIT'   ,  .false.  , .true.  , 'yearly'   , ''       , ''
-   sn_trccbc(N5s)  = 'RIVER_DACUNHA-ORCA2_annual' , -12 ,  'RIVERSIL'   ,  .false.  , .true.  , 'yearly'   , ''       , ''
-   sn_trccbc(N7f)  = 'RIVER_DACUNHA-ORCA2_annual' , -12 ,  'RIVERFe80'  ,  .false.  , .true.  , 'yearly'   , ''       , ''
-   sn_trccbc(R1c)  = 'RIVER_DACUNHA-ORCA2_annual' , -12 ,  'RIVERDOC'   ,  .false.  , .true.  , 'yearly'   , ''       , ''
-   sn_trccbc(O3c)  = 'RIVER_DACUNHA-ORCA2_annual' , -12 ,  'RIVERDIC'   ,  .false.  , .true.  , 'yearly'   , ''       , ''
+   sn_trccbc(N1p)  = 'ORCA2_GNEWS_RIVER_annual' , -12 ,  'RIVERDIP'   ,  .false.  , .true.  , 'yearly'   , ''       , ''
+   sn_trccbc(N3n)  = 'ORCA2_GNEWS_RIVER_annual' , -12 ,  'RIVERDIN'   ,  .false.  , .true.  , 'yearly'   , ''       , ''
+   sn_trccbc(N5s)  = 'ORCA2_GNEWS_RIVER_annual' , -12 ,  'RIVERDSI'   ,  .false.  , .true.  , 'yearly'   , ''       , ''
+   sn_trccbc(N7f)  = 'ORCA2_GNEWS_RIVER_annual' , -12 ,  'RIVERDFE'   ,  .false.  , .true.  , 'yearly'   , ''       , ''
+   sn_trccbc(R1c)  = 'ORCA2_GNEWS_RIVER_annual' , -12 ,  'RIVERDOC'   ,  .false.  , .true.  , 'yearly'   , ''       , ''
+   sn_trccbc(R1n)  = 'ORCA2_GNEWS_RIVER_annual' , -12 ,  'RIVERDON'   ,  .false.  , .true.  , 'yearly'   , ''       , ''
+   sn_trccbc(R1p)  = 'ORCA2_GNEWS_RIVER_annual' , -12 ,  'RIVERDOP'   ,  .false.  , .true.  , 'yearly'   , ''       , ''
+   sn_trccbc(O3c)  = 'ORCA2_GNEWS_RIVER_annual' , -12 ,  'RIVERDIC'   ,  .false.  , .true.  , 'yearly'   , ''       , ''
    rn_trcfac(N1p)  =  8.8464e+10     ! 1 mol P = 30.97 g; 1.e12*1.e3/30.97/365 conversion factor from Tg/y to mmol/d
    rn_trcfac(N3n)  =  1.9556e+11     ! 1 mol N = 14.01 g; 1.e12*1.e3/14.01/365 conversion factor from Tg/y to mmol/d
    rn_trcfac(N5s)  =  9.7534e+10     ! 1 mol Si = 28.09 g; 1.e12*1.e3/28.09/365 conversion factor from Tg/y to mmol/d
-   rn_trcfac(N7f)  =  4.9055e+10     ! 1 mol Fe = 55.85 g; 1.e12*1.e6/55.85/365 conversion factor from Tg/y to umol/d
-                                   ! NOTE ADDED A FACTOR 1.e-3 BECAUSE THE SUM DOES NOT CORRESPOND TO THE PAPER (was 4.9055e+13)
-   rn_trcfac(R1c) =  2.7397e+12     ! 1.e15/365 ! conversion factor from Tg/y to mg/d
-   rn_trcfac(O3c) =  2.7397e+12     ! 1.e15/365 ! conversion factor from Tg/y to mg/d
+   rn_trcfac(N7f)  =  4.9055e+13     ! 1 mol Fe = 55.85 g; 1.e12*1.e6/55.85/365 conversion factor from Tg/y to umol/d
+   rn_trcfac(R1c)  =  2.7397e+12     ! 1.e15/365 ! conversion factor from Tg/y to mg/d
+   rn_trcfac(R1n)  =  8.8464e+10     ! 1 mol P = 30.97 g; 1.e12*1.e3/30.97/365 conversion factor from Tg/y to mmol/d
+   rn_trcfac(R1p)  =  1.9556e+11     ! 1 mol P = 30.97 g; 1.e12*1.e3/30.97/365 conversion factor from Tg/y to mmol/d
+   rn_trcfac(O3c)  =  2.7397e+12     ! 1.e15/365 ! conversion factor from Tg/y to mg/d
    cn_dir       = './'  !  root directory for the location of the boundary condition files
         filename_nml_conf = 'namelist_top_cfg',
 /
@@ -998,7 +1000,6 @@ p_paMEZ(2,:)=   0.0,    1.0
           'P1c','P1l','P1f','P2c','P2l','P3c','P3l',
           'Z4c','Z5c','Z6c','B1c',
           'R1c','R2c','R6c','R6f','Chla','R1n','R1p',
-          'eiPPY_iiP1','eiPPY_iiP2','eiPPY_iiP3',
           'P1n','P2n','P3n',
           'P1p','P2p','P3p',
           'jbotR6c','jsurO2o','jsurO3c',

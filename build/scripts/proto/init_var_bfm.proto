@@ -18,10 +18,10 @@ MODULE init_var_bfm_local
 !-----------------------------------------------------------------------
 !BOP
 !
-! !ROUTINE: Initialise constituents of BFM variables
+! !ROUTINE: Initialise quotas of living and non-living organic components
 !
 ! !INTERFACE:
-   subroutine init_organic_constituents()
+   subroutine ini_organic_quotas()
 !
 ! !DESCRIPTION:
 !  Call the initialization of internal ratios for the living
@@ -53,7 +53,7 @@ MODULE init_var_bfm_local
 ! !INPUT PARAMETERS:
 !
 ! !REVISION HISTORY:
-!  Original author(s): Marcello Vichi
+!  Original author(s): BFM System Team 
 !
 ! !LOCAL VARIABLES:
    integer              :: i
@@ -85,7 +85,76 @@ MODULE init_var_bfm_local
 
 #endif
       return
-end subroutine init_organic_constituents
+end subroutine ini_organic_quotas
+
+!-----------------------------------------------------------------------
+!BOP
+!
+! !ROUTINE: Update quotas of Living and non-living organic components
+!
+! !INTERFACE:
+   subroutine upd_organic_quotas()
+!
+! !DESCRIPTION:
+!  Update the internal ratios to carbon content for the living
+! and non-living organic components
+!
+! !USES:
+   use mem
+   use mem_PelGlobal
+   use mem_PelChem
+   use mem_PelBac
+   use mem_MesoZoo
+   use mem_MicroZoo
+   use mem_Phyto
+
+   use constants, ONLY: HOURS_PER_DAY
+   use mem_Param, ONLY: p_small,          &
+                        CalcPelagicFlag,  &
+                        CalcBenthicFlag,  &
+                        CalcSeaiceFlag,   &
+                        CalcPelChemistry, &
+                        CalcTransportFlag
+#ifdef INCLUDE_SEAICE
+   use mem_SeaiceAlgae
+   use mem_SeaiceBac
+   use mem_SeaiceZoo
+#endif
+   IMPLICIT NONE
+!
+! !INPUT PARAMETERS:
+!
+! !REVISION HISTORY:
+!  Original author(s): BFM System Team
+!
+! !LOCAL VARIABLES:
+   integer              :: i
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+   !---------------------------------------------
+   ! Update quotas for pelagic components
+   !---------------------------------------------
+
+%3d-state-pel-UpdInternal
+
+#ifdef INCLUDE_BEN
+   !---------------------------------------------
+   ! Update quotas for benthic components
+   !---------------------------------------------
+
+%2d-state-ben-UpdInternal
+
+#endif
+
+#ifdef INCLUDE_SEAICE
+   !---------------------------------------------
+   ! Update quotas for seaice components
+   !---------------------------------------------
+
+%2d-state-ice-UpdInternal
+
+#endif
+      return
+end subroutine upd_organic_quotas
 
 
 END MODULE init_var_bfm_local

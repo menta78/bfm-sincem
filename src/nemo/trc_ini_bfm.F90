@@ -359,9 +359,11 @@
          Initvar(m)%varname=var_names(m)
          if (bfm_lwp) write(LOGUNIT, 158) InitVar(m)
       end do
-      ! Initialize internal constitutents of functional groups
-      call init_organic_constituents()
    end if
+
+   ! Initialize internal constitutents quota of functional groups
+   call ini_organic_quotas()
+
    if (bfm_lwp) then 
          LEVEL1 ' '
          LEVEL1 '         BFM INITIALIZATION ... DONE!          '

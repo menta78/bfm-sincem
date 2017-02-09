@@ -21,13 +21,13 @@
 #ifdef NOPOINTERS
   use mem
 #else
-  use mem, ONLY: iiC,iiN,iiP,iiS,iiL,iiP3
+  use mem, ONLY: iiC,iiN,iiP,iiS,iiL
   use mem, ONLY: D3STATE, R1c, R6c, O2o, R2c, &
                  N3n, N4n, N1p, R1n, R6n, R1p, R6p, N5s
   use mem, ONLY: ppR1c, ppR6c, ppO2o, ppR2c, ppN3n, ppN4n, ppN1p, ppR1n, &
     ppR6n, ppR1p, ppR6p, ppN5s, ppR6s, SUNQ, ThereIsLight, ETW, EIR, &
     xEPS, Depth, eiPPY, sediPPY, sunPPY, qpcPPY, qncPPY, qscPPY, qlcPPY, NO_BOXES, &
-    iiBen, iiPel, flux_vector
+    iiBen, iiPel, flux_vector, quota_flux
   use mem, ONLY: ppPhytoPlankton
 #ifdef INCLUDE_PELCO2
   use mem, ONLY: ppO3c, ppO5c, ppO3h, qccPPY
@@ -40,7 +40,7 @@
   use mem_Param,  ONLY: p_small, ChlDynamicsFlag
   use mem_PAR,    ONLY: LightPeriodFlag, LightLocationFlag
   use mem_Phyto
-  use mem_globalfun,   ONLY: eTq_vector, MM_vector, insw_vector
+  use mem_globalfun,   ONLY: eTq_vector, MM_vector, insw_vector, nutlim
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Implicit typing is never allowed
@@ -83,17 +83,16 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   integer, save :: first=0
   integer :: ppphytoc, ppphyton, ppphytop, ppphytos, ppphytol 
+  integer,dimension(NO_BOXES)  :: limit
   real(RLEN),allocatable,save,dimension(:) :: phytoc,phyton,phytop,phytos,phytol
                                                                                                                                                              
   real(RLEN),allocatable,save,dimension(:) :: r,tmp,et,sum,sadap,sea,sdo,rugc,  &
-                                       srt,slc,run,pe_R6,rupp,rump,misp,rupn,   &
-                                       rumn3,rumn4,rumn,netgrowth,misn,cqun3,   &
-                                       sra,srs
-  real(RLEN),allocatable,save,dimension(:) :: rums,rups,miss,tN,fpplim,iN,iN1p, &
-                                       rr1n,rr1p,rr6c,rr6n,rr6p,rr6s,runn,runn3,&
-                                       runn4,runp,runs,Irr,rho_Chl,rate_Chl,seo,&
-                                       flPIR2c,iNIn,eN5s,rrc,rr1c
-  real(RLEN),allocatable,save,dimension(:) :: iN5s,chl_opt
+        & srt,slc,run,pe_R6,rupp,rump,misp,rupn,rumn3,rumn4,rumn,netgrowth,     &
+        & misn,cqun3,sra,srs,rums,rups,miss,tN,fpplim,iN,iN1p,rr1n,rr1p,rr6c,   &
+        & rr6n,rr6p,rr6s,runn,runn3,runn4,runp,runs,Irr,rho_Chl,rate_Chl,seo,   &
+        & flPIR2c,iNIn,eN5s,rrc,rr1c,iN5s,chl_opt
+
+  real(RLEN),allocatable,save,dimension(:) :: tfluxC, tfluxN, tfluxP, pe_R1n, pe_R1p, pe_R1c
 #ifndef INCLUDE_PELCO2
   integer,parameter :: ppO3c = 0
 #endif
@@ -105,142 +104,37 @@
   integer :: AllocStatus, DeallocStatus
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Allocate local memory
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   if (first==0) then
-     first=1
-     allocate(phytoc(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating phytoc"
-     allocate(phyton(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating phyton"
-     allocate(phytop(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating phytop"
-     allocate(phytos(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating phytos"
-     allocate(phytol(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating phytol"
-     allocate(r(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating r"
-     allocate(tmp(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating tmp"
-     allocate(et(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating et"
-     allocate(sum(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating sum"
-     allocate(sadap(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating sadap"
-     allocate(sea(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating sea"
-     allocate(sdo(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating sdo"
-     allocate(rugc(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rugc"
-     allocate(sra(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating sra"
-     allocate(srs(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating srs"
-     allocate(srt(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating srt"
-     allocate(slc(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating slc"
-     allocate(run(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating run"
-     allocate(pe_R6(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating pe_R6"
-     allocate(rupp(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rupp"
-     allocate(rump(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rump"
-     allocate(misp(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating misp"
-     allocate(rupn(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rupn"
-     allocate(rumn3(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rumn3"
-     allocate(rumn4(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rumn4"
-     allocate(rumn(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rumn"
-     allocate(netgrowth(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating netgrowth"
-     allocate(misn(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating misn"
-     allocate(cqun3(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating cqun3"
-     allocate(rums(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rums"
-     allocate(rups(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rups"
-     allocate(miss(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating miss"
-     allocate(tN(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating tN"
-     allocate(fpplim(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating fpplim"
-     allocate(iN(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating iN"
-     allocate(iN1p(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating iN1p"
-     allocate(iNIn(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating iNIn"
-     allocate(eN5s(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating eN5s"
-     allocate(rrc(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rrc"
-     allocate(rr1c(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rr1c"
-     allocate(rr1n(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rr1n"
-     allocate(rr1p(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rr1p"
-     allocate(rr6c(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rr6c"
-     allocate(rr6n(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rr6n"
-     allocate(rr6p(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rr6p"
-     allocate(rr6s(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rr6s"
-     allocate(runn(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating runn"
-     allocate(runn3(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating runn3"
-     allocate(runn4(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating runn4"
-     allocate(runp(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating runp"
-     allocate(runs(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating runs"
-     allocate(Irr(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating Irr"
-     allocate(rho_Chl(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rho_Chl"
-     allocate(rate_Chl(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rate_Chl"
-     allocate(flPIR2c(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating flPIR2c"
-     allocate(seo(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating seo"
-     allocate(iN5s(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating iN5s"
-     allocate(chl_opt(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating chl_opt"
+     ALLOCATE ( phytoc(NO_BOXES), phyton(NO_BOXES), phytop(NO_BOXES),           &
+        &       phytos(NO_BOXES), phytol(NO_BOXES), r(NO_BOXES), tmp(NO_BOXES), &
+        &       et(NO_BOXES), sum(NO_BOXES), sadap(NO_BOXES),                   &
+        &       sdo(NO_BOXES), rugc(NO_BOXES), sra(NO_BOXES), srs(NO_BOXES),    &
+        &       srt(NO_BOXES), slc(NO_BOXES), run(NO_BOXES), pe_R6(NO_BOXES),   &
+        &       rupp(NO_BOXES), rump(NO_BOXES), misp(NO_BOXES), rupn(NO_BOXES), & 
+        &       rumn3(NO_BOXES), rumn4(NO_BOXES), rumn(NO_BOXES),               & 
+        &       netgrowth(NO_BOXES), misn(NO_BOXES), cqun3(NO_BOXES),           &
+        &       rums(NO_BOXES), rups(NO_BOXES), miss(NO_BOXES), tN(NO_BOXES),   &
+        &       fpplim(NO_BOXES), iN(NO_BOXES), iN1p(NO_BOXES), iNIn(NO_BOXES), &
+        &       eN5s(NO_BOXES), iN5s(NO_BOXES), rrc(NO_BOXES),                  &
+        &       rr1c(NO_BOXES), rr1n(NO_BOXES), rr1p(NO_BOXES),                 &
+        &       rr6c(NO_BOXES), rr6n(NO_BOXES), rr6p(NO_BOXES), rr6s(NO_BOXES), &
+        &       runn(NO_BOXES), runn3(NO_BOXES), runn4(NO_BOXES),               &
+        &       runp(NO_BOXES), runs(NO_BOXES), Irr(NO_BOXES),                  &
+        &       flPIR2c(NO_BOXES), seo(NO_BOXES), sea(NO_BOXES),                &
+        &       rate_Chl(NO_BOXES), rho_Chl(NO_BOXES), chl_opt(NO_BOXES),       & 
+        &       tfluxC(NO_BOXES), tfluxN(NO_BOXES), tfluxP(NO_BOXES),           &
+        &       pe_R1n(NO_BOXES), pe_R1p(NO_BOXES), pe_R1c(NO_BOXES),           &
 #ifdef INCLUDE_PELFE
-     allocate(phytof(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating phytof"
-     allocate(misf(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating misf"
-     allocate(iN7f(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating iN7f"
-     allocate(rr1f(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rr1f"
-     allocate(rr6f(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rr6f"
-     allocate(rupf(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rupf"
-     allocate(rumf(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rumf"
-     allocate(runf(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating runf"
+        &       phytof(NO_BOXES), misf(NO_BOXES), iN7f(NO_BOXES),               &
+        &       rr1f(NO_BOXES), rr6f(NO_BOXES),                                 &
+        &       rupf(NO_BOXES), rumf(NO_BOXES), runf(NO_BOXES),                 &
 #endif
+        &      STAT = AllocStatus )
+     IF( AllocStatus /= 0 ) call bfm_error('PhytoDynamics','Error allocating arrays')
+     first=1
   end if
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -260,7 +154,10 @@
   ppphytof = ppPhytoPlankton(phyto,iiF)
   if ( ppphytof > 0 ) phytof(:) = phytoc(:) * qfcPPY(phyto,:)
 #endif
-
+  ! Quota collectors
+  tfluxC = ZERO
+  tfluxN = ZERO
+  tfluxP = ZERO
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
@@ -438,11 +335,11 @@
        ! Activity and Nutrient-stress excretions are assigned to R2
        flPIR2c  =  seo*phytoc + sea*phytoc
   end select
-  call flux_vector( iiPel, ppO3c,ppphytoc, rugc )  
-  call flux_vector( iiPel, ppphytoc,ppR1c, rr1c )
-  call flux_vector( iiPel, ppphytoc,ppR6c, rr6c )
+  call quota_flux( iiPel, ppphytoc ,ppO3c,ppphytoc, rugc, tfluxC )  
+  call quota_flux( iiPel, ppphytoc, ppphytoc,ppR1c, rr1c, tfluxC )
+  call quota_flux( iiPel, ppphytoc, ppphytoc,ppR6c, rr6c, tfluxC )
 
-  call flux_vector( iiPel, ppphytoc,ppO3c, rrc )
+  call quota_flux( iiPel, ppphytoc, ppphytoc,ppO3c, rrc, tfluxC )
   call flux_vector( iiPel, ppO2o,ppO2o,-( rrc/ MW_C) )
   call flux_vector( iiPel, ppO2o,ppO2o, rugc/ MW_C ) 
 
@@ -486,7 +383,7 @@
       run  =   netgrowth
   end if
 
-  call flux_vector( iiPel, ppphytoc,ppR2c, flPIR2c )
+  call quota_flux( iiPel, ppphytoc, ppphytoc,ppR2c, flPIR2c, tfluxC )
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Specific net growth rate (d-1)
@@ -503,10 +400,10 @@
   r  =   insw_vector(  runn)
   runn3  =   r* runn* rumn3/( p_small+ rumn)  ! actual uptake of Nn
   runn4  =   r* runn* rumn4/( p_small+ rumn)  ! actual uptake of Nn
-  call flux_vector( iiPel, ppN3n,ppphyton, runn3 )  ! source/sink.n
-  call flux_vector( iiPel, ppN4n,ppphyton, runn4 )  ! source/sink.n
+  call quota_flux( iiPel, ppphyton, ppN3n,ppphyton, runn3, tfluxN )  ! source/sink.n
+  call quota_flux( iiPel, ppphyton, ppN4n,ppphyton, runn4, tfluxN )  ! source/sink.n
   tmp = - runn*( ONE- r)
-  call flux_vector(iiPel, ppphyton,ppR1n,tmp)  ! source/sink.n
+  call quota_flux( iiPel, ppphyton, ppphyton,ppR1n,tmp, tfluxN)  ! source/sink.n
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Nuttrient dynamics: PHOSPHORUS
@@ -520,9 +417,9 @@
 
   r  =   insw_vector(  runp)
   tmp = runp*r
-  call flux_vector( iiPel, ppN1p,ppphytop, tmp )  ! source/sink.p
+  call quota_flux(iiPel, ppphytop, ppN1p,ppphytop, tmp, tfluxP)  ! source/sink.p
   tmp = - runp*( ONE- r)
-  call flux_vector(iiPel, ppphytop,ppR1p, tmp)  ! source/sink.p
+  call quota_flux(iiPel, ppphytop, ppphytop,ppR1p, tmp, tfluxP)  ! source/sink.p
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Excretion of N and P to PON and POP
@@ -533,11 +430,12 @@
      rr6p  =  pe_R6* sdo* phytop
      rr1p  =  sdo* phytop- rr6p
 
-  call flux_vector( iiPel, ppphyton,ppR6n, rr6n )  ! source/sink.n
-  call flux_vector( iiPel, ppphyton,ppR1n, rr1n )  ! source/sink.n
+  call quota_flux( iiPel, ppphyton, ppphyton,ppR6n, rr6n, tfluxN )  ! source/sink.n
+  call quota_flux( iiPel, ppphyton, ppphyton,ppR1n, rr1n, tfluxN )  ! source/sink.n
 
-  call flux_vector( iiPel, ppphytop,ppR6p, rr6p )  ! source/sink.p
-  call flux_vector( iiPel, ppphytop,ppR1p, rr1p )  ! source/sink.p
+
+  call quota_flux( iiPel, ppphytop, ppphytop,ppR6p, rr6p, tfluxP )  ! source/sink.p
+  call quota_flux( iiPel, ppphytop, ppphytop,ppR1p, rr1p, tfluxP )  ! source/sink.p
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Nutrient dynamics: SILICATE
@@ -662,6 +560,37 @@
   call flux_vector( iiPel, ppO3c,ppO5c, qccPPY(phyto, :)*rr6c )
   call flux_vector( iiPel, ppO3h,ppO3h, -C2ALK*qccPPY(phyto, :)*rr6c )
 #endif
+
+   if ( ppphyton .EQ.  0 .or. ppphytop .EQ.  0 ) then
+    
+     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+     ! Eliminate the excess of the non-limiting constituent under fixed quota
+     ! Determine whether C, P or N is limiting (Total Fluxes Formulation)
+     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+     limit = nutlim(tfluxC,tfluxN,tfluxP,qncPPY(phyto,:),qpcPPY(phyto,:),iiC,iiN,iiP)
+
+     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+     ! Compute the correction terms depending on the limiting constituent
+     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+     WHERE     ( limit == iiC )
+         pe_R1p = max(ZERO,tfluxp  - p_qpcPPY(phyto)* tfluxc)
+         pe_R1n = max(ZERO,tfluxn  - p_qncPPY(phyto)* tfluxc)
+         pe_R1c = ZERO
+     ELSEWHERE ( limit == iiP )
+         pe_R1p = ZERO
+         pe_R1n = max(ZERO, tfluxn  - tfluxp/p_qpcPPY(phyto)*p_qncPPY(phyto) )
+         pe_R1c = max(ZERO, tfluxc  - tfluxp/p_qpcPPY(phyto))
+     ELSEWHERE ( limit == iiN )
+         pe_R1p = max(ZERO, tfluxp  - tfluxn/p_qncPPY(phyto)*p_qpcPPY(phyto))
+         pe_R1n = ZERO
+         pe_R1c = max(ZERO, tfluxc  - tfluxn/p_qncPPY(phyto))
+     END WHERE
+
+     call flux_vector(iiPel, ppphytoc, ppR1c, pe_R1c)
+     call flux_vector(iiPel, ppphytop, ppR1p, pe_R1p)
+     call flux_vector(iiPel, ppphyton, ppR1n, pe_R1n)
+
+endif
 
   ! End of computation section for process PhytoDynamics
 

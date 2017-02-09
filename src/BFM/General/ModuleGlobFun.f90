@@ -17,7 +17,8 @@
   MODULE mem_globalfun
 !
 ! !USES:
-  USE global_mem, ONLY:RLEN, ZERO, ONE, BASETEMP
+  USE global_mem, ONLY: RLEN, ZERO, ONE, BASETEMP
+  USE mem_Param,  ONLY: p_small
 
 !  
 !
@@ -156,6 +157,79 @@
         if (input > ZERO ) INSW=ONE 
 
     end function INSW
+
+    elemental function nutlim(fc, fn, fp, qnc, qpc, c, n, p)
+    !==========================================================================
+    ! Determine whether C, N, or P is the limiting element for a PFT
+    ! fc,fn,fp     : total fluxes of C,N,P                    [mol/kg]
+    ! qnc          : N:C ratio                                [molN/molC]
+    ! qpc          : P:C ratio                                [molP/molC]
+    ! c,n,p        : constituents indexes                     [-]
+    ! nutlim       : limiting consituent index                [-]
+    !
+    ! Configurations of fluxes for C, N, P
+    !          fc        fn         fp
+    !   1      <0        <0         <0
+    !   2      <0        <0         >0
+    !   3      <0        >0         <0
+    !   4      <0        >0         >0
+    !   5      >0        <0         <0
+    !   6      >0        <0         >0
+    !   7      >0        >0         <0
+    !   8      >0        >0         >0
+    !==========================================================================
+       IMPLICIT NONE
+       !
+       real(RLEN), intent(in) :: fc, fn, fp, qnc, qpc
+       integer,    intent(in) :: c, n, p
+       integer                :: nutlim
+       real(RLEN) :: pu_n, pu_p, pq_n, pq_p
+       !
+       pu_n = fn / ( p_small + fc ) ; pq_n = pu_n / qnc
+       pu_p = fp / ( p_small + fc ) ; pq_p = pu_p / qpc
+       !
+       nutlim = c
+       !
+       ! CASE 1
+       if ( (fc <0) .AND. (fn <0) .AND. (fp <0) ) then
+          if ( pq_p>pq_n .OR. abs(pq_p-pq_n)<p_small ) then
+             if (abs(pu_p) > qpc) nutlim = p
+          else
+             if (abs(pu_n) > qnc) nutlim = n
+          endif
+       endif
+       ! CASE 2
+       if ( (fc <0) .AND. (fn <0) .AND. (fp >0) ) then
+           if (abs(pu_n) > qnc) nutlim = n
+       endif
+       ! CASE 3
+       if ( (fc <0) .AND. (fn >0) .AND. (fp <0) ) then
+          if (abs(pu_p) > qpc) nutlim = p
+       endif
+       ! CASE 4
+       if ( (fc <0) .AND. (fn >0) .AND. (fp >0) ) nutlim = c
+       ! CASE 5
+       if ( (fc >0) .AND. (fn <0) .AND. (fp <0) ) then
+          if ( pq_p<pq_n .OR. abs(pq_p-pq_n)<p_small ) then
+             nutlim = p
+          else
+             nutlim = n
+          endif
+       endif
+       ! CASE 6
+       if ( (fc >0) .AND. (fn <0) .AND. (fp >0) ) nutlim = n
+       ! CASE 7
+       if ( (fc >0) .AND. (fn >0) .AND. (fp <0) ) nutlim = p
+       ! CASE 8
+       if ( (fc >0) .AND. (fn >0) .AND. (fp >0) ) then
+          if ( pq_p<pq_n .OR. abs(pq_p-pq_n)<p_small ) then
+             if ( pu_p < qpc ) nutlim = p
+          else
+             if ( pu_n < qnc ) nutlim = n
+          endif
+       endif
+
+    end function nutlim
 
   end module mem_globalfun
 !EOC
