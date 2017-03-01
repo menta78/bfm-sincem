@@ -52,6 +52,7 @@
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   use constants,  ONLY: HOURS_PER_DAY,ZERO_KELVIN,MW_C
   use global_mem, ONLY: RLEN,ZERO,ONE
+  use mem_CO2,    ONLY: CO2fluxfac
 #ifdef NOPOINTERS
   use mem
 #else
@@ -188,7 +189,7 @@ IMPLICIT NONE
     ! (or added to) the diagonal element of O3c (i.e. infinite source)
     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     jsurO3c(:) = jsurO3c(:) + (ONE-ice(:)) * CO2airflux(:) * MW_C
-    tmpflux(SRFindices) = jsurO3c(:) / Depth(SRFindices)
+    tmpflux(SRFindices) = jsurO3c(:) / Depth(SRFindices) * CO2fluxfac
     if ( AssignAirPelFluxesInBFMFlag) then
        call flux_vector( iiPel, ppO3c,ppO3c, tmpflux )
     end if

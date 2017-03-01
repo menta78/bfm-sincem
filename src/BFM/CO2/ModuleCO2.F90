@@ -75,6 +75,7 @@
   !                                 2 : Default. Standard OCMIP iteration 
   !                                 3 : Follows et al., Ocean Modelling 2006 
   ! CalcBioAlkFlag logical          Compute biological processes corrections on total alkalinity
+  ! CO2fluxfac     real             Multipling factor for CO2 flux to accelerate air-sea exchange
   !              ---------  Parameters for MethodCalcCO2=2 -----------
   ! M2XACC         real             Accuracy of the iterative scheme for OCMIP (default 1.E-10) 
   ! M2PHDELT       [pH]             Delta of pH for the root search (realized pH+/-DELT)
@@ -124,6 +125,7 @@
    real(RLEN)   :: p_kdca
    integer      :: p_nomega
    logical      :: CalcBioAlkFlag = .FALSE.
+   real(RLEN)   :: Co2fluxfac = 1.0_RLEN
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! SHARED PUBLIC FUNCTIONS (must be explicited below "contains")
   public InitCO2, CloseCO2
@@ -146,7 +148,7 @@
                               phscale,phstart,M2XACC,M2PHDELT,M2MAXIT,           &
                               Caconc0,Canorm,p_kdca, p_nomega,                   &
                               AtmCO2_N,AtmSLP_N,AtmTDP_N,                        &
-                              CalcBioAlkFlag
+                              CalcBioAlkFlag,Co2fluxfac
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   integer            ::error=0
   !---------------------------------------------------------------------------
