@@ -104,8 +104,9 @@
   !           '1764-07-01 00:00' ,  'yearly'  ,  .TRUE.
   !
   ! Convention for Input reading : 0 = use constant value (default if struct is not initialized)
-  !                               2 = read timeseries file ( e.g. CO2 mixing ratios)
-  !                               4 = field from a coupled model (e.g. atmospheric SLP from OGCM)
+  !                                1 = read timeseries file ( e.g. CO2 mixing ratios)
+  !                                2 = read 2D fields using NEMO fldread 
+  !                                3 = field from a coupled model (e.g. atmospheric SLP from OGCM)
   ! NOTE: The file "CMIP5_Historical_GHG_1765_2005.dat" is located in "$BFMDIR/tools" folder
   !-----------------------------------------------------------------------------------!
    real(RLEN)   :: AtmCO20=365.0_RLEN ! ppm 
@@ -181,36 +182,37 @@
   ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     ! Atmospheric CO2 concentration
     AtmCO2%init = AtmCO2_N%init 
-    if (AtmCO2%init == 0) then
-       ! Use constant  
-       CALL FieldInit(AtmCO2_N, AtmCO2)
-       ! the following check is needed to avoid allocation of empty arrays
-       ! with MPI and land domains
-       if (NO_BOXES_XY > 0) then
-          AtmCO2%fnow = AtmCO20
-          write(LOGUNIT,*) 'Using constant atmospheric CO2 concentration:', AtmCO2%fnow(1)
-          write(LOGUNIT,*) ' '
-       end if
-    elseif (AtmCO2%init == 2) then
-       ! read external 0-D timeseries
-       CALL FieldInit(AtmCO2_N, AtmCO2)
-       ! the following check is needed to avoid allocation of empty arrays
-       ! with MPI and land domains
-       if (NO_BOXES_XY > 0) then
-          write(LOGUNIT,*) 'Using variable atmospheric CO2 concentration. Initial value:', AtmCO2%fnow(1)
-          write(LOGUNIT,*) ' '
-       end if
-    elseif (AtmCO2%init == 4) then
-       ! CO2 concentration is provided by external model
-       CALL FieldInit(AtmCO2_N, AtmCO2)
-       ! the following check is needed to avoid allocation of empty arrays
-       ! with MPI and land domains
-       if (NO_BOXES_XY > 0) then
-          AtmCO2%fnow = AtmCO20
-          write(LOGUNIT,*) 'CO2 conc. provided by external model. Initialize with default uniform value', AtmCO2%fnow(1)
-          write(LOGUNIT,*) ' '
-       end if
-    endif
+    CALL FieldInit(AtmCO2_N, AtmCO2)
+    SELECT CASE ( AtmCO2%init )
+       CASE (0) ! Costant
+          ! the following check is needed to avoid allocation of empty arrays with MPI and land domains
+          if (NO_BOXES_XY > 0) then
+             AtmCO2%fnow = AtmCO20
+             write(LOGUNIT,*) 'Using constant atmospheric CO2 concentration:', AtmCO2%fnow(1)
+             write(LOGUNIT,*) ' '
+          end if
+       CASE (1) ! read external 0-D timeseries
+          ! the following check is needed to avoid allocation of empty arrays with MPI and land domains
+          if (NO_BOXES_XY > 0) then
+             write(LOGUNIT,*) 'BFM Read atmospheric CO2 timeseries. Initial value:', AtmCO2%fnow(1)
+             write(LOGUNIT,*) ' '
+          end if
+       CASE (2) ! read external 2-D fields with NEMO fldread (see envforcing_bfm)
+          ! the following check is needed to avoid allocation of empty arrays with MPI and land domains
+          if (NO_BOXES_XY > 0) then
+             AtmCO2%fnow = AtmCO20
+             write(LOGUNIT,*) 'Read CO2 2D fields with NEMO fldread. Initialize with default uniform value', AtmCO2%fnow(1)
+             write(LOGUNIT,*) ' '
+          end if
+       CASE (3) ! receive from CO2 and SLP from NEMO (see envforcing_bfm)
+          ! the following check is needed to avoid allocation of empty arrays with MPI and land domains
+          if (NO_BOXES_XY > 0) then
+             AtmCO2%fnow = AtmCO20
+             write(LOGUNIT,*) 'Receive CO2 and SLP fields from NEMO. Initialize with default uniform value', AtmCO2%fnow(1)
+             write(LOGUNIT,*) ' '
+          end if
+    END SELECT
+
     ! Rough approximation: pCO2 is assumed equal to the mixing ratio of CO2
     if (.not. calcAtmpCO2) EPCO2air = AtmCO2%fnow
 
@@ -219,21 +221,21 @@
     AtmSLP%init = AtmSLP_N%init
     AtmTDP%init = AtmTDP_N%init
     if (calcAtmpCO2) then
+       CALL FieldInit(AtmSLP_N, AtmSLP)
        if (AtmSLP%init == 0) then
-         ! Use constant
-          CALL FieldInit(AtmSLP_N, AtmSLP)
-          ! the following check is needed to avoid allocation of empty arrays
-          ! with MPI and land domains
+          ! Use constant
+          ! the following check is needed to avoid allocation of empty arrays with MPI and land domains
           if (NO_BOXES_XY > 0) then
              AtmSLP%fnow = slp0
              write(LOGUNIT,*) 'Using constant atmospheric SLP (see slp0 in BFM_General.nml): ', AtmSLP%fnow(1)
              write(LOGUNIT,*) ' '
           end if
        else
-         CALL FieldInit(AtmSLP_N, AtmSLP)
+         if (AtmSLP%init .eq. 1 ) &
+            write(LOGUNIT,*) 'BFM reads atmospheric SLP timeseries from file: ', AtmSLP_N%filename
          if (AtmSLP%init .eq. 2 ) &
-            write(LOGUNIT,*) 'BFM reads atmospheric SLP from file: ', AtmSLP_N%filename
-         if (AtmSLP%init .eq. 4 ) &
+            write(LOGUNIT,*) 'BFM reads atmospheric SLP 2D fields from file: ', AtmSLP_N%filename
+         if (AtmSLP%init .eq. 3 ) &
             write(LOGUNIT,*) 'BFM receives atmospheric SLP from coupled model (see env_forcing)'
          write(LOGUNIT,*) ' '
        endif
@@ -241,9 +243,11 @@
        ! Atmospheric Dew Point Temperature
        if (pCO2Method == 2 .AND. AtmTDP%init .ne. 0 ) then
           CALL FieldInit(AtmTDP_N, AtmTDP)
+         if (AtmTDP%init .eq. 1 ) &
+            write(LOGUNIT,*) 'BFM reads Dew Point Temperature timeseries from file: ', AtmTDP_N%filename
          if (AtmTDP%init .eq. 2 ) &
-            write(LOGUNIT,*) 'BFM reads Dew Point Temperature from file: ', AtmTDP_N%filename
-         if (AtmTDP%init .eq. 4 ) &
+            write(LOGUNIT,*) 'BFM reads Dew Point Temperature 2D fields from file: ', AtmTDP_N%filename
+         if (AtmTDP%init .eq. 3 ) &
             write(LOGUNIT,*) 'BFM receives Dew Point Temperature from coupled model (see env_forcing)'
          write(LOGUNIT,*) ' '
        else
@@ -264,8 +268,9 @@
     end select
     
     if (calcAtmpCO2) write(LOGUNIT,*) 'BFM computes pCO2 with method: ', pCO2Method
-    if (AtmSLP%init == 4 ) write(LOGUNIT,*) 'SLP is provided by external model.' 
-    if (AtmTDP%init == 4 ) write(LOGUNIT,*) 'TDP is provided by external model.' 
+    if (AtmSLP%init == 2 ) write(LOGUNIT,*) 'SLP is provided by external 2D field.' 
+    if (AtmTDP%init == 2 ) write(LOGUNIT,*) 'TDP is provided by external 2D field.' 
+    if (AtmSLP%init == 3 ) write(LOGUNIT,*) 'SLP is provided by NEMO model.' 
     LEVEL1 '-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'
     LEVEL1 ' '
 

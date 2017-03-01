@@ -312,9 +312,10 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
 !          !  yyyymmdd         ! Frequency  !  interp  !
 !           '1764-07-01 00:00' ,  'yearly'  ,  .TRUE.
 !
-! Convention for Input reading : 0 = use constant value (default if structure is not initialized) 
-!                               2 = read timeseries file ( e.g. CO2 mixing ratios)
-!                               4 = field from a coupled model (e.g. atmospheric SLP from OGCM)
+! Convention for Input reading : 0 = use constant value (default if struct is not initialized)
+!                                1 = read timeseries file ( e.g. CO2 mixing ratios)
+!                                2 = read 2D fields using NEMO fldread
+!                                3 = field from a coupled model (e.g. atmospheric SLP from OGCM)
 ! NOTE: The file "CMIP5_Historical_GHG_1765_2005.dat" is located in "$BFMDIR/tools" folder
 !-----------------------------------------------------------------------------------!
 &CO2_parameters

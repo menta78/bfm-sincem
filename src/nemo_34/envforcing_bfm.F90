@@ -5,7 +5,7 @@
 ! !ROUTINE: Light and other environmental forcing used in the BFM
 !
 ! !INTERFACE
-   subroutine envforcing_bfm()
+   subroutine envforcing_bfm(kt)
 !
 ! !DESCRIPTION
 !
@@ -13,7 +13,7 @@
 ! BFM modules
    use constants,  only: E2W
    use global_mem, only: RLEN,ZERO,LOGUNIT,ONE
-   use mem_param,  only: p_small
+   use mem_param,  only: p_small, slp0
    use mem_PAR,    only: ChlAttenFlag, P_PARRGB, P_PAR, &
                          R_EPS, B_EPS, G_EPS, P_EPSIR,  &
                          EIRR, EIRB, EIRG
@@ -22,6 +22,7 @@
                          NO_BOXES, NO_BOXES_XY
    use api_bfm
    use SystemForcing, only : FieldRead
+   use time, only: bfmtime
 #ifdef INCLUDE_PELCO2
    use mem,        only: ppO3c, ppO3h, ppN6r
    use mem_CO2,    only: AtmCO20, AtmCO2, AtmSLP, AtmTDP
@@ -30,6 +31,8 @@
 ! OPA modules
    use oce_trc
    use trc_oce, only: etot3
+   use sbc_oce, only: atm_co2
+   use sbcapr,  only: apr
 
 IMPLICIT NONE
 ! OPA domain substitutions
@@ -75,38 +78,46 @@ IMPLICIT NONE
    !
    ! CO2 atmospheric mixing ratio
    !
-   ! Read timeseries in BFM
-   if (AtmCO2%init .gt. 0 .AND. AtmCO2%init .lt. 4) call FieldRead(AtmCO2)
-
-   ! Read in NEMO Boundary Conditions
-   if (AtmCO2%init .eq. 4 ) then
+   SELECT CASE ( AtmCO2%init )
+     CASE (1) ! Read timeseries in BFM
+       call FieldRead(AtmCO2)
+     CASE (2) ! Read Boundary Conditions using NEMO fldread (namtrc_bc)
        n = n_trc_indsbc(ppO3c)
        AtmCO2%fnow = pack( sf_trcsbc(n)%fnow(:,:,1),SRFmask(:,:,1) )
-   endif
+     CASE (3) ! Receive Boundary Conditions from NEMO
+      AtmCO2%fnow = pack( atm_co2(:,:),SRFmask(:,:,1) )
+   END SELECT
    !
    ! Atmospheric sea level pressure (MFS index jp_msl  = 4)
    !
    if ( allocated(AtmSLP%fnow))  then 
-      ! Read timeseries in BFM
-      if (AtmSLP%init .gt. 0 .AND. AtmSLP%init .lt. 4) call FieldRead(AtmSLP)
-      ! Read in NEMO Boundary Conditions
-      if (AtmSLP%init .eq.4) then
-         n = n_trc_indsbc(ppO3h)
-         AtmSLP%fnow = pack( sf_trcsbc(n)%fnow(:,:,1),SRFmask(:,:,1) )
-      endif
+      SELECT CASE ( AtmSLP%init )
+         CASE (1) ! Read timeseries in BFM
+            call FieldRead(AtmSLP)
+         CASE (2) ! Read Boundary Conditions using NEMO fldread (namtrc_bc)
+            n = n_trc_indsbc(ppO3h)
+            AtmSLP%fnow = pack( sf_trcsbc(n)%fnow(:,:,1),SRFmask(:,:,1) )
+         CASE (3) ! Receive Boundary Conditions from NEMO
+            AtmSLP%fnow = pack( apr(:,:),SRFmask(:,:,1) )
+      END SELECT
    endif
    !
    ! Atmospheric Dew Point Temperature
    !
    if ( allocated(AtmTDP%fnow)) then 
-      ! Read timeseries in BFM
-      if (AtmTDP%init .gt. 0 .AND. AtmTDP%init .lt. 4) call FieldRead(AtmTDP)
-      ! Read in NEMO Boundary Conditions
-      if (AtmTDP%init .eq.4) then
-         n = n_trc_indsbc(ppN6r)
-         AtmTDP%fnow = pack( sf_trcsbc(n)%fnow(:,:,1),SRFmask(:,:,1) )
-      endif
-   endif
+      SELECT CASE ( AtmTDP%init )
+         CASE (1) ! Read timeseries in BFM
+            call FieldRead(AtmTDP)
+         CASE (2) ! Read Boundary Conditions using NEMO fldread (namtrc_bc)
+            n = n_trc_indsbc(ppN6r)
+            AtmTDP%fnow = pack( sf_trcsbc(n)%fnow(:,:,1),SRFmask(:,:,1) )
+      END SELECT
+   endif  
+
+   ! print control on received fluxes
+   IF ( (kt-nit000)<20 .OR. MOD(kt,200)==0 .OR. kt==nitend) THEN
+      write(LOGUNIT,*) 'env_forcing: Step ',kt,' Air_pCO2: ',maxval(AtmCO2%fnow), ' SLP:', maxval(AtmSLP%fnow) 
+   ENDIF
 #endif
 
    !---------------------------------------------

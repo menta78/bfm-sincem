@@ -82,7 +82,7 @@
    !---------------------------------------------
    ! Compute external forcing functions
    !---------------------------------------------
-   call envforcing_bfm
+   call envforcing_bfm(kt)
 
    !---------------------------------------------
    ! Compute Biogeochemical trends
