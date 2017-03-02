@@ -287,7 +287,7 @@
      write (LOGUNIT,'(a,1x,i8,1x,a)') 'No ocean point in core :', parallel_rank, &
            '. Disable BFM core computation.'
      ! set to zero nemo passive tracers array
-     trn(:,:,:,1) = ZERO
+     trn(:,:,:,:) = ZERO
    endif
 
    !---------------------------------------------
@@ -414,10 +414,10 @@
    D3STATE_tot(:) = ZERO
    do m = 1,NO_D3_BOX_STATES
          ! compute statistics (need to map to 3D shape for global sum)
-         trn(:,:,:,1) = unpack(D3STATE(m,:),SEAmask,ZEROS)
-         D3STATE_tot(m) = glob_sum( trn(:,:,:,1) * cvol(:,:,:)   )
-         zmin  = minval( trn(:,:,:,1), mask= ((tmask*SPREAD(tmask_i,DIM=3,NCOPIES=jpk).NE.0.)) )
-         zmax  = maxval( trn(:,:,:,1), mask= ((tmask*SPREAD(tmask_i,DIM=3,NCOPIES=jpk).NE.0.)) )
+         trn(:,:,:,m) = unpack(D3STATE(m,:),SEAmask,ZEROS)
+         D3STATE_tot(m) = glob_sum( trn(:,:,:,m) * cvol(:,:,:)   )
+         zmin  = minval( trn(:,:,:,m), mask= ((tmask*SPREAD(tmask_i,DIM=3,NCOPIES=jpk).NE.0.)) )
+         zmax  = maxval( trn(:,:,:,m), mask= ((tmask*SPREAD(tmask_i,DIM=3,NCOPIES=jpk).NE.0.)) )
          if (lk_mpp) then
             call mpp_min( zmin )      ! min over the global domain                                                                
             call mpp_max( zmax )      ! max over the global domain
@@ -499,7 +499,7 @@
    ! Initialize boundary conditions  
    call trc_bc_init(NO_D3_BOX_STATES)
 
-#ifdef INCLUDE_PELCO2
+#if defined INCLUDE_PELCO2 && ! defined CCSMCOUPLED
    ! control consistency between namelists setting
    if (AtmCO2%init .eq. 4 .and. .NOT. ln_trc_sbc(ppO3c)) then
      LEVEL1 'CO2 data from Nemo not available in surface BC &

@@ -114,7 +114,7 @@
 
       ! Compute vertical sinking with upwind scheme
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-      CALL trc_sink_bfm(wbio)
+      CALL trc_sink_bfm(wbio,m)
    
    endif
 

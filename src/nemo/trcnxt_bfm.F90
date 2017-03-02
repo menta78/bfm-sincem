@@ -47,7 +47,7 @@ CONTAINS
    END FUNCTION trc_nxt_alloc
 
 
-   SUBROUTINE trc_nxt_bfm( kt,m )
+   SUBROUTINE trc_nxt_bfm( kt )
       !!----------------------------------------------------------------------
       !!                   ***  ROUTINE trcnxt  ***
       !!
@@ -69,7 +69,6 @@ CONTAINS
 
 !   !! * Routine accessibility
       INTEGER, INTENT( in ) ::   kt         ! ocean time-step index
-      INTEGER, INTENT( in ) ::   m          ! index of the BFM state variable
       !! * Local declarations
       INTEGER  ::   jk,jn   ! dummy loop indices
       REAL(wp) ::   zfact   ! temporary scalar
@@ -81,15 +80,12 @@ CONTAINS
       !
       IF( kt == nit000 .AND. lwp ) THEN
          WRITE(numout,*)
-         WRITE(numout,*) 'trc_nxt_bfm : time stepping on BFM tracer',m
+         WRITE(numout,*) 'trc_nxt_bfm : time stepping on BFM tracer'
       ENDIF
-
-
-      jn = 1 ! BFM uses only one tracer as a working array
 
       ! 0. Lateral boundary conditions on tra (T-point, unchanged sign)
       ! ---------------------------------============
-      CALL lbc_lnk( tra(:,:,:,jn), 'T', 1. )
+      CALL lbc_lnk_t( tra, jptra, 'T', 1. )
 
       ! Check that the BFM compliant integrations are used
       IF(.NOT.lk_c1d) THEN
@@ -112,9 +108,9 @@ CONTAINS
 
 !  case of smolar scheme or muscl (the only ones allowed with BFM)
       DO jk = 1, jpk
-            trb(:,:,jk,jn) = tra(:,:,jk,jn)
-            trn(:,:,jk,jn) = tra(:,:,jk,jn)
-            tra(:,:,jk,jn) = 0.
+            trb(:,:,jk,:) = tra(:,:,jk,:)
+            trn(:,:,jk,:) = tra(:,:,jk,:)
+            tra(:,:,jk,:) = 0.
       END DO
 
       IF( nn_timing == 1 )  CALL timing_stop('trc_nxt_bfm')
