@@ -28,12 +28,11 @@
 !
 ! !PUBLIC MEMBER FUNCTIONS:
   
-! Possible convention to differentiate input field:
+! Convention to differentiate input field:
 ! 0 = No input / Set Model constant value
-! 1 = Analytic
-! 2 = 1D timeseries
-! 3 = 2D Field
-! 4 = Coupling with external model
+! 1 = 1D timeseries
+! 2 = 2D Field
+! 3 = Coupling with external model
 
    type, public :: ForcingName
       integer           :: init
@@ -100,23 +99,18 @@
    hh = 0
    nn = 0
    ! additional check
-   if (FName%init == 0 .OR. FName%init == 4 ) then 
+   if (FName%init == 0 .OR. FName%init == 2 .OR. FName%init == 3 ) then 
       allocate (FData%fnow(NO_BOXES_XY))
       write(LOGUNIT,*) 'FieldInit Warning ',trim(FName%varname), &
                        ': Data will not be read, ONLY %fnow memory structure is allocated !'
       return
    endif
-   if (FName%init < 0 .OR. FName%init > 4 ) then
+   if (FName%init < 0 .OR. FName%init > 3 ) then
       LEVEL1  'FieldInit Error ',trim(FName%varname), &
-                       ': initialization flag %init is  invalid! Allowed 0-4.'
+                       ': initialization flag %init is invalid! Allowed 0-3.'
       STOP
    endif 
-   ! Temporary check to avoid unavailable data structure selection 
-   if (FName%init == 1 .OR. FName%init == 3 ) then
-      LEVEL1  'FieldInit Error ',trim(FName%varname), &
-                       ': initialization flag %init with option 1 and 3 is not yet implemented in the code.'
-      STOP
-   endif
+
    ! Initialize FData structure 
    allocate (FData%fbef(NO_BOXES_XY), FData%fnow(NO_BOXES_XY), FData%faft(NO_BOXES_XY))
    FData%init     = Fname%init 
@@ -267,16 +261,10 @@
    type(ForcingField), intent(INOUT)   :: FData
      
    ! additional check 
-   if (FData%init == 0 .OR. FData%init == 4 ) then
+   if (FData%init == 0 .OR. FData%init == 2 .OR. FData%init == 3 ) then
       if (bfmtime%stepnow ==  bfmtime%step0) &
-         write(LOGUNIT,*) 'FieldRead Warning: Data will not be read because filed %init is either 0 or 4!'
+         write(LOGUNIT,*) 'FieldRead Warning: Data will not be read because field %init is either 0, 2 or 3!'
       return
-   endif
-   ! Temporary check to avoid unavailable data structure selection 
-   if (FData%init == 1 .OR. FData%init == 3 ) then
-      LEVEL1  'FieldRead Error : initialization flag %init ', &
-              'with option 1 and 3 is not yet implemented in the code.'
-      STOP
    endif
 
    allocate(diff((NO_BOXES_XY)))
@@ -329,7 +317,7 @@
       ! SEQUENTIAL
          readok = .FALSE. 
          select case (FData%init)
-            case(2) ! Timeseries
+            case(1) ! Timeseries
                read(FData%lun,*,END=905,ERR=906) Inpdate, ValAft
                readok = .TRUE.
                read (InpDate,'(I4,a1,I2,a1,I2,1x,I2,a1,I2)') yy,c1,mm,c1,dd,hh,c1,nn
@@ -344,7 +332,7 @@
                   FData%fbef = FData%faft
                   FData%taft = bfmtime%timeEnd
                endif
-            case(0,1,3,4) 
+            case(0,2,3,4) 
                Stop ' FieldRead: Wrong type of input. Only timeseries for sequential file.'
          end select
       ENDIF
@@ -375,17 +363,11 @@
 
    ! read in records
       select case (FData%init)
-         case(1) ! Analytic
-
-         case(2) ! Timeseries
+         case(1) ! Timeseries
             call check_err( nf90_get_var(FData%lun, FData%varID, Val0D, start = (/FData%nbef/)), 'FieldGet') 
             FData%fbef = Val0D
             call check_err( nf90_get_var(FData%lun, FData%varID, Val0D, start = (/FData%naft/)), 'FieldGet')
             FData%faft = Val0D 
-         case(3) ! 1D fields
-
-         case(4) ! 2D fields
-
       end select
       return
 

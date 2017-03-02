@@ -242,7 +242,7 @@
 
        ! Atmospheric Dew Point Temperature
        if (pCO2Method == 2 .AND. AtmTDP%init .ne. 0 ) then
-          CALL FieldInit(AtmTDP_N, AtmTDP)
+         CALL FieldInit(AtmTDP_N, AtmTDP)
          if (AtmTDP%init .eq. 1 ) &
             write(LOGUNIT,*) 'BFM reads Dew Point Temperature timeseries from file: ', AtmTDP_N%filename
          if (AtmTDP%init .eq. 2 ) &
