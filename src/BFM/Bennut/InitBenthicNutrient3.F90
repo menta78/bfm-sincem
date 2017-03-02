@@ -49,8 +49,7 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! The following sesame functions are used:IntegralExp
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  use global_interface,   ONLY: eTq
-  use mem_globalfun,   ONLY: IntegralExp
+  use mem_globalfun,   ONLY: IntegralExp, eTq
   use mem_BenthicNutrient3
 
 

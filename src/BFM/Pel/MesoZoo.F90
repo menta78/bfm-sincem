@@ -47,9 +47,9 @@
   use mem_MesoZoo
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! The following vector functions are used:eTq_vector, MM_vector
+  ! The following vector functions are used: eTq, MM, MM_power
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  use mem_globalfun,   ONLY: eTq_vector, MM_vector, MM_power_vector
+  use mem_globalfun,   ONLY: eTq, MM, MM_power
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Implicit typing is never allowed
@@ -225,8 +225,8 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Physiological temperature and oxygen response
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  eo = MM_power_vector(max(p_small,O2o(:)), p_clO2o(zoo),3)
-  et = eTq_vector(ETW(:), p_q10(zoo))
+  eo = MM_power(max(p_small,O2o(:)), p_clO2o(zoo),3)
+  et = eTq(ETW(:), p_q10(zoo))
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Calculate total potential food given the non-dim prey availability
@@ -251,7 +251,7 @@
   ! Calculate total food uptake rate (eq 38 Vichi et al. 2007) and 
   ! specific uptake rate considering potentially available food (sut)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  rugc  = et*p_sum(zoo)*MM_vector(p_vum(zoo)*rumc, p_sum(zoo))*zooc
+  rugc  = et*p_sum(zoo)*MM(p_vum(zoo)*rumc, p_sum(zoo))*zooc
   sut = rugc/(p_small + rumc)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

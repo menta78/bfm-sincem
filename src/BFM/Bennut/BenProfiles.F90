@@ -37,9 +37,9 @@
         use mem_Param, ONLY: p_sedlevels
 
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-!       The following global functions are used:eTq
+! The following global functions are used: eTq
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-        use global_interface,   ONLY: eTq
+        use mem_globalfun,   ONLY:  eTq
 
 !
 ! CHANGE_LOG

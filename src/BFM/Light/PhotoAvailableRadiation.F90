@@ -53,9 +53,9 @@
 
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! The following vector functions are used:insw_vector
+  ! The following vector functions are used: insw
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  use mem_globalfun,   ONLY: insw_vector
+  use mem_globalfun,   ONLY: insw
 
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -188,9 +188,8 @@
       corr_irrb  =   2.0E+00_RLEN*( f_0_afternoon- f_z_afternoon)/ xd
 
     case ( 3 )
-      rampcontrol  =   2* int(insw_vector(  pirrz_noon- ONE))
-      rampcontrol = min( 2, rampcontrol+ int(insw_vector( pirr0_noon- &
-        ONE)))
+      rampcontrol  =   2* int(insw(  pirrz_noon- ONE))
+      rampcontrol = min( 2, rampcontrol+ int(insw( pirr0_noon - ONE)))
 
         WHERE (( rampcontrol)==2)
           corr_irra  =  ( log(  pirr0_noon)- log(  pirrz_noon))/ xd
@@ -203,8 +202,8 @@
 
       END WHERE
 
-      rampcontrol  =   2* int(insw_vector(  pirrz_afternoon- ONE))
-      rampcontrol = min( 2, rampcontrol+ int(insw_vector( pirr0_afternoon- ONE)))
+      rampcontrol  =   2* int(insw(  pirrz_afternoon- ONE))
+      rampcontrol = min( 2, rampcontrol+ int(insw( pirr0_afternoon- ONE)))
 
       WHERE (( rampcontrol)==2)
           corr_irrb  =   ONE

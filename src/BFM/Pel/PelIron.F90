@@ -34,9 +34,9 @@
   use mem_PelChem
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! The following vector functions are used: eTq_vector
+  ! The following vector functions are used: eTq
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  use mem_globalfun,   ONLY: eTq_vector
+  use mem_globalfun,   ONLY: eTq
 
 !  
 !
@@ -90,10 +90,10 @@
   ! Linear regeneration of bioavailable iron
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-  fR1N7f(:)  =  p_sR1N7* eTq_vector(  ETW(:),  p_q10R6N7)* R1f(:)
+  fR1N7f(:)  =  p_sR1N7* eTq(  ETW(:),  p_q10R6N7)* R1f(:)
   call flux_vector( iiPel, ppR1f, ppN7f, fR1N7f(:) )
 
-  fR6N7f(:)  =  p_sR6N7* eTq_vector(  ETW(:),  p_q10R6N7)* R6f(:)
+  fR6N7f(:)  =  p_sR6N7* eTq(  ETW(:),  p_q10R6N7)* R6f(:)
   call flux_vector( iiPel, ppR6f, ppN7f, fR6N7f(:) )
 
   !-=-==-=-=-=-=-===--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=

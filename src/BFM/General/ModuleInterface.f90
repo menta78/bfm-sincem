@@ -107,17 +107,6 @@
 
   INTERFACE
 
-  FUNCTION eTq(temp,p_q10)
-  use global_mem, ONLY:RLEN
-  implicit none
-  real(RLEN),intent(IN) :: temp
-  real(RLEN),intent(IN) :: p_q10
-  real(RLEN) :: eTq
-  end FUNCTION eTq
-  end INTERFACE
-
-  INTERFACE
-
   SUBROUTINE CalcChlorophylla()
   use global_mem, ONLY:RLEN
   implicit none

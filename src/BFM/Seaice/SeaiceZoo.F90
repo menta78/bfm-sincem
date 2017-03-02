@@ -35,9 +35,9 @@
   use mem_SeaiceZoo
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! The following vector functions are used:eTq_vector, MM_vector
+  ! The following vector functions are used: eTq, MM
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  use mem_globalfun,   ONLY: eTq_vector, MM_vector,MM_power_vector
+  use mem_globalfun,   ONLY: eTq, MM
 
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -128,11 +128,11 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Temperature effect
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  et  =   eTq_vector(ETB(:),  p_q10(zoo))
+  et  =   eTq(ETB(:),  p_q10(zoo))
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Oxygen limitation
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  eF2 = min(ONE, MM_vector(F2o(:), p_chro(zoo)))
+  eF2 = min(ONE, MM(F2o(:), p_chro(zoo)))
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Calculate total potential food given the non-dim prey availability
@@ -143,7 +143,7 @@
   rump = ZERO
  do i = 1 , iiSeaiceBacteria
     SBAc(:,i) = p_paSBA(zoo,i)*SeaiceBacteria(i,iiC)* &
-                MM_vector(SeaiceBacteria(i,iiC), p_minfood(zoo))
+                MM(SeaiceBacteria(i,iiC), p_minfood(zoo))
     rumc = rumc + SBAc(:,i)
     rumn = rumn + SBAc(:,i)*qncSBA(i,:)
     rump = rump + SBAc(:,i)*qpcSBA(i,:)
@@ -151,7 +151,7 @@
 
   do i = 1 ,iiSeaiceAlgae
      SALc(:,i) = p_paSAL(zoo,i)*SeaiceAlgae(i,iiC)* &
-                 MM_vector(SeaiceAlgae(i,iiC), p_minfood(zoo))
+                 MM(SeaiceAlgae(i,iiC), p_minfood(zoo))
      rumc = rumc + SALc(:,i)
      rumn = rumn + SALc(:,i)*qncSAL(i,:)
      rump = rump + SALc(:,i)*qpcSAL(i,:)
@@ -159,7 +159,7 @@
 
   do i = 1, iiSeaiceZoo
      SZOc(:,i) = p_paSZO(zoo,i)* SeaiceZoo(i,iiC)* &
-                MM_vector(SeaiceZoo(i,iiC), p_minfood(zoo))
+                MM(SeaiceZoo(i,iiC), p_minfood(zoo))
      rumc = rumc + SZOc(:,i)
      rumn = rumn + SZOc(:,i)*qncSZO(i,:)
      rump = rump + SZOc(:,i)*qpcSZO(i,:)
@@ -169,7 +169,7 @@
   ! Calculate total food uptake rate (eq 38 Vichi et al. 2007) and 
   ! specific uptake rate considering potentially available food (sut)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  rugc  = et*p_sum(zoo)*MM_vector(rumc, p_chuc(zoo))*zooc
+  rugc  = et*p_sum(zoo)*MM(rumc, p_chuc(zoo))*zooc
   sut = rugc/rumc
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

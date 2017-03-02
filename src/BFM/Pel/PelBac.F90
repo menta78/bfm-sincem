@@ -36,8 +36,7 @@
   use constants,  ONLY: MW_C, ONE_PER_DAY
   use mem_Param,  ONLY: p_pe_R1c, p_pe_R1n, p_pe_R1p, p_qro, p_small
   use mem_PelBac
-  use mem_globalfun,   ONLY: eTq_vector, MM_power_vector, insw_vector, &
-                             MM_vector
+  use mem_globalfun,   ONLY: eTq, MM_power, insw, MM
 !  
 !
 ! !AUTHORS
@@ -211,7 +210,7 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Temperature effect on pelagic bacteria:
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  et = eTq_vector(ETW(:), p_q10(bac))
+  et = eTq(ETW(:), p_q10(bac))
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Oxygen environment: bacteria are both aerobic and anaerobic
@@ -219,13 +218,13 @@
   ! oxygen regulating factor eO2 is cubic
   ! (eq. 19 in Vichi et al., 2004)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  eO2 = MM_power_vector(max(p_small,O2o(:)),  p_chdo(bac),3)
+  eO2 = MM_power(max(p_small,O2o(:)),  p_chdo(bac),3)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! External nutrient limitation (used by some parametrizations)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  eN4n = MM_vector(N4n(:), p_chn(bac))
-  eN1p = MM_vector(N1p(:), p_chp(bac))
+  eN4n = MM(N4n(:), p_chn(bac))
+  eN1p = MM(N1p(:), p_chp(bac))
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   !  Mortality:
@@ -381,8 +380,8 @@
       ! and controlled with a Michaelis-Menten function
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
       ren = (qncPBA(bac,:) - p_qncPBA(bac))*bacc*p_ruen(bac)
-      call flux_vector(iiPel, ppbacn, ppN4n,       ren*insw_vector( ren))
-      call flux_vector(iiPel, ppN4n, ppbacn, -eN4n*ren*insw_vector(-ren))
+      call flux_vector(iiPel, ppbacn, ppN4n,       ren*insw( ren))
+      call flux_vector(iiPel, ppN4n, ppbacn, -eN4n*ren*insw(-ren))
 
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
       ! Dissolved Phosphorus dynamics
@@ -391,8 +390,8 @@
       ! and controlled with a Michaelis-Menten function
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
       rep  =  (qpcPBA(bac,:) - p_qpcPBA(bac))*bacc*p_ruep(bac)
-      call flux_vector(iiPel, ppbacp, ppN1p,       rep*insw_vector( rep))
-      call flux_vector(iiPel, ppN1p, ppbacp, -eN1p*rep*insw_vector(-rep))
+      call flux_vector(iiPel, ppbacp, ppN1p,       rep*insw( rep))
+      call flux_vector(iiPel, ppN1p, ppbacp, -eN1p*rep*insw(-rep))
 
     case ( BACT1 ) ! Vichi et al. 2007
 
@@ -409,8 +408,8 @@
       ! and controlled with a Michaelis-Menten function
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
       ren  =  (qncPBA(bac,:) - p_qncPBA(bac))*bacc*p_ruen(bac)
-      call flux_vector(iiPel, ppbacn, ppN4n,       ren*insw_vector( ren))
-      call flux_vector(iiPel, ppN4n, ppbacn, -eN4n*ren*insw_vector(-ren))
+      call flux_vector(iiPel, ppbacn, ppN4n,       ren*insw( ren))
+      call flux_vector(iiPel, ppN4n, ppbacn, -eN4n*ren*insw(-ren))
 
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
       ! Dissolved Phosphorus dynamics
@@ -419,8 +418,8 @@
       ! and controlled with a Michaelis-Menten function
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
       rep  =  (qpcPBA(bac,:) - p_qpcPBA(bac))*bacc*p_ruep(bac)
-      call flux_vector(iiPel, ppbacp, ppN1p,       rep*insw_vector( rep))
-      call flux_vector(iiPel, ppN1p, ppbacp, -eN1p*rep*insw_vector(-rep))
+      call flux_vector(iiPel, ppbacp, ppN1p,       rep*insw( rep))
+      call flux_vector(iiPel, ppN1p, ppbacp, -eN1p*rep*insw(-rep))
 
     case ( BACT2 ) ! Vichi et al. 2004
 
@@ -429,7 +428,7 @@
       ! is a bug in the paper as there should be no division by B1c)
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
       huln = (ruR6n + ruR1n) - p_qncPBA(bac)*run
-      ren  = huln*insw_vector(huln)
+      ren  = huln*insw(huln)
       call flux_vector(iiPel, ppbacn, ppN4n, ren)
 
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -441,7 +440,7 @@
       rumn3 = p_qun(bac)*N3n(:)*bacc*(ONE-eN4n)
       rumn4 = p_qun(bac)*N4n(:)*bacc
       rumn  = rumn3 + rumn4
-      ren   = max(-rumn,huln)*insw_vector(-huln)
+      ren   = max(-rumn,huln)*insw(-huln)
       call flux_vector(iiPel, ppN4n, ppbacn, -ren*rumn4/rumn)
       call flux_vector(iiPel, ppN3n, ppbacn, -ren*rumn3/rumn)
 
@@ -450,7 +449,7 @@
       ! is an error in the paper as there should be no division by B1c)
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
       hulp = (ruR6p + ruR1p) - p_qpcPBA(bac)*run
-      rep  = hulp*insw_vector(hulp)
+      rep  = hulp*insw(hulp)
       call flux_vector(iiPel, ppbacp, ppN1p, rep)
 
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -459,7 +458,7 @@
       ! from dissolved phosphate whene P is not balanced (hulp<0)
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
       rump = p_qup(bac)*N1p(:)*bacc
-      rep  = max(-rump,hulp)*insw_vector(-hulp)
+      rep  = max(-rump,hulp)*insw(-hulp)
       call flux_vector(iiPel, ppN1p, ppbacp, -rep)
 
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

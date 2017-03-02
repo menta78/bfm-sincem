@@ -39,10 +39,9 @@
 
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! The following vector functions are used:eTq_vector, eramp_vector, &
-  ! MM_vector, PartQ_vector
+  ! The following vector functions are used: eTq, eramp, MM, PartQ
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  use mem_globalfun,   ONLY: eTq_vector, eramp_vector, MM_vector, PartQ_vector
+  use mem_globalfun,   ONLY: eTq, eramp, MM, PartQ
 
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -148,8 +147,8 @@
   ! Physiological temperature and oxygen response
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-  et  =   eTq_vector(  ETW_Ben(:),  p_q10(y))
-  eo  =   eramp_vector(  D1m(:),  p_sdm(y))
+  et  =   eTq(  ETW_Ben(:),  p_q10(y))
+  eo  =   eramp( D1m(:),  p_sdm(y))
 
   ! As alternative the following function can be used
   ! eo = MM(pow(O2.o, 3.0), p_chdo);
@@ -174,7 +173,7 @@
 
   do i = 1 , ( iiBenOrganisms)
     food_src  =   BenOrganisms(i,iiC)* p_Yn(y,i)
-    food  =   food+ food_src* MM_vector(  food_src,  p_clu(y))
+    food  =   food+ food_src* MM( food_src,  p_clu(y))
   end do
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -183,7 +182,7 @@
 
   do i = 1 , ( iiBenBacteria)
     food_src  =   max(ZERO,BenBacteria(i,iiC)* p_Hn(y,i))
-    food  =   food+ food_src* MM_vector(  food_src,  p_clu(y))
+    food  =   food+ food_src* MM( food_src,  p_clu(y))
   end do
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -194,12 +193,12 @@
   if ( p_puQ6(y)> ZERO) then
     clm  =   p_clm(y)
     cm  =   p_cm(y)
-    availQ6_c  =   Q6c(:)* PartQ_vector(  D6m(:),  clm,  cm,  p_d_tot)
-    availQ6_n  =   Q6n(:)* PartQ_vector(  D7m(:),  clm,  cm,  p_d_tot)
-    availQ6_p  =   Q6p(:)* PartQ_vector(  D8m(:),  clm,  cm,  p_d_tot)
+    availQ6_c  =   Q6c(:)* PartQ(  D6m(:),  clm,  cm,  p_d_tot)
+    availQ6_n  =   Q6n(:)* PartQ(  D7m(:),  clm,  cm,  p_d_tot)
+    availQ6_p  =   Q6p(:)* PartQ(  D8m(:),  clm,  cm,  p_d_tot)
 
     food_src  =   p_puQ6(y)* availQ6_c
-    food  =   food+ food_src* MM_vector(  food_src,  p_clu(y))
+    food  =   food+ food_src* MM(  food_src,  p_clu(y))
   else 
     availQ6_c  =   ZERO;
     availQ6_n  =   ZERO;
@@ -210,7 +209,7 @@
   ! Correct for too much food...
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-  eF  =   MM_vector(  food,  p_chu(y))
+  eF  =   MM(  food,  p_chu(y))
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Correction of growth rate for environmental factors
@@ -243,7 +242,7 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
   do i = 1 , ( iiBenOrganisms)
-    choice = p_Yn(y,i)* MM_vector( p_Yn(y, i)* BenOrganisms(i, iiC), p_clu(y))
+    choice = p_Yn(y,i)* MM( p_Yn(y, i)* BenOrganisms(i, iiC), p_clu(y))
     ruYIc  =   BenOrganisms(i,iiC)* sgu* choice
     ruYIn  =   BenOrganisms(i,iiN)* sgu* choice
     ruYIp  =   BenOrganisms(i,iiP)* sgu* choice
@@ -277,7 +276,7 @@
 
   do i = 1 , ( iiBenBacteria)
 
-    choice = p_Hn(y,i)* MM_vector( p_Hn(y, i)* BenBacteria(i, iiC), p_clu(y))
+    choice = p_Hn(y,i)* MM( p_Hn(y, i)* BenBacteria(i, iiC), p_clu(y))
     ruBIc  =   BenBacteria(i,iiC)* sgu* choice
     ruBIn  =   BenBacteria(i,iiN)* sgu* choice
     ruBIp  =   BenBacteria(i,iiP)* sgu* choice
@@ -308,7 +307,7 @@
   select case ( p_puQ6(y)> ZERO)
 
     case( .TRUE. )
-      choice  =   p_puQ6(y)* MM_vector(  p_puQ6(y)* availQ6_c,  p_clu(y))
+      choice  =   p_puQ6(y)* MM( p_puQ6(y)* availQ6_c,  p_clu(y))
       ruQ6c  =   sgu* choice* availQ6_c
       ruQ6n  =   sgu* choice* availQ6_n
       ruQ6p  =   sgu* choice* availQ6_p

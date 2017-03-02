@@ -38,8 +38,7 @@
   use mem_BenthicNutrient3, ONLY:p_max_shift_change
   use bennut_interface, ONLY: InitializeSet, DefineSet, CompleteSet, &
     CalculateSet, CalculateTau, CalculateFromSet
-  use global_interface,   ONLY: eTq
-  use mem_globalfun,   ONLY: IntegralExp, insw
+  use mem_globalfun,   ONLY: IntegralExp, insw, eTq
 !  
 !
 ! !AUTHORS

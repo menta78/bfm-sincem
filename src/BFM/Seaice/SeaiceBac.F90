@@ -35,16 +35,10 @@
 
   use constants,  ONLY: MW_C, ONE_PER_DAY
   use mem_Param,  ONLY: p_pe_R1c, p_pe_R1n, p_pe_R1p, p_qro, p_small
-  use mem_globalfun,   ONLY: eTq_vector, MM_power_vector, insw_vector, &
-                             MM_vector
+  use mem_globalfun,   ONLY: eTq, MM_power, insw, MM
   use mem_SeaiceBac
 
 
-
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! The following vector functions are used:eTq_vector, MM_vector, insw_vector
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  use mem_globalfun,   ONLY: eTq_vector, MM_power_vector, insw_vector
 
 ! !AUTHORS
 !   Original version by M. Vichi and L. Tedesco
@@ -115,20 +109,20 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Temperature effect on pelagic bacteria:
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  et  =   eTq_vector(ETB(:),  p_q10(bac))
+  et  =   eTq(ETB(:),  p_q10(bac))
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Oxygen environment: bacteria are both aerobic and anaerobic
   ! To provide a faster switching between the two metabolic pathways the
   ! oxygen regulating factor eO2 is cubic
   ! (eq. 19 in Vichi et al., 2004)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  eO2 = MM_power_vector(max(p_small,F2o(:)),  p_chdo(bac),3)
+  eO2 = MM_power(max(p_small,F2o(:)),  p_chdo(bac),3)
  
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! External nutrient limitation (used by some parametrizations)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  eI4n = MM_vector(I4n(:), p_chn(bac))
-  eI1p = MM_vector(I1p(:), p_chp(bac))
+  eI4n = MM(I4n(:), p_chn(bac))
+  eI1p = MM(I1p(:), p_chp(bac))
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   !  Mortality:
   !   1. first order mortality: p_sd 
@@ -243,8 +237,8 @@
       ! and controlled with a Michaelis-Menten function
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
       ren  =  (qncSBA(bac,:) - p_qncSBA(bac))*bacc*p_ruen(bac)
-      call flux_vector(iiIce, ppbacn, ppI4n,       ren*insw_vector( ren))
-      call flux_vector(iiIce, ppI4n, ppbacn, -eI4n*ren*insw_vector(-ren))
+      call flux_vector(iiIce, ppbacn, ppI4n,       ren*insw( ren))
+      call flux_vector(iiIce, ppI4n, ppbacn, -eI4n*ren*insw(-ren))
 
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
       ! Dissolved Phosphorus dynamics
@@ -253,8 +247,8 @@
       ! and controlled with a Michaelis-Menten function
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
       rep  =  (qpcSBA(bac,:) - p_qpcSBA(bac))*bacc*p_ruep(bac)
-      call flux_vector(iiIce, ppbacp, ppI1p,       rep*insw_vector( rep))
-      call flux_vector(iiIce, ppI1p, ppbacp, -eI1p*rep*insw_vector(-rep))
+      call flux_vector(iiIce, ppbacp, ppI1p,       rep*insw( rep))
+      call flux_vector(iiIce, ppI1p, ppbacp, -eI1p*rep*insw(-rep))
 
 
   end select

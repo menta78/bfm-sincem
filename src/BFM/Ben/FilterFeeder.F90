@@ -44,10 +44,9 @@
   use mem_FilterFeeder
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! The following vector functions are used:eTq_vector, eramp_vector, &
-  ! MM_vector, PartQ_vector
+  ! The following vector functions are used: eTq, MM, PartQ
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  use mem_globalfun,   ONLY: eTq_vector, eramp_vector, MM_vector, MM_power_vector, insw_vector, PartQ_vector
+  use mem_globalfun,   ONLY: eTq, MM, MM_power, insw, PartQ
 
 !
 ! !AUTHORS
@@ -168,9 +167,9 @@
   ! Physiological temperature response
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-  et  =   eTq_vector(  ETW_Ben(:),  p_q10)
+  et  =   eTq(  ETW_Ben(:),  p_q10)
 
-  eo  =   MM_power_vector(  max(p_small,O2o_Ben(:)),  p_clO2o,3)
+  eo  =   MM_power(  max(p_small,O2o_Ben(:)),  p_clO2o,3)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Calculate total food Cfluxes!
@@ -184,7 +183,7 @@
 
   food_PT=ZERO
   do i=1,iiPhytoPlankton
-     r =  PI_Benc(i,:) * MM_vector(  PI_Benc(i,:),  clu)
+     r =  PI_Benc(i,:) * MM( PI_Benc(i,:),  clu)
      call CorrectConcNearBed(Depth_Ben(:), sediPPY_Ben(i,:), p_height, & 
                                     p_max, p_vum*et*Y3c(:), corr)
      food_PIc(i,:)=r*corr*p_PI
@@ -194,7 +193,7 @@
 
   ! For microzooplankton:
 
-  food_ZI  =   p_ZI * ZI_Fc(:) * MM_vector(  ZI_Fc(:),  clu)
+  food_ZI  =   p_ZI * ZI_Fc(:) * MM( ZI_Fc(:),  clu)
   food  =   food+ food_ZI
 
 
@@ -203,7 +202,7 @@
   ! and add it to the total amount of food
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-  r=   RI_Fc(:)* MM_vector(  RI_Fc(:),  clu)
+  r=   RI_Fc(:)* MM( RI_Fc(:),  clu)
   call CorrectConcNearBed(Depth_Ben(:), sediR6_Ben(:), p_height, & 
                                     p_max, p_vum*et*Y3c(:), corr)
   RTc=r*corr
@@ -228,11 +227,11 @@
     foodpm2 =food*fdepth
     clm  =   p_clm
     cmm  =   p_cm
-    availQ6_c  =   Q6c(:)* PartQ_vector(  D6m(:),  clm,  cmm,  p_d_tot)
-    availQ6_n  =   Q6n(:)* PartQ_vector(  D7m(:),  clm,  cmm,  p_d_tot)
-    availQ6_p  =   Q6p(:)* PartQ_vector(  D8m(:),  clm,  cmm,  p_d_tot)
+    availQ6_c  =   Q6c(:)* PartQ(  D6m(:),  clm,  cmm,  p_d_tot)
+    availQ6_n  =   Q6n(:)* PartQ(  D7m(:),  clm,  cmm,  p_d_tot)
+    availQ6_p  =   Q6p(:)* PartQ(  D8m(:),  clm,  cmm,  p_d_tot)
 
-    food_Q6  =   p_puQ6* availQ6_c* MM_vector(  availQ6_c,  clu)
+    food_Q6  =   p_puQ6* availQ6_c* MM(  availQ6_c,  clu)
     foodpm2  =   foodpm2+ food_Q6
 
     cmm  =  ( p_clm+ p_cm)* 0.5D+00
@@ -241,7 +240,7 @@
     ! Correct for too much food:
     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-     eF  =   MM_vector(  foodpm2,  p_chu)
+     eF  =   MM(  foodpm2,  p_chu)
 
      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
      ! Correction of growth rate for environmental factors:
@@ -266,16 +265,16 @@
      cmm = ZERO;
 
      fdepth=Depth_Ben(:)
-     su  =  et* eO*  p_su* MM_vector(  p_vum* food,  p_su)
+     su  =  et* eO*  p_su* MM(  p_vum* food,  p_su)
      fsat=min(ONE,su/(et*eo*p_vum*food))
      rgu= su *Y3c(:)
      rrc = max(eo * p_sra*fsat, p_srr)* Y3c(:)* et
      foodpm2 =food*fdepth
    case(3)
      fdepth=Depth_Ben(:)
-     su  =  p_su* MM_vector(  p_vum* food,  p_su)
+     su  =  p_su* MM(  p_vum* food,  p_su)
      netto= (ONE-(p_pueQ6*food_RI+p_puePI*food_PT +p_pueZI*food_ZI)/food ) * (ONE-p_pur);
-     su=su * insw_vector(netto * su-p_sra);
+     su=su * insw(netto * su-p_sra);
      fsat=min(ONE,su/(p_vum*food));
      rgu= et* eO*  su *Y3c(:)
      rrc = max(eo * p_sra*fsat, p_srr)* Y3c(:)* et
@@ -289,7 +288,7 @@
      !  the costs for filtering  are lower than the  profit
      !  For this we solve the next equation in which r is the unknown:
      !    (left side == profit , right side=costs)
-     !    r* p_su* MM_vector(  p_vum* food,  r* p_su)* Y3c(:)*netto = p_sra *r 
+     !    r* p_su* MM(  p_vum* food,  r* p_su)* Y3c(:)*netto = p_sra *r 
      !  If r > ONE : there is enough food to grow
      !  if r < ONE : there is balance between costs and profit if  r*p_puf*sgu is larger than
      !  the rest respiration.
@@ -382,7 +381,7 @@
   ! Pelagic MicroZooplankton:
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-  choice  =   p_ZI* MM_vector(  ZI_Fc(:),  clu)* fdepth
+  choice  =   p_ZI* MM(  ZI_Fc(:),  clu)* fdepth
 
   ruZIc  =   ZI_Fc(:)* sgu* choice
   ruZIn  =   ZI_Fn(:)* sgu* choice
@@ -424,7 +423,7 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
   if ( sw_uptake == 1) then
-    choice  =   p_puQ6* MM_vector(  availQ6_c,  clu)
+    choice  =   p_puQ6* MM(  availQ6_c,  clu)
 
     ruQ6c  =   sgu* choice* availQ6_c
     ruQ6n  =   sgu* choice* availQ6_n

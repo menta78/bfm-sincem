@@ -36,9 +36,9 @@
 
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! The following vector functions are used:MM_vector
+  ! The following vector functions are used: MM
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  use mem_globalfun,   ONLY: MM_vector
+  use mem_globalfun,   ONLY: MM
 
 
 
@@ -98,7 +98,7 @@
 
   Ytur  =   Y2c(:)+ Y5c(:)+ p_turY1* Y1c(:)
 
-  turenh(:)  =   ONE+ p_cmtur* MM_vector(  Ytur,  p_chtur)* et
+  turenh(:)  =   ONE+ p_cmtur* MM( Ytur,  p_chtur)* et
 
   call flux_vector(iiBen, ppD6m,ppD6m, p_Etur* turenh(:)*( ONE- exp( - &
     p_cturm/ D6m(:)))/ D6m(:))
@@ -116,7 +116,7 @@
 
   Yirr  =   Y2c(:)+ Y5c(:)+ p_irrY4* Y4c(:) +Y3c(:)
 
-  irrenh(:)  =   ONE+ p_cmirr* MM_vector(  Yirr,  p_chirr)* et
+  irrenh(:)  =   ONE+ p_cmirr* MM( Yirr,  p_chirr)* et
 
   end subroutine BioturbationDynamics
 !EOC
