@@ -53,17 +53,10 @@
   use bennut_interface, ONLY: GetInfoFromSet, InitializeSet, DefineSet, &
     CompleteSet, CalculateSet, CalculateTau, CalculateFromSet
 
-
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! The following global functions are used:eTq
+  ! The following sesame functions are used:IntegralExp, insw, eTq
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  use global_interface,   ONLY: eTq
-
-
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! The following sesame functions are used:IntegralExp
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  use mem_globalfun,   ONLY: IntegralExp,insw
+  use mem_globalfun,   ONLY: IntegralExp,insw, eTq
 
 !  
 !

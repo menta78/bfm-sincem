@@ -75,8 +75,8 @@
   real(RLEN)  :: p_pueQ6(iiBenOrganisms)
   real(RLEN)  :: p_cm(iiBenOrganisms)
   real(RLEN)  :: p_clm(iiBenOrganisms)
-  real(RLEN)  :: p_qn(iiBenOrganisms)
-  real(RLEN)  :: p_qp(iiBenOrganisms)
+  real(RLEN)  :: p_qncBOS(iiBenOrganisms)
+  real(RLEN)  :: p_qpcBOS(iiBenOrganisms)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! SHARED PUBLIC FUNCTIONS (must be explicited below "contains")
 
@@ -87,8 +87,8 @@
   subroutine InitBenOrganism()
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  namelist /BenOrganism_parameters/ p_q10, p_su, p_chu, p_clu, p_pue, p_pur, &
-    p_pudil, p_sr, p_puQ6, p_pueQ6, p_cm, p_clm, p_sd, p_sdm, p_qn, p_qp, p_Yn, &
+  namelist /BenOrganisms_parameters/ p_q10, p_su, p_chu, p_clu, p_pue, p_pur, &
+    p_pudil, p_sr, p_puQ6, p_pueQ6, p_cm, p_clm, p_sd, p_sdm, p_qncBOS, p_qpcBOS, p_Yn, &
     p_Hn
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
@@ -100,11 +100,11 @@
 
     write(LOGUNIT,*) "#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
     write(LOGUNIT,*) "#  Reading BenOrganism parameters.."
-    open(NMLUNIT,file='BenOrganism.nml',status='old',action='read',err=100)
-    read(NMLUNIT,nml=BenOrganism_parameters,err=101)
+    open(NMLUNIT,file='BenOrganisms.nml',status='old',action='read',err=100)
+    read(NMLUNIT,nml=BenOrganisms_parameters,err=101)
     close(NMLUNIT)
     write(LOGUNIT,*) "#  Namelist is:"
-    write(LOGUNIT,nml=BenOrganism_parameters)
+    write(LOGUNIT,nml=BenOrganisms_parameters)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   !END compute
@@ -114,7 +114,7 @@
   ! Local Error Messages
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 100 call error_msg_prn(NML_OPEN,"InitBenOrganism.f90","BenOrganism.nml")
-101 call error_msg_prn(NML_READ,"InitBenOrganism.f90","BenOrganism_parameters")
+101 call error_msg_prn(NML_READ,"InitBenOrganism.f90","BenOrganisms_parameters")
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   end  subroutine InitBenOrganism
 

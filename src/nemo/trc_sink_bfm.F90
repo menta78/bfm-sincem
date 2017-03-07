@@ -4,7 +4,7 @@
 ! !ROUTINE: trc_sink_bfm.F90
 !
 ! !INTERFACE:
-   subroutine trc_sink_bfm(ws_in)
+   subroutine trc_sink_bfm(ws_in,m)
 
 ! !DESCRIPTION:
 !
@@ -35,6 +35,7 @@
 !
 ! !INPUT PARAMETERS:
       REAL(wp), INTENT(IN)  :: ws_in(jpi,jpj,jpk)
+      integer , INTENT(IN)  :: m
 !
 ! !REVISION HISTORY:
 !  Original author(s): Lars Umlauf (GOTM team)
@@ -70,22 +71,22 @@
             !-------------------------------
             if (ws(ji,jj,jk) .gt. 0.0_wp) then
                ! positive speed
-               Yu=trn(ji,jj,jk+1,1)          ! upstream value
-               Yc=trn(ji,jj,jk,1)            ! central value
+               Yu=trn(ji,jj,jk+1,m)          ! upstream value
+               Yc=trn(ji,jj,jk,m)            ! central value
                if (jk .gt. 1) then
-                  Yd=trn(ji,jj,jk-1,1)       ! downstream value
+                  Yd=trn(ji,jj,jk-1,m)       ! downstream value
                else
-                  Yd=trn(ji,jj,1,1) 
+                  Yd=trn(ji,jj,1,m) 
                end if
             else
                ! negative speed
                if (jk .gt. 2) then
-                  Yu=trn(ji,jj,jk-2,1)       ! upstream value
+                  Yu=trn(ji,jj,jk-2,m)       ! upstream value
                else
-                  Yu=trn(ji,jj,1,1)          ! upstream value
+                  Yu=trn(ji,jj,1,m)          ! upstream value
                end if
-               Yc=trn(ji,jj,jk-1,1)          ! central value
-               Yd=trn(ji,jj,jk,1)            ! downstream value
+               Yc=trn(ji,jj,jk-1,m)          ! central value
+               Yd=trn(ji,jj,jk,m)            ! downstream value
             end if
             ! compute the mass flow across the central interface 
             cu(ji,jj,jk)=ws(ji,jj,jk)*Yc
@@ -102,7 +103,7 @@
    do jj = 1, jpj      
       do ji = 1, jpi    
          do jk = 1, jpkm1
-            tra(ji,jj,jk,1) = tra(ji,jj,jk,1) + &
+            tra(ji,jj,jk,m) = tra(ji,jj,jk,m) + &
                  (cu(ji,jj,jk+1)-cu(ji,jj,jk))/fse3t(ji,jj,jk)
          end do
       end do 

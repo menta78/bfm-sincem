@@ -303,9 +303,10 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
 !          !  yyyymmdd         ! Frequency  !  interp  !
 !           '1764-07-01 00:00' ,  'yearly'  ,  .TRUE.
 !
-! Convention for Input reading : 0 = use constant value (default if structure is not initialized) 
-!                               2 = read timeseries file ( e.g. CO2 mixing ratios)
-!                               4 = field from a coupled model (e.g. atmospheric SLP from OGCM)
+! Convention for Input reading : 0 = use constant value (default if struct is not initialized)
+!                                1 = read timeseries file ( e.g. CO2 mixing ratios)
+!                                2 = read 2D fields using NEMO fldread
+!                                3 = field from a coupled model (e.g. atmospheric SLP from OGCM)
 ! NOTE: The file "CMIP5_Historical_GHG_1765_2005.dat" is located in "$BFMDIR/tools" folder
 !-----------------------------------------------------------------------------------!
 &CO2_parameters
@@ -890,7 +891,7 @@ p_paMEZ(2,:)=   0.0,    1.0
 !  p_qlcSAL:    Maximum quotum Chla:C
 !  p_chlNI:       Nutrient stress threshold for chlorophyll
 !
-&Seaicealgae_parameters
+&SeaiceAlgae_parameters
 !           	S1	S2
       p_q10 = 2.0,	2.0,
       p_sum = 1.5,	2.0,
@@ -918,7 +919,7 @@ p_alpha_chl = 1.4e-4,	1.6e-5,
 /
 
 !-------------------------------------------------------------------------!
-!NAMELIST SeaiceBac_parameters
+!NAMELIST SeaiceBacteria_parameters
 !-------------------------------------------------------------------------!
 ! NAME         [UNIT]/KIND            DESCRIPTION
 ! p_version   integer         Switch for bacteria parameterization
@@ -941,7 +942,8 @@ p_alpha_chl = 1.4e-4,	1.6e-5,
 ! p_chp       [mmolP/m2]       Half saturation phosphate conc. for uptake
 ! p_ruen      [1/d]            Relaxation timescale for N uptake/remin.
 ! p_ruep      [1/d]            Relaxation timescale for P uptake/remin.
-&SeaiceBac_parameters
+&SeaiceBacteria_parameters
+!                T1
    p_version = 1,
    p_q10 = 2.95,
    p_chdo = 3.0,

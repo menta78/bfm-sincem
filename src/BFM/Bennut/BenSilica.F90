@@ -50,14 +50,9 @@
     CalculateSet, CalculateTau, CopySet, CalculateFromSet, GetInfoFromSet
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! The following global functions are used:eTq
+  ! The following functions are used:IntegralExp, insw, eTq
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  use global_interface,   ONLY: eTq
-
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! The following functions are used:IntegralExp, insw
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  use mem_globalfun,   ONLY: IntegralExp, insw
+  use mem_globalfun,   ONLY: IntegralExp, insw, eTq
 !  
 !
 ! !AUTHORS

@@ -28,13 +28,12 @@
 #endif
   use mem, ONLY: Depth,ETW, NO_BOXES, iiBen, iiPel, flux_vector,InitializeModel
   use mem_Param,  ONLY: p_small, p_poro
-  use global_interface,   ONLY: eTq
   use mem_Silt, ONLY: siltmethod
 
-
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! The following vector functions are used:MM_vector, eTq_vector, insw_vector
+  ! The following global functions are used: eTq
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  use mem_globalfun,   ONLY: eTq
 
 !  
 !

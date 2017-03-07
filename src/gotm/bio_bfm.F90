@@ -265,7 +265,7 @@ use mem,       ONLY: Volume, Area, Area2D
 use mem,       ONLY: R9x
 #endif
 use mem_Param,  ONLY: p_eps0, p_epsESS,p_poro
-use global_interface,   ONLY: eTq
+use mem_globalfun,   ONLY: eTq
 use bio_var,    ONLY: wind_gotm => wind, u_taub
 use global_mem, only: ONE
 ! GOTM module for light extinction

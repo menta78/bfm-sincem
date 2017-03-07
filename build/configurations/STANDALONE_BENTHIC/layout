@@ -157,7 +157,12 @@ end
   #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   # Benthic State Vars
   #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    group BenOrganisms[cnp] (BOS) : mg C/m2:mmol N/m2:mmol P/m2
+    group BenBacteria[cnp] (BBA) : mg C/m2 : mmol N/m2 : mmol P/m2
+                H1                      : Aerobic benthic bacteria
+                H2                      : Anaerobic benthic bacteria
+    end
+
+    group BenOrganisms[cnp] (BOS) : mg C/m2 : mmol N/m2 : mmol P/m2
                 Y1      : Epibenthos
                 Y2      : Deposit feeders
                 Y3      : Suspension feeders
@@ -165,48 +170,42 @@ end
                 Y5      : Benthic predators
     end
 
-    Q6[cnps]    :Particulate organic carbon  :mg C/m2:mmol N/m2:mmol P/m2:mmolSi/m2
-
-    group BenDetritus[cnp] (BMT) :mg C/m2:mmol N/m2:mmol P/m2
-                Q1      : Labile organic carbon
-                Q11     : Labile organic carbon
-    end
-
-    group BenBacteria[cnp] (BBA) :mg C/m2:mmol N/m2:mmol P/m2
-                H1                      : Aerobic benthic bacteria
-                H2                      : Anaerobic benthic bacteria
+    group BenDetritus[cnps] (BOM) : mg C/m2: mmol N/m2 : mmol P/m2 : mmol Si/m2
+                Q1[-s]    : Labile organic Matter
+                Q11[-s]   : Labile organic Matter
+                Q6        : Particulate organic Matter
     end
 
   #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   #     Benthic nutrient dynamics
   #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    group BenthicPhosphate[p] (BNP) :mmol P/m2
+    group BenthicPhosphate[p] (BNP) : mmol P/m2
                 K1              : Phosphate in oxic layer
                 K11             : Phosphate in denitrification layer
                 K21             : Phosphate in anoxic layer
     end
 
-    group BenthicAmmonium[n] (BNA) :mmol N/m2
+    group BenthicAmmonium[n] (BNA) : mmol N/m2
                 K4              : Ammonium in oxic layer
                 K14             : Ammonium in denitrification layer
                 K24             : Ammonium in anoxic layer
     end
 
-    K6r       : Reduction equivalents in oxic layer : mmolS--/m2
+    K6r       : Reduction equivalents in oxic layer            : mmolS--/m2
     K16r      : Reduction equivalents in denitrification layer : mmolS--/m2
-    K26r      : Reduction equivalents in anoxic layer : mmolS--/m2
+    K26r      : Reduction equivalents in anoxic layer          : mmolS--/m2
 
-    K3n       : Nitrate in sediments :  mmol N/m2
-    K5s       : Silicate in sediments : mmol Si/m2
-    G2o       : Benthic O2 : mmol O2/m2
-    G4n       : N2 sink for benthic system. :mmol N/m2
+    K3n       : Nitrate in sediments       : mmol N/m2
+    K5s       : Silicate in sediments      : mmol Si/m2
+    G2o       : Benthic O2                 : mmol O2/m2
+    G4n       : N2 sink for benthic system : mmol N/m2
 
-    D1m       : Oxygen penetration depth      :m
-    D2m       : Denitrification depth         :m
-    D6m       : Penetration Depth organic C   :m
-    D7m       : Penetration Depth organic N   :m
-    D8m       : Penetration Depth organic P   :m
-    D9m       : Penetration Depth organic Si  :m
+    D1m       : Oxygen penetration depth      : m
+    D2m       : Denitrification depth         : m
+    D6m       : Penetration Depth organic C   : m
+    D7m       : Penetration Depth organic N   : m
+    D8m       : Penetration Depth organic P   : m
+    D9m       : Penetration Depth organic Si  : m
 end
 
 2d-variable-ben -if-exist INCLUDE_BEN
@@ -258,6 +257,20 @@ end
     M3n         : nitrate in porewater (pore-waters):mmol N/m3
     M5s         : silicate in oxic_denitrification layer (pore-waters):mmol Si/m3
     M6r         : reduction equivalent in porewater (pore-waters):mmol S--/m3
+
+    #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    # Variables holding quota of elements in species
+    #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    qpcBBA(BenBacteria)         : Quotum P/C in Benthic Bacteria :mmol P/mg C
+    qncBBA(BenBacteria)         : Quotum N/C in Benthic Bacteria :mmol N/mg C
+
+    qpcBOS(BenOrganisms)        : Quotum P/C in Benthic Organisms : mmol P/mg C
+    qncBOS(BenOrganisms)        : Quotum N/C in Benthic Organisms : mmol N/mg C
+
+    qpcBOM(BenDetritus)         : Quotum P/C in Benthic Organic Matter:mmol N/mg C
+    qncBOM(BenDetritus)         : Quotum N/C in Benthic Organic Matter:mmol P/mg C
+    qscBOM(BenDetritus)         : Quotum Si/C in Benthic Organic Matter:mmol Si/mg C
 
 end
 
@@ -404,7 +417,7 @@ end
     qncPPY(PhytoPlankton)	: Quotum N/C in Phytoplankton : mmol N/mg C 
     qscPPY(PhytoPlankton)	: Quotum Si/C in Phytoplankton : mmol Si/mg C 
     qlcPPY(PhytoPlankton)	: Quotum Chl/C in Phytoplankton : mg Chl /mg C
-    qccPPY(PhytoPlankton)   : Quotum PIC/POC in Phytoplankton : mg C/mg C
+    qccPPY(PhytoPlankton)       : Quotum PIC/POC in Phytoplankton : mg C/mg C
 
     qpcMEZ(MesoZooPlankton)	: Quotum P/C in Mesozooplankton :mmol P/mg C 
     qncMEZ(MesoZooPlankton)	: Quotum N/C in Mesozooplankton :mmol N/mg C 

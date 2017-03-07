@@ -55,108 +55,98 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   contains
 
-    FUNCTION INSW_VECTOR(input)
-        real(RLEN),intent(IN) ::input(:)
-        real(RLEN) ::INSW_VECTOR(size(input))
-
-        INSW_VECTOR = ZERO
-        where (input > ZERO ) INSW_VECTOR=ONE 
-
-    end function INSW_VECTOR
-
-    FUNCTION MM_VECTOR(vector,param)
-        real(RLEN),intent(IN) ::param
-        real(RLEN)            ::vector(:)
-        real(RLEN)            ::MM_VECTOR(size(vector))
-
-        MM_VECTOR= VECTOR / ( VECTOR+  PARAM)
-
-    end function MM_VECTOR
-
-    FUNCTION MM_POWER_VECTOR(vector,param,pow)
-        real(RLEN),intent(IN) ::param
-        integer               ::pow
-        real(RLEN)            ::vector(:)
-        real(RLEN)            ::MM_POWER_VECTOR(size(vector))
-
-        MM_POWER_VECTOR= VECTOR**pow / ( VECTOR**pow+  PARAM**pow)
-
-    end function MM_POWER_VECTOR
-
-    FUNCTION eramp_VECTOR(x, m)
-        real(RLEN),intent(IN) ::x(:)
-        real(RLEN),intent(IN) ::m
-        real(RLEN)            ::eramp_VECTOR(size(x))
-
-        eramp_VECTOR =ZERO
-        where (x > ZERO ) 
-           eramp_VECTOR=ONE 
-           where (X< M) eramp_VECTOR=X/M;
-        endwhere
-
-    end function
-
-    FUNCTION PartQ_vector(p, d_a, d_b, d_m)
-        real(RLEN),intent(IN) ::p(:)
-        real(RLEN),intent(IN) ::d_a(:)
-        real(RLEN),intent(IN) ::d_b(:)
-        real(RLEN),intent(IN) ::d_m
-        real(RLEN)            ::PartQ_VECTOR(size(p))
-
-        real(RLEN),dimension(:),allocatable ::c1
-        REAL(RLEN),dimension(:),allocatable ::b1 
-        REAL(RLEN),dimension(:),allocatable ::a1 
-        REAL(RLEN),dimension(:),allocatable ::norm 
-        REAL(RLEN),dimension(:),allocatable ::r 
-
-        ALLOCATE(c1(size(p)))
-        ALLOCATE(b1(size(p)))
-        ALLOCATE(a1(size(p)))
-        ALLOCATE(norm(size(p)))
-        ALLOCATE(r(size(p)))
-
-        c1 = min(p * (-ONE * log(1.0E-20_RLEN)), d_m);
-        b1 = min(d_b, c1);
-        a1 = min(d_a, b1);
-        r=ZERO
-        where ( d_a ==ZERO ) r=ONE
-
-        where (c1 > ZERO .and. p /= ZERO)
-           norm = ONE - exp((- c1) / p);
-           PartQ_vector= (exp( -a1 / p) - exp(- b1 / p)) / norm;
-        elsewhere 
-           PartQ_VECTOR =r
-        endwhere
-
-    end function
-
-    function eTq_VECTOR(temp,p_q10)
+    ! Convert values in 0 or 1 according to input field
+    elemental FUNCTION INSW(x)
 
         IMPLICIT NONE
-        real(RLEN)            :: temp(:)
-        real(RLEN),intent(IN) :: p_q10
-        real(RLEN)            ::eTq_VECTOR(size(temp))
-
-        eTq_VECTOR=  exp(  log(  p_q10)*( temp- BASETEMP)/ BASETEMP)
-    end function eTq_VECTOR
-
-    function IntegralExp(alfa,x)
-        IMPLICIT NONE
-        real(RLEN),intent(IN)       :: alfa
-        real(RLEN),intent(IN)       :: x
-        real(RLEN)                 :: IntegralExp
-        
-        IntegralExp=(exp(alfa * x) -ONE)/alfa
-    end function IntegralExp
-
-    FUNCTION INSW(input)
-        real(RLEN),intent(IN) ::input
-        real(RLEN) ::INSW
-
-        INSW =ZERO
-        if (input > ZERO ) INSW=ONE 
+        real(RLEN),intent(IN) :: x
+        real(RLEN)            :: INSW
+ 
+        INSW = ZERO
+        if (x > ZERO ) INSW=ONE 
 
     end function INSW
+
+    ! Michaelis-Menten saturation curve
+    elemental FUNCTION MM(x, m)
+
+        IMPLICIT NONE
+        real(RLEN),intent(IN) :: x, m
+        real(RLEN)            :: MM
+
+        MM = x / (x + m)
+
+    end function MM
+
+    ! Michaelis-Menten saturation curve at power
+    elemental FUNCTION MM_POWER(x, m, p)
+
+        IMPLICIT NONE
+        real(RLEN),intent(IN) :: x, m
+        integer   ,intent(IN) :: p
+        real(RLEN)            :: MM_POWER
+
+        MM_POWER = x**p / ( x**p+ m**p)
+
+    end function MM_POWER
+
+    ! Ramp unary real function
+    elemental FUNCTION ERAMP(x, m)
+
+        IMPLICIT NONE
+        real(RLEN),intent(IN) :: x, m
+        real(RLEN)            :: ERAMP
+
+        ERAMP = ZERO
+        if ( x > ZERO ) ERAMP = ONE 
+        if ( x < m )    ERAMP = x / m
+
+    end function
+
+    elemental FUNCTION PartQ(p, a, b, c)
+
+        IMPLICIT NONE
+        real(RLEN),intent(IN) :: p, a, b, c
+        real(RLEN)            :: PartQ
+
+        real(RLEN) :: a1, b1, c1, norm, r
+
+        c1 = min(p * (-ONE * log(1.0E-20_RLEN)), c);
+        b1 = min(b, c1);
+        a1 = min(a, b1);
+        r  = ZERO
+
+        if ( a == ZERO ) r = ONE
+
+        if (c1 > ZERO .and. p /= ZERO) then
+           norm = ONE - exp((- c1) / p)
+           PartQ = (exp( -a1 / p) - exp(- b1 / p)) / norm
+        else
+           PartQ = r
+        endif
+
+    end function
+
+    ! temperature dependency for Q10 function
+    elemental function eTq(t, q10)
+
+        IMPLICIT NONE
+        real(RLEN),intent(IN) :: t, q10
+        real(RLEN)            :: eTq
+
+        eTq = exp( log(q10) * (t-BASETEMP) / BASETEMP)
+
+    end function eTq
+
+    elemental function IntegralExp(alfa,x)
+
+        IMPLICIT NONE
+        real(RLEN),intent(IN)  :: alfa, x
+        real(RLEN)             :: IntegralExp
+        
+        IntegralExp=(exp(alfa * x) -ONE)/alfa
+
+    end function IntegralExp
 
     elemental function nutlim(fc, fn, fp, qnc, qpc, c, n, p)
     !==========================================================================

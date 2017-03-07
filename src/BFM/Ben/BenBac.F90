@@ -40,11 +40,9 @@
 
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! The following vector functions are used:eTq_vector, MM_vector, &
-  ! PartQ_vector, eramp_vector, insw_vector
+  ! The following vector functions are used: eTq, MM, PartQ, eramp, insw
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  use mem_globalfun, ONLY: eTq_vector, MM_vector, PartQ_vector, eramp_vector, &
-    insw_vector
+  use mem_globalfun, ONLY: eTq, MM, PartQ, eramp, insw
 
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -177,8 +175,8 @@
   ! Physiological temperature response
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-  et  =   eTq_vector(  ETW_Ben(:),  p_q10(hx))
-  eo  =   MM_vector(  max(cm-clm,p_clD1D2m), p_cdm(hx))
+  et  =   eTq(  ETW_Ben(:),  p_q10(hx))
+  eo  =   MM(  max(cm-clm,p_clD1D2m), p_cdm(hx))
 
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -190,9 +188,9 @@
   ! and add it to the total amount of food
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-  availQ6_c  =   Q6c(:)* PartQ_vector(  D6m(:),  clm,  chm,  p_d_tot)
-  availQ6_n  =   Q6n(:)* PartQ_vector(  D7m(:),  clm,  chm,  p_d_tot)
-  availQ6_p  =   Q6p(:)* PartQ_vector(  D8m(:),  clm,  chm,  p_d_tot)
+  availQ6_c  =   Q6c(:)* PartQ(  D6m(:),  clm,  chm,  p_d_tot)
+  availQ6_n  =   Q6n(:)* PartQ(  D7m(:),  clm,  chm,  p_d_tot)
+  availQ6_p  =   Q6p(:)* PartQ(  D8m(:),  clm,  chm,  p_d_tot)
 
   qnQ6c  =   availQ6_n/( availQ6_c+ 1.0D-30)
   qpQ6c  =   availQ6_p/( availQ6_c+ 1.0D-30)
@@ -201,7 +199,7 @@
   ! Growth is controlled by quality of detritus (N and P content):
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-  eN  =   eramp_vector(qnQ6c, p_qnc(hx))* eramp_vector(qpQ6c, p_qpc(hx))
+  eN  =   eramp(qnQ6c, p_qncBBA(hx))* eramp(qpQ6c, p_qpcBBA(hx))
 
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -268,13 +266,13 @@
    
   ! a too high nutrient content of food is related to the food upake ( r < 0) 
   ! a too low nutrient content of food is related to net growth of the organisms   ( r > 0)
-  r=p_qnc(hx)* hxc(:)-hxn(:)
-  misn = (run*r*insw_vector(r)+max(rrc,rug)*r*insw_vector(-r))/hxc(:)
-  r=p_qpc(hx)* hxc(:)-hxp(:)
-  misp = (run*r*insw_vector(r)+max(rrc,rug)*r*insw_vector(-r))/hxc(:)
+  r=p_qncBBA(hx)* hxc(:)-hxn(:)
+  misn = (run*r*insw(r)+max(rrc,rug)*r*insw(-r))/hxc(:)
+  r=p_qpcBBA(hx)* hxc(:)-hxp(:)
+  misp = (run*r*insw(r)+max(rrc,rug)*r*insw(-r))/hxc(:)
    
-  rupn=run*p_qnc(hx)
-  rupp=run*p_qpc(hx)
+  rupn=run*p_qncBBA(hx)
+  rupp=run*p_qpcBBA(hx)
 
   runn=min(rumn-min(ZERO,misn),rupn+max(ZERO,misn))
   runp=min(rump-min(ZERO,misp),rupp+max(ZERO,misp))
@@ -291,8 +289,8 @@
   call flux_vector( iiBen, pphxc,pphxc,-( run- netgrowth) )
   run  =   netgrowth
 
-  ren  =   max(ruQ6n+ruQ1n-run*p_qnc(hx),-runn) *insw_vector(run) -min(ZERO,misn)
-  rep  =   max(ruQ6p+ruQ1p-run*p_qpc(hx),-runp) *insw_vector(run) -min(ZERO,misp)
+  ren  =   max(ruQ6n+ruQ1n-run*p_qncBBA(hx),-runn) *insw(run) -min(ZERO,misn)
+  rep  =   max(ruQ6p+ruQ1p-run*p_qpcBBA(hx),-runp) *insw(run) -min(ZERO,misp)
 
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -319,11 +317,11 @@
   ! Fluxes
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-  call flux_vector(iiBen, pphxn,ppBenthicAmmonium(p_iK4(hx),iiN),  ren*insw_vector(ren))
-  call flux_vector(iiBen, ppBenthicAmmonium(p_iK4(hx),iiN),pphxn, -ren*insw_vector(-ren))
+  call flux_vector(iiBen, pphxn,ppBenthicAmmonium(p_iK4(hx),iiN),  ren*insw(ren))
+  call flux_vector(iiBen, ppBenthicAmmonium(p_iK4(hx),iiN),pphxn, -ren*insw(-ren))
 
-  call flux_vector(iiBen, pphxp,ppBenthicPhosphate(p_iK1(hx),iiP),  rep* insw_vector(rep) )
-  call flux_vector(iiBen, ppBenthicPhosphate(p_iK1(hx),iiP),pphxp, -rep* insw_vector(-rep))
+  call flux_vector(iiBen, pphxp,ppBenthicPhosphate(p_iK1(hx),iiP),  rep* insw(rep) )
+  call flux_vector(iiBen, ppBenthicPhosphate(p_iK1(hx),iiP),pphxp, -rep* insw(-rep))
 
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

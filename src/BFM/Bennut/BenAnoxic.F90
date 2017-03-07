@@ -42,8 +42,7 @@
   use mem_BenAnoxic
   use bennut_interface, ONLY: GetInfoFromSet, InitializeSet, DefineSet, &
     CompleteSet, CalculateSet, CalculateTau, CalculateFromSet
-  use global_interface,   ONLY: eTq
-  use mem_globalfun,   ONLY: IntegralExp, insw
+  use mem_globalfun,   ONLY: IntegralExp, insw, eTq
 !
 !
 ! !AUTHORS

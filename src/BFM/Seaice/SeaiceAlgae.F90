@@ -40,9 +40,9 @@
 
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! The following vector functions are used:eTq_vector, MM_vector, insw_vector
+  ! The following vector functions are used: eTq, insw
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  use mem_globalfun,   ONLY: eTq_vector, MM_vector, insw_vector
+  use mem_globalfun,   ONLY: eTq, insw
 
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -187,7 +187,7 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Temperature response of Sea ice algae
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  et  =   eTq_vector(  ETB(:),  p_q10(alg))
+  et  =   eTq(  ETB(:),  p_q10(alg))
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Photosynthesis (Irradiance EIB is in uE m-2 s-1)
@@ -280,7 +280,7 @@
   rupn  =   p_xqn(alg)* p_qncSAL(alg)* run-( srs+ sdo)* algn  ! N uptake based on net assimilat. C
   runn  =   min(  rumn,  rupn+ misn)  ! actual uptake of SAL
 
-  r  =   insw_vector(  runn)
+  r  =   insw(runn)
   runn3  =   r* runn* rumn3/( p_small+ rumn)  ! actual uptake of In
   runn4  =   r* runn* rumn4/( p_small+ rumn)  ! actual uptake of In
   call flux_vector( iiIce, ppI3n,ppalgn, runn3 )  ! source/sink.n
@@ -294,7 +294,7 @@
   rupp  =   p_xqp(alg)* run* p_qpcSAL(alg)-( sdo+ srs)* algp  ! P uptake based on C uptake
   runp  =   min(  rump,  rupp+ misp)  ! actual uptake
 
-  r  =   insw_vector(  runp)
+  r  =   insw(runp)
   call flux_vector( iiIce, ppI1p,ppalgp, runp* r )  ! source/sink.p
   call flux_vector(iiIce, ppalgp,ppI1p,- runp*( ONE- r))  ! source/sink.p
 

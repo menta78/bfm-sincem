@@ -40,7 +40,7 @@
 #endif
   use mem_Param,  ONLY: p_qon_nitri, p_qro, p_qon_dentri, p_small
   use mem_PelChem
-  use mem_globalfun,   ONLY: MM_vector, eTq_vector, insw_vector
+  use mem_globalfun,   ONLY: MM, eTq, insw
 #ifdef INCLUDE_PELCO2
   use mem_CO2, ONLY: CalcBioAlkFlag
 #endif
@@ -117,13 +117,13 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Regulating factors
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  eo  =   MM_vector(  max(p_small,O2o(:)),  p_clO2o)
-  er  =   MM_vector(  N6r(:),  p_clN6r)
+  eo  =   MM(  max(p_small,O2o(:)),  p_clO2o)
+  er  =   MM(  N6r(:),  p_clN6r)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Nitrification in the water
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  flN4N3n(:) =  max(ZERO,p_sN4N3* N4n(:)* eTq_vector(  ETW(:),  p_q10N4N3)* eo)
+  flN4N3n(:) =  max(ZERO,p_sN4N3* N4n(:)* eTq(  ETW(:),  p_q10N4N3)* eo)
   call flux_vector( iiPel, ppN4n,ppN3n, flN4N3n(:) )
   call flux_vector( iiPel, ppO2o,ppO2o,-( flN4N3n(:)* p_qon_nitri) )
 
@@ -131,11 +131,11 @@
   ! Denitrification in the water
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   rPAo  =   flPTN6r(:)/ p_qro
-  flN3O4n(:) = max(ZERO,p_sN3O4n* eTq_vector( ETW(:), p_q10N4N3)* er* rPAo/ p_rPAo* &
+  flN3O4n(:) = max(ZERO,p_sN3O4n* eTq( ETW(:), p_q10N4N3)* er* rPAo/ p_rPAo* &
                N3n(:))
   call flux_vector( iiPel, ppN3n,ppO4n, flN3O4n(:) )
   call flux_vector( iiPel, ppN6r,ppN6r,-( p_qro* flN3O4n(:)* p_qon_dentri* &
-  insw_vector( -( O2o(:)- N6r(:)/ p_qro))) )
+  insw( -( O2o(:)- N6r(:)/ p_qro))) )
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Reoxidation of reduction equivalents
@@ -147,7 +147,7 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Dissolution of biogenic silicate
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  fR6N5s  =   p_sR6N5* eTq_vector(  ETW(:),  p_q10R6N5)* R6s(:)
+  fR6N5s  =   p_sR6N5* eTq(  ETW(:),  p_q10R6N5)* R6s(:)
   call flux_vector( iiPel, ppR6s,ppN5s, fR6N5s )
 
 #ifdef INCLUDE_PELCO2

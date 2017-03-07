@@ -42,9 +42,9 @@
   use mem_MicroZoo
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! The following vector functions are used:eTq_vector, MM_vector
+  ! The following vector functions are used: eTq, MM, nutlim
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  use mem_globalfun,   ONLY: eTq_vector, MM_vector,MM_power_vector,nutlim
+  use mem_globalfun,   ONLY: eTq, MM, nutlim
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Implicit typing is never allowed
@@ -143,12 +143,12 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Temperature effect
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  et = eTq_vector(ETW(:), p_q10(zoo))
+  et = eTq(ETW(:), p_q10(zoo))
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Oxygen limitation
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  eO2 = min(ONE, MM_vector(O2o(:), p_chro(zoo)))
+  eO2 = min(ONE, MM(O2o(:), p_chro(zoo)))
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Calculate total potential food given the non-dim prey availability
@@ -157,19 +157,19 @@
   rumc   = ZERO
   do i = 1 ,iiPelBacteria
      PBAc(:,i) = p_paPBA(zoo,i)*PelBacteria(i,iiC)* &
-                 MM_vector(PelBacteria(i,iiC), p_minfood(zoo))
+                 MM(PelBacteria(i,iiC), p_minfood(zoo))
      rumc = rumc + PBAc(:,i)
   end do
 
   do i = 1 ,iiPhytoPlankton
      PPYc(:,i) = p_paPPY(zoo,i)*PhytoPlankton(i,iiC)* &
-                   MM_vector(PhytoPlankton(i,iiC), p_minfood(zoo))
+                   MM(PhytoPlankton(i,iiC), p_minfood(zoo))
     rumc = rumc + PPYc(:,i)
   end do
 
   do i = 1, iiMicroZooPlankton
      MIZc(:,i) = p_paMIZ(zoo,i)*MicroZooPlankton(i,iiC)* &
-                   MM_vector(MicroZooPlankton(i,iiC), p_minfood(zoo))
+                   MM(MicroZooPlankton(i,iiC), p_minfood(zoo))
     rumc = rumc + MIZc(:,i)
   end do
 
@@ -177,7 +177,7 @@
   ! Calculate total food uptake rate (eq 38 Vichi et al. 2007) and 
   ! specific uptake rate considering potentially available food (sut)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  rugc  = et*p_sum(zoo)*MM_vector(rumc, p_chuc(zoo))*zooc
+  rugc  = et*p_sum(zoo)*MM(rumc, p_chuc(zoo))*zooc
   sut = rugc / (p_small + rumc)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

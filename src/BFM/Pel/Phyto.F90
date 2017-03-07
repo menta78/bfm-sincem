@@ -40,7 +40,7 @@
   use mem_Param,  ONLY: p_small, ChlDynamicsFlag
   use mem_PAR,    ONLY: LightPeriodFlag, LightLocationFlag
   use mem_Phyto
-  use mem_globalfun,   ONLY: eTq_vector, MM_vector, insw_vector, nutlim
+  use mem_globalfun,   ONLY: eTq, MM, insw, nutlim
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Implicit typing is never allowed
@@ -226,7 +226,7 @@
   ! Temperature response of Phytoplankton
   ! Include cut-off at low temperature if p_temp>0
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  et  =   eTq_vector(  ETW(:),  p_q10(phyto))
+  et  =   eTq(  ETW(:),  p_q10(phyto))
   et  =   max(ZERO,et-p_temp(phyto))
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -281,7 +281,7 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   sdo  =  ( p_thdo(phyto)/( iN+ p_thdo(phyto)))* p_sdmo(phyto)  ! nutr. -stress lysis
   ! extra lysis for high-density
-  sdo  =   sdo+ p_seo(phyto)* MM_vector(phytoc, p_sheo(phyto))
+  sdo  =   sdo+ p_seo(phyto)* MM(phytoc, p_sheo(phyto))
 
   sea  =   sum* p_pu_ea(phyto)  ! activity excretion
 
@@ -397,7 +397,7 @@
   rupn  =   p_xqn(phyto)* p_qncPPY(phyto)* run  ! N uptake based on net assimilat. C
   runn  =   min(  rumn,  rupn+ misn)  ! actual uptake of NI
 
-  r  =   insw_vector(  runn)
+  r  =   insw(runn)
   runn3  =   r* runn* rumn3/( p_small+ rumn)  ! actual uptake of Nn
   runn4  =   r* runn* rumn4/( p_small+ rumn)  ! actual uptake of Nn
   call quota_flux( iiPel, ppphyton, ppN3n,ppphyton, runn3, tfluxN )  ! source/sink.n
@@ -415,7 +415,7 @@
 #endif
   runp  =   min(  rump,  rupp+ misp)  ! actual uptake
 
-  r  =   insw_vector(  runp)
+  r  =   insw(runp)
   tmp = runp*r
   call quota_flux(iiPel, ppphytop, ppN1p,ppphytop, tmp, tfluxP)  ! source/sink.p
   tmp = - runp*( ONE- r)
@@ -480,7 +480,7 @@
      misf  =   sadap*max(ZERO,p_xqf(phyto)*p_qfcPPY(phyto)*phytoc - phytof)  
      rupf  =   p_xqp(phyto)* run* p_qfcPPY(phyto)  ! Fe uptake based on C uptake
      runf  =   min(  rumf,  rupf+ misf)  ! actual uptake
-     r  =   insw_vector(runf)
+     r  =   insw(runf)
      ! uptake from inorganic if shortage
      call flux_vector( iiPel, ppN7f,ppphytof, runf* r )
      ! release to dissolved organic to keep the balance if excess
@@ -553,7 +553,7 @@
   !  - temperature enhancement
   !  - density enhancement
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  qccPPY(phyto, :) = min(0.8_RLEN,p_caco3r(phyto)*tN*et*MM_vector(phytoc, p_sheo(phyto)))
+  qccPPY(phyto, :) = min(0.8_RLEN,p_caco3r(phyto)*tN*et*MM(phytoc, p_sheo(phyto)))
   qccPPY(phyto, :) = max(0.02_RLEN,qccPPY(phyto, :))
   ! Calcite production is parameterized as a flux between DIC and PIC
   ! that affects alkalinity
