@@ -88,10 +88,6 @@ CONTAINS
 
       CALL trc_ini_bfm              ! Initialize BFM tracers
 
-      IF( lk_offline )  THEN
-           neuler = 0                  ! Set time-step indicator at nit000 (euler)
-           CALL day_init               ! set calendar
-      ENDIF
       ! Initialize temporary NEMO arrays for tracer transport
       trn(:,:,:,:) = 0._wp
       tra(:,:,:,:) = 0._wp
