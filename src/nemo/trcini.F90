@@ -88,10 +88,6 @@ CONTAINS
 
       CALL trc_ini_bfm              ! Initialize BFM tracers
 
-      IF( lk_offline )  THEN
-           neuler = 0                  ! Set time-step indicator at nit000 (euler)
-           CALL day_init               ! set calendar
-      ENDIF
       ! Initialize temporary NEMO arrays for tracer transport
       trn(:,:,:,:) = 0._wp
       tra(:,:,:,:) = 0._wp
@@ -104,7 +100,7 @@ CONTAINS
       !
       ! check consistency of light paramterizations
       if ( ln_dm2dc .AND. LightPeriodFlag .NE. 1) &
-                 CALL ctl_stop( ' The diurnal cycle (ln_dm2dc) is not compatible with the BFM LightPeriodFlag = 1.' )
+                 CALL ctl_stop( ' The diurnal cycle (ln_dm2dc) is compatible only with the BFM LightPeriodFlag = 1' )
 
       IF( nn_timing == 1 )   CALL timing_stop('trc_init')
       
