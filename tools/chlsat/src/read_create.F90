@@ -203,8 +203,9 @@ subroutine read_create
      call handle_err( nf90_inq_varid(ncchlid, TRIM(timename), IDtimetmp), errstring="inquiring time var in "//fname1)
      allocate(time(ntime))
      call handle_err( nf90_get_var(ncchlid, IDtimetmp, time, start = (/ 1 /), count = (/ ntime /)) )
-     call handle_err( nf90_def_var(ncid, TRIM(coorname(4)) , NF90_REAL, (/ IDtime /), IDvartime) )
+     call handle_err( nf90_def_var(ncid, TRIM(coorname(4)) , NF90_DOUBLE, (/ IDtime /), IDvartime) )
      call handle_err( nf90_copy_att(ncchlid, IDtimetmp, "units", ncid, IDvartime) )
+     call handle_err( nf90_copy_att(ncchlid, IDtimetmp, "calendar", ncid, IDvartime) )
 
      if (compute_chlsat) then
      ! define the output variable: chlsat
