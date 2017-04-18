@@ -117,12 +117,10 @@
        CalcPhytoPlankton(1) = .TRUE.
        CalcPhytoPlankton(2) = .TRUE.
        CalcPhytoPlankton(3) = .TRUE.
-       CalcPhytoPlankton(4) = .FALSE.
          CalcPelBacteria(1) = .TRUE.
     CalcMicroZooPlankton(1) = .TRUE.
     CalcMicroZooPlankton(2) = .TRUE.
-     CalcMesoZooPlankton(1) = .FALSE.
-     CalcMesoZooPlankton(2) = .TRUE.
+     CalcMesoZooPlankton(1) = .TRUE.
            CalcPelChemistry = .TRUE.
 AssignPelBenFluxesInBFMFlag = .TRUE.
 AssignAirPelFluxesInBFMFlag = .TRUE.
@@ -177,20 +175,18 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
    N3n0 = 5.0,
    N4n0 = 1.0,
    N5s0 = 8.0,
-   N6r0 = 1.0,
+   N6r0 = 0.01,
    N7f0 = 0.3,
    O3c0 = 27060.00,
    O3h0 = 2660.0,
    O5c0 = 1.0e-3,
    O4n0 = 200.0,
-   P1c0 = 1.0, 
-   P2c0 = 1.0, 
-   P3c0 = 1.0, 
-   P4c0 = 1.0, 
-   Z3c0 = 1.0, 
-   Z4c0 = 1.0, 
-   Z5c0 = 1.0, 
-   Z6c0 = 1.0, 
+   P1c0 = 0.1, 
+   P2c0 = 0.1, 
+   P3c0 = 0.1, 
+   Z4c0 = 0.1, 
+   Z5c0 = 0.1, 
+   Z6c0 = 0.1, 
    B1c0 = 1.0, 
    R1c0 = 1.0, 
    R2c0 = 0.1,
@@ -229,7 +225,6 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
           'P1c','P1l','P1f','P2c','P2l','P3c','P3l',
           'Z4c','Z5c','Z6c','B1c',
           'R1c','R2c','R6c','R6f','Chla','R1n','R1p',
-          'eiPPY_iiP1','eiPPY_iiP2','eiPPY_iiP3',
           'P1n','P2n','P3n',
           'P1p','P2p','P3p',
           'jbotR6c','jsurO2o','jsurO3c',
@@ -253,7 +248,7 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
 ! p_burvel_O5     [m/d]              Bottom Burial Velocity for calcite
 !-------------------------------------------------------------------------!
 &Settling_parameters
-  p_burvel_R6 = 1.5,
+  p_burvel_R6 = 3.0,
   p_burvel_O5 = 30.0,
   p_burvel_R2 = 0.0,
   p_burvel_PI = 0.0
@@ -807,7 +802,7 @@ p_paMEZ(2,:)=   0.0,    1.0
 !   sn_tracer(1) is a dummy tracer to let NEMO know that there is a model
 !-------------------------------------------------------------------------!
 &namtrc     
-   sn_tracer(1)   = 'DUMMY', 'Dummy tracer', 'dummy units',.false.,.true.
+   sn_tracer(1)   = 'DUMMY', 'Dummy tracer', 'dummy units',.false.,.false.
         filename_nml_conf = 'namelist_top_cfg',
 /
 
@@ -910,13 +905,13 @@ p_paMEZ(2,:)=   0.0,    1.0
 !   and the conversion factor rn_trfac(VARNAME)
 !-------------------------------------------------------------------------!
 &namtrc_dta      
-   sn_trcdta(O2o)  = 'DOX_WOA09-ORCA2_L31_annual',  -12   ,  'DOX'     ,    .false.   , .true. , 'yearly'  , ''       , ''
-   sn_trcdta(N1p)  = 'PO4_WOA09-ORCA2_L31_annual',  -12   ,  'PO4'     ,    .false.   , .true. , 'yearly'  , ''       , ''
-   sn_trcdta(N3n)  = 'NO3_WOA09-ORCA2_L31_annual',  -12   ,  'NO3'     ,    .false.   , .true. , 'yearly'  , ''       , ''
-   sn_trcdta(N5s)  = 'SIL_WOA09-ORCA2_L31_annual',  -12   ,  'SIL'     ,    .false.   , .true. , 'yearly'  , ''       , ''
+   sn_trcdta(O2o)  = 'DOX_WOA13-ORCA2_L31_annual',  -12   ,  'DOX'     ,    .false.   , .true. , 'yearly'  , ''       , ''
+   sn_trcdta(N1p)  = 'PO4_WOA13-ORCA2_L31_annual',  -12   ,  'PO4'     ,    .false.   , .true. , 'yearly'  , ''       , ''
+   sn_trcdta(N3n)  = 'NO3_WOA13-ORCA2_L31_annual',  -12   ,  'NO3'     ,    .false.   , .true. , 'yearly'  , ''       , ''
+   sn_trcdta(N5s)  = 'SIL_WOA13-ORCA2_L31_annual',  -12   ,  'SIL'     ,    .false.   , .true. , 'yearly'  , ''       , ''
    sn_trcdta(N7f)  = 'DFE_SMOOTH-ORCA2_L31_annual', -12   ,  'DFE'     ,    .false.   , .true. , 'yearly'  , ''       , ''
-   sn_trcdta(O3c) = 'DIC_GLODAP-ORCA2_L31_annual' , -12   ,  'DIC'     ,    .false.   , .true. , 'yearly'  , ''       , ''
-   sn_trcdta(O3h) = 'ALK_GLODAP-ORCA2_L31_annual',  -12   ,  'ALK'     ,    .false.   , .true. , 'yearly'  , ''       , ''
+   sn_trcdta(O3c) = 'DIC_GLODAPv2-ORCA2_L31_annual' , -12   ,  'DIC'     ,    .false.   , .true. , 'yearly'  , ''       , ''
+   sn_trcdta(O3h) = 'ALK_GLODAPv2-ORCA2_L31_annual',  -12   ,  'ALK'     ,    .false.   , .true. , 'yearly'  , ''       , ''
    cn_dir        =  './'      !  root directory for the location of the data files
    rn_trfac(O2o)   =  44.661 !  conversion factor from ml/l to mmol/m3 (1 ml/l = 10^3/22.391 = 44.661 umol/l)
    rn_trfac(N1p)   =   1.0   !  no conversion
