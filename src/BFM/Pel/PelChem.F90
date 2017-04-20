@@ -34,16 +34,10 @@
   use mem, ONLY: ppN4n, ppN3n, ppO2o, ppO4n, ppN6r, ppR6s, ppN5s,    &
     flN3O4n, ETW, flPTN6r, NO_BOXES, iiBen, iiPel, flN4N3n, &
     flux_vector
-#ifdef INCLUDE_PELCO2
-  use mem, ONLY: ppO3c, ppO5c
-#endif
 #endif
   use mem_Param,  ONLY: p_qon_nitri, p_qro, p_qon_dentri, p_small
   use mem_PelChem
   use mem_globalfun,   ONLY: MM, eTq, insw
-#ifdef INCLUDE_PELCO2
-  use mem_CO2, ONLY: CalcBioAlkFlag
-#endif
 !  
 !
 ! !AUTHORS
@@ -84,9 +78,6 @@
   integer       :: AllocStatus, DeallocStatus
   real(RLEN),allocatable,save,dimension(:) :: fN4N3n,fN6O2r,eo,     &
                                               er,osat,rPAo,fR6N5s
-#ifndef INCLUDE_PELCO2
-  integer,parameter :: ppO3c = 0
-#endif
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
   if (first==0) then
@@ -106,13 +97,6 @@
      allocate(fN4N3n(NO_BOXES),stat=AllocStatus)
      if (AllocStatus  /= 0) stop "error allocating fN4N3n"
   end if
-
-#ifdef INCLUDE_PELCO2
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! Carbonate chemistry
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  call PelCO2Dynamics( )
-#endif
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Regulating factors
@@ -151,11 +135,10 @@
   call flux_vector( iiPel, ppR6s,ppN5s, fR6N5s )
 
 #ifdef INCLUDE_PELCO2
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  ! Corrections of nitrogen cycle biogeochemistry on Total Alkalinity
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  if ( ppO3c > 0 .and. CalcBioAlkFlag)  call AlkalinityDynamics( )
-  if ( ppO5c > 0 )  call PelPICDynamics( )
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Carbonate chemistry
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  call PelCO2Dynamics( )
 #endif
 
 #ifdef INCLUDE_PELFE

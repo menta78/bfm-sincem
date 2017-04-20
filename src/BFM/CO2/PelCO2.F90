@@ -18,19 +18,20 @@
 !
 ! !USES:
 
-  use global_mem, ONLY:RLEN,ONE,ZERO
-  use constants, ONLY:MW_C
-  use mem_Param, ONLY:  AssignAirPelFluxesInBFMFlag
+  use global_mem, ONLY: RLEN,ONE,ZERO
+  use constants,  ONLY: MW_C, C2ALK
+  use mem_Param,  ONLY: AssignAirPelFluxesInBFMFlag
 #ifdef NOPOINTERS
   use mem
 #else
   use mem, ONLY: iiPel, O3h, O3c, D3STATE, jsurO3c, CO2airflux,    &
-                 Depth, flux_vector, DIC, EPCO2air, ALK, DIC
+                 Depth, flux_vector, DIC, EPCO2air, ALK,           &
+                 Source_D3_vector, ppO5c, ppN3n, ppN4n
   use mem, ONLY: ppO3h, ppO3c, NO_BOXES, NO_BOXES_XY, BoxNumber,   &
     N1p,N5s,CO2, HCO3, CO3, pCO2, pH, ETW, ESW, ERHO, EWIND, EICE, &
-    OCalc, OArag, EPR
+    OCalc, OArag, EPR, ppO5c, O5c
 #endif
-  use CO2System, ONLY: CalcCO2System,CalcK0
+  use CO2System, ONLY: CalcCO2System
   use mem_CO2    
   use BFM_ERROR_MSG, ONLY: BFM_ERROR
 #ifdef BFM_GOTM
@@ -46,9 +47,13 @@
 !   M. Vichi, H. Thomas and P. Ruardij
 !
 ! !REVISION_HISTORY
-
+! 2017  : T. Lovato, simplify CO2 workflow 
+!
 ! !LOCAL VARIABLES:
-  integer            ::error=0
+  integer            :: error=0
+  integer,save       :: first=0
+  integer            :: AllocStatus
+  real(RLEN),allocatable,save,dimension(:) :: rateN, excess, rdiss
 !
 ! COPYING
 !   
@@ -69,6 +74,18 @@
 !BOC
 !
 !
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Allocate local memory
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  if (first==0) then
+     ALLOCATE ( rateN(NO_BOXES), excess(NO_BOXES), rdiss(NO_BOXES),           &
+        &      STAT = AllocStatus )
+     IF( AllocStatus /= 0 ) call bfm_error('PelCO2Dynamics','Error allocating arrays')
+     first=1
+  end if
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Compute carbonate system equilibria
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! To use the Pressure correction of CSYS here the pr_in=EPS value
   do BoxNumber=1,NO_BOXES
      ! convert DIC and alkalinity from model units to diagnostic output
@@ -111,18 +128,45 @@
      endif
   end do
 
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Computes Atmospheric pCO2 value
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Rough approximation: pCO2 is assumed equal to the mixing ratio of CO2
   if (.not. calcAtmpCO2) EPCO2air = AtmCO2%fnow
-
-  !---------------------------------------------------------------
-  ! Computes Atmospheric pCO2 value
-  !---------------------------------------------------------------
+  ! 
   if (calcAtmpCO2) call CalcPCO2Air()
 
-  !---------------------------------------------------------------
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Computes air-sea flux (only at surface points)
-  !---------------------------------------------------------------
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   call CO2Flux()
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Changes in alkalinity due to N uptake (see BFM Manual Eq. 2.5.21)
+  ! It is computed this way
+  ! net_uptakeNO3=dNO3/dt+denit-nit , net_uptakeNH4=dNH4/dt+nit
+  ! dTA/dt = -net_uptakeNO3 + net_uptakeNH4 - 2*nit + denit = -dNO3/dt+dNH4/dt
+  ! Sulfur reactions associated to reduction equivalents are not
+  ! considered as included in the operational TA definition
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  if ( CalcBioAlkFlag ) then
+     rateN(:) = - Source_D3_vector(ppN3n) + Source_D3_vector(ppN4n)
+     call flux_vector( iiPel, ppO3h,ppO3h, rateN)
+  endif 
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Dissolution of Particulate Inorganic Carbon (calcite/aragonite) in seawater
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Compute undersaturation
+  excess(:) = max(ZERO,ONE - OCalc(:))
+  ! Dissolution rate of C in CaCO3 (mg C/m3/d) from Morse and Berner (1972)
+  rdiss(:) = p_kdca * excess(:)**p_nomega * O5c(:)
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Inorganic carbon and alkalinity flux due to PIC changes
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  call flux_vector( iiPel, ppO5c, ppO3c, rdiss(:) )
+  call flux_vector( iiPel, ppO3h, ppO3h, -C2ALK*rdiss(:) )
 
   end subroutine PelCO2Dynamics
 !EOC
