@@ -31,7 +31,7 @@
     N1p,N5s,CO2, HCO3, CO3, pCO2, pH, ETW, ESW, ERHO, EWIND, EICE, &
     OCalc, OArag, EPR, ppO5c, O5c
 #endif
-  use mem_PelCO2    
+  use mem_CO2    
   use mem_CSYS, ONLY : CarbonateSystem
   use BFM_ERROR_MSG, ONLY: BFM_ERROR
 #ifdef BFM_GOTM
@@ -54,7 +54,6 @@
   integer,save       :: first=0
   integer            :: AllocStatus
   real(RLEN),allocatable,save,dimension(:) :: rateN, excess, rdiss, xflux
-  real(RLEN),allocatable,save,dimension(:) :: tCO2airflux,tjsurO3c
 !
 ! COPYING
 !   
@@ -80,13 +79,11 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   if (first==0) then
      ALLOCATE ( rateN(NO_BOXES), excess(NO_BOXES), rdiss(NO_BOXES), xflux(NO_BOXES),  &
-        &       tCO2airflux(NO_BOXES),tjsurO3c(NO_BOXES),&
         &      STAT = AllocStatus )
      IF( AllocStatus /= 0 ) call bfm_error('PelagicCSYS','Error allocating arrays')
      first=1
   end if
   if (bfm_init == 0 ) pH(:) = -ONE
-  if (bfm_init == 0 ) tjsurO3c(:) = 0
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Compute carbonate system equilibria
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -104,7 +101,7 @@
                pCO2(BoxNumber), patm=AtmSLP%fnow(BoxNumber), pr_in=EPR(BoxNumber), &
                OmegaC=OCalc(BoxNumber), OmegaA=OArag(BoxNumber))
 #ifdef DEBUG
-       write(LOGUNIT,*) "in PelCO2:"
+       write(LOGUNIT,*) "in PelagicCSYS:"
        write(LOGUNIT,'(A,'' ='',f12.6)') 'ERHO',ERHO(BoxNumber)
        write(LOGUNIT,'(A,'' ='',f12.6)') 'ESW',ESW(BoxNumber)
        write(LOGUNIT,'(A,'' ='',f12.6)') 'N1p',N1p(BoxNumber)
@@ -115,39 +112,34 @@
        write(LOGUNIT,'(A,'' ='',f12.6)') 'OArag',OArag(BoxNumber)
        write(LOGUNIT,'(''layer:'',I4,'' pH='',f12.6)') BoxNumber,pH(BoxNumber)
 #endif
-       write(*,*) "in PelCO2 NEW:", DIC(BoxNumber),ALK(BoxNumber),pH(BoxNumber),pCO2(BoxNumber),OCalc(BoxNumber),OArag(BoxNumber), CO2(BoxNumber)
        if ( error > 0 ) then
-              call BFM_ERROR("PelCO2","Error in csys computation")
+              call BFM_ERROR("PelagicCSYS","Error in csys computation")
               write(LOGUNIT,'(''layer:'',I4,'' pH='',f12.6)') BoxNumber,pH(BoxNumber)
        endif
     end do
-
-
-   ! write(LOGUNIT,*) ' air-sea'
-   ! write(LOGUNIT,*) ' alk bio'
-   ! write(LOGUNIT,*) ' calcite '
-    
+   
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Computes Atmospheric pCO2 value
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Rough approximation: pCO2 is assumed equal to the mixing ratio of CO2
   EPCO2air = AtmCO2%fnow
-  call CO2flux()
+  !
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Computes air-sea flux (only at surface points)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  !write (*,*) AtmCO2%fnow, AtmSLP%fnow,ETW,ESW,ERHO,EWIND,EICE,pCO2,CO2
   do BoxNumber=1,NO_BOXES 
   call AirSeaCO2(AtmCO2%fnow(BoxNumber),AtmSLP%fnow(BoxNumber),ETW(BoxNumber),ESW(BoxNumber), &  
-         ERHO(BoxNumber),EWIND(BoxNumber),EICE(BoxNumber),CO2(BoxNumber),tCO2airflux(BoxNumber))
+         ERHO(BoxNumber),EWIND(BoxNumber),EICE(BoxNumber),CO2(BoxNumber),CO2airflux(BoxNumber))
   enddo
-  !call AirSeaCO2(AtmCO2%fnow,AtmSLP%fnow,ETW,ESW,ERHO,EWIND,EICE,pCO2,tCO2airflux)
-  tjsurO3c(:) = tjsurO3c(:) + tCO2airflux * MW_C * 1000.0_RLEN
-  xflux(SRFindices) = tjsurO3c(:) / Depth(SRFindices) * CO2fluxfac
+  !call AirSeaCO2(AtmCO2%fnow, AtmSLP%fnow, ETW(SRFindices), ESW(SRFindices), &
+  !        ERHO(SRFindices), EWIND, EICE, pCO2(SRFindices), CO2airflux)
+  ! Flux from mol/m2/d to mmol/m2/day
+  CO2airflux = CO2airflux * 1000.0_RLEN
+  jsurO3c(:) = jsurO3c(:) + CO2airflux * MW_C
+  xflux(SRFindices) = jsurO3c(:) / Depth(SRFindices) * CO2fluxfac
   if ( AssignAirPelFluxesInBFMFlag) then
      call flux_vector( iiPel, ppO3c,ppO3c, xflux )
   end if
-  write (*,*) 'co2 flux new, ', xflux
   
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Changes in alkalinity due to N uptake (see BFM Manual Eq. 2.5.21)

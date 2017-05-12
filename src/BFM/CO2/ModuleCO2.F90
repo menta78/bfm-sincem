@@ -9,7 +9,7 @@
 ! !ROUTINE: ModulePelCO2
 !
 ! DESCRIPTION
-! Module for CO2 dynamics in Sea Water
+! Module to simulate the Carbonate system dynamics in Pelagic compartment
 !
 ! !INTERFACE
   module mem_CO2
@@ -17,21 +17,17 @@
 ! !USES:
   use global_mem
   use SystemForcing, only :ForcingName, ForcingField, FieldInit, FieldClose
-  use mem_PelCO2, only: InitPelCO2,ClosePelCO2
   IMPLICIT NONE
 !  
 !
 ! !AUTHORS
-!   L. Patara, M. Vichi (INGV-CMCC)
-!   P. Ruardij, H. Thomas (NIOZ)
+!   T. Lovato (CMCC) 2017
 !
 ! !REVISION_HISTORY
-!   T. Lovato (CMCC) 2012
+!
 ! COPYING
 !   
-!   Copyright (C) 2015 BFM System Team (bfm_st@lists.cmcc.it)
-!   Copyright (C) 2007 P. Ruardij and M. Vichi
-!   (rua@nioz.nl, vichi@bo.ingv.it)
+!   Copyright (C) 2017 BFM System Team (bfm_st@lists.cmcc.it)
 !
 !   This program is free software; you can redistribute it and/or modify
 !   it under the terms of the GNU General Public License as published by
@@ -49,53 +45,23 @@
   ! Default all is public
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   public
-  integer,parameter   :: STATIC=1
-  integer,parameter   :: DYNAMIC=2
-  integer,parameter   :: FOLLOWS=3
-  integer,parameter   :: TOTAL=1
-  integer,parameter   :: SWS=2
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  !NAMELIST CO2_parameters
+  !NAMELIST PelCO2_parameters
   !-------------------------------------------------------------------------!
   ! CARBONATE SYSYEM SETTING
-  ! NAME           [UNIT]/KIND             DESCRIPTION
-  ! AtmCO20        [ppmv]           Initial atmospheric concentration of CO2
-  ! calcAtmpCO2    logical          Compute the partial pressure of Atmospheric CO2
-  ! pCO2Method     integer          pCO2 computation method: 1=MixRatio*p_atm0, 2=Magnus formula
-  ! phstart        [pH]             Initial pH value
-  ! K1K2           integer          Switch for the acidity constants parameterization
-  !                                 1 : Roy et al. (1993); DOE (1994); pH on total scale
-  !                                 2 : Default. OCMIP STANDARD; pH on Sea Water Scale
-  !                                     Mehrbach et al (1973) refit by Dickson & Millero (1987)
-  !                                 3 : Mehrbach et al (1973) refit by Lueker et al. (2000)
-  !                                     pH on total scale
-  !                                 4 : Hansson (1973b) data as refitted by Dickson and 
-  !                                     Millero (1987);  pH on Sea Water Scale 
-  ! MethodCalcCO2  numeric          Switch for the choice of [H+] numerical computation 
-  !                                 1 : Approximate static solution 
-  !                                 2 : Default. Standard OCMIP iteration 
-  !                                 3 : Follows et al., Ocean Modelling 2006 
-  ! CalcBioAlkFlag logical          Compute biological processes corrections on total alkalinity
-  ! CO2fluxfac     real             Multipling factor for CO2 flux to accelerate air-sea exchange
-  !              ---------  Parameters for MethodCalcCO2=2 -----------
-  ! M2XACC         real             Accuracy of the iterative scheme for OCMIP (default 1.E-10) 
-  ! M2PHDELT       [pH]             Delta of pH for the root search (realized pH+/-DELT)
-  !                                 in the OCMIP scheme (default 0.5)
-  ! M2MAXIT        integer          Maximum number of iterations for OCMIP (default 100 )
+  ! NAME            [UNIT]/KIND             DESCRIPTION
+  ! AtmCO20         [ppmv]           Initial atmospheric concentration of CO2
+  ! calcAtmpCO2     logical          Compute the partial pressure of Atmospheric CO2
+  ! CalcBioAlk      logical          Compute biological processes corrections on total alkalinity
+  ! CO2fluxfac      real             Multipling factor for CO2 flux to accelerate air-sea exchange
+  !              ---------  SolveSAPHE parameters  -----------
+  ! MaxIterPHsolver integer          Maximum number of iterations (default 50)
   !              ---------  Parameters for calcium and calcite ---------
-  ! Caconc0        [mol/m3]         Calcium ion concentration 
-  !                                 ["Seawater : Its composition, properties and behaviour" 
-  !                                 (2nd Edition), Open University Course Team, 1995]
-  !                                 Seawater concentration   = 412 mg / l 
-  !                                                        -> atomic weight = 40.078 g / mol
-  !                                 therefore, concentration = 10.279 mmol / l = 10.279 mol / m3
-  ! Canorm          logical         Normalize Calcium ion concentration by sea water salinity
-  ! p_kdca          [d-1]           Calcite dissolution rate constant
-  ! p_nomega        [-]             Order of the dissolution rate dependence on Omega
+  ! p_kdca          [d-1]            Calcite dissolution rate constant
+  ! p_nomega        [-]              Order of the dissolution rate dependence on Omega
   !              ---------  EXTERNAL DATA INPUT STRUCTURES -----------
   ! AtmCO2_N       structure        Read external data for atmospheric CO2 values
   ! AtmSLP_N       structure        Read external data for atmospheric sea level pressure
-  ! AtmTDP_N       structure        Read external data for atmospheric dew-point temperature
   ! Example of general input structure for the data structure:
   !          ! Read  !   File                               ! NetCDF  !  Var    !
   !          ! Input !   name                               ! Logical !  name   !
@@ -107,30 +73,19 @@
   ! Convention for Input reading : 0 = use constant value (default if struct is not initialized)
   !                                1 = read timeseries file ( e.g. CO2 mixing ratios)
   !                                2 = read 2D fields using NEMO fldread 
-  !                                3 = field from a coupled model (e.g. atmospheric SLP from OGCM)
   ! NOTE: The file "CMIP5_Historical_GHG_1765_2005.dat" is located in "$BFMDIR/tools" folder
   !-----------------------------------------------------------------------------------!
-   real(RLEN)   :: AtmCO20=365.0_RLEN ! ppm 
-   logical      :: calcAtmpCO2=.FALSE. 
-   integer      :: pCO2Method=1
-   type(ForcingName)    :: AtmCO2_N, AtmSLP_N, AtmTDP_N
-   type(ForcingField)   :: AtmCO2, AtmSLP, AtmTDP
-   integer      :: K1K2=2
-   integer      :: MethodCalcCO2=2 
-   real(RLEN)   :: M2XACC=1.E-20_RLEN
-   real(RLEN)   :: M2PHDELT=0.5_RLEN
-   integer      :: M2MAXIT=100
-   real(RLEN)   :: phstart=8.0_RLEN ! [-]
-   integer      :: phscale = SWS
-   real(RLEN)   :: Caconc0 = 10.279E0
-   logical      :: Canorm = .TRUE.
+   real(RLEN)   :: AtmCO20 = 365.0_RLEN ! ppm 
+   integer      :: MaxIterPHsolver = 50
    real(RLEN)   :: p_kdca
    integer      :: p_nomega
-   logical      :: CalcBioAlkFlag = .FALSE.
+   logical      :: CalcBioAlk = .FALSE.
    real(RLEN)   :: Co2fluxfac = 1.0_RLEN
+   type(ForcingName)    :: AtmCO2_N, AtmSLP_N
+   type(ForcingField)   :: AtmCO2, AtmSLP
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! SHARED PUBLIC FUNCTIONS (must be explicited below "contains")
-  public InitCO2, CloseCO2
+   public InitCO2, CloseCO2
 
   contains
 
@@ -146,11 +101,9 @@
   use api_bfm, ONLY: bfm_init
   use mem_Param, ONLY: p_atm0
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-    namelist /CO2_parameters/ AtmCO20,calcAtmpCO2,pCO2Method,K1K2,MethodCalcCO2, &
-                              phscale,phstart,M2XACC,M2PHDELT,M2MAXIT,           &
-                              Caconc0,Canorm,p_kdca, p_nomega,                   &
-                              AtmCO2_N,AtmSLP_N,AtmTDP_N,                        &
-                              CalcBioAlkFlag,Co2fluxfac
+    namelist /CSYS_parameters/ AtmCO20, MaxIterPHsolver,         &
+                            p_kdca, p_nomega,                  &
+                            AtmCO2_N, AtmSLP_N, CalcBioAlk, Co2fluxfac
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   integer            ::error=0
   !---------------------------------------------------------------------------
@@ -161,7 +114,6 @@
                         ! Input !   name     ! Logical !  name  ! RefTime ! Frequency  !  interp  !
     AtmCO2_N = ForcingName( 0  , "dummy.nc" , .TRUE.  ,"AtmCO2" , "dummy" ,  "dummy"   ,  .TRUE.  )
     AtmSLP_N = ForcingName( 0  , "dummy.nc" , .TRUE.  ,"AtmSLP" , "dummy" ,  "dummy"   ,  .TRUE.  )
-    AtmTDP_N = ForcingName( 0  , 'dummy.nc' , .TRUE.  ,'AtmTDP' , 'dummy' ,  'dummy'   ,  .TRUE.  )
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   !  Open the namelist file(s)
@@ -173,9 +125,9 @@
     LEVEL1 ' '
     LEVEL2 'Namelist content:'
     open(NMLUNIT,file='Carbonate_Dynamics.nml',status='old',action='read',err=100)
-    read(NMLUNIT,nml=CO2_parameters,err=101)
+    read(NMLUNIT,nml=CSYS_parameters,err=101)
     close(NMLUNIT)
-    write(LOGUNIT,nml=CO2_parameters)
+    write(LOGUNIT,nml=CSYS_parameters)
     LEVEL1 ' '
  
   ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -205,83 +157,47 @@
              write(LOGUNIT,*) 'Read CO2 2D fields with NEMO fldread. Initialize with default uniform value', AtmCO2%fnow(1)
              write(LOGUNIT,*) ' '
           end if
-       CASE (3) ! receive from CO2 and SLP from NEMO (see envforcing_bfm)
-          ! the following check is needed to avoid allocation of empty arrays with MPI and land domains
-          if (NO_BOXES_XY > 0) then
-             AtmCO2%fnow = AtmCO20
-             write(LOGUNIT,*) 'Receive CO2 and SLP fields from NEMO. Initialize with default uniform value', AtmCO2%fnow(1)
-             write(LOGUNIT,*) ' '
-          end if
     END SELECT
 
     ! Rough approximation: pCO2 is assumed equal to the mixing ratio of CO2
-    if (.not. calcAtmpCO2) EPCO2air = AtmCO2%fnow
+    EPCO2air = AtmCO2%fnow
 
     ! COMPUTATION OF pCO2
     ! Sea Level Pressure
     AtmSLP%init = AtmSLP_N%init
-    AtmTDP%init = AtmTDP_N%init
-    if (calcAtmpCO2) then
-       CALL FieldInit(AtmSLP_N, AtmSLP)
-       if (AtmSLP%init == 0) then
-          ! Use constant
-          ! the following check is needed to avoid allocation of empty arrays with MPI and land domains
-          if (NO_BOXES_XY > 0) then
-             AtmSLP%fnow = p_atm0
-             write(LOGUNIT,*) 'Using constant atmospheric SLP (see p_atm0 in BFM_General.nml): ', AtmSLP%fnow(1)
-             write(LOGUNIT,*) ' '
-          end if
-       else
-         if (AtmSLP%init .eq. 1 ) &
-            write(LOGUNIT,*) 'BFM reads atmospheric SLP timeseries from file: ', AtmSLP_N%filename
-         if (AtmSLP%init .eq. 2 ) &
-            write(LOGUNIT,*) 'BFM reads atmospheric SLP 2D fields from file: ', AtmSLP_N%filename
-         if (AtmSLP%init .eq. 3 ) &
-            write(LOGUNIT,*) 'BFM receives atmospheric SLP from coupled model (see env_forcing)'
-         write(LOGUNIT,*) ' '
-       endif
-
-       ! Atmospheric Dew Point Temperature
-       if (pCO2Method == 2 .AND. AtmTDP%init .ne. 0 ) then
-         CALL FieldInit(AtmTDP_N, AtmTDP)
-         if (AtmTDP%init .eq. 1 ) &
-            write(LOGUNIT,*) 'BFM reads Dew Point Temperature timeseries from file: ', AtmTDP_N%filename
-         if (AtmTDP%init .eq. 2 ) &
-            write(LOGUNIT,*) 'BFM reads Dew Point Temperature 2D fields from file: ', AtmTDP_N%filename
-         if (AtmTDP%init .eq. 3 ) &
-            write(LOGUNIT,*) 'BFM receives Dew Point Temperature from coupled model (see env_forcing)'
-         write(LOGUNIT,*) ' '
-       else
-          pCO2Method = 1
-          write(LOGUNIT,*) 'pCO2Method is forced to 1 because AtmTDP%init is set to 0.'
-       endif
+    CALL FieldInit(AtmSLP_N, AtmSLP)
+    if (AtmSLP%init == 0) then
+       ! Use constant
+       ! the following check is needed to avoid allocation of empty arrays with MPI and land domains
+       if (NO_BOXES_XY > 0) then
+          AtmSLP%fnow = p_atm0
+          write(LOGUNIT,*) 'Using constant atmospheric SLP (see p_atm0 in BFM_General.nml): ', AtmSLP%fnow(1)
+          write(LOGUNIT,*) ' '
+       end if
+    else
+      if (AtmSLP%init .eq. 1 ) &
+         write(LOGUNIT,*) 'BFM reads atmospheric SLP timeseries from file: ', AtmSLP_N%filename
+      if (AtmSLP%init .eq. 2 ) &
+         write(LOGUNIT,*) 'Read SLP 2D fields with NEMO fldread. Initialize with default uniform value', AtmSLP%fnow(1)
+      write(LOGUNIT,*) ' '
     endif
 
-    ! Assign initial pH 
-    if (bfm_init /= 1 ) pH(:) = phstart
+    ! Assign initial pH as negative value if not restart
+    !if (bfm_init == 0 ) pH(:) = -ONE
 
-    ! Check consistency of input parameters
-    select case (K1K2)
-    case (1,3) 
-        phscale = TOTAL
-    case (2) 
-        phscale = SWS
-    end select
-    
-    if (calcAtmpCO2) write(LOGUNIT,*) 'BFM computes pCO2 with method: ', pCO2Method
-    if (AtmSLP%init == 2 ) write(LOGUNIT,*) 'SLP is provided by external 2D field.' 
-    if (AtmTDP%init == 2 ) write(LOGUNIT,*) 'TDP is provided by external 2D field.' 
-    if (AtmSLP%init == 3 ) write(LOGUNIT,*) 'SLP is provided by NEMO model.' 
+    ! summary of input parameters
+    write(LOGUNIT,*) ' Model uses PH Total Scale '
+
     LEVEL1 '-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'
     LEVEL1 ' '
-   call InitPelCO2
+
     FLUSH(LOGUNIT)
     return
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Local Error Messages
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-100 call error_msg_prn(NML_OPEN,"ModuleCO2.f90","Carbonate_Dynamics.nml")
-101 call error_msg_prn(NML_READ,"ModuleCO2.f90","CO2_parameters")
+100 call error_msg_prn(NML_OPEN,"ModuleCO2.f90","Carbonate_system.nml")
+101 call error_msg_prn(NML_READ,"ModuleCO2.f90","CSYS_parameters")
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   end  subroutine InitCO2
 
@@ -289,15 +205,13 @@
   subroutine CloseCO2()
     implicit none
     
-    if (AtmCO2%init == 1) then
+    if (AtmCO2%init == 1 ) then
        ! close external 0-D timeseries
        CALL FieldClose(AtmCO2_N, AtmCO2)
-       call ClosePelCO2
     end if
   end subroutine CloseCO2
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-
   end module mem_CO2
 
 !EOC

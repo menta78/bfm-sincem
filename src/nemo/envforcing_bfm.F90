@@ -26,7 +26,7 @@
    use time, only: bfmtime
 #ifdef INCLUDE_PELCO2
    use mem,        only: ppO3c, ppO3h, ppN6r
-   use mem_CO2,    only: AtmCO20, AtmCO2, AtmSLP, AtmTDP
+   use mem_CO2,    only: AtmCO20, AtmCO2, AtmSLP
    USE trcbc,      only: sf_trcsbc, n_trc_indsbc
 #endif
 ! OPA modules

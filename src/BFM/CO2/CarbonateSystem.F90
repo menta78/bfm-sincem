@@ -74,7 +74,7 @@ module mem_CSYS
 ! !INTERFACE
 ! !USES:
   use global_mem, ONLY: RLEN, LOGUNIT, ONE, ZERO
-  use mem_PelCO2, ONLY: MaxIterPHsolver
+  use mem_CO2, ONLY: MaxIterPHsolver
 
 ! Shared variables
   implicit none
@@ -98,8 +98,8 @@ module mem_CSYS
   contains
 
 ! !INTERFACE
-  integer function CarbonateSystem(salt,temp,rho,n1p,n5s,dic,alk,      &
-                          co2,hco3,co3,pH,pco2,patm,pr_in,OmegaC,OmegaA,fCO2)
+  function CarbonateSystem(salt,temp,rho,n1p,n5s,dic,alk,      &
+                   co2,hco3,co3,pH,pco2,patm,pr_in,OmegaC,OmegaA,fCO2)
 ! !DESCRIPTION
 ! See module preamble
 !
@@ -107,10 +107,9 @@ module mem_CSYS
   use constants,  ONLY : ZERO_KELVIN,MW_C,MW_Ca,Rgas
   use mem_Param,  ONLY : p_atm0
 
-!  use mem_co2
-
 ! !INPUT PARAMETERS:
   IMPLICIT NONE
+  integer :: CarbonateSystem
   real(RLEN),intent(IN)            :: salt ! practical salinity
   real(RLEN),intent(IN)            :: temp ! in-situ temperature
   real(RLEN),intent(IN)            :: rho  ! in-situ density
@@ -177,6 +176,7 @@ module mem_CSYS
             0.3692_RLEN,  0.3692_RLEN, 0.0427_RLEN, 0.09_RLEN, 0.0714_RLEN, 0.0_RLEN  /
   !DATA b2 / 12*0.0_RLEN / ! not used as it is zero
   !
+  CarbonateSystem = 0
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! 1. PREPARE INPUT FIELDS
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -435,13 +435,14 @@ module mem_CSYS
   ! 3. COMPUTE CARBONATE SYSTEM
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! if pH < 0 then need to compute initial value
-  if ( pH < 0 ) call ahini_for_at(ta,tc,bt,K1,K2,Kb,pH)
+  if ( pH < 0 ) pH = phini_for_at(ta,tc,bt,K1,K2,Kb)
 
   ! Solve for H+ using above result as the initial H+ value
   H = solve_at_general(ta, tc, Bt, pt, sit, St, Ft,            &
                K0, K1, K2, Kb, Kw, Ks, Kf, K1p, K2p, K3p, Ksi, pH )
 
   ! Calculate pH from from H+ concentration (mol/kg)
+  if (H < 0._RLEN) CarbonateSystem = 1
   pH = -1.*LOG10(H)
   
   ! Compute carbonate Alk (Ac) by difference: from total Alk and other Alk components
@@ -493,8 +494,8 @@ module mem_CSYS
 ! ----------------
 
   ! turn into elemental function
-  SUBROUTINE ahini_for_at(p_alkcb, p_dictot, p_bortot, K1, K2, Kb, p_hini)
-  ! Subroutine returns the root for the 2nd order approximation of the
+  elemental FUNCTION phini_for_at(p_alkcb, p_dictot, p_bortot, K1, K2, Kb)
+  ! Function returns the root for the 2nd order approximation of the
   ! DIC -- B_T -- A_CB equation for [H+] (reformulated as a cubic polynomial)
   ! around the local minimum, if it exists.
   
@@ -503,15 +504,16 @@ module mem_CSYS
   !         * 1E-07_RLEN if 0 < p_alkcb < 2*p_dictot + p_bortot
   !                    and the 2nd order approximation does not have a solution 
     IMPLICIT NONE
+    REAL(KIND=RLEN) :: PHINI_FOR_AT
     
     ! Argument variables
     !--------------------
     REAL(KIND=RLEN), INTENT(IN)   ::  p_alkcb, p_dictot, p_bortot
     REAL(KIND=RLEN), INTENT(IN)   ::  K1, K2, Kb
-    REAL(KIND=RLEN), INTENT(OUT)  ::  p_hini
     
     ! Local variables
     !-----------------
+    REAL(KIND=RLEN)  ::  p_hini
     REAL(KIND=RLEN)  ::  zca, zba
     REAL(KIND=RLEN)  ::  zd, zsqrtd, zhmin
     REAL(KIND=RLEN)  ::  za2, za1, za0
@@ -544,13 +546,15 @@ module mem_CSYS
         p_hini = 1.e-7_RLEN
       ENDIF
     
+    phini_for_at = p_hini 
+
     ENDIF
     RETURN
-  END SUBROUTINE ahini_for_at
+  END FUNCTION phini_for_at
   
 ! ----------------
 
-  FUNCTION solve_at_general(p_alktot, p_dictot, p_bortot,                       &
+  elemental FUNCTION solve_at_general(p_alktot, p_dictot, p_bortot,               &
                               p_po4tot, p_siltot,                                 &
                               p_so4tot, p_flutot,                                 &
                               K0, K1, K2, Kb, Kw, Ks, Kf, K1p, K2p, K3p, Ksi,     &

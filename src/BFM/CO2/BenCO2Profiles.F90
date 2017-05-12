@@ -33,8 +33,7 @@
 #endif
         use constants, ONLY: INTEGRAL,STANDARD,MW_C
         use bennut_interface, ONLY:CalculateFromSet
-        use CO2System,ONLY: CalcCO2System
-        use mem_CO2,ONLY: MethodCalcCO2
+        use mem_CSYS,ONLY: CarbonateSystem
         use bfm_error_msg, ONLY: bfm_error
 !
 ! CHANGE_LOG
@@ -96,11 +95,12 @@
                   (KALK(BoxNumberXY_ben),INTEGRAL,STANDARD,s,r)/(r-s)/ &
                   ERHO_Ben(BoxNumberXY_ben)*1000._RLEN
              if (llpH) then
-               error= CalcCO2System(MethodCalcCO2,ESW_Ben(BoxNumberXY_ben), &
-                   ETW_Ben(BoxNumberXY_ben),ERHO_Ben(BoxNumberXY_ben),&
-                   PrM1p(BoxNumber_ben),max(ZERO,PrM5s(BoxNumber_ben)),PrAc(BoxNumber_ben),&
-                   dumCO2,dumHCO3,dumCO3,PrpH(BoxNumber_ben),&
-                   DIC_in=PrDIC(BoxNumber_ben),pCO2_out=dumpCO2)
+               error= CarbonateSystem( ESW_Ben(BoxNumberXY_ben), &
+                   ETW_Ben(BoxNumberXY_ben),ERHO_Ben(BoxNumberXY_ben), &
+                   PrM1p(BoxNumber_ben),max(ZERO,PrM5s(BoxNumber_ben)), &
+                   PrDIC(BoxNumber_ben), PrAc(BoxNumber_ben), &
+                   dumCO2,dumHCO3,dumCO3,PrpH(BoxNumber_ben),dumpCO2)
+                   
                if ( error > 0 ) then
                  write(LOGUNIT,*)"Warning: Ph outside range"
                  write(LOGUNIT,'(A,'' ='',G12.6)') 'PrM1p',PrM1p(BoxNumber_ben)

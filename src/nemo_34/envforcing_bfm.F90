@@ -25,7 +25,7 @@
    use time, only: bfmtime
 #ifdef INCLUDE_PELCO2
    use mem,        only: ppO3c, ppO3h, ppN6r
-   use mem_CO2,    only: AtmCO20, AtmCO2, AtmSLP, AtmTDP
+   use mem_CO2,    only: AtmCO20, AtmCO2, AtmSLP
    USE trcbc,      only: sf_trcsbc, n_trc_indsbc
 #endif
 ! OPA modules
@@ -101,18 +101,6 @@ IMPLICIT NONE
             AtmSLP%fnow = pack( apr(:,:),SRFmask(:,:,1) )
       END SELECT
    endif
-   !
-   ! Atmospheric Dew Point Temperature
-   !
-   if ( allocated(AtmTDP%fnow)) then 
-      SELECT CASE ( AtmTDP%init )
-         CASE (1) ! Read timeseries in BFM
-            call FieldRead(AtmTDP)
-         CASE (2) ! Read Boundary Conditions using NEMO fldread (namtrc_bc)
-            n = n_trc_indsbc(ppN6r)
-            AtmTDP%fnow = pack( sf_trcsbc(n)%fnow(:,:,1),SRFmask(:,:,1) )
-      END SELECT
-   endif  
 
    ! print control on received fluxes
    IF ( (kt-nit000)<20 .OR. MOD(kt,200)==0 .OR. kt==nitend) THEN

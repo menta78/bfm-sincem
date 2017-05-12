@@ -8,13 +8,10 @@
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 !BOP
 !
-! !ROUTINE: PelCO2Dynamics
+! !ROUTINE: AirSeaCO2
 !
 ! DESCRIPTION
-!   !
-!
-! !INTERFACE
-!  
+!   ! compute Air-Sea CO2 Exchange
 !
 ! !AUTHORS
 !   T. Lovato (CMCC) 2017
@@ -37,8 +34,8 @@
 !-------------------------------------------------------------------------!
 !BOC
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  subroutine AirSeaCO2(xco2,patm,temp,salt,rho,wind,Fice,pco2ocn,xflux) 
-  ! compute Air-Sea Gas Exchange
+  subroutine AirSeaCO2(xco2,patm,temp,salt,rho,wind,Fice,co2ocn,xflux) 
+  ! 
   use global_mem, ONLY: RLEN,ONE,ZERO
   use constants,  ONLY: HOURS_PER_DAY,ZERO_KELVIN
   !
@@ -50,16 +47,16 @@
     real(RLEN),intent(IN)            :: rho    ! in-situ density 
     real(RLEN),intent(IN)            :: wind   ! wind speed [m/s]
     real(RLEN),intent(IN)            :: Fice   ! Sea-ice cover fraction [0-1]
-    real(RLEN),intent(IN)            :: pco2ocn ! gas concentration at surface [umol/kg]
-    ! 
-    real(RLEN),intent(OUT)           :: xflux ! Air-Sea Gas Flux (positive downward) [mol/m2/d]
+    real(RLEN),intent(IN)            :: co2ocn ! gas concentration at surface [umol/kg]
+    !
+    real(RLEN),intent(OUT)           :: xflux  ! Air-Sea Gas Flux (positive downward) [mol/m2/d]
     !---------------------------------------------------------------------------
     real(RLEN),parameter    :: PERMIL=ONE/1000.0_RLEN
     real(RLEN),parameter    :: bar2atm  = ONE/1.01325_RLEN ! Conversion factor from bar to atm
     real(RLEN),parameter    :: Rgas_atm = 82.05736_RLEN    ! (cm3 * atm) / (mol * K)  CODATA (2006)
     real(RLEN),parameter    :: kwfac = 0.01_RLEN * HOURS_PER_DAY ! convert from cm/h to m/d
     real(RLEN)   :: pco2atm, patma, co2starair, co2star
-    real(RLEN)   :: pH20, fco2atm, fugcoeff, bb, Del, xc2
+    real(RLEN)   :: pH20, fco2atm, fugcoeff, bb, Del, xc2, phi0atm
     real(RLEN)   :: tk, tk100, tk1002, itk100
     real(RLEN)   :: pschmidt, Kw660, kwgas, K0
     ! CO2 solubility coefficients
@@ -68,7 +65,7 @@
     ! Schmidt coefficients
     real(RLEN),parameter :: Sc = 660.0_RLEN, &
          C(5)  = (/2116.8_RLEN, -136.25_RLEN, 4.7353_RLEN, -0.092307_RLEN, 0.0007555_RLEN/)
-    real(RLEN),parameter :: F(7) = (/-160.7333, 215.4152, 89.8920, -1.47759, 0.029941, -0.027455, 0.0053407/)
+    !real(RLEN),parameter :: F(7) = (/-160.7333, 215.4152, 89.8920, -1.47759, 0.029941, -0.027455, 0.0053407/)
     !---------------------------------------------------------------------------
     !
     ! common arrays
@@ -78,22 +75,30 @@
     itk100 = 1.0_RLEN/tk100
     patma = patm * PERMIL * bar2atm ! convert patm from mbar to atm
     !
+    ! Oceanic concentration [CO2*] from umol/kg to mol/kg
+    co2star = co2ocn * 1.0e-6_RLEN 
+    !
     ! Compute vapor pressure of seawater [in atm] (Weiss and Price, 1980, Eq. 10)
     pH20 = exp(24.4543_RLEN - 67.4509_RLEN*(100._RLEN/tk) - 4.8489_RLEN*log(tk/100.0_RLEN) - 0.000544_RLEN*salt)
-    !!
-    !! Compute pco2atm [uatm] from xco2 [ppm], atmospheric pressure [atm], & vapor pressure of seawater pH20 [atm]
+    !
+    ! Compute pco2atm [uatm] from xco2 [ppm], atmospheric pressure [atm], & vapor pressure of seawater pH20 [atm]
     pco2atm = (patma - pH20) * xco2
-    !!write(*,*) 'new atm', patma , pH20 , xco2, pco2atm
-    !!pco2atm = xco2
-    !! 
-    !! Compute fCO2atm [uatm] from pCO2atm [uatm] & fugacity coefficient [unitless]
+    ! 
+    ! Compute fCO2atm [uatm] from pCO2atm [uatm] & fugacity coefficient [unitless]
     bb = -1636.75_RLEN + 12.0408_RLEN*tk - 0.0327957_RLEN*(tk*tk) + 0.0000316528_RLEN*(tk*tk*tk)
     Del = 57.7_RLEN - 0.118_RLEN*tk
     xc2 = (ONE - (pco2atm*1.e-6_RLEN) )**2
     fugcoeff = EXP( patma*(bb + 2.0d0*xc2*Del)/(Rgas_atm*tk) )
     fco2atm = pco2atm * fugcoeff
-    !!fco2atm = exp (F(1) + F(2)*itk100 + F(3)*log(tk100) + F(4)*tk1002 + salt*(F(5) + F(6)*tk100 + F(7)*tk1002))
-    !!co2starair = patma * fco2atm * xco2 * 1.0e-6_RLEN
+    ! Surface solubility of gas K0  [(mol/kg) / atm] at T, S of surface water according to Weiss (1974)
+    K0 = exp( A(1) + A(2)/tk100 + A(3)*log(tk100) + salt*(B(1) + B(2)*tk100 + B(3)*tk1002) )
+    ! air-sea gas flux
+    co2starair = K0 * fco2atm * 1.0e-6_RLEN   ! Equil.  [A*] for atm gas at Patm & sfc-water T,S [mol/kg]
+    ! Alternative computation
+    !! Solubility function for atmospheric CO2 saturation concentration (Orr et al. GMD 2017, Eq. 15)
+    !phi0atm = exp (F(1) + F(2)*itk100 + F(3)*log(tk100) + F(4)*tk1002 + salt*(F(5) + F(6)*tk100 + F(7)*tk1002))
+    !! Compute saturation concentration in atmosphere [mol/kg] at total pressure Pa as in Orr et al i(GMD 2017, Eq. 16)
+    !co2starair = patma * phi0atm * xco2 * 1.0e-6_RLEN
     ! 
     ! Compute piston velolicty kw660 (at 25 C) from wind speed (Wanninkhof 2014, Limnol. Oceanograph. Methods, 12, 351-362)
     kw660 = 0.251_RLEN * wind**2 * kwfac
@@ -101,15 +106,10 @@
     pschmidt = C(1) + C(2)*temp + C(3)*temp**2 + C(4)*temp**3 + C(5)*temp**4
     ! Transfer velocity for gas in m/d (see equation [4] in OCMIP2 design document & OCMIP2 Abiotic HOWTO)
     kwgas = kw660 * (Sc/pschmidt)**0.5
-    ! Surface solubility of gas K0  [(mol/kg) / atm] at T, S of surface water according to Weiss (1974)
-    K0 = exp( A(1) + A(2)/tk100 + A(3)*log(tk100) + salt*(B(1) + B(2)*tk100 + B(3)*tk1002) )
+
     ! air-sea gas flux
-    co2starair = K0 * fco2atm * 1.0e-6_RLEN   ! Equil.  [A*] for atm gas at Patm & sfc-water T,S [mol/kg]
-    co2star = pco2ocn * 1.0e-6_RLEN            ! Oceanic [A*] in [mol/kg] 
+    co2star = co2ocn * 1.0e-6_RLEN            ! Oceanic [A*] in [mol/kg] 
     xflux = kwgas * (co2starair - co2star) * (ONE - Fice) * rho ! Air-sea gas flux [mol/(m2 * day)]
-    !xflux = kwgas * (pco2atm - pco2ocn) * K0 * (ONE - Fice) * rho / 1000.0_RLEN
-    !write(*,*) 'new',kwgas,pco2atm,pco2ocn,K0,rho 
-    ! write(*,*) 'new', kwgas, co2starair, co2star, rho
   
     return 
 

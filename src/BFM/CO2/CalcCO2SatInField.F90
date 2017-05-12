@@ -24,7 +24,7 @@
 
   use global_mem, ONLY:RLEN
   use mem, ONLY: ppN1p,ppN5s,ppO3h,ppO3c
-  use CO2System,ONLY: CalcCO2System,HplusBASIS 
+  use mem_CSYS ,ONLY: CarbonateSystem 
   use mem_PelCO2    
 
 !  
@@ -76,15 +76,16 @@
   real(RLEN)          ::dumCO3
   real(RLEN)          ::dumHCO3
   real(RLEN)          ::dumpH
+  ! TL: HplusBASIS lost in BFM evolution, Add here for consistency
+  real(RLEN)          ::HplusBASIS=0
 
   if ( ppO3c > 0 ) then
     do i=1,kmax
           j=ppO3h
           Ac   =   cc(j,i)+ HplusBASIS
-          error= CalcCO2System(MethodCalcCO2,ESW(i),ETW(i),ERHO(i),&
-                   cc(ppN1p,i),cc(ppN5s,i),Ac,&
-                   dumCO2,dumHCO3,dumCO3,dumpH,&
-                   pCO2_in=pCO2_Air,DIC_out=DIC)
+          error= CarbonateSystem ( ESW(i),ETW(i),ERHO(i),&
+                   cc(ppN1p,i),cc(ppN5s,i),DIC,Ac,&
+                   dumCO2,dumHCO3,dumCO3,dumpH,pCO2_Air)
           j=ppO3c
           cc(j,i)=DIC* 12.0;
     enddo

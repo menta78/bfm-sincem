@@ -33,7 +33,7 @@ subroutine analytical_forcing
    use standalone, only: timesec,latitude
    use envforcing
 #ifdef INCLUDE_PELCO2
-   use mem_CO2,    only: AtmCO20, AtmCO2, AtmSLP, AtmTDP
+   use mem_CO2,    only: AtmCO20, AtmCO2, AtmSLP
 #endif
    use time,       only: julianday, secondsofday, timefmt, &
                          julian_day,calendar_date,dayofyear
@@ -131,8 +131,6 @@ subroutine analytical_forcing
 !  Update sea level pressure
    if ( allocated(AtmSLP%fnow)) CALL FieldRead(AtmSLP)
 
-!  Update Air Dew Point temperature
-   if ( allocated(AtmTDP%fnow)) CALL FieldRead(AtmTDP)
 #endif
 #ifdef DEBUG
    LEVEL2 'ETW=',ETW(:)
