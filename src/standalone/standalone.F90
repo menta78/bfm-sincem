@@ -21,6 +21,7 @@
 #ifdef INCLUDE_PELCO2
    use mem_CO2, ONLY: CloseCO2
 #endif   
+   use sw_tool,    only: gsw_p_from_z
    private
 !
 ! !PUBLIC MEMBER FUNCTIONS:
@@ -115,7 +116,7 @@
    use mem,   only: NO_D3_BOX_STATES, NO_BOXES,          &
                   NO_BOXES_X, NO_BOXES_Y, NO_BOXES_Z,  &
                   NO_BOXES_XY, NO_D2_BOX_DIAGNOSS, &
-                  NO_D3_BOX_DIAGNOSS, NO_STATES, Depth, D3STATE
+                  NO_D3_BOX_DIAGNOSS, NO_STATES, Depth, D3STATE, EPR
    use mem,  only: Volume, Area, Area2d
    use global_mem, only: RLEN, LOGUNIT, NML_OPEN, NML_READ, &
                          error_msg_prn, NMLUNIT
@@ -293,6 +294,7 @@
    ! Assign depth
    !---------------------------------------------
    Depth = indepth
+   EPR = gsw_p_from_z(-Depth,latitude)
    ! assume area is 1m^2 (make a parameter in the future for 
    ! mesocosm simulations)
    Area = ONE

@@ -63,13 +63,18 @@ IMPLICIT NONE
    !---------------------------------------------
    ETW(:) = pack(tsn(:,:,:,jp_tem),SEAmask)
    ESW(:) = pack(tsn(:,:,:,jp_sal),SEAmask)
-   ERHO(:) = pack( (rhd(:,:,:) + 1._RLEN) * rau0, SEAmask)
 
    ! convert to in-situ temperature and practical salinity
    ! TEOS-10 conversions not yet available
    if ( nn_eos .eq. 0 ) then
       ETW(:)  = sw_t_from_pt(ESW,ETW,EPR,EPR*0.)
    endif
+
+   !---------------------------------------------
+   ! Assign in-situ density
+   !---------------------------------------------
+   ERHO(:) = pack( (rhd(:,:,:) + 1._RLEN) * rau0, SEAmask)
+
    !---------------------------------------------
    ! Assign wind speed
    !---------------------------------------------
@@ -119,18 +124,6 @@ IMPLICIT NONE
 #endif
       END SELECT
    endif
-   !
-   ! Atmospheric Dew Point Temperature
-   !
-   if ( allocated(AtmTDP%fnow)) then 
-      SELECT CASE ( AtmTDP%init )
-         CASE (1) ! Read timeseries in BFM
-            call FieldRead(AtmTDP)
-         CASE (2) ! Read Boundary Conditions using NEMO fldread (namtrc_bc)
-            n = n_trc_indsbc(ppN6r)
-            AtmTDP%fnow = pack( sf_trcsbc(n)%fnow(:,:,1),SRFmask(:,:,1) )
-      END SELECT
-   endif  
 
    ! print control on received fluxes
    IF ( (kt-nit000)<20 .OR. MOD(kt,200)==0 .OR. kt==nitend) THEN

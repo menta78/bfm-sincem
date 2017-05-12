@@ -66,11 +66,12 @@
   integer,      parameter :: ECOLOGY=1  ! Base temperature for Q10
   integer,      parameter :: TRANSPORT=2
   real(RLEN),   parameter :: ZERO_KELVIN=-273.15_RLEN
-  real(RLEN),   parameter :: Rgas=83.131_RLEN ! Gas constant: bar mol^-1 deg-1
+  real(RLEN),   parameter :: Rgas=83.14472_RLEN ! Gas constant: L·mbar·K-1·mol-1
   real(RLEN),   parameter :: MW_C=12.0_RLEN  ! Molecular weight Carbon
   real(RLEN),   parameter :: MW_N=14.0_RLEN  ! Molecular weight Nitrogen
   real(RLEN),   parameter :: MW_P=31.0_RLEN  ! Molecular weight Phosphorus
   real(RLEN),   parameter :: MW_SI=28.0_RLEN  ! Molecular weight Silica
+  real(RLEN),   parameter :: MW_Ca=40.078_RLEN  ! Molecular weight Calcium
   real(RLEN),   parameter :: C2ALK=2.0_RLEN/MW_C ! Conversion factor between inorganic carbon and alkalinity
   real(RLEN),   parameter :: E2W=0.217_RLEN  ! Conversion factor Einstein->W
   real(RLEN),   parameter :: SEC_PER_DAY=86400.0_RLEN  ! Seconds in day

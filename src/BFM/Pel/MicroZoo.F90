@@ -164,13 +164,13 @@
   do i = 1 ,iiPhytoPlankton
      PPYc(:,i) = p_paPPY(zoo,i)*PhytoPlankton(i,iiC)* &
                    MM(PhytoPlankton(i,iiC), p_minfood(zoo))
-    rumc = rumc + PPYc(:,i)
+     rumc = rumc + PPYc(:,i)
   end do
 
   do i = 1, iiMicroZooPlankton
      MIZc(:,i) = p_paMIZ(zoo,i)*MicroZooPlankton(i,iiC)* &
                    MM(MicroZooPlankton(i,iiC), p_minfood(zoo))
-    rumc = rumc + MIZc(:,i)
+     rumc = rumc + MIZc(:,i)
   end do
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

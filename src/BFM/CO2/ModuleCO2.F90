@@ -17,6 +17,7 @@
 ! !USES:
   use global_mem
   use SystemForcing, only :ForcingName, ForcingField, FieldInit, FieldClose
+  use mem_PelCO2, only: InitPelCO2,ClosePelCO2
   IMPLICIT NONE
 !  
 !
@@ -60,7 +61,7 @@
   ! NAME           [UNIT]/KIND             DESCRIPTION
   ! AtmCO20        [ppmv]           Initial atmospheric concentration of CO2
   ! calcAtmpCO2    logical          Compute the partial pressure of Atmospheric CO2
-  ! pCO2Method     integer          pCO2 computation method: 1=MixRatio*slp0, 2=Magnus formula
+  ! pCO2Method     integer          pCO2 computation method: 1=MixRatio*p_atm0, 2=Magnus formula
   ! phstart        [pH]             Initial pH value
   ! K1K2           integer          Switch for the acidity constants parameterization
   !                                 1 : Roy et al. (1993); DOE (1994); pH on total scale
@@ -143,7 +144,7 @@
   use mem,          ONLY:NO_BOXES_XY
 #endif
   use api_bfm, ONLY: bfm_init
-  use mem_Param, ONLY: slp0
+  use mem_Param, ONLY: p_atm0
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     namelist /CO2_parameters/ AtmCO20,calcAtmpCO2,pCO2Method,K1K2,MethodCalcCO2, &
                               phscale,phstart,M2XACC,M2PHDELT,M2MAXIT,           &
@@ -226,8 +227,8 @@
           ! Use constant
           ! the following check is needed to avoid allocation of empty arrays with MPI and land domains
           if (NO_BOXES_XY > 0) then
-             AtmSLP%fnow = slp0
-             write(LOGUNIT,*) 'Using constant atmospheric SLP (see slp0 in BFM_General.nml): ', AtmSLP%fnow(1)
+             AtmSLP%fnow = p_atm0
+             write(LOGUNIT,*) 'Using constant atmospheric SLP (see p_atm0 in BFM_General.nml): ', AtmSLP%fnow(1)
              write(LOGUNIT,*) ' '
           end if
        else
@@ -273,7 +274,7 @@
     if (AtmSLP%init == 3 ) write(LOGUNIT,*) 'SLP is provided by NEMO model.' 
     LEVEL1 '-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'
     LEVEL1 ' '
-
+   call InitPelCO2
     FLUSH(LOGUNIT)
     return
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -288,9 +289,10 @@
   subroutine CloseCO2()
     implicit none
     
-    if (AtmCO2%init == 2) then
+    if (AtmCO2%init == 1) then
        ! close external 0-D timeseries
        CALL FieldClose(AtmCO2_N, AtmCO2)
+       call ClosePelCO2
     end if
   end subroutine CloseCO2
 

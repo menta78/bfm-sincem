@@ -138,7 +138,8 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Carbonate chemistry
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  call PelCO2Dynamics( )
+  !call PelCO2Dynamics( )
+  call PelagicCSYS()
 #endif
 
 #ifdef INCLUDE_PELFE

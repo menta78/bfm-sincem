@@ -14,7 +14,7 @@
 !   !
 !
 ! !INTERFACE
-  subroutine PelCO2Dynamics()
+  subroutine PelagicCSYS()
 !
 ! !USES:
 
@@ -31,13 +31,13 @@
     N1p,N5s,CO2, HCO3, CO3, pCO2, pH, ETW, ESW, ERHO, EWIND, EICE, &
     OCalc, OArag, EPR, ppO5c, O5c
 #endif
-  use CO2System, ONLY: CalcCO2System
-  use mem_CO2    
+  use mem_PelCO2    
+  use mem_CSYS, ONLY : CarbonateSystem
   use BFM_ERROR_MSG, ONLY: BFM_ERROR
 #ifdef BFM_GOTM
   use bio_var, ONLY: SRFindices
 #else
-  use api_bfm, ONLY: SRFindices
+  use api_bfm, ONLY: SRFindices,bfm_init
 #endif
   IMPLICIT NONE
 
@@ -53,7 +53,8 @@
   integer            :: error=0
   integer,save       :: first=0
   integer            :: AllocStatus
-  real(RLEN),allocatable,save,dimension(:) :: rateN, excess, rdiss
+  real(RLEN),allocatable,save,dimension(:) :: rateN, excess, rdiss, xflux
+  real(RLEN),allocatable,save,dimension(:) :: tCO2airflux,tjsurO3c
 !
 ! COPYING
 !   
@@ -78,70 +79,76 @@
   ! Allocate local memory
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   if (first==0) then
-     ALLOCATE ( rateN(NO_BOXES), excess(NO_BOXES), rdiss(NO_BOXES),           &
+     ALLOCATE ( rateN(NO_BOXES), excess(NO_BOXES), rdiss(NO_BOXES), xflux(NO_BOXES),  &
+        &       tCO2airflux(NO_BOXES),tjsurO3c(NO_BOXES),&
         &      STAT = AllocStatus )
-     IF( AllocStatus /= 0 ) call bfm_error('PelCO2Dynamics','Error allocating arrays')
+     IF( AllocStatus /= 0 ) call bfm_error('PelagicCSYS','Error allocating arrays')
      first=1
   end if
+  if (bfm_init == 0 ) pH(:) = -ONE
+  if (bfm_init == 0 ) tjsurO3c(:) = 0
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Compute carbonate system equilibria
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! To use the Pressure correction of CSYS here the pr_in=EPS value
-  do BoxNumber=1,NO_BOXES
-     ! convert DIC and alkalinity from model units to diagnostic output
-     ! mg C/m3 --> umol/kg
-     ! mmol eq/m3 --> umol/kg
-     DIC(BoxNumber) = O3c(BoxNumber)/MW_C/ERHO(BoxNumber)*1000.0_RLEN
-     ALK(BoxNumber) = O3h(BoxNumber)/ERHO(BoxNumber)*1000.0_RLEN
-     error= CalcCO2System(MethodCalcCO2,ESW(BoxNumber),    &
-              ETW(BoxNumber),ERHO(BoxNumber),  &
-              N1p(BoxNumber),N5s(BoxNumber),ALK(BoxNumber),&
-              CO2(BoxNumber),HCO3(BoxNumber),CO3(BoxNumber),pH(BoxNumber),&
-              pr_in=EPR(BoxNumber), DIC_in=DIC(BoxNumber),pCO2_out=pCO2(BoxNumber),& 
-              omegacal=OCalc(BoxNumber),omegarag=OArag(BoxNumber))
-#ifdef DEBUG
-     write(LOGUNIT,*) "in PelCO2:"
-     write(LOGUNIT,'(A,'' ='',f12.6)') 'ERHO',ERHO(BoxNumber)
-     write(LOGUNIT,'(A,'' ='',f12.6)') 'ESW',ESW(BoxNumber)
-     write(LOGUNIT,'(A,'' ='',f12.6)') 'N1p',N1p(BoxNumber)
-     write(LOGUNIT,'(A,'' ='',f12.6)') 'N5s',N5s(BoxNumber)
-     write(LOGUNIT,'(A,'' ='',f12.6)') 'DIC',DIC(BoxNumber)
-     write(LOGUNIT,'(A,'' ='',f12.6)') 'ALK',ALK(BoxNumber)
-     write(LOGUNIT,'(A,'' ='',f12.6)') 'OCalc',OCalc(BoxNumber)
-     write(LOGUNIT,'(A,'' ='',f12.6)') 'OArag',OArag(BoxNumber)
-     write(LOGUNIT,'(''layer:'',I4,'' pH='',f12.6)') BoxNumber,pH(BoxNumber)
-#endif
-     write(LOGUNIT,*) "in PelCO2 OLD:", DIC(BoxNumber),ALK(BoxNumber),pH(BoxNumber),pCO2(BoxNumber),OCalc(BoxNumber),OArag(BoxNumber)
-     if ( error > 0 ) then
-            write(LOGUNIT,*)" Ph outside range"
-            write(LOGUNIT,'(A,'' ='',f12.6)') 'ERHO',ERHO(BoxNumber)
-            write(LOGUNIT,'(A,'' ='',f12.6)') 'ETW',ETW(BoxNumber)
-            write(LOGUNIT,'(A,'' ='',f12.6)') 'ESW',ESW(BoxNumber)
-            write(LOGUNIT,'(A,'' ='',f12.6)') 'EPR',EPR(BoxNumber)
-            write(LOGUNIT,'(A,'' ='',f12.6)') 'N1p',N1p(BoxNumber)
-            write(LOGUNIT,'(A,'' ='',f12.6)') 'N5s',N5s(BoxNumber)
-            write(LOGUNIT,'(A,'' ='',f12.6)') 'DIC',DIC(BoxNumber)
-            write(LOGUNIT,'(A,'' ='',f12.6)') 'OCalc',OCalc(BoxNumber)
-            write(LOGUNIT,'(A,'' ='',f12.6)') 'OArag',OArag(BoxNumber)
-            write(LOGUNIT,'(A,'' ='',f12.6)') 'ALK',O3h(BoxNumber)
-            write(LOGUNIT,'(''layer:'',I4,'' pH='',f12.6)') BoxNumber,pH(BoxNumber)
-            call BFM_ERROR("PelCO2Dynamics","pH outside range 2-11")
-     endif
-  end do
+    do BoxNumber=1,NO_BOXES
+       ! convert DIC and alkalinity from model units to diagnostic output
+       ! mg C/m3 --> umol/kg
+       ! mmol eq/m3 --> umol/kg
+       DIC(BoxNumber) = O3c(BoxNumber)/MW_C/ERHO(BoxNumber)*1000.0_RLEN
+       ALK(BoxNumber) = O3h(BoxNumber)/ERHO(BoxNumber)*1000.0_RLEN
 
+       error= CarbonateSystem( ESW(BoxNumber), ETW(BoxNumber),ERHO(BoxNumber), &
+               N1p(BoxNumber), N5s(BoxNumber), DIC(BoxNumber), ALK(BoxNumber), &
+               CO2(BoxNumber) ,HCO3(BoxNumber), CO3(BoxNumber), pH(BoxNumber), &
+               pCO2(BoxNumber), patm=AtmSLP%fnow(BoxNumber), pr_in=EPR(BoxNumber), &
+               OmegaC=OCalc(BoxNumber), OmegaA=OArag(BoxNumber))
+#ifdef DEBUG
+       write(LOGUNIT,*) "in PelCO2:"
+       write(LOGUNIT,'(A,'' ='',f12.6)') 'ERHO',ERHO(BoxNumber)
+       write(LOGUNIT,'(A,'' ='',f12.6)') 'ESW',ESW(BoxNumber)
+       write(LOGUNIT,'(A,'' ='',f12.6)') 'N1p',N1p(BoxNumber)
+       write(LOGUNIT,'(A,'' ='',f12.6)') 'N5s',N5s(BoxNumber)
+       write(LOGUNIT,'(A,'' ='',f12.6)') 'DIC',DIC(BoxNumber)
+       write(LOGUNIT,'(A,'' ='',f12.6)') 'ALK',ALK(BoxNumber)
+       write(LOGUNIT,'(A,'' ='',f12.6)') 'OCalc',OCalc(BoxNumber)
+       write(LOGUNIT,'(A,'' ='',f12.6)') 'OArag',OArag(BoxNumber)
+       write(LOGUNIT,'(''layer:'',I4,'' pH='',f12.6)') BoxNumber,pH(BoxNumber)
+#endif
+       write(*,*) "in PelCO2 NEW:", DIC(BoxNumber),ALK(BoxNumber),pH(BoxNumber),pCO2(BoxNumber),OCalc(BoxNumber),OArag(BoxNumber), CO2(BoxNumber)
+       if ( error > 0 ) then
+              call BFM_ERROR("PelCO2","Error in csys computation")
+              write(LOGUNIT,'(''layer:'',I4,'' pH='',f12.6)') BoxNumber,pH(BoxNumber)
+       endif
+    end do
+
+
+   ! write(LOGUNIT,*) ' air-sea'
+   ! write(LOGUNIT,*) ' alk bio'
+   ! write(LOGUNIT,*) ' calcite '
+    
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Computes Atmospheric pCO2 value
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Rough approximation: pCO2 is assumed equal to the mixing ratio of CO2
-  if (.not. calcAtmpCO2) EPCO2air = AtmCO2%fnow
-  ! 
-  if (calcAtmpCO2) call CalcPCO2Air()
-
+  EPCO2air = AtmCO2%fnow
+  call CO2flux()
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Computes air-sea flux (only at surface points)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  call CO2Flux()
-
+  !write (*,*) AtmCO2%fnow, AtmSLP%fnow,ETW,ESW,ERHO,EWIND,EICE,pCO2,CO2
+  do BoxNumber=1,NO_BOXES 
+  call AirSeaCO2(AtmCO2%fnow(BoxNumber),AtmSLP%fnow(BoxNumber),ETW(BoxNumber),ESW(BoxNumber), &  
+         ERHO(BoxNumber),EWIND(BoxNumber),EICE(BoxNumber),CO2(BoxNumber),tCO2airflux(BoxNumber))
+  enddo
+  !call AirSeaCO2(AtmCO2%fnow,AtmSLP%fnow,ETW,ESW,ERHO,EWIND,EICE,pCO2,tCO2airflux)
+  tjsurO3c(:) = tjsurO3c(:) + tCO2airflux * MW_C * 1000.0_RLEN
+  xflux(SRFindices) = tjsurO3c(:) / Depth(SRFindices) * CO2fluxfac
+  if ( AssignAirPelFluxesInBFMFlag) then
+     call flux_vector( iiPel, ppO3c,ppO3c, xflux )
+  end if
+  write (*,*) 'co2 flux new, ', xflux
+  
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Changes in alkalinity due to N uptake (see BFM Manual Eq. 2.5.21)
   ! It is computed this way
@@ -150,7 +157,7 @@
   ! Sulfur reactions associated to reduction equivalents are not
   ! considered as included in the operational TA definition
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  if ( CalcBioAlkFlag ) then
+  if ( CalcBioAlk ) then
      rateN(:) = - Source_D3_vector(ppN3n) + Source_D3_vector(ppN4n)
      call flux_vector( iiPel, ppO3h,ppO3h, rateN)
   endif 
@@ -169,7 +176,7 @@
   call flux_vector( iiPel, ppO5c, ppO3c, rdiss(:) )
   call flux_vector( iiPel, ppO3h, ppO3h, -C2ALK*rdiss(:) )
 
-  end subroutine PelCO2Dynamics
+  end subroutine PelagicCSYS
 !EOC
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model 

@@ -190,9 +190,11 @@ IMPLICIT NONE
     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     jsurO3c(:) = jsurO3c(:) + (ONE-ice(:)) * CO2airflux(:) * MW_C
     tmpflux(SRFindices) = jsurO3c(:) / Depth(SRFindices) * CO2fluxfac
-    if ( AssignAirPelFluxesInBFMFlag) then
-       call flux_vector( iiPel, ppO3c,ppO3c, tmpflux )
-    end if
+    !if ( AssignAirPelFluxesInBFMFlag) then
+    !   call flux_vector( iiPel, ppO3c,ppO3c, tmpflux )
+    !end if
+    ! write(*,*) 'old',kv,pco2air,pco2sea,k0,rho
+    write (*,*) 'co2 flux old, ', tmpflux
 
     return
 
