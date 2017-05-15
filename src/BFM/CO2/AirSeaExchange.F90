@@ -1,6 +1,4 @@
 #include "cppdefs.h"
-#include "DEBUG.h"
-#include "INCLUDE.h"
 
 #ifdef INCLUDE_PELCO2
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -8,10 +6,19 @@
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 !BOP
 !
-! !ROUTINE: AirSeaCO2
+! !ROUTINE: Air-Sea flux Exchange
 !
 ! DESCRIPTION
 !   ! compute Air-Sea CO2 Exchange
+
+! !INTERFACE
+Module AirSeaExchange
+!
+! !USES:
+  use global_mem, ONLY: RLEN,ONE,ZERO
+  use constants,  ONLY: HOURS_PER_DAY,ZERO_KELVIN
+
+  IMPLICIT NONE
 !
 ! !AUTHORS
 !   T. Lovato (CMCC) 2017
@@ -33,13 +40,15 @@
 !EOP
 !-------------------------------------------------------------------------!
 !BOC
+  public AirSeaCO2
+
+ contains
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  subroutine AirSeaCO2(xco2,patm,temp,salt,rho,wind,Fice,co2ocn,xflux) 
+  elemental function AirSeaCO2(xco2,patm,temp,salt,rho,wind,Fice,co2ocn) 
   ! 
-  use global_mem, ONLY: RLEN,ONE,ZERO
-  use constants,  ONLY: HOURS_PER_DAY,ZERO_KELVIN
-  !
     implicit none
+    real(RLEN)                       :: AirSeaCO2 
+    !     
     real(RLEN),intent(IN)            :: xco2   ! Atmospheric mixing ratio of Gas [ppmv]
     real(RLEN),intent(IN)            :: patm   ! Atmospheric pressure [mbar]
     real(RLEN),intent(IN)            :: temp   ! in-situ temperature at surface
@@ -49,22 +58,24 @@
     real(RLEN),intent(IN)            :: Fice   ! Sea-ice cover fraction [0-1]
     real(RLEN),intent(IN)            :: co2ocn ! gas concentration at surface [umol/kg]
     !
-    real(RLEN),intent(OUT)           :: xflux  ! Air-Sea Gas Flux (positive downward) [mol/m2/d]
+    real(RLEN)           :: xflux  ! Air-Sea Gas Flux (positive downward) [mol/m2/d]
     !---------------------------------------------------------------------------
     real(RLEN),parameter    :: PERMIL=ONE/1000.0_RLEN
     real(RLEN),parameter    :: bar2atm  = ONE/1.01325_RLEN ! Conversion factor from bar to atm
     real(RLEN),parameter    :: Rgas_atm = 82.05736_RLEN    ! (cm3 * atm) / (mol * K)  CODATA (2006)
     real(RLEN),parameter    :: kwfac = 0.01_RLEN * HOURS_PER_DAY ! convert from cm/h to m/d
     real(RLEN)   :: pco2atm, patma, co2starair, co2star
-    real(RLEN)   :: pH20, fco2atm, fugcoeff, bb, Del, xc2, phi0atm
+    real(RLEN)   :: pH20, fco2atm, fugcoeff, bb, Del, xc2
     real(RLEN)   :: tk, tk100, tk1002, itk100
     real(RLEN)   :: pschmidt, Kw660, kwgas, K0
     ! CO2 solubility coefficients
     real(RLEN),parameter :: A(3) = (/-58.0931_RLEN, 90.5069_RLEN, 22.2940_RLEN/), &
                             B(3) = (/0.027766_RLEN, -0.025888_RLEN, 0.0050578_RLEN/)
-    ! Schmidt coefficients
+    !! Schmidt coefficients
     real(RLEN),parameter :: Sc = 660.0_RLEN, &
          C(5)  = (/2116.8_RLEN, -136.25_RLEN, 4.7353_RLEN, -0.092307_RLEN, 0.0007555_RLEN/)
+    ! This is for alternative fit of co2starair 
+    !real(RLEN)   :: phi0atm
     !real(RLEN),parameter :: F(7) = (/-160.7333, 215.4152, 89.8920, -1.47759, 0.029941, -0.027455, 0.0053407/)
     !---------------------------------------------------------------------------
     !
@@ -90,10 +101,12 @@
     xc2 = (ONE - (pco2atm*1.e-6_RLEN) )**2
     fugcoeff = EXP( patma*(bb + 2.0d0*xc2*Del)/(Rgas_atm*tk) )
     fco2atm = pco2atm * fugcoeff
+    !
     ! Surface solubility of gas K0  [(mol/kg) / atm] at T, S of surface water according to Weiss (1974)
     K0 = exp( A(1) + A(2)/tk100 + A(3)*log(tk100) + salt*(B(1) + B(2)*tk100 + B(3)*tk1002) )
     ! air-sea gas flux
     co2starair = K0 * fco2atm * 1.0e-6_RLEN   ! Equil.  [A*] for atm gas at Patm & sfc-water T,S [mol/kg]
+
     ! Alternative computation
     !! Solubility function for atmospheric CO2 saturation concentration (Orr et al. GMD 2017, Eq. 15)
     !phi0atm = exp (F(1) + F(2)*itk100 + F(3)*log(tk100) + F(4)*tk1002 + salt*(F(5) + F(6)*tk100 + F(7)*tk1002))
@@ -105,16 +118,15 @@
     !  Schmidt number (Sc), ratio between the kinematic viscosity and the molecular diffusivity of the gas
     pschmidt = C(1) + C(2)*temp + C(3)*temp**2 + C(4)*temp**3 + C(5)*temp**4
     ! Transfer velocity for gas in m/d (see equation [4] in OCMIP2 design document & OCMIP2 Abiotic HOWTO)
-    kwgas = kw660 * (Sc/pschmidt)**0.5
+    kwgas = kw660 * (sc/pschmidt)**0.5
 
-    ! air-sea gas flux
-    co2star = co2ocn * 1.0e-6_RLEN            ! Oceanic [A*] in [mol/kg] 
-    xflux = kwgas * (co2starair - co2star) * (ONE - Fice) * rho ! Air-sea gas flux [mol/(m2 * day)]
-  
+    ! Air-sea gas flux [mmol/(m2 * day)]
+    AirSeaCO2 = kwgas * (co2starair - co2star) * (ONE - Fice) * rho * 1000
     return 
 
-  end subroutine AirSeaCO2
+  end function AirSeaCO2
 
+end module AirSeaExchange
 !EOC
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model 

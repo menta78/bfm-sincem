@@ -33,6 +33,7 @@
 #endif
   use mem_CO2    
   use mem_CSYS, ONLY : CarbonateSystem
+  use AirSeaExchange, ONLY: AirSeaCO2
   use BFM_ERROR_MSG, ONLY: BFM_ERROR
 #ifdef BFM_GOTM
   use bio_var, ONLY: SRFindices
@@ -44,10 +45,9 @@
 !  
 !
 ! !AUTHORS
-!   M. Vichi, H. Thomas and P. Ruardij
+!  T. Lovato 
 !
 ! !REVISION_HISTORY
-! 2017  : T. Lovato, simplify CO2 workflow 
 !
 ! !LOCAL VARIABLES:
   integer            :: error=0
@@ -57,9 +57,7 @@
 !
 ! COPYING
 !   
-!   Copyright (C) 2015 BFM System Team (bfm_st@lists.cmcc.it)
-!   Copyright (C) 2006 P. Ruardij and M. Vichi
-!   (rua@nioz.nl, vichi@bo.ingv.it)
+!   Copyright (C) 2017 BFM System Team (bfm_st@lists.cmcc.it)
 !
 !   This program is free software; you can redistribute it and/or modify
 !   it under the terms of the GNU General Public License as published by
@@ -78,7 +76,8 @@
   ! Allocate local memory
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   if (first==0) then
-     ALLOCATE ( rateN(NO_BOXES), excess(NO_BOXES), rdiss(NO_BOXES), xflux(NO_BOXES),  &
+     ALLOCATE ( rateN(NO_BOXES), excess(NO_BOXES), rdiss(NO_BOXES),  &
+        &      xflux(NO_BOXES_XY),                                   &
         &      STAT = AllocStatus )
      IF( AllocStatus /= 0 ) call bfm_error('PelagicCSYS','Error allocating arrays')
      first=1
@@ -127,19 +126,12 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Computes air-sea flux (only at surface points)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  do BoxNumber=1,NO_BOXES 
-  call AirSeaCO2(AtmCO2%fnow(BoxNumber),AtmSLP%fnow(BoxNumber),ETW(BoxNumber),ESW(BoxNumber), &  
-         ERHO(BoxNumber),EWIND(BoxNumber),EICE(BoxNumber),CO2(BoxNumber),CO2airflux(BoxNumber))
-  enddo
-  !call AirSeaCO2(AtmCO2%fnow, AtmSLP%fnow, ETW(SRFindices), ESW(SRFindices), &
-  !        ERHO(SRFindices), EWIND, EICE, pCO2(SRFindices), CO2airflux)
-  ! Flux from mol/m2/d to mmol/m2/day
-  CO2airflux = CO2airflux * 1000.0_RLEN
+  CO2airflux = AirSeaCO2(AtmCO2%fnow, AtmSLP%fnow, ETW(SRFindices), ESW(SRFindices), &
+          ERHO(SRFindices), EWIND, EICE, CO2(SRFindices) )
+  !
   jsurO3c(:) = jsurO3c(:) + CO2airflux * MW_C
-  xflux(SRFindices) = jsurO3c(:) / Depth(SRFindices) * CO2fluxfac
-  if ( AssignAirPelFluxesInBFMFlag) then
-     call flux_vector( iiPel, ppO3c,ppO3c, xflux )
-  end if
+  xflux = jsurO3c(:) / Depth(SRFindices) * CO2fluxfac
+  if ( AssignAirPelFluxesInBFMFlag)  call flux_vector( iiPel, ppO3c,ppO3c, xflux )
   
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Changes in alkalinity due to N uptake (see BFM Manual Eq. 2.5.21)
