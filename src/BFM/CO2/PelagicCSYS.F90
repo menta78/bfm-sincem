@@ -77,11 +77,15 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   if (first==0) then
      ALLOCATE ( rateN(NO_BOXES), excess(NO_BOXES), rdiss(NO_BOXES),  &
-        &      xflux(NO_BOXES_XY),                                   &
+        &      xflux(NO_BOXES),                                      &
         &      STAT = AllocStatus )
      IF( AllocStatus /= 0 ) call bfm_error('PelagicCSYS','Error allocating arrays')
      first=1
   end if
+  !
+  xflux = ZERO
+  !
+  ! If cold start, CarbonateSystem computes initial pH
   if (bfm_init == 0 ) pH(:) = -ONE
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Compute carbonate system equilibria
@@ -118,22 +122,6 @@
     end do
    
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! Computes Atmospheric pCO2 value
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! Rough approximation: pCO2 is assumed equal to the mixing ratio of CO2
-  EPCO2air = AtmCO2%fnow
-  !
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! Computes air-sea flux (only at surface points)
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  CO2airflux = AirSeaCO2(AtmCO2%fnow, AtmSLP%fnow, ETW(SRFindices), ESW(SRFindices), &
-          ERHO(SRFindices), EWIND, EICE, CO2(SRFindices) )
-  !
-  jsurO3c(:) = jsurO3c(:) + CO2airflux * MW_C
-  xflux = jsurO3c(:) / Depth(SRFindices) * CO2fluxfac
-  if ( AssignAirPelFluxesInBFMFlag)  call flux_vector( iiPel, ppO3c,ppO3c, xflux )
-  
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Changes in alkalinity due to N uptake (see BFM Manual Eq. 2.5.21)
   ! It is computed this way
   ! net_uptakeNO3=dNO3/dt+denit-nit , net_uptakeNH4=dNH4/dt+nit
@@ -153,12 +141,29 @@
   excess(:) = max(ZERO,ONE - OCalc(:))
   ! Dissolution rate of C in CaCO3 (mg C/m3/d) from Morse and Berner (1972)
   rdiss(:) = p_kdca * excess(:)**p_nomega * O5c(:)
-
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Inorganic carbon and alkalinity flux due to PIC changes
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   call flux_vector( iiPel, ppO5c, ppO3c, rdiss(:) )
   call flux_vector( iiPel, ppO3h, ppO3h, -C2ALK*rdiss(:) )
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Computes Atmospheric pCO2 value
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Rough approximation: pCO2 is assumed equal to the mixing ratio of CO2
+  EPCO2air = AtmCO2%fnow
+  !
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Computes air-sea flux (only at surface points)
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  if (SRFindices(1) .eq. 0 ) return
+
+  CO2airflux(:) = AirSeaCO2(AtmCO2%fnow, AtmSLP%fnow, ETW(SRFindices), ESW(SRFindices), &
+          ERHO(SRFindices), EWIND, EICE, CO2(SRFindices) )
+
+  jsurO3c(:) = jsurO3c(:) + CO2airflux(:) * MW_C
+  xflux(SRFindices) = jsurO3c(:) / Depth(SRFindices) * CO2fluxfac
+  if ( AssignAirPelFluxesInBFMFlag)  call flux_vector( iiPel, ppO3c,ppO3c, xflux )
 
   end subroutine PelagicCSYS
 !EOC

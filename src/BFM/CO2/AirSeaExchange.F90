@@ -44,7 +44,7 @@ Module AirSeaExchange
 
  contains
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  elemental function AirSeaCO2(xco2,patm,temp,salt,rho,wind,Fice,co2ocn) 
+  elemental function AirSeaCO2(xco2,patm,temp,salt,rho,wind,Fice,co2ocn)
   ! 
     implicit none
     real(RLEN)                       :: AirSeaCO2 
@@ -110,7 +110,7 @@ Module AirSeaExchange
     ! Alternative computation
     !! Solubility function for atmospheric CO2 saturation concentration (Orr et al. GMD 2017, Eq. 15)
     !phi0atm = exp (F(1) + F(2)*itk100 + F(3)*log(tk100) + F(4)*tk1002 + salt*(F(5) + F(6)*tk100 + F(7)*tk1002))
-    !! Compute saturation concentration in atmosphere [mol/kg] at total pressure Pa as in Orr et al i(GMD 2017, Eq. 16)
+    !! Compute saturation concentration in atmosphere [mol/kg] at total pressure Pa as in Orr et al (GMD 2017, Eq. 16)
     !co2starair = patma * phi0atm * xco2 * 1.0e-6_RLEN
     ! 
     ! Compute piston velolicty kw660 (at 25 C) from wind speed (Wanninkhof 2014, Limnol. Oceanograph. Methods, 12, 351-362)

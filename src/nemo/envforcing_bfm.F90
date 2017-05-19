@@ -13,7 +13,7 @@
 ! BFM modules
    use constants,  only: E2W
    use global_mem, only: RLEN,ZERO,LOGUNIT,ONE
-   use mem_param,  only: p_small, slp0
+   use mem_param,  only: p_small, p_atm0
    use mem_PAR,    only: ChlAttenFlag, P_PARRGB, P_PAR, &
                          R_EPS, B_EPS, G_EPS, P_EPSIR,  &
                          EIRR, EIRB, EIRG
@@ -119,7 +119,7 @@ IMPLICIT NONE
             AtmSLP%fnow = pack( apr(:,:),SRFmask(:,:,1) )
 #ifdef CCSMCOUPLED
             if ( kt < 10 .AND. bfm_init /= 1 ) then                 ! ugly patch to get values in first step of CESM
-              WHERE ( AtmSLP%fnow == 0. ) ; AtmSLP%fnow = slp0 ; END WHERE ;
+              WHERE ( AtmSLP%fnow == 0. ) ; AtmSLP%fnow = p_atm0 ; END WHERE ;
             endif
 #endif
       END SELECT

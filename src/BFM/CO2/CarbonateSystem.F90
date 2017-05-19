@@ -1,6 +1,4 @@
 #include "cppdefs.h"
-#include "DEBUG.h"
-#include "INCLUDE.h"
 
 #if defined INCLUDE_PELCO2 || defined INCLUDE_BENCO2
 

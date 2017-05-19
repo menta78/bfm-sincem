@@ -503,12 +503,12 @@
 
 #if defined INCLUDE_PELCO2 && ! defined CCSMCOUPLED
    ! control consistency between namelists setting
-   if (AtmCO2%init .eq. 4 .and. .NOT. ln_trc_sbc(ppO3c)) then
+   if (AtmCO2%init .eq. 2 .and. .NOT. ln_trc_sbc(ppO3c)) then
      LEVEL1 'CO2 data from Nemo not available in surface BC &
           for O3c (check namelist_top and BFM_General).'
      stop
    endif   
-   if (AtmSLP%init .eq. 4 .and. .NOT. ln_trc_sbc(ppO3h)) then
+   if (AtmSLP%init .eq. 2 .and. .NOT. ln_trc_sbc(ppO3h)) then
      LEVEL1 'Sea Level Pressure data from Nemo not available in surface BC &
           for O3h (check namelist_top and BFM_General).'
      stop
