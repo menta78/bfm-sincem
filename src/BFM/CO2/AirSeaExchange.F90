@@ -40,7 +40,7 @@ Module AirSeaExchange
 !EOP
 !-------------------------------------------------------------------------!
 !BOC
-  public AirSeaCO2
+  public AirSeaCO2, AirpGas
 
  contains
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -74,7 +74,7 @@ Module AirSeaExchange
     !! Schmidt coefficients
     real(RLEN),parameter :: Sc = 660.0_RLEN, &
          C(5)  = (/2116.8_RLEN, -136.25_RLEN, 4.7353_RLEN, -0.092307_RLEN, 0.0007555_RLEN/)
-    ! This is for alternative fit of co2starair 
+    ! This is for alternative fit of co2starair (see Orr et al, 2017 GMD)
     !real(RLEN)   :: phi0atm
     !real(RLEN),parameter :: F(7) = (/-160.7333, 215.4152, 89.8920, -1.47759, 0.029941, -0.027455, 0.0053407/)
     !---------------------------------------------------------------------------
@@ -122,9 +122,41 @@ Module AirSeaExchange
 
     ! Air-sea gas flux [mmol/(m2 * day)]
     AirSeaCO2 = kwgas * (co2starair - co2star) * (ONE - Fice) * rho * 1000
+
     return 
 
   end function AirSeaCO2
+
+! -----------------------------------------------------------------------------
+
+  elemental function AirpGas(xgas,patm,temp,salt)
+  !
+    implicit none
+    real(RLEN)                       :: AirpGas ! Atmospheric partial pressure of gas [uatm]
+    !
+    real(RLEN),intent(IN)            :: xgas    ! Atmospheric mixing ratio of Gas [ppmv]
+    real(RLEN),intent(IN)            :: patm    ! Atmospheric pressure [mbar]
+    real(RLEN),intent(IN)            :: temp    ! in-situ temperature at surface
+    real(RLEN),intent(IN)            :: salt    ! practical salinity at surface
+    !---------------------------------------------------------------------------
+    real(RLEN)   :: tk
+    real(RLEN)   :: patma, pH20
+    !
+    real(RLEN),parameter    :: PERMIL=ONE/1000.0_RLEN
+    real(RLEN),parameter    :: bar2atm  = ONE/1.01325_RLEN ! Conversion factor from bar to atm
+    !---------------------------------------------------------------------------
+    ! common arrays
+    tk = temp - ZERO_KELVIN
+    patma = patm * PERMIL * bar2atm ! convert patm from mbar to atm
+    !
+    ! Compute vapor pressure of seawater [in atm] (Weiss and Price, 1980, Eq. 10)
+    pH20 = exp(24.4543_RLEN - 67.4509_RLEN*(100._RLEN/tk) - 4.8489_RLEN*log(tk/100.0_RLEN) - 0.000544_RLEN*salt)
+    !
+    ! Compute pco2atm [uatm] from xco2 [ppm], atmospheric pressure [atm], & vapor pressure of seawater pH20 [atm]
+    AirpGas = (patma - pH20) * xgas
+
+    return
+  end function AirpGas
 
 end module AirSeaExchange
 !EOC

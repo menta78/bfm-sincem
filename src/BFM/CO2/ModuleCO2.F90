@@ -75,14 +75,16 @@
   !                                2 = read 2D fields using NEMO fldread 
   ! NOTE: The file "CMIP5_Historical_GHG_1765_2005.dat" is located in "$BFMDIR/tools" folder
   !-----------------------------------------------------------------------------------!
-   real(RLEN)   :: AtmCO20 = 365.0_RLEN ! ppm 
-   integer      :: MaxIterPHsolver = 50
-   real(RLEN)   :: p_kdca
-   integer      :: p_nomega
-   logical      :: CalcBioAlk = .FALSE.
-   real(RLEN)   :: Co2fluxfac = 1.0_RLEN
+   real(RLEN)           :: AtmCO20 = 365.0_RLEN ! ppm 
+   integer              :: MaxIterPHsolver = 50
+   real(RLEN)           :: p_kdca
+   integer              :: p_nomega
+   logical              :: CalcBioAlk = .FALSE.
+   real(RLEN)           :: Co2fluxfac = 1.0_RLEN
    type(ForcingName)    :: AtmCO2_N, AtmSLP_N
    type(ForcingField)   :: AtmCO2, AtmSLP
+   ! ancillary
+   real(RLEN),allocatable,dimension(:) :: patm3d ! atm. pressure over NO_BOXES
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! SHARED PUBLIC FUNCTIONS (must be explicited below "contains")
    public InitCO2, CloseCO2
@@ -95,8 +97,7 @@
 #ifdef NOPOINTERS
   use mem
 #else
-  use mem,          ONLY:EPCO2air,pH
-  use mem,          ONLY:NO_BOXES_XY
+  use mem,          ONLY: NO_BOXES, NO_BOXES_XY, pH
 #endif
   use api_bfm, ONLY: bfm_init
   use mem_Param, ONLY: p_atm0
@@ -106,6 +107,9 @@
                             AtmCO2_N, AtmSLP_N, CalcBioAlk, Co2fluxfac
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   integer            ::error=0
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  allocate (patm3d(NO_BOXES))
+  patm3d = p_atm0
   !---------------------------------------------------------------------------
   ! Initialize the structured array that defines if a variable is initialized  
   ! with external data.
@@ -159,11 +163,7 @@
           end if
     END SELECT
 
-    ! Rough approximation: pCO2 is assumed equal to the mixing ratio of CO2
-    EPCO2air = AtmCO2%fnow
-
-    ! COMPUTATION OF pCO2
-    ! Sea Level Pressure
+    ! Atmospheric Sea Level Pressure
     AtmSLP%init = AtmSLP_N%init
     CALL FieldInit(AtmSLP_N, AtmSLP)
     if (AtmSLP%init == 0) then
@@ -182,11 +182,11 @@
       write(LOGUNIT,*) ' '
     endif
 
-    ! Assign initial pH as negative value if not restart
-    !if (bfm_init == 0 ) pH(:) = -ONE
-
     ! summary of input parameters
     write(LOGUNIT,*) ' Model uses PH Total Scale '
+ 
+    ! If cold start, CarbonateSystem computes initial pH
+    if (bfm_init == 0 ) pH(:) = -ONE
 
     LEVEL1 '-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'
     LEVEL1 ' '

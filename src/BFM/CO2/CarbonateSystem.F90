@@ -144,7 +144,7 @@ module mem_CSYS
   real(RLEN),parameter    :: bar2atm  = ONE/1.01325_RLEN ! Conversion factor from bar to atm
 
   integer     :: i, l, error
-  real(RLEN)  :: H, ta, tc, sit, pt, tfco2
+  real(RLEN)  :: H, Hi, ta, tc, sit, pt, tfco2
   real(RLEN)  :: Bt, Ft, St
   real(RLEN)  :: lnk, Ks_0p, Kf_0p, deltav, deltak
   real(RLEN)  :: tk, tk100, tk1002, tc2, invtk, dlogtk, is, is2, sqrtis
@@ -211,7 +211,7 @@ module mem_CSYS
   pratm = p_atm0 * PERMIL     ! convert reference atmospheric pressure from mbar to bar
   if ( present(patm) ) pratm = patm * PERMIL  ! convert from mbar to bar
   Ptot  = (pratm + press) * bar2atm   !total pressure (in atm) = atmospheric pressure + hydrostatic pressure
-  !
+  ! 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! 2. COMPUTE CONSTANTS
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -432,17 +432,22 @@ module mem_CSYS
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! 3. COMPUTE CARBONATE SYSTEM
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! if pH < 0 then need to compute initial value
-  if ( pH < 0 ) pH = phini_for_at(ta,tc,bt,K1,K2,Kb)
+  ! H+ concentration (mol/kg) at previous step
+  if ( pH < 0._RLEN ) then
+     Hi = Hini_for_at(ta,tc,bt,K1,K2,Kb)
+  else
+     Hi = (10.0_RLEN**(-pH)) * 1000._RLEN / rho ! (mol/L -> mol/kg)
+  endif
 
-  ! Solve for H+ using above result as the initial H+ value
+  ! Solve for H+ using above result as the initial H+ value (mol/kg)
   H = solve_at_general(ta, tc, Bt, pt, sit, St, Ft,            &
-               K0, K1, K2, Kb, Kw, Ks, Kf, K1p, K2p, K3p, Ksi, pH )
+               K0, K1, K2, Kb, Kw, Ks, Kf, K1p, K2p, K3p, Ksi, Hi )
+  if (H < ZERO) CarbonateSystem = 1
 
-  ! Calculate pH from from H+ concentration (mol/kg)
-  if (H < 0._RLEN) CarbonateSystem = 1
-  pH = -1.*LOG10(H)
-  
+  ! Calculate pH from from H+ concentration (mol/kg -> mol/L)
+  pH = -ONE * LOG10( H * rho * PERMIL )
+
+
   ! Compute carbonate Alk (Ac) by difference: from total Alk and other Alk components
   HSO4 = St/(1.0_RLEN + Ks/(H/(1.0_RLEN + St/Ks)))
   HF   = 1.0_RLEN / (1.0_RLEN + Kf/H)
@@ -484,15 +489,12 @@ module mem_CSYS
   hco3 = cb * MEG
   co3  = cc * MEG
 
-  ! return no error
-  CarbonateSystem = 0  
   return
   end function CarbonateSystem
 
 ! ----------------
 
-  ! turn into elemental function
-  elemental FUNCTION phini_for_at(p_alkcb, p_dictot, p_bortot, K1, K2, Kb)
+  elemental FUNCTION Hini_for_at(p_alkcb, p_dictot, p_bortot, K1, K2, Kb)
   ! Function returns the root for the 2nd order approximation of the
   ! DIC -- B_T -- A_CB equation for [H+] (reformulated as a cubic polynomial)
   ! around the local minimum, if it exists.
@@ -502,11 +504,11 @@ module mem_CSYS
   !         * 1E-07_RLEN if 0 < p_alkcb < 2*p_dictot + p_bortot
   !                    and the 2nd order approximation does not have a solution 
     IMPLICIT NONE
-    REAL(KIND=RLEN) :: PHINI_FOR_AT
+    REAL(KIND=RLEN) :: Hini_for_at   ! [H+] in mol/kg
     
     ! Argument variables
     !--------------------
-    REAL(KIND=RLEN), INTENT(IN)   ::  p_alkcb, p_dictot, p_bortot
+    REAL(KIND=RLEN), INTENT(IN)   ::  p_alkcb, p_dictot, p_bortot ! [mol/kg]
     REAL(KIND=RLEN), INTENT(IN)   ::  K1, K2, Kb
     
     ! Local variables
@@ -544,11 +546,11 @@ module mem_CSYS
         p_hini = 1.e-7_RLEN
       ENDIF
     
-    phini_for_at = p_hini 
+    Hini_for_at = p_hini 
 
     ENDIF
     RETURN
-  END FUNCTION phini_for_at
+  END FUNCTION hini_for_at
   
 ! ----------------
 
@@ -564,20 +566,20 @@ module mem_CSYS
     ! determines upper an lower bounds for the solution if required
     
     IMPLICIT NONE
-    REAL(KIND=RLEN) :: SOLVE_AT_GENERAL
+    REAL(KIND=RLEN) :: SOLVE_AT_GENERAL    ! [H+] in mol/L
     
     ! Argument variables
     !--------------------
-    REAL(KIND=RLEN), INTENT(IN)            :: p_alktot
-    REAL(KIND=RLEN), INTENT(IN)            :: p_dictot
-    REAL(KIND=RLEN), INTENT(IN)            :: p_bortot
-    REAL(KIND=RLEN), INTENT(IN)            :: p_po4tot
-    REAL(KIND=RLEN), INTENT(IN)            :: p_siltot
-    REAL(KIND=RLEN), INTENT(IN)            :: p_so4tot
-    REAL(KIND=RLEN), INTENT(IN)            :: p_flutot
+    REAL(KIND=RLEN), INTENT(IN)            :: p_alktot  ! [mol/kg] 
+    REAL(KIND=RLEN), INTENT(IN)            :: p_dictot  ! [mol/kg]
+    REAL(KIND=RLEN), INTENT(IN)            :: p_bortot  ! [mol/kg]
+    REAL(KIND=RLEN), INTENT(IN)            :: p_po4tot  ! [mol/kg]
+    REAL(KIND=RLEN), INTENT(IN)            :: p_siltot  ! [mol/kg]
+    REAL(KIND=RLEN), INTENT(IN)            :: p_so4tot  ! [mol/kg]
+    REAL(KIND=RLEN), INTENT(IN)            :: p_flutot  ! [mol/kg]
     REAL(KIND=RLEN), INTENT(IN)            :: K0, K1, K2, Kb, Kw, Ks, Kf
     REAL(KIND=RLEN), INTENT(IN)            :: K1p, K2p, K3p, Ksi
-    REAL(KIND=RLEN), INTENT(IN)            :: p_h
+    REAL(KIND=RLEN), INTENT(IN)            :: p_h       ! [H+] in mol/kg
     
     ! Local variables
     !-----------------
@@ -589,8 +591,9 @@ module mem_CSYS
     REAL(KIND=RLEN)  ::  aphscale
     LOGICAL          ::  l_exitnow
     INTEGER          ::  niter_atgen
-    REAL(KIND=RLEN)  ::  znumer, zdenom
+    REAL(KIND=RLEN)  ::  znumer, zdenom, zdnumer
     REAL(KIND=RLEN)  ::  zalk_dic, zalk_bor, zalk_po4, zalk_sil, zalk_so4, zalk_flu, zalk_wat
+    REAL(KIND=RLEN)  ::  zdalk_dic, zdalk_bor, zdalk_po4, zdalk_sil, zdalk_so4, zdalk_flu, zdalk_wat
 
     ! General parameters
     !-----------------
@@ -606,6 +609,7 @@ module mem_CSYS
     ! inf(TA - [OH-] + [H+]) and sup(TA - [OH-] + [H+])
     zalknw_inf = -p_po4tot - p_so4tot - p_flutot
     zalknw_sup = p_dictot + p_dictot + p_bortot + p_po4tot + p_po4tot + p_siltot
+
     zdelta = (p_alktot-zalknw_inf)**2 + 4._RLEN*Kw/aphscale
     
     IF(p_alktot >= zalknw_inf) THEN
@@ -625,46 +629,64 @@ module mem_CSYS
     zh = MAX(MIN(zh_max, p_h), zh_min)
     niter_atgen        = 0                 ! Reset counters of iterations
     zeqn_absmin        = HUGE(1._RLEN)
-    
+
     DO
        IF(niter_atgen >= MaxIterPHsolver ) THEN
           zh = -1._RLEN
           EXIT
        ENDIF
-    
+
        zh_prev = zh
 
        ! Compute total alkalinity from ion concentrations and equilibrium constants
        ! H2CO3 - HCO3 - CO3 : n=2, m=0
-       znumer     = 2._RLEN*K1*K2 + p_h*       K1
-       zdenom     =       K1*K2 + p_h*(      K1 + p_h)
+       znumer     = 2._RLEN*K1*K2 + zh*       K1
+       zdenom     =         K1*K2 + zh*(      K1 + zh)
        zalk_dic   = p_dictot * (znumer/zdenom)
+       zdnumer    = K1*K1*K2 + zh*(4._RLEN*K1*K2 + zh* K1 ) 
+       zdalk_dic  = -p_dictot * (zdnumer/zdenom**2)
        ! B(OH)3 - B(OH)4 : n=1, m=0
-       znumer     =       Kb
-       zdenom     =       Kb + p_h
+       znumer     = Kb
+       zdenom     = Kb + zh
        zalk_bor   = p_bortot * (znumer/zdenom)
+       zdnumer    = Kb
+       zdalk_bor  = -p_bortot * (zdnumer/zdenom**2)
        ! H3PO4 - H2PO4 - HPO4 - PO4 : n=3, m=1
-       znumer     = 3._RLEN*K1p*K2p*K3p + p_h*(2._RLEN*K1p*K2p + p_h* K1p)
-       zdenom     =       K1p*K2p*K3p + p_h*(      K1p*K2p + p_h*(K1p + p_h))
+       znumer     = 3._RLEN*K1p*K2p*K3p + zh*(2._RLEN*K1p*K2p + zh* K1p)
+       zdenom     =         K1p*K2p*K3p + zh*(        K1p*K2p + zh*(K1p + zh))
        zalk_po4   = p_po4tot * (znumer/zdenom - 1._RLEN) ! Zero level of H3PO4 = 1
+       zdnumer    = K1p*K2p*K1p*K2p*K3p + zh*(4._RLEN*K1p*K1p*K2p*K3p            &
+                                        + zh*(9._RLEN*K1p*K2p*K3p + K1p*K1p*K2p  &
+                                        + zh*(4._RLEN*K1p*K2p                    &
+                                        + zh*       K1p)))
+       zdalk_po4  = -p_po4tot * (zdnumer/zdenom**2)
        ! H4SiO4 - H3SiO4 : n=1, m=0
-       znumer     =       Ksi
-       zdenom     =       Ksi + p_h
+       znumer     = Ksi
+       zdenom     = Ksi + zh
        zalk_sil   = p_siltot * (znumer/zdenom)
+       zdnumer    = Ksi
+       zdalk_sil  = -p_siltot * (zdnumer/zdenom**2)
        ! HSO4 - SO4 : n=1, m=1
-       znumer     =       Ks
-       zdenom     =       Ks + p_h
+       znumer     = Ks
+       zdenom     = Ks + zh
        zalk_so4   = p_so4tot * (znumer/zdenom - 1._RLEN)
+       zdnumer    = Ks
+       zdalk_so4  = -p_so4tot * (zdnumer/zdenom**2)
        ! HF - F : n=1, m=1
-       znumer     =       Kf
-       zdenom     =       Kf + p_h
+       znumer     = Kf
+       zdenom     = Kf + zh
        zalk_flu   = p_flutot * (znumer/zdenom - 1._RLEN)
+       zdnumer    = Kf
+       zdalk_flu  = -p_flutot * (zdnumer/zdenom**2)
        ! H2O - OH
-       zalk_wat   = Kw/p_h - p_h/aphscale
+       zalk_wat   = Kw/zh - zh/aphscale
+       zdalk_wat  = -Kw/zh**2 - 1._RLEN/aphscale
         
-       zeqn = zalk_dic + zalk_bor + zalk_po4 + zalk_sil    &
-               + zalk_so4 + zalk_flu                       &
-               + zalk_wat - p_alktot
+       zeqn = zalk_dic + zalk_bor + zalk_po4 + zalk_sil   &
+               + zalk_so4 + zalk_flu + zalk_wat - p_alktot 
+      
+       zdeqndh = zdalk_dic + zdalk_bor + zdalk_po4 + zdalk_sil &
+               + zdalk_so4 + zdalk_flu + zdalk_wat
 
     
        ! Adapt bracketing interval

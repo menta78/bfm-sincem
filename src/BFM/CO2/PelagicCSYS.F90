@@ -25,15 +25,15 @@
   use mem
 #else
   use mem, ONLY: iiPel, O3h, O3c, D3STATE, jsurO3c, CO2airflux,    &
-                 Depth, flux_vector, DIC, EPCO2air, ALK,           &
+                 Depth, flux_vector, DIC, ALK,                     &
                  Source_D3_vector, ppO5c, ppN3n, ppN4n
   use mem, ONLY: ppO3h, ppO3c, NO_BOXES, NO_BOXES_XY, BoxNumber,   &
     N1p,N5s,CO2, HCO3, CO3, pCO2, pH, ETW, ESW, ERHO, EWIND, EICE, &
-    OCalc, OArag, EPR, ppO5c, O5c
+    OCalc, OArag, EPR, ppO5c, O5c, EPCO2air
 #endif
   use mem_CO2    
   use mem_CSYS, ONLY : CarbonateSystem
-  use AirSeaExchange, ONLY: AirSeaCO2
+  use AirSeaExchange, ONLY: AirSeaCO2, AirpGas
   use BFM_ERROR_MSG, ONLY: BFM_ERROR
 #ifdef BFM_GOTM
   use bio_var, ONLY: SRFindices
@@ -85,8 +85,6 @@
   !
   xflux = ZERO
   !
-  ! If cold start, CarbonateSystem computes initial pH
-  if (bfm_init == 0 ) pH(:) = -ONE
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Compute carbonate system equilibria
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -101,8 +99,9 @@
        error= CarbonateSystem( ESW(BoxNumber), ETW(BoxNumber),ERHO(BoxNumber), &
                N1p(BoxNumber), N5s(BoxNumber), DIC(BoxNumber), ALK(BoxNumber), &
                CO2(BoxNumber) ,HCO3(BoxNumber), CO3(BoxNumber), pH(BoxNumber), &
-               pCO2(BoxNumber), patm=AtmSLP%fnow(BoxNumber), pr_in=EPR(BoxNumber), &
+               pCO2(BoxNumber), patm=patm3d(BoxNumber), pr_in=EPR(BoxNumber), &
                OmegaC=OCalc(BoxNumber), OmegaA=OArag(BoxNumber))
+
 #ifdef DEBUG
        write(LOGUNIT,*) "in PelagicCSYS:"
        write(LOGUNIT,'(A,'' ='',f12.6)') 'ERHO',ERHO(BoxNumber)
@@ -120,7 +119,7 @@
               write(LOGUNIT,'(''layer:'',I4,'' pH='',f12.6)') BoxNumber,pH(BoxNumber)
        endif
     end do
-   
+  !write(*,*) 'Pcsys ', DIC, ALK, CO2,pCO2,pH  
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Changes in alkalinity due to N uptake (see BFM Manual Eq. 2.5.21)
   ! It is computed this way
@@ -147,18 +146,16 @@
   call flux_vector( iiPel, ppO5c, ppO3c, rdiss(:) )
   call flux_vector( iiPel, ppO3h, ppO3h, -C2ALK*rdiss(:) )
 
+  if (SRFindices(1) .eq. 0 ) return
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Computes Atmospheric pCO2 value
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! Rough approximation: pCO2 is assumed equal to the mixing ratio of CO2
-  EPCO2air = AtmCO2%fnow
-  !
+  EPCO2air(:) = AirpGas(AtmCO2%fnow, patm3d(SRFindices), ETW(SRFindices), ESW(SRFindices))
+
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Computes air-sea flux (only at surface points)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  if (SRFindices(1) .eq. 0 ) return
-
-  CO2airflux(:) = AirSeaCO2(AtmCO2%fnow, AtmSLP%fnow, ETW(SRFindices), ESW(SRFindices), &
+  CO2airflux(:) = AirSeaCO2(AtmCO2%fnow, patm3d(SRFindices), ETW(SRFindices), ESW(SRFindices), &
           ERHO(SRFindices), EWIND, EICE, CO2(SRFindices) )
 
   jsurO3c(:) = jsurO3c(:) + CO2airflux(:) * MW_C
