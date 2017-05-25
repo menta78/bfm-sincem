@@ -103,8 +103,8 @@ Module AirSeaExchange
     !
     ! Surface solubility of gas K0  [(mol/kg) / atm] at T, S of surface water according to Weiss (1974)
     K0 = exp( A(1) + A(2)/tk100 + A(3)*log(tk100) + salt*(B(1) + B(2)*tk100 + B(3)*tk1002) )
-    ! air-sea gas flux
-    co2starair = K0 * fco2atm * 1.0e-6_RLEN   ! Equil.  [A*] for atm gas at Patm & sfc-water T,S [mol/kg]
+    ! Equilbrium [CO2*air] for atm gas at Patm & sfc-water T,S [mol/kg]
+    co2starair = K0 * fco2atm * 1.0e-6_RLEN
 
     ! Alternative computation
     !! Solubility function for atmospheric CO2 saturation concentration (Orr et al. GMD 2017, Eq. 15)
@@ -117,7 +117,7 @@ Module AirSeaExchange
     !  Schmidt number (Sc), ratio between the kinematic viscosity and the molecular diffusivity of the gas
     pschmidt = C(1) + C(2)*temp + C(3)*temp**2 + C(4)*temp**3 + C(5)*temp**4
     ! Transfer velocity for gas in m/d (see equation [4] in OCMIP2 design document & OCMIP2 Abiotic HOWTO)
-    kwgas = kw660 * (sc/pschmidt)**0.5
+    kwgas = kw660 * (Sc/pschmidt)**0.5
 
     ! Air-sea gas flux [mmol/(m2 * day)]
     AirSeaCO2 = kwgas * (co2starair - co2star) * (ONE - Fice) * rho * 1000
@@ -133,7 +133,7 @@ Module AirSeaExchange
     implicit none
     real(RLEN)                       :: AirpGas ! Atmospheric partial pressure of gas [uatm]
     !
-    real(RLEN),intent(IN)            :: xgas    ! Atmospheric mixing ratio of Gas [ppmv]
+    real(RLEN),intent(IN)            :: xgas    ! Mixing ratio of Gas in dry air [ppmv]
     real(RLEN),intent(IN)            :: patm    ! Atmospheric pressure [mbar]
     real(RLEN),intent(IN)            :: temp    ! in-situ temperature at surface
     real(RLEN),intent(IN)            :: salt    ! practical salinity at surface
@@ -151,7 +151,7 @@ Module AirSeaExchange
     ! Compute vapor pressure of seawater [in atm] (Weiss and Price, 1980, Eq. 10)
     pH20 = exp(24.4543_RLEN - 67.4509_RLEN*(100._RLEN/tk) - 4.8489_RLEN*log(tk/100.0_RLEN) - 0.000544_RLEN*salt)
     !
-    ! Compute pco2atm [uatm] from xco2 [ppm], atmospheric pressure [atm], & vapor pressure of seawater pH20 [atm]
+    ! Compute pGasatm [uatm] from xgas [ppm], atmospheric pressure [atm], & vapor pressure of seawater pH20 [atm]
     AirpGas = (patma - pH20) * xgas
 
     return
