@@ -72,7 +72,7 @@ MODULE lib_mpp
    PUBLIC   mpp_ini_north, mpp_lbc_north, mpp_lbc_north_e
    PUBLIC   mpp_min, mpp_max, mpp_sum, mpp_minloc, mpp_maxloc
    PUBLIC   mpp_max_multiple
-   PUBLIC   mpp_lnk_3d_t, mpp_lnk_4d_t
+   PUBLIC   mpp_lnk_4d
    PUBLIC   mpp_lnk_3d, mpp_lnk_3d_gather, mpp_lnk_2d, mpp_lnk_2d_e
    PUBLIC   mpp_lnk_2d_9 , mpp_lnk_2d_multiple 
    PUBLIC   mppscatter, mppgather
@@ -328,7 +328,7 @@ CONTAINS
       !
    END FUNCTION mynode
 
-   SUBROUTINE mpp_lnk_4d_t( ptab, kjpt, cd_type, psgn, cd_mpp, pval )
+   SUBROUTINE mpp_lnk_4d( ptab, cd_type, psgn, cd_mpp, pval )
       !!----------------------------------------------------------------------
       !!                  ***  routine mpp_lnk_3d  ***
       !!
@@ -349,8 +349,7 @@ CONTAINS
       !! ** Action  :   ptab with update value at its periphery
       !!
       !!----------------------------------------------------------------------
-      REAL(wp), DIMENSION(jpi,jpj,jpk,kjpt), INTENT(inout) ::   ptab     ! 3D array on which the boundary condition is applied
-      INTEGER                         , INTENT(in   ) ::   kjpt     ! number of tracers
+      REAL(wp), DIMENSION(:,:,:,:)    , INTENT(inout) ::   ptab     ! 3D array on which the boundary condition is applied
       CHARACTER(len=1)                , INTENT(in   ) ::   cd_type  ! define the nature of ptab array grid-points
       !                                                             ! = T , U , V , F , W points
       REAL(wp)                        , INTENT(in   ) ::   psgn     ! =-1 the sign change across the north fold boundary
@@ -359,6 +358,7 @@ CONTAINS
       REAL(wp)        , OPTIONAL      , INTENT(in   ) ::   pval     ! background value (used at closed boundaries)
       !!
       INTEGER  ::   ji, jj, jk, jl, jn         ! dummy loop indices
+      INTEGER  ::   ipt                        ! 4th dimension of the input array
       INTEGER  ::   imigr, iihom, ijhom        ! temporary integers
       INTEGER  ::   ml_req1, ml_req2, ml_err   ! for key_mpi_isend
       REAL(wp) ::   zland
@@ -368,9 +368,10 @@ CONTAINS
       REAL(wp), DIMENSION(:,:,:,:,:), ALLOCATABLE ::   zt4ew, zt4we   ! 3d for east-west & west-east
 
       !!----------------------------------------------------------------------
+      ipt = size(ptab,4) 
       
-      ALLOCATE( zt4ns(jpi,jprecj,jpk,kjpt,2), zt4sn(jpi,jprecj,jpk,kjpt,2),   &
-         &      zt4ew(jpj,jpreci,jpk,kjpt,2), zt4we(jpj,jpreci,jpk,kjpt,2)  )
+      ALLOCATE( zt4ns(jpi,jprecj,jpk,ipt,2), zt4sn(jpi,jprecj,jpk,ipt,2),   &
+         &      zt4ew(jpj,jpreci,jpk,ipt,2), zt4we(jpj,jpreci,jpk,ipt,2)  )
 
 
       !write(numout,*) 'lbc_lnk in bgc 4d mode'
@@ -384,7 +385,7 @@ CONTAINS
       IF( PRESENT( cd_mpp ) ) THEN      ! only fill added line/raw with existing values
          !
          ! WARNING ptab is defined only between nld and nle
-      DO jn = 1 , kjpt
+      DO jn = 1 , ipt
          DO jk = 1, jpk
             DO jj = nlcj+1, jpj                 ! added line(s)   (inner only)
                ptab(nldi  :nlei  , jj          ,jk,jn) = ptab(nldi:nlei,     nlej,jk,jn)
@@ -430,7 +431,7 @@ CONTAINS
       END SELECT
       !
       !                           ! Migrations
-      imigr = jpreci * jpj * jpk * kjpt
+      imigr = jpreci * jpj * jpk * ipt
       !
       SELECT CASE ( nbondi )
       CASE ( -1 )
@@ -483,7 +484,7 @@ CONTAINS
       ENDIF
       !
       !                           ! Migrations
-      imigr = jprecj * jpi * jpk * kjpt
+      imigr = jprecj * jpi * jpk * ipt
       !
       SELECT CASE ( nbondj )
       CASE ( -1 )
@@ -528,7 +529,7 @@ CONTAINS
       !
       IF( npolj /= 0 .AND. .NOT. PRESENT(cd_mpp) ) THEN
          ! set a loop over tracers
-        DO jn = 1 , kjpt
+        DO jn = 1 , ipt
          SELECT CASE ( jpni )
          CASE ( 1 )     ;   CALL lbc_nfd      ( ptab(:,:,:,jn), cd_type, psgn )   ! only 1 northern proc, no mpp
          CASE DEFAULT   ;   CALL mpp_lbc_north( ptab(:,:,:,jn), cd_type, psgn )   ! for all northern procs.
@@ -539,216 +540,8 @@ CONTAINS
       !
       DEALLOCATE( zt4ns, zt4sn, zt4ew, zt4we )
       !
-   END SUBROUTINE mpp_lnk_4d_t
+   END SUBROUTINE mpp_lnk_4d
 
-   SUBROUTINE mpp_lnk_3d_t( ptab, kjpt, cd_type, psgn, cd_mpp, pval )
-      !!----------------------------------------------------------------------
-      !!                  ***  routine mpp_lnk_3d_t  ***
-      !!
-      !! ** Purpose :   Message passing management
-      !!
-      !! ** Method  :   Use mppsend and mpprecv function for passing mask
-      !!      between processors following neighboring subdomains.
-      !!            domain parameters
-      !!                    nlci   : first dimension of the local subdomain
-      !!                    nlcj   : second dimension of the local subdomain
-      !!                    nbondi : mark for "east-west local boundary"
-      !!                    nbondj : mark for "north-south local boundary"
-      !!                    noea   : number for local neighboring processors
-      !!                    nowe   : number for local neighboring processors
-      !!                    noso   : number for local neighboring processors
-      !!                    nono   : number for local neighboring processors
-      !!
-      !! ** Action  :   ptab with update value at its periphery
-      !!
-      !!----------------------------------------------------------------------
-      REAL(wp), DIMENSION(jpi,jpj,kjpt), INTENT(inout) ::   ptab     ! 3D array on which the boundary condition is applied
-      INTEGER                         , INTENT(in   ) ::   kjpt     ! number of tracers
-      CHARACTER(len=1)                , INTENT(in   ) ::   cd_type  ! define the nature of ptab array grid-points
-      !                                                             ! = T , U , V , F , W points
-      REAL(wp)                        , INTENT(in   ) ::   psgn     ! =-1 the sign change across the north fold boundary
-      !                                                             ! =  1. , the sign is kept
-      CHARACTER(len=3), OPTIONAL      , INTENT(in   ) ::   cd_mpp   ! fill the overlap area only
-      REAL(wp)        , OPTIONAL      , INTENT(in   ) ::   pval     ! background value (used at closed boundaries)
-      !!
-      INTEGER  ::   ji, jj, jk, jl, jn         ! dummy loop indices
-      INTEGER  ::   imigr, iihom, ijhom        ! temporary integers
-      INTEGER  ::   ml_req1, ml_req2, ml_err   ! for key_mpi_isend
-      REAL(wp) ::   zland
-      INTEGER, DIMENSION(MPI_STATUS_SIZE) ::   ml_stat   ! for key_mpi_isend
-      !
-      REAL(wp), DIMENSION(:,:,:,:), ALLOCATABLE ::   zt3ns, zt3sn   ! 3d for north-south & south-north
-      REAL(wp), DIMENSION(:,:,:,:), ALLOCATABLE ::   zt3ew, zt3we   ! 3d for east-west & west-east
-
-      !!----------------------------------------------------------------------
-      
-      ALLOCATE( zt3ns(jpi,jprecj,kjpt,2), zt3sn(jpi,jprecj,kjpt,2),   &
-         &      zt3ew(jpj,jpreci,kjpt,2), zt3we(jpj,jpreci,kjpt,2)  )
-
-      !
-      IF( PRESENT( pval ) ) THEN   ;   zland = pval      ! set land value
-      ELSE                         ;   zland = 0.e0      ! zero by default
-      ENDIF
-
-      ! 1. standard boundary treatment
-      ! ------------------------------
-      IF( PRESENT( cd_mpp ) ) THEN      ! only fill added line/raw with existing values
-         !
-         ! WARNING ptab is defined only between nld and nle
-         DO jk = 1, kjpt
-            DO jj = nlcj+1, jpj                 ! added line(s)   (inner only)
-               ptab(nldi  :nlei  , jj          ,jk) = ptab(nldi:nlei,     nlej,jk)
-               ptab(1     :nldi-1, jj          ,jk) = ptab(nldi     ,     nlej,jk)
-               ptab(nlei+1:nlci  , jj          ,jk) = ptab(     nlei,     nlej,jk)
-            END DO
-            DO ji = nlci+1, jpi                 ! added column(s) (full)
-               ptab(ji           ,nldj  :nlej  ,jk) = ptab(     nlei,nldj:nlej,jk)
-               ptab(ji           ,1     :nldj-1,jk) = ptab(     nlei,nldj     ,jk)
-               ptab(ji           ,nlej+1:jpj   ,jk) = ptab(     nlei,     nlej,jk)
-            END DO
-         END DO
-         !
-      ELSE                              ! standard close or cyclic treatment
-         !
-         !                                   ! East-West boundaries
-         !                                        !* Cyclic east-west
-         IF( nbondi == 2 .AND. (nperio == 1 .OR. nperio == 4 .OR. nperio == 6) ) THEN
-            ptab( 1 ,:,:) = ptab(jpim1,:,:)
-            ptab(jpi,:,:) = ptab(  2  ,:,:)
-         ELSE                                     !* closed
-            IF( .NOT. cd_type == 'F' )   ptab(     1       :jpreci,:,:) = zland    ! south except F-point
-                                         ptab(nlci-jpreci+1:jpi   ,:,:) = zland    ! north
-         ENDIF
-         !                                   ! North-South boundaries (always closed)
-         IF( .NOT. cd_type == 'F' )   ptab(:,     1       :jprecj,:) = zland       ! south except F-point
-                                      ptab(:,nlcj-jprecj+1:jpj   ,:) = zland       ! north
-         !
-      ENDIF
-
-      ! 2. East and west directions exchange
-      ! ------------------------------------
-      ! we play with the neigbours AND the row number because of the periodicity
-      !
-      SELECT CASE ( nbondi )      ! Read Dirichlet lateral conditions
-      CASE ( -1, 0, 1 )                ! all exept 2 (i.e. close case)
-         iihom = nlci-nreci
-         DO jl = 1, jpreci
-            zt3ew(:,jl,:,1) = ptab(jpreci+jl,:,:)
-            zt3we(:,jl,:,1) = ptab(iihom +jl,:,:)
-         END DO
-      END SELECT
-      !
-      !                           ! Migrations
-      imigr = jpreci * jpj * kjpt
-      !
-      SELECT CASE ( nbondi )
-      CASE ( -1 )
-         CALL mppsend( 2, zt3we(1,1,1,1), imigr, noea, ml_req1 )
-         CALL mpprecv( 1, zt3ew(1,1,1,2), imigr, noea )
-         IF(l_isend) CALL mpi_wait(ml_req1, ml_stat, ml_err)
-      CASE ( 0 )
-         CALL mppsend( 1, zt3ew(1,1,1,1), imigr, nowe, ml_req1 )
-         CALL mppsend( 2, zt3we(1,1,1,1), imigr, noea, ml_req2 )
-         CALL mpprecv( 1, zt3ew(1,1,1,2), imigr, noea )
-         CALL mpprecv( 2, zt3we(1,1,1,2), imigr, nowe )
-         IF(l_isend) CALL mpi_wait(ml_req1, ml_stat, ml_err)
-         IF(l_isend) CALL mpi_wait(ml_req2, ml_stat, ml_err)
-      CASE ( 1 )
-         CALL mppsend( 1, zt3ew(1,1,1,1), imigr, nowe, ml_req1 )
-         CALL mpprecv( 2, zt3we(1,1,1,2), imigr, nowe )
-         IF(l_isend) CALL mpi_wait(ml_req1, ml_stat, ml_err)
-      END SELECT
-      !
-      !                           ! Write Dirichlet lateral conditions
-      iihom = nlci-jpreci
-      !
-      SELECT CASE ( nbondi )
-      CASE ( -1 )
-         DO jl = 1, jpreci
-            ptab(iihom+jl,:,:) = zt3ew(:,jl,:,2)
-         END DO
-      CASE ( 0 )
-         DO jl = 1, jpreci
-            ptab(jl      ,:,:) = zt3we(:,jl,:,2)
-            ptab(iihom+jl,:,:) = zt3ew(:,jl,:,2)
-         END DO
-      CASE ( 1 )
-         DO jl = 1, jpreci
-            ptab(jl      ,:,:) = zt3we(:,jl,:,2)
-         END DO
-      END SELECT
-
-
-      ! 3. North and south directions
-      ! -----------------------------
-      ! always closed : we play only with the neigbours
-      !
-      IF( nbondj /= 2 ) THEN      ! Read Dirichlet lateral conditions
-         ijhom = nlcj-nrecj
-         DO jl = 1, jprecj
-            zt3sn(:,jl,:,1) = ptab(:,ijhom +jl,:)
-            zt3ns(:,jl,:,1) = ptab(:,jprecj+jl,:)
-         END DO
-      ENDIF
-      !
-      !                           ! Migrations
-      imigr = jprecj * jpi * kjpt
-      !
-      SELECT CASE ( nbondj )
-      CASE ( -1 )
-         CALL mppsend( 4, zt3sn(1,1,1,1), imigr, nono, ml_req1 )
-         CALL mpprecv( 3, zt3ns(1,1,1,2), imigr, nono )
-         IF(l_isend) CALL mpi_wait(ml_req1, ml_stat, ml_err)
-      CASE ( 0 )
-         CALL mppsend( 3, zt3ns(1,1,1,1), imigr, noso, ml_req1 )
-         CALL mppsend( 4, zt3sn(1,1,1,1), imigr, nono, ml_req2 )
-         CALL mpprecv( 3, zt3ns(1,1,1,2), imigr, nono )
-         CALL mpprecv( 4, zt3sn(1,1,1,2), imigr, noso )
-         IF(l_isend) CALL mpi_wait(ml_req1, ml_stat, ml_err)
-         IF(l_isend) CALL mpi_wait(ml_req2, ml_stat, ml_err)
-      CASE ( 1 )
-         CALL mppsend( 3, zt3ns(1,1,1,1), imigr, noso, ml_req1 )
-         CALL mpprecv( 4, zt3sn(1,1,1,2), imigr, noso )
-         IF(l_isend) CALL mpi_wait(ml_req1, ml_stat, ml_err)
-      END SELECT
-      !
-      !                           ! Write Dirichlet lateral conditions
-      ijhom = nlcj-jprecj
-      !
-      SELECT CASE ( nbondj )
-      CASE ( -1 )
-         DO jl = 1, jprecj
-            ptab(:,ijhom+jl,:) = zt3ns(:,jl,:,2)
-         END DO
-      CASE ( 0 )
-         DO jl = 1, jprecj
-            ptab(:,jl      ,:) = zt3sn(:,jl,:,2)
-            ptab(:,ijhom+jl,:) = zt3ns(:,jl,:,2)
-         END DO
-      CASE ( 1 )
-         DO jl = 1, jprecj
-            ptab(:,jl,:) = zt3sn(:,jl,:,2)
-         END DO
-      END SELECT
-
-
-      ! 4. north fold treatment
-      ! -----------------------
-      !
-      IF( npolj /= 0 .AND. .NOT. PRESENT(cd_mpp) ) THEN
-         !
-        DO jn = 1 , kjpt
-         SELECT CASE ( jpni )
-         CASE ( 1 )     ;   CALL lbc_nfd      ( ptab(:,:,jn), cd_type, psgn )   ! only 1 northern proc, no mpp
-         CASE DEFAULT   ;   CALL mpp_lbc_north( ptab(:,:,jn), cd_type, psgn )   ! for all northern procs.
-         END SELECT
-        ENDDO
-         !
-      ENDIF
-      !
-      DEALLOCATE( zt3ns, zt3sn, zt3ew, zt3we )
-      !
-   END SUBROUTINE mpp_lnk_3d_t
 
    SUBROUTINE mpp_lnk_3d( ptab, cd_type, psgn, cd_mpp, pval )
       !!----------------------------------------------------------------------
@@ -771,7 +564,7 @@ CONTAINS
       !! ** Action  :   ptab with update value at its periphery
       !!
       !!----------------------------------------------------------------------
-      REAL(wp), DIMENSION(jpi,jpj,jpk), INTENT(inout) ::   ptab     ! 3D array on which the boundary condition is applied
+      REAL(wp), DIMENSION(:,:,:)      , INTENT(inout) ::   ptab     ! 3D array on which the boundary condition is applied
       CHARACTER(len=1)                , INTENT(in   ) ::   cd_type  ! define the nature of ptab array grid-points
       !                                                             ! = T , U , V , F , W points
       REAL(wp)                        , INTENT(in   ) ::   psgn     ! =-1 the sign change across the north fold boundary
@@ -780,6 +573,7 @@ CONTAINS
       REAL(wp)        , OPTIONAL      , INTENT(in   ) ::   pval     ! background value (used at closed boundaries)
       !!
       INTEGER  ::   ji, jj, jk, jl             ! dummy loop indices
+      INTEGER  ::   ipk                        ! 3rd dimension of the input array
       INTEGER  ::   imigr, iihom, ijhom        ! temporary integers
       INTEGER  ::   ml_req1, ml_req2, ml_err   ! for key_mpi_isend
       REAL(wp) ::   zland
@@ -789,9 +583,10 @@ CONTAINS
       REAL(wp), DIMENSION(:,:,:,:), ALLOCATABLE ::   zt3ew, zt3we   ! 3d for east-west & west-east
 
       !!----------------------------------------------------------------------
+      ipk = SIZE( ptab, 3 )
       
-      ALLOCATE( zt3ns(jpi,jprecj,jpk,2), zt3sn(jpi,jprecj,jpk,2),   &
-         &      zt3ew(jpj,jpreci,jpk,2), zt3we(jpj,jpreci,jpk,2)  )
+      ALLOCATE( zt3ns(jpi,jprecj,ipk,2), zt3sn(jpi,jprecj,ipk,2),   &
+         &      zt3ew(jpj,jpreci,ipk,2), zt3we(jpj,jpreci,ipk,2)  )
 
       !
       IF( PRESENT( pval ) ) THEN   ;   zland = pval      ! set land value
@@ -803,7 +598,7 @@ CONTAINS
       IF( PRESENT( cd_mpp ) ) THEN      ! only fill added line/raw with existing values
          !
          ! WARNING ptab is defined only between nld and nle
-         DO jk = 1, jpk
+         DO jk = 1, ipk
             DO jj = nlcj+1, jpj                 ! added line(s)   (inner only)
                ptab(nldi  :nlei  , jj          ,jk) = ptab(nldi:nlei,     nlej,jk)
                ptab(1     :nldi-1, jj          ,jk) = ptab(nldi     ,     nlej,jk)
@@ -847,7 +642,7 @@ CONTAINS
       END SELECT
       !
       !                           ! Migrations
-      imigr = jpreci * jpj * jpk
+      imigr = jpreci * jpj * ipk
       !
       SELECT CASE ( nbondi )
       CASE ( -1 )
@@ -900,7 +695,7 @@ CONTAINS
       ENDIF
       !
       !                           ! Migrations
-      imigr = jprecj * jpi * jpk
+      imigr = jprecj * jpi * ipk
       !
       SELECT CASE ( nbondj )
       CASE ( -1 )
@@ -2759,12 +2554,13 @@ CONTAINS
       !!              scatter the north fold array back to the processors.
       !!
       !!----------------------------------------------------------------------
-      REAL(wp), DIMENSION(jpi,jpj,jpk), INTENT(inout) ::   pt3d      ! 3D array on which the b.c. is applied
+      REAL(wp), DIMENSION(:,:,:)      , INTENT(inout) ::   pt3d      ! 3D array on which the b.c. is applied
       CHARACTER(len=1)                , INTENT(in   ) ::   cd_type   ! nature of pt3d grid-points
       !                                                              !   = T ,  U , V , F or W  gridpoints
       REAL(wp)                        , INTENT(in   ) ::   psgn      ! = -1. the sign change across the north fold 
       !!                                                             ! =  1. , the sign is kept
       INTEGER ::   ji, jj, jr, jk
+      INTEGER ::   ipk                                               ! 3rd dimension of the input array 
       INTEGER ::   ierr, itaille, ildi, ilei, iilb
       INTEGER ::   ijpj, ijpjm1, ij, iproc
       INTEGER, DIMENSION (jpmaxngh)          ::   ml_req_nf          !for mpi_isend when avoiding mpi_allgather
@@ -2779,15 +2575,16 @@ CONTAINS
       INTEGER :: istatus(mpi_status_size)
       INTEGER :: iflag
       !!----------------------------------------------------------------------
+      ipk = SIZE( pt3d, 3 ) 
       !
-      ALLOCATE( ztab(jpiglo,4,jpk) , znorthloc(jpi,4,jpk), zfoldwk(jpi,4,jpk), znorthgloio(jpi,4,jpk,jpni) )
-      ALLOCATE( ztabl(jpi,4,jpk), ztabr(jpi*jpmaxngh, 4, jpk) ) 
+      ALLOCATE( ztab(jpiglo,4,ipk) , znorthloc(jpi,4,ipk), zfoldwk(jpi,4,ipk), znorthgloio(jpi,4,ipk,jpni) )
+      ALLOCATE( ztabl(jpi,4,ipk), ztabr(jpi*jpmaxngh, 4, ipk) ) 
 
       ijpj   = 4
       ijpjm1 = 3
       !
       znorthloc(:,:,:) = 0
-      DO jk = 1, jpk
+      DO jk = 1, ipk
          DO jj = nlcj - ijpj +1, nlcj          ! put in xnorthloc the last 4 jlines of pt3d
             ij = jj - nlcj + ijpj
             znorthloc(:,ij,jk) = pt3d(:,jj,jk)
@@ -2795,14 +2592,14 @@ CONTAINS
       END DO
       !
       !                                     ! Build in procs of ncomm_north the znorthgloio
-      itaille = jpi * jpk * ijpj
+      itaille = jpi * ipk * ijpj
 
       IF ( l_north_nogather ) THEN
          !
         ztabr(:,:,:) = 0
         ztabl(:,:,:) = 0
 
-        DO jk = 1, jpk
+        DO jk = 1, ipk
            DO jj = nlcj-ijpj+1, nlcj          ! First put local values into the global array
               ij = jj - nlcj + ijpj
               DO ji = nfsloop, nfeloop
@@ -2825,7 +2622,7 @@ CONTAINS
             ENDIF
             IF((iproc .ne. (narea-1)) .and. (iproc .ne. -1)) THEN
               CALL mpprecv(5, zfoldwk, itaille, iproc)
-              DO jk = 1, jpk
+              DO jk = 1, ipk
                  DO jj = 1, ijpj
                     DO ji = ildi, ilei
                        ztabr(iilb+ji,jj,jk) = zfoldwk(ji,jj,jk)
@@ -2833,7 +2630,7 @@ CONTAINS
                  END DO
               END DO
            ELSE IF (iproc .eq. (narea-1)) THEN
-              DO jk = 1, jpk
+              DO jk = 1, ipk
                  DO jj = 1, ijpj
                     DO ji = ildi, ilei
                        ztabr(iilb+ji,jj,jk) = pt3d(ji,nlcj-ijpj+jj,jk)
@@ -2850,7 +2647,7 @@ CONTAINS
             END DO
          ENDIF
          CALL mpp_lbc_nfd( ztabl, ztabr, cd_type, psgn )   ! North fold boundary condition
-         DO jk = 1, jpk
+         DO jk = 1, ipk
             DO jj = nlcj-ijpj+1, nlcj             ! Scatter back to pt3d
                ij = jj - nlcj + ijpj
                DO ji= 1, nlci
@@ -2870,7 +2667,7 @@ CONTAINS
             ildi  = nldit (iproc)
             ilei  = nleit (iproc)
             iilb  = nimppt(iproc)
-            DO jk = 1, jpk
+            DO jk = 1, ipk
                DO jj = 1, ijpj
                   DO ji = ildi, ilei
                     ztab(ji+iilb-1,jj,jk) = znorthgloio(ji,jj,jk,jr)
@@ -2880,7 +2677,7 @@ CONTAINS
          END DO
          CALL lbc_nfd( ztab, cd_type, psgn )   ! North fold boundary condition
          !
-         DO jk = 1, jpk
+         DO jk = 1, ipk
             DO jj = nlcj-ijpj+1, nlcj             ! Scatter back to pt3d
                ij = jj - nlcj + ijpj
                DO ji= 1, nlci

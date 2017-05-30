@@ -28,11 +28,7 @@ MODULE lbclnk
    END INTERFACE
 
    INTERFACE lbc_lnk
-      MODULE PROCEDURE mpp_lnk_3d_gather, mpp_lnk_3d, mpp_lnk_2d
-   END INTERFACE
-
-   INTERFACE lbc_lnk_t
-      MODULE PROCEDURE mpp_lnk_3d_t, mpp_lnk_4d_t 
+      MODULE PROCEDURE mpp_lnk_3d_gather, mpp_lnk_3d, mpp_lnk_2d, mpp_lnk_4d
    END INTERFACE
 
    INTERFACE lbc_bdy_lnk
@@ -78,7 +74,7 @@ MODULE lbclnk
    PRIVATE
 
    INTERFACE lbc_lnk
-      MODULE PROCEDURE lbc_lnk_3d_gather, lbc_lnk_3d, lbc_lnk_2d
+      MODULE PROCEDURE lbc_lnk_3d_gather, lbc_lnk_3d, lbc_lnk_2d, lbc_lnk_4d
    END INTERFACE
 
    INTERFACE lbc_lnk_e
@@ -93,10 +89,6 @@ MODULE lbclnk
       MODULE PROCEDURE lbc_bdy_lnk_2d, lbc_bdy_lnk_3d
    END INTERFACE
 
-   INTERFACE lbc_lnk_t
-      MODULE PROCEDURE lbc_lnk_3d_t, lbc_lnk_4d_t
-   END INTERFACE
-
    INTERFACE lbc_lnk_icb
       MODULE PROCEDURE lbc_lnk_2d_e
    END INTERFACE
@@ -107,7 +99,6 @@ MODULE lbclnk
    PUBLIC   arrayptr
 
    PUBLIC   lbc_lnk       ! ocean/ice  lateral boundary conditions
-   PUBLIC   lbc_lnk_t 
    PUBLIC   lbc_lnk_e 
    PUBLIC   lbc_lnk_multi ! modified ocean lateral boundary conditions
    PUBLIC   lbc_bdy_lnk   ! ocean lateral BDY boundary conditions
@@ -144,7 +135,7 @@ CONTAINS
    END SUBROUTINE lbc_lnk_3d_gather
 
 
-   SUBROUTINE lbc_lnk_3d_t( ptab, kjpt, cd_type, psgn, cd_mpp, pval )
+   SUBROUTINE lbc_lnk_4d( ptab, cd_type, psgn, cd_mpp, pval )
       !!---------------------------------------------------------------------
       !!                  ***  ROUTINE lbc_lnk_3d  ***
       !!
@@ -153,51 +144,25 @@ CONTAINS
       !! ** Method  :   1D case, the central water column is set everywhere
       !!----------------------------------------------------------------------
       CHARACTER(len=1)                 , INTENT(in   )           ::   cd_type   ! nature of pt3d grid-points
-      INTEGER                          , INTENT(in   )           ::   kjpt      ! number of tracers
-      REAL(wp), DIMENSION(jpi,jpj,kjpt), INTENT(inout)           ::   ptab      ! 3D array on which the lbc is applied
-      REAL(wp)                         , INTENT(in   )           ::   psgn      ! control of the sign
-      CHARACTER(len=3)                 , INTENT(in   ), OPTIONAL ::   cd_mpp    ! MPP only (here do nothing)
-      REAL(wp)                         , INTENT(in   ), OPTIONAL ::   pval      ! background value (for closed boundaries)
-      !
-      INTEGER  ::   jk     ! dummy loop index
-      REAL(wp) ::   ztab   ! local scalar
-      !!----------------------------------------------------------------------
-      !
-      DO jk = 1, kjpt
-         ztab = ptab(2,2,jk)
-         ptab(:,:,jk) = ztab
-      END DO
-      !
-   END SUBROUTINE lbc_lnk_3d_t
-
-
-   SUBROUTINE lbc_lnk_4d_t( ptab, kjpt, cd_type, psgn, cd_mpp, pval )
-      !!---------------------------------------------------------------------
-      !!                  ***  ROUTINE lbc_lnk_3d  ***
-      !!
-      !! ** Purpose :   set lateral boundary conditions on a 3D array (C1D case)
-      !!
-      !! ** Method  :   1D case, the central water column is set everywhere
-      !!----------------------------------------------------------------------
-      CHARACTER(len=1)                 , INTENT(in   )           ::   cd_type   ! nature of pt3d grid-points
-      INTEGER                          , INTENT(in   )           ::   kjpt      ! number of tracers
-      REAL(wp), DIMENSION(jpi,jpj,jpk,kjpt), INTENT(inout)       ::   ptab      ! 4D array on which the lbc is applied
+      REAL(wp), DIMENSION(:,:,:,:)     , INTENT(inout)           ::   ptab      ! 4D array on which the lbc is applied
       REAL(wp)                         , INTENT(in   )           ::   psgn      ! control of the sign
       CHARACTER(len=3)                 , INTENT(in   ), OPTIONAL ::   cd_mpp    ! MPP only (here do nothing)
       REAL(wp)                         , INTENT(in   ), OPTIONAL ::   pval      ! background value (for closed boundaries)
       !
       INTEGER  ::   jk, jt     ! dummy loop index
+      INTEGER  ::   ipt        ! 4th dimension of the input array
       REAL(wp) ::   ztab       ! local scalar
       !!----------------------------------------------------------------------
+      ipt = SIZE( ptab, 4 ) 
       !
-      DO jt = 1 , kjpt
+      DO jt = 1 , ipt
          DO jk = 1, jpk
             ztab = ptab(2,2,jk,jt)
             ptab(:,:,jk,jt) = ztab
          END DO
       END DO
       !
-   END SUBROUTINE lbc_lnk_4d_t
+   END SUBROUTINE lbc_lnk_4d
 
 
    SUBROUTINE lbc_lnk_3d( pt3d, cd_type, psgn, cd_mpp, pval )
@@ -209,16 +174,18 @@ CONTAINS
       !! ** Method  :   1D case, the central water column is set everywhere
       !!----------------------------------------------------------------------
       CHARACTER(len=1)                , INTENT(in   )           ::   cd_type   ! nature of pt3d grid-points
-      REAL(wp), DIMENSION(jpi,jpj,jpk), INTENT(inout)           ::   pt3d      ! 3D array on which the lbc is applied
+      REAL(wp), DIMENSION(:,:,:)      , INTENT(inout)           ::   pt3d      ! 3D array on which the lbc is applied
       REAL(wp)                        , INTENT(in   )           ::   psgn      ! control of the sign 
       CHARACTER(len=3)                , INTENT(in   ), OPTIONAL ::   cd_mpp    ! MPP only (here do nothing)
       REAL(wp)                        , INTENT(in   ), OPTIONAL ::   pval      ! background value (for closed boundaries)
       !
       INTEGER  ::   jk     ! dummy loop index
+      INTEGER  ::   ipk    ! 3rd dimension of the input array
       REAL(wp) ::   ztab   ! local scalar
       !!----------------------------------------------------------------------
+      ipk = SIZE( pt3d, 3 )
       !
-      DO jk = 1, jpk
+      DO jk = 1, ipk
          ztab = pt3d(2,2,jk)
          pt3d(:,:,jk) = ztab
       END DO
@@ -346,13 +313,15 @@ CONTAINS
       !!                             for closed boundaries.
       !!----------------------------------------------------------------------
       CHARACTER(len=1)                , INTENT(in   )           ::   cd_type   ! nature of pt3d grid-points
-      REAL(wp), DIMENSION(jpi,jpj,jpk), INTENT(inout)           ::   pt3d      ! 3D array on which the lbc is applied
+      REAL(wp), DIMENSION(:,:,:)      , INTENT(inout)           ::   pt3d      ! 3D array on which the lbc is applied
       REAL(wp)                        , INTENT(in   )           ::   psgn      ! control of the sign 
       CHARACTER(len=3)                , INTENT(in   ), OPTIONAL ::   cd_mpp    ! MPP only (here do nothing)
       REAL(wp)                        , INTENT(in   ), OPTIONAL ::   pval      ! background value (for closed boundaries)
       !!
       REAL(wp) ::   zland
+      INTEGER  ::   ipk                        ! 3rd dimension of the input array 
       !!----------------------------------------------------------------------
+      ipk = SIZE( pt3d, 3 )
 
       IF( PRESENT( pval ) ) THEN   ;   zland = pval      ! set land value (zero by default)
       ELSE                         ;   zland = 0._wp

@@ -146,8 +146,8 @@ CONTAINS
          END DO
       ENDDO
       !
-      CALL lbc_lnk_t( zwx, kjpt, 'U', -1. )                        ! lateral boundary conditions on zwx, zwy   (changed sign)
-      CALL lbc_lnk_t( zwy, kjpt, 'V', -1. )
+      CALL lbc_lnk( zwx, 'U', -1. )                        ! lateral boundary conditions on zwx, zwy   (changed sign)
+      CALL lbc_lnk( zwy, 'V', -1. )
       !                                             !-- Slopes of tracer
       DO jn = 1, kjpt
          zslpx(:,:,jpk,jn) = 0.e0   ;   zslpy(:,:,jpk,jn) = 0.e0    ! bottom values
@@ -199,7 +199,8 @@ CONTAINS
          END DO
       ENDDO
       !                                                    ! lateral boundary conditions on zwx, zwy   (changed sign)
-      CALL lbc_lnk_t( zwx, kjpt, 'U', -1. )   ;   CALL lbc_lnk_t( zwy, kjpt, 'V', -1. )
+      CALL lbc_lnk( zwx, 'U', -1. )   
+      CALL lbc_lnk( zwy, 'V', -1. )
       !
       ! Tracer flux divergence at t-point added to the general trend
       DO jn = 1, kjpt
