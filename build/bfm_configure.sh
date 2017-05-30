@@ -351,7 +351,6 @@ if [ ${GEN} ]; then
         find ${BFMDIR}/src/share -name "*.?90" -print >> BFM.lst
         find ${BFMDIR}/src/BFM/Pel -name "*.?90" -print >> BFM.lst
         find ${BFMDIR}/src/BFM/Light -name "*.?90" -print >> BFM.lst
-        find ${BFMDIR}/src/BFM/Oxygen -name "*.?90" -print >> BFM.lst
         find ${BFMDIR}/src/BFM/Forcing -name "*.?90" -print >> BFM.lst
         find ${BFMDIR}/src/BFM/CO2 -name "*.?90" -print >> BFM.lst
         find ${BFMDIR}/src/BFM/PelBen -name "*.?90" -print >> BFM.lst
