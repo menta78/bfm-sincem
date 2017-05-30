@@ -262,7 +262,7 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
 
 
 !-------------------------------------------------------------------------!
-!NAMELIST CO2_parameters 
+!NAMELIST CSYS_parameters 
 !-------------------------------------------------------------------------!
 ! CARBONATE SYSYEM SETTING
 ! NAME            [UNIT]/KIND             DESCRIPTION
