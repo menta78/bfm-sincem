@@ -902,7 +902,7 @@ p_paMEZ(2,:)=   0.0,    1.0
    rn_trfac(N5s)   =   1.0   !  no conversion
    rn_trfac(N7f)   =   1.0   !  no conversion
    rn_trfac(O3c)  =  12.288  !  conversion factor from umol/kg to mg/m3 (rho=1024 kg/m3)
-   rn_trfac(O3h)  =   1.024  !  conversion factor from umol/kg to umol/m3 (rho=1024 kg/m3)
+   rn_trfac(O3h)  =   1.024  !  conversion factor from umol/kg to umol(eq)/m3 (rho=1024 kg/m3)
         filename_nml_conf = 'namelist_top_cfg',
 /
 
@@ -929,6 +929,7 @@ p_paMEZ(2,:)=   0.0,    1.0
    sn_trccbc(R1n)  =  'ORCA2_GNEWS_RIVER_annual'  -12  'RIVERDON'  .false.  .true.  'yearly'  ''  ''
    sn_trccbc(R1p)  =  'ORCA2_GNEWS_RIVER_annual'  -12  'RIVERDOP'  .false.  .true.  'yearly'  ''  ''
    sn_trccbc(O3c)  =  'ORCA2_GNEWS_RIVER_annual'  -12  'RIVERDIC'  .false.  .true.  'yearly'  ''  ''
+   sn_trccbc(O3h)  =  'ORCA2_GNEWS_RIVER_annual'  -12  'RIVERDIC'  .false.  .true.  'yearly'  ''  ''
    rn_trcfac(N1p)  =  8.8464e+10    ! 1 mol P = 30.97 g; 1.e12*1.e3/30.97/365 conversion factor from Tg/y to mmol/d
    rn_trcfac(N3n)  =  1.9556e+11    ! 1 mol N = 14.01 g; 1.e12*1.e3/14.01/365 conversion factor from Tg/y to mmol/d
    rn_trcfac(N5s)  =  9.7534e+10    ! 1 mol Si = 28.09 g; 1.e12*1.e3/28.09/365 conversion factor from Tg/y to mmol/d
@@ -937,6 +938,7 @@ p_paMEZ(2,:)=   0.0,    1.0
    rn_trcfac(R1n)  =  1.9556e+11    ! 1 mol N = 14.01 g; 1.e12*1.e3/14.01/365 conversion factor from Tg/y to mmol/d
    rn_trcfac(R1p)  =  8.8464e+10    ! 1 mol P = 30.97 g; 1.e12*1.e3/30.97/365 conversion factor from Tg/y to mmol/d
    rn_trcfac(O3c)  =  2.7397e+12    ! 1.e15/365 ! conversion factor from Tg/y to mg/d
+   rn_trcfac(O3h)  =  2.2812e+11    ! 1.e15/(12.01 * 365) !conversion factor from Tg/y to mmol(eq)/d
    cn_dir       = './'  !  root directory for the location of the boundary condition files
         filename_nml_conf = 'namelist_top_cfg',
 /
