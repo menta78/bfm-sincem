@@ -31,19 +31,16 @@
   use mem
 #else
   use mem,  ONLY: N4n, N3n, O2o, O4n, N6r, R6s, N5s, P1s
-  use mem, ONLY: ppN4n, ppN3n, ppO2o, ppO4n, ppN6r, ppR6s, ppN5s,    &
-    flN3O4n, ETW, flPTN6r, NO_BOXES, iiBen, iiPel, flN4N3n, &
-    flux_vector
-#ifdef INCLUDE_PELCO2
-  use mem, ONLY: ppO3c, ppO5c
+  use mem,  ONLY: ppN4n, ppN3n, ppO2o, ppO4n, ppN6r, ppR6s, ppN5s, &
+    flN3O4n, ETW, flPTN6r, NO_BOXES, iiBen, iiPel, flN4N3n, flux_vector
+#ifdef INCLUDE_PELFE
+  use mem,  ONLY: N7f, R6f, R1f, ppN7f, ppR6f, ppR1f, fscavN7f
 #endif
 #endif
   use mem_Param,  ONLY: p_qon_nitri, p_qro, p_qon_dentri, p_small
   use mem_PelChem
   use mem_globalfun,   ONLY: MM, eTq, insw
-#ifdef INCLUDE_PELCO2
-  use mem_CO2, ONLY: CalcBioAlkFlag
-#endif
+  use bfm_error_msg,   ONLY: bfm_error
 !  
 !
 ! !AUTHORS
@@ -84,35 +81,23 @@
   integer       :: AllocStatus, DeallocStatus
   real(RLEN),allocatable,save,dimension(:) :: fN4N3n,fN6O2r,eo,     &
                                               er,osat,rPAo,fR6N5s
-#ifndef INCLUDE_PELCO2
-  integer,parameter :: ppO3c = 0
+#ifdef INCLUDE_PELFE
+  real(RLEN),allocatable,save,dimension(:) :: fR1N7f, fR6N7f
 #endif
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-
+  ! Allocate local memory
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   if (first==0) then
+     ALLOCATE ( fN6O2r(NO_BOXES),   eo(NO_BOXES),   er(NO_BOXES), &
+        &       rPAo(NO_BOXES), fR6N5s(NO_BOXES), osat(NO_BOXES), &    
+        &       fN4N3n(NO_BOXES),                                 &
+#ifdef INCLUDE_PELFE
+        &       fR1N7f(NO_BOXES), fR6N7f(NO_BOXES),               &
+#endif 
+        &      STAT = AllocStatus )
+     IF( AllocStatus /= 0 ) call bfm_error('PelChem','Error allocating arrays')
      first=1
-     allocate(fN6O2r(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating fN6O2r"
-     allocate(eo(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating eo"
-     allocate(er(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating er"
-     allocate(rPAo(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rPAo"
-     allocate(fR6N5s(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating fR6N5s"
-     allocate(osat(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating osat"
-     allocate(fN4N3n(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating fN4N3n"
   end if
-
-#ifdef INCLUDE_PELCO2
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! Carbonate chemistry
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  call PelCO2Dynamics( )
-#endif
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Regulating factors
@@ -150,19 +135,28 @@
   fR6N5s  =   p_sR6N5* eTq(  ETW(:),  p_q10R6N5)* R6s(:)
   call flux_vector( iiPel, ppR6s,ppN5s, fR6N5s )
 
-#ifdef INCLUDE_PELCO2
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  ! Corrections of nitrogen cycle biogeochemistry on Total Alkalinity
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  if ( ppO3c > 0 .and. CalcBioAlkFlag)  call AlkalinityDynamics( )
-  if ( ppO5c > 0 )  call PelPICDynamics( )
-#endif
-
 #ifdef INCLUDE_PELFE
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  !  Iron Chemistry (dissolution and scavenging)
+  !  Dissolved Iron Chemistry (dissolution and scavenging)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  call PelIronDynamics()
+  ! Linear regeneration of bioavailable iron
+  fR1N7f(:)  =  p_sR1N7* eTq(  ETW(:),  p_q10R6N7)* R1f(:)
+  call flux_vector( iiPel, ppR1f, ppN7f, fR1N7f(:) )
+
+  fR6N7f(:)  =  p_sR6N7* eTq(  ETW(:),  p_q10R6N7)* R6f(:)
+  call flux_vector( iiPel, ppR6f, ppN7f, fR6N7f(:) )
+
+  ! Scavenging to particles : Linear relaxation to the solubility (p_N7fsol)
+  fscavN7f(:) = max(ZERO,p_scavN7f*(N7f-p_N7fsol))
+  call flux_vector( iiPel, ppN7f, ppN7f, -fscavN7f(:) )
+
+#endif
+
+#ifdef INCLUDE_PELCO2
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Carbonate chemistry
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  call PelagicCSYS()
 #endif
 
   end subroutine PelChemDynamics

@@ -78,14 +78,10 @@
   call PelGlobalDynamics
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  ! Compute oxygen variables: cxoO2 eO2mO2
-  ! calculate oxygen OxygenReaeration
+  ! Dissovled oxygen saturation and air-sea flux
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  call  CalcOxygenSaturation( )
+  call PelOxygen
 
-  if ( CalcPelChemistry) then
-     call OxygenReaerationDynamics
-  endif
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! This part is executed if Optimal Irradiance is used
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=

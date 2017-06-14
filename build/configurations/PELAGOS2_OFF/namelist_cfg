@@ -7,8 +7,8 @@
    cn_exp      =  "PELAGOS2_OFF"  !  experience name 
    nn_it000    =       1    !  first time step
    nn_itend    =    1460    !  last  time step (std 5475)
-   nn_stock    =     450    !  frequency of creation of a restart file (modulo referenced to 1)
-   nn_write    =     450    !  frequency of write in the output file   (modulo referenced to nn_it000)
+   nn_stock    =    1460    !  frequency of creation of a restart file (modulo referenced to 1)
+   nn_write    =    1460    !  frequency of write in the output file   (modulo referenced to nn_it000)
    nn_date0    =  20000101  !  date at nit_0000 (format yyyymmdd) used if ln_rstart=F or (ln_rstart=T and nn_rstctl=0 or 1)
    ln_clobber  = .false.    !  clobber (overwrite) an existing file
 /
@@ -33,7 +33,7 @@
 !-----------------------------------------------------------------------
 &namdom        !   space and time domain (bathymetry, mesh, timestep)
 !-----------------------------------------------------------------------
-   nn_msh      =    1      !  create (=1) a mesh file or not (=0)
+   nn_msh      =    0      !  create (=1) a mesh file or not (=0)
    rn_rdt      = 21600.    !  time step for the dynamics (and tracer if nn_acc=0)
    rn_rdtmin   = 21600.          !  minimum time step on tracers (used if nn_acc=1)
    rn_rdtmax   = 21600.          !  maximum time step on tracers (used if nn_acc=1)
@@ -65,6 +65,7 @@
 &namsbc        !   Surface Boundary Condition (surface module)
 !-----------------------------------------------------------------------
    nn_fsbc     = 1         !  frequency of surface boundary condition computation 
+   ln_dm2dc    = .true.    !  daily mean to diurnal cycle on short wave
 /  
 !-----------------------------------------------------------------------
 &namtra_qsr    !   penetrative solar radiation
@@ -98,35 +99,28 @@
 !-----------------------------------------------------------------------
 &namdta_dyn        !   offline dynamics read in files                ("key_offline")
 !-----------------------------------------------------------------------
-!          !  file name  ! frequency (hours) ! variable  ! time interp. !  clim  ! 'yearly'/ ! weights  ! rotation ! land/sea mask !
-!          !             !  (if <0  months)  !   name    !   (logical)  !  (T/F) ! 'monthly' ! filename ! pairing  ! filename      !
-   sn_tem  = 'PELAGOS2_1d_20000101_20001231_grid_T' ,    24            , 'votemper' ,  .true.    , .true. ,   'yearly'  , ''       , ''    , ''
-   sn_sal  = 'PELAGOS2_1d_20000101_20001231_grid_T' ,    24            , 'vosaline' ,  .true.    , .true. ,   'yearly'  , ''       , ''    , ''
-   sn_mld  = 'PELAGOS2_1d_20000101_20001231_grid_T' ,    24            , 'somixhgt' ,  .true.    , .true. ,   'yearly'  , ''       , ''    , ''
-   sn_emp  = 'PELAGOS2_1d_20000101_20001231_grid_T' ,    24            , 'sowaflup' ,  .true.    , .true. ,   'yearly'  , ''       , ''    , ''
-   sn_fmf  = 'PELAGOS2_1d_20000101_20001231_grid_T' ,    24            , 'sosfldow' ,  .true.    , .true. ,   'yearly'  , ''       , ''    , ''
-   sn_ice  = 'PELAGOS2_1d_20000101_20001231_grid_T' ,    24            , 'soicecov' ,  .true.    , .true. ,   'yearly'  , ''       , ''    , ''
-   sn_qsr  = 'PELAGOS2_1d_20000101_20001231_grid_T' ,    24            , 'soshfldo' ,  .true.    , .true. ,   'yearly'  , ''       , ''    , ''
-   sn_wnd  = 'PELAGOS2_1d_20000101_20001231_grid_T' ,    24            , 'sowindsp' ,  .true.    , .true. ,   'yearly'  , ''       , ''    , ''
-   sn_rnf  = 'PELAGOS2_1d_20000101_20001231_grid_T' ,    24            , 'sorunoff' ,  .true.    , .true. ,   'yearly'  , ''       , ''    , ''
-   sn_uwd  = 'PELAGOS2_1d_20000101_20001231_grid_U' ,    24            , 'vozocrtx' ,  .true.    , .true. ,   'yearly'  , ''       , ''    , ''
-   sn_vwd  = 'PELAGOS2_1d_20000101_20001231_grid_V' ,    24            , 'vomecrty' ,  .true.    , .true. ,   'yearly'  , ''       , ''    , ''
-   sn_wwd  = 'PELAGOS2_1d_20000101_20001231_grid_W' ,    24            , 'vovecrtz' ,  .true.    , .true. ,   'yearly'  , ''       , ''    , ''
-   sn_avt  = 'PELAGOS2_1d_20000101_20001231_grid_W' ,    24            , 'voddmavs' ,  .true.    , .true. ,   'yearly'  , ''       , ''    , ''
-   sn_ubl  = 'PELAGOS2_1d_20000101_20001231_grid_U' ,    24            , 'sobblcox' ,  .true.    , .true. ,   'yearly'  , ''       , ''    , ''
-   sn_vbl  = 'PELAGOS2_1d_20000101_20001231_grid_V' ,    24            , 'sobblcoy' ,  .true.    , .true. ,   'yearly'  , ''       , ''    , ''
-   sn_ahu  = 'PELAGOS2_1d_20000101_20001231_grid_U' ,    24            , 'vozoahtu' ,  .true.    , .true. ,   'yearly'  , ''       , ''    , ''
-   sn_ahv  = 'PELAGOS2_1d_20000101_20001231_grid_V' ,    24            , 'vomeahtv' ,  .true.    , .true. ,   'yearly'  , ''       , ''    , ''
-   sn_ahw  = 'PELAGOS2_1d_20000101_20001231_grid_W' ,    24            , 'voveahtz' ,  .true.    , .true. ,   'yearly'  , ''       , ''    , ''
-   sn_eiu  = 'PELAGOS2_1d_20000101_20001231_grid_U' ,    24            , 'vozoaeiu' ,  .true.    , .true. ,   'yearly'  , ''       , ''    , ''
-   sn_eiv  = 'PELAGOS2_1d_20000101_20001231_grid_V' ,    24            , 'vomeaeiv' ,  .true.    , .true. ,   'yearly'  , ''       , ''    , ''
-   sn_eiw  = 'PELAGOS2_1d_20000101_20001231_grid_W' ,    24            , 'soleaeiw' ,  .true.    , .true. ,   'yearly'  , ''       , ''    , ''
+!          !  file name                             ! frequency (hours) ! variable  ! time interp. !  clim  ! 'yearly'/ ! weights  ! rotation ! land/sea mask !
+!          !                                        !  (if <0  months)  !   name    !   (logical)  !  (T/F) ! 'monthly' ! filename ! pairing  ! filename      !
+   sn_tem  = 'PELAGOS2_1d_20020101_20021231_grid_T' ,    24            , 'thetao'     ,  .true.    , .true. ,   'yearly'  , ''       , ''    , ''
+   sn_sal  = 'PELAGOS2_1d_20020101_20021231_grid_T' ,    24            , 'so'         ,  .true.    , .true. ,   'yearly'  , ''       , ''    , ''
+   sn_mld  = 'PELAGOS2_1d_20020101_20021231_grid_T' ,    24            , 'somixhgt'   ,  .true.    , .true. ,   'yearly'  , ''       , ''    , ''
+   sn_emp  = 'PELAGOS2_1d_20020101_20021231_grid_T' ,    24            , 'wfo'        ,  .true.    , .true. ,   'yearly'  , ''       , ''    , ''
+   sn_fmf  = 'PELAGOS2_1d_20020101_20021231_grid_T' ,    24            , 'sosflxdo'   ,  .true.    , .true. ,   'yearly'  , ''       , ''    , ''
+   sn_ice  = 'PELAGOS2_1d_20020101_20021231_grid_T' ,    24            , 'sic'        ,  .true.    , .true. ,   'yearly'  , ''       , ''    , ''
+   sn_qsr  = 'PELAGOS2_1d_20020101_20021231_grid_T' ,    24            , 'rsntds'     ,  .false.   , .true. ,   'yearly'  , ''       , ''    , ''
+   sn_wnd  = 'PELAGOS2_1d_20020101_20021231_grid_T' ,    24            , 'sowindsp'   ,  .true.    , .true. ,   'yearly'  , ''       , ''    , ''
+   sn_uwd  = 'PELAGOS2_1d_20020101_20021231_grid_U' ,    24            , 'uocetr_eff' ,  .true.    , .true. ,   'yearly'  , ''       , ''    , ''
+   sn_vwd  = 'PELAGOS2_1d_20020101_20021231_grid_V' ,    24            , 'vocetr_eff' ,  .true.    , .true. ,   'yearly'  , ''       , ''    , ''
+   sn_wwd  = 'PELAGOS2_1d_20020101_20021231_grid_W' ,    24            , 'wocetr_eff' ,  .true.    , .true. ,   'yearly'  , ''       , ''    , ''
+   sn_avt  = 'PELAGOS2_1d_20020101_20021231_grid_W' ,    24            , 'voddmavs'   ,  .true.    , .true. ,   'yearly'  , ''       , ''    , ''
+   sn_ubl  = 'PELAGOS2_1d_20020101_20021231_grid_U' ,    24            , 'sobblcox'   ,  .true.    , .true. ,   'yearly'  , ''       , ''    , ''
+   sn_vbl  = 'PELAGOS2_1d_20020101_20021231_grid_V' ,    24            , 'sobblcoy'   ,  .true.    , .true. ,   'yearly'  , ''       , ''    , ''
+   sn_rnf  = 'PELAGOS2_1d_20020101_20021231_grid_T' ,    24            , 'sorunoff'   ,  .true.    , .true. ,   'yearly'  , ''       , ''    , ''
 !
-   cn_dir      = './'      !  root directory for the location of the dynamical files
-   ln_degrad   =  .false.  !  flag for degradation -                requires ("key_degrad")
-   ln_dynwzv   =  .false.  !  computation of vertical velocity instead of using the one read in file
-   ln_dynbbl   =  .false.  !  bbl coef are in files, so read them - requires ("key_trabbl")
-   ln_dynrnf   =  .true.  !  read runoff data in file (T) or set to zero (F)
+   cn_dir          = './'       !  root directory for the location of the dynamical files
+   ln_dynrnf       =  .true.   !  runoffs option enabled (T) or not (F)
+   ln_dynrnf_depth =  .false.   ! runoffs is spread in vertical (T) or not (F)
+!   fwbcorr      = 3.786e-06    ! annual global mean of empmr for ssh correction
 /
 !-----------------------------------------------------------------------
 &nammpp        !   Massively Parallel Processing                        ("key_mpp_mpi")
@@ -138,5 +132,5 @@
 !-----------------------------------------------------------------------
 &namctl        !   Control prints & Benchmark
 !-----------------------------------------------------------------------
-   nn_timing   =    1      !  timing by routine activated (=1) creates timing.output file, or not (=0)
+   nn_timing   =    0      !  timing by routine activated (=1) creates timing.output file, or not (=0)
 /

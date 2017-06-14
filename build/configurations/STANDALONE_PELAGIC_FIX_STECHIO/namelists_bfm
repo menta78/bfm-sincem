@@ -112,7 +112,7 @@
 ! Switches : 
             CalcPelagicFlag = .TRUE.
             CalcBenthicFlag = 0
-       CalcConservationFlag = .FALSE.
+       CalcConservationFlag = .TRUE.
           CalcTransportFlag = .FALSE.
        CalcPhytoPlankton(1) = .TRUE.
        CalcPhytoPlankton(2) = .TRUE.
@@ -144,32 +144,6 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
 !-------------------------------------------------------------------------!
 !Pelagic initialisation of standard variables
 !<variablename>0 = <realvalue>
-!
-! Initialization with InitVar structure 
-!----------------------------------------
-! NOTE:
-! This part is still experimental and will be improved in the future
-!----------------------------------------
-! BFM variable information for data input
-! available fields:
-! integer init: select the initialization
-!               0 = homogeneous
-!               1 = analytical (linear)
-!               2 = from file
-! options for init==1
-!   real anv1: value in the surface layer
-!   real anz1: thickness of the surface layer
-!   real anv2: value in the bottom layer
-!   real anz2: starting depth of the bottom layer
-! options for init==2 
-! * Options currently used when coupled with NEMO
-!   logical obc: variable has open boundary data
-!   logical sbc: variable has surface boundary data
-!   logical cbc: variable has coastal boundary data
-! * Options not used when coupled with NEMO because
-!   overridden by values in namelist_top_cfg
-!   char filename: name of the input file
-!   char  varname: name of the var in input file
 !-------------------------------------------------------------------------!
 &bfm_init_nml
    O2o0 = 300.0,
@@ -207,10 +181,12 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
 !-------------------------------------------------------------------------!
 &bfm_save_nml
    var_save = ''
-   ave_save = 'ETW','EIR','xEPS',
-          'DIC','pCO2' 'O3h','O5c','OCalc','OArag',
+   ave_save = 'ETW','O2o','DIC',
+          'O5c','OCalc','OArag',
+          'EIR',
+          'xEPS',
           'Chla',
-          'O2o','N1p','N3n','N4n','N5s',
+          'N1p','N3n','N4n','N5s',
           'B1c',
           'P1c','P2c','P3c','P4c',
           'P1l','P2l','P3l','P4l',
@@ -223,7 +199,7 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
           'P1s','R6s',
           'ruPPYc','resPBAc','resZOOc',
           'ruPPYn','ruPPYp','ruPPYs','exPPYc',
-          'ruZOOc','remZOOn','remZOOp','remPBAn','remPBAp',
+          'ruZOOc','remZOOn','remZOOp','remPBAn','remPBAp', 'qpcMEZ_iiZ3', 'qncMEZ_iiZ3',
           'qpcPBA_iiB1', 'qncPBA_iiB1',
           'qpcMEZ_iiZ3', 'qncMEZ_iiZ3', 'qpcMEZ_iiZ4', 'qncMEZ_iiZ4',
           'qpcMIZ_iiZ5', 'qncMIZ_iiZ5', 'qpcMIZ_iiZ6', 'qncMIZ_iiZ6'
@@ -449,7 +425,7 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
 !               P1      P2      P3      P4
         p_q10 = 2.0,    2.0,    2.0,    2.0
        p_temp = 0.0,    0.0,    0.75,    0.0
-        p_sum = 2.0,    2.5,    3.0,    0.75
+        p_sum = 2.0,    2.5,    3.0,    0.9
         p_srs = 0.01,   0.05,   0.1,    0.1
        p_sdmo = 0.05,   0.05,   0.05,   0.0
        p_thdo = 0.1,    0.1,    0.1,    0.1
@@ -567,9 +543,9 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
 !              Z5      Z6
        p_q10 =  2.0,    2.0
        p_srs =  0.02,   0.02
-       p_sum =  2.0,    4.0
+       p_sum =  3.0,    4.0
        p_sdo =  0.25,   0.25
-        p_sd =  0.05,   0.05
+        p_sd =  0.01,   0.01
         p_pu =  0.6,    0.5
      p_pu_ea =  0.4,    0.3
       p_chro =  0.5,    0.5
@@ -583,12 +559,12 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
      p_paPBA =  0.1,    0.9
 !               P1      P2      P3      P4
 !       Z5
-p_paPPY(1,:) =  0.2,    1.0,    0.1,    0.0
+p_paPPY(1,:) =  0.1,    1.0,    0.1,    0.0
 !       Z6
 p_paPPY(2,:) =  0.0,    0.1,    1.0,    0.0
 !               Z5      Z6
 !       Z5
-p_paMIZ(1,:) =  1.0,    0.8
+p_paMIZ(1,:) =  0.2,    0.6
 !       Z6
 p_paMIZ(2,:) =  0.0,    0.2
 	filename_nml_conf = 'Pelagic_Ecology.nml',
@@ -644,7 +620,7 @@ p_paPPY(2,:) =  1.0,    0.0,    0.0,    0.7
 !       Z3
 p_paMIZ(1,:) =  0.0,    0.0
 !       Z4
-p_paMIZ(2,:)=   1.0,    0.0,
+p_paMIZ(2,:)=   0.8,    0.0,
 !               Z3      Z4
 !       Z3
 p_paMEZ(1,:)=   1.0,    1.0

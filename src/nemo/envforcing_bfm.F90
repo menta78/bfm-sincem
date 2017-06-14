@@ -13,7 +13,7 @@
 ! BFM modules
    use constants,  only: E2W
    use global_mem, only: RLEN,ZERO,LOGUNIT,ONE
-   use mem_param,  only: p_small, slp0
+   use mem_param,  only: p_small, p_atm0
    use mem_PAR,    only: ChlAttenFlag, P_PARRGB, P_PAR, &
                          R_EPS, B_EPS, G_EPS, P_EPSIR,  &
                          EIRR, EIRB, EIRG
@@ -26,7 +26,7 @@
    use time, only: bfmtime
 #ifdef INCLUDE_PELCO2
    use mem,        only: ppO3c, ppO3h, ppN6r
-   use mem_CO2,    only: AtmCO20, AtmCO2, AtmSLP, AtmTDP
+   use mem_CO2,    only: AtmCO20, AtmCO2, AtmSLP, patm3d
    USE trcbc,      only: sf_trcsbc, n_trc_indsbc
 #endif
 ! OPA modules
@@ -63,13 +63,18 @@ IMPLICIT NONE
    !---------------------------------------------
    ETW(:) = pack(tsn(:,:,:,jp_tem),SEAmask)
    ESW(:) = pack(tsn(:,:,:,jp_sal),SEAmask)
-   ERHO(:) = pack( (rhd(:,:,:) + 1._RLEN) * rau0, SEAmask)
 
    ! convert to in-situ temperature and practical salinity
    ! TEOS-10 conversions not yet available
    if ( nn_eos .eq. 0 ) then
       ETW(:)  = sw_t_from_pt(ESW,ETW,EPR,EPR*0.)
    endif
+
+   !---------------------------------------------
+   ! Assign in-situ density
+   !---------------------------------------------
+   ERHO(:) = pack( (rhd(:,:,:) + 1._RLEN) * rau0, SEAmask)
+
    !---------------------------------------------
    ! Assign wind speed
    !---------------------------------------------
@@ -93,48 +98,36 @@ IMPLICIT NONE
        n = n_trc_indsbc(ppO3c)
        AtmCO2%fnow = pack( sf_trcsbc(n)%fnow(:,:,1),SRFmask(:,:,1) )
      CASE (3) ! Receive Boundary Conditions from NEMO
-      AtmCO2%fnow = pack( atm_co2(:,:),SRFmask(:,:,1) )
+       AtmCO2%fnow = pack( atm_co2(:,:),SRFmask(:,:,1) )
 #ifdef CCSMCOUPLED
-      if ( kt < 10 .AND. bfm_init /= 1 ) then                 ! ugly patch to get values in first step of CESM
-         WHERE ( AtmCO2%fnow == 0. ) ; AtmCO2%fnow = AtmCO20 ; END WHERE ;
-      endif
+       if ( kt < 10 .AND. bfm_init /= 1 ) then                 ! ugly patch to get values in first step of CESM
+          WHERE ( AtmCO2%fnow == 0. ) ; AtmCO2%fnow = AtmCO20 ; END WHERE ;
+       endif
 #endif
    END SELECT
    !
    ! Atmospheric sea level pressure (MFS index jp_msl  = 4)
-   !
-   if ( allocated(AtmSLP%fnow))  then 
-      SELECT CASE ( AtmSLP%init )
-         CASE (1) ! Read timeseries in BFM
-            call FieldRead(AtmSLP)
-         CASE (2) ! Read Boundary Conditions using NEMO fldread (namtrc_bc)
-            n = n_trc_indsbc(ppO3h)
-            AtmSLP%fnow = pack( sf_trcsbc(n)%fnow(:,:,1),SRFmask(:,:,1) )
-         CASE (3) ! Receive Boundary Conditions from NEMO
-            AtmSLP%fnow = pack( apr(:,:),SRFmask(:,:,1) )
+   SELECT CASE ( AtmSLP%init )
+     CASE (1) ! Read timeseries in BFM
+       call FieldRead(AtmSLP)
+     CASE (2) ! Read Boundary Conditions using NEMO fldread (namtrc_bc)
+       n = n_trc_indsbc(ppO3h)
+       AtmSLP%fnow = pack( sf_trcsbc(n)%fnow(:,:,1),SRFmask(:,:,1) )
+     CASE (3) ! Receive Boundary Conditions from NEMO
+       AtmSLP%fnow = pack( apr(:,:),SRFmask(:,:,1) )
 #ifdef CCSMCOUPLED
-            if ( kt < 10 .AND. bfm_init /= 1 ) then                 ! ugly patch to get values in first step of CESM
-              WHERE ( AtmSLP%fnow == 0. ) ; AtmSLP%fnow = slp0 ; END WHERE ;
-            endif
+       if ( kt < 10 .AND. bfm_init /= 1 ) then                 ! ugly patch to get values in first step of CESM
+         WHERE ( AtmSLP%fnow == 0. ) ; AtmSLP%fnow = p_atm0 ; END WHERE ;
+       endif
 #endif
-      END SELECT
-   endif
-   !
-   ! Atmospheric Dew Point Temperature
-   !
-   if ( allocated(AtmTDP%fnow)) then 
-      SELECT CASE ( AtmTDP%init )
-         CASE (1) ! Read timeseries in BFM
-            call FieldRead(AtmTDP)
-         CASE (2) ! Read Boundary Conditions using NEMO fldread (namtrc_bc)
-            n = n_trc_indsbc(ppN6r)
-            AtmTDP%fnow = pack( sf_trcsbc(n)%fnow(:,:,1),SRFmask(:,:,1) )
-      END SELECT
-   endif  
+   END SELECT
+   ! broadcast surface atm pressure over the water column (NO_BOXES)
+   patm3d = pack(SPREAD(unpack(AtmSLP%fnow,SRFmask(:,:,1),ZERO),DIM=3,Ncopies=SIZE(SEAmask,3)),SEAmask)
 
    ! print control on received fluxes
    IF ( (kt-nit000)<20 .OR. MOD(kt,200)==0 .OR. kt==nitend) THEN
-      write(LOGUNIT,*) 'env_forcing: Step ',kt,' Air_pCO2: ',maxval(AtmCO2%fnow), ' SLP:', maxval(AtmSLP%fnow) 
+      write(LOGUNIT,'(a,i14,a,f10.4,a,f10.3)') 'envforcing_bfm - Step ', kt,  & 
+         '  Air_xCO2: ',maxval(AtmCO2%fnow), '  SLP:', maxval(AtmSLP%fnow) 
    ENDIF
 #endif
 

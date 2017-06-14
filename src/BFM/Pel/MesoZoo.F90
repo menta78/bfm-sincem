@@ -31,7 +31,7 @@
     ppPhytoPlankton, ppMicroZooPlankton, ppMesoZooPlankton, ETW, &
     qncPPY, qpcPPY, qlcPPY, qscPPY, qncMIZ, qpcMIZ, qncMEZ, qpcMEZ, iiPhytoPlankton, &
     iiMicroZooPlankton, iiMesoZooPlankton, iiC, iiN, iiP, iiL, iiS, NO_BOXES, &
-    iiBen, iiPel, flux_vector
+    iiBen, iiPel, flux_vector, quota_flux
 #ifdef INCLUDE_PELCO2
   use mem, ONLY: ppO3c, ppO5c, ppO3h, qccPPY
 #endif
@@ -43,13 +43,14 @@
   use mem, ONLY: jnetMeZc
 #endif
   use mem_Param,  ONLY: p_small
+  use bfm_error_msg, ONLY: bfm_error
   use constants,ONLY: MIN_VAL_EXPFUN, MW_C, C2ALK
   use mem_MesoZoo
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! The following vector functions are used: eTq, MM, MM_power
+  ! The following vector functions are used: eTq, MM, MM_power, nutlim
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  use mem_globalfun,   ONLY: eTq, MM, MM_power
+  use mem_globalfun,   ONLY: eTq, MM, MM_power, nutlim
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Implicit typing is never allowed
@@ -94,8 +95,8 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   integer  :: i
   integer  :: ppzooc, ppzoon, ppzoop
-  integer,dimension(NO_BOXES)  :: nut_lim
   integer, save :: first =0
+  integer,dimension(NO_BOXES)  :: limit
   real(RLEN),allocatable,save,dimension(:) :: sut,temp_p,temp_n,rumc,rugc,eo,  &
                                        et,rrs_c,rrs_n,rrs_p,rut_c, &
                                        rut_n,rut_p,rd_c,rd_n,rd_p,sdo,rdo_c,  &
@@ -103,10 +104,11 @@
                                        ru_n,ru_p,pu_e_n,pu_e_p,prI,pe_R6c
 
   real(RLEN),allocatable,save,dimension(:) :: pe_N1p,pe_N4n,ruPPYc,ruMIZc,ruMEZc,rq6c, &
-                                       rq6n,rq6p,rrc,ren,rep,zooc,zoop,zoon
+                                       rq6n,rq6p,rrc,ren,rep,tfluxC, tfluxN, tfluxP,     &
+                                       zooc,zoop,zoon
   real(RLEN),allocatable,save,dimension(:,:) :: PPYc,MIZc,MEZc
   real(RLEN),allocatable,save,dimension(:) :: net,r
-  integer :: AllocStatus, DeallocStatus
+  integer :: AllocStatus
 #ifndef INCLUDE_PELCO2
   integer,parameter :: ppO3c = 0
 #endif
@@ -116,99 +118,27 @@
   ! Allocate local memory
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   if (first==0) then
+     ALLOCATE ( PPYc(NO_BOXES,iiPhytoPlankton), MIZc(NO_BOXES,iiMicroZooPlankton), &
+        &       MEZc(NO_BOXES,iiMesoZooPlankton),  &
+        &       zooc(NO_BOXES), zoop(NO_BOXES), zoon(NO_BOXES),        &
+        &       rep(NO_BOXES), ren(NO_BOXES), rrc(NO_BOXES),           &
+        &       rq6p(NO_BOXES), rq6n(NO_BOXES), rq6c(NO_BOXES),        &
+        &       ruPPYc(NO_BOXES), ruMIZc(NO_BOXES), ruMEZc(NO_BOXES),  &
+        &       pe_N4n(NO_BOXES), pe_N1p(NO_BOXES), pe_R6c(NO_BOXES),  &
+        &       prI(NO_BOXES), pu_e_p(NO_BOXES), pu_e_n(NO_BOXES),     &
+        &       ru_p(NO_BOXES), ru_n(NO_BOXES), ru_c(NO_BOXES),        &
+        &       ret_p(NO_BOXES), ret_n(NO_BOXES), ret_c(NO_BOXES),     &
+        &       rdo_p(NO_BOXES), rdo_n(NO_BOXES), rdo_c(NO_BOXES),     &
+        &       rd_p(NO_BOXES) , rd_n(NO_BOXES) , rd_c(NO_BOXES) ,     &
+        &       rut_p(NO_BOXES), rut_n(NO_BOXES), rut_c(NO_BOXES),     &
+        &       eo(NO_BOXES), sdo(NO_BOXES), et(NO_BOXES), sut(NO_BOXES),   &
+        &       rumc(NO_BOXES), rugc(NO_BOXES), net(NO_BOXES), r(NO_BOXES), &
+        &       tfluxC(NO_BOXES), tfluxN(NO_BOXES), tfluxP(NO_BOXES),  &
+        &       temp_p(NO_BOXES), temp_n(NO_BOXES),                    &
+        &      STAT = AllocStatus )
+
+     IF( AllocStatus /= 0 ) call bfm_error('MesoZooDynamics','Error allocating arrays')
      first=1
-     allocate(eo(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating eo"
-     allocate(PPYc(NO_BOXES,iiPhytoplankton),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating PPYc"
-       allocate(MIZc(NO_BOXES,iiMicroZooPlankton),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating MIZc"
-       allocate(MEZc(NO_BOXES,iiMesoZooPlankton),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating MEZc"
-       allocate(zooc(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating zooc"
-       allocate(zoop(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating zoop"
-       allocate(zoon(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating zoon"
-     allocate(rep(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rep"
-     allocate(ren(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating ren"
-     allocate(rrc(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rrc"
-     allocate(rq6p(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rq6p"
-     allocate(rq6n(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rq6n"
-     allocate(rq6c(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rq6c"
-     allocate(ruMEZc(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating ruMEZc"
-     allocate(ruMIZc(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating ruMIZc"
-     allocate(ruPPYc(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating ruPPYc"
-     allocate(pe_N4n(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating pe_N4n"
-     allocate(pe_N1p(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating pe_N1p"
-     allocate(pe_R6c(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating pe_R6c"
-     allocate(prI(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating prI"
-     allocate(pu_e_p(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating pu_e_p"
-     allocate(pu_e_n(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating pu_e_n"
-     allocate(ru_p(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating ru_p"
-     allocate(ru_n(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating ru_n"
-     allocate(ru_c(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating ru_c"
-     allocate(ret_p(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating ret_p"
-     allocate(ret_n(NO_BOXES),stat=AllocStatus)
-      if (AllocStatus  /= 0) stop "error allocating ret_n"
-     allocate(ret_c(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating ret_c"
-     allocate(rdo_p(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rdo_p"
-     allocate(rdo_n(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rdo_n"
-     allocate(rdo_c(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rdo_c"
-     allocate(sdo(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating sdo"
-     allocate(rd_p(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rd_p"
-     allocate(rd_n(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rd_n"
-     allocate(rd_c(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rd_c"
-     allocate(rut_p(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rut_p"
-     allocate(rut_n(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rut_n"
-     allocate(rut_c(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rut_c"
-     allocate(et(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating et"
-     allocate(sut(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating sut"
-     allocate(temp_p(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating temp_p"
-     allocate(temp_n(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating temp_n"
-     allocate(rumc(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rumc"
-     allocate(rugc(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating rugc"
-     allocate(net(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating net"
-     allocate(r(NO_BOXES),stat=AllocStatus)
-     if (AllocStatus  /= 0) stop "error allocating r"
   endif
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -221,6 +151,11 @@
   zooc = D3STATE(ppzooc,:)
   zoon = zooc * qncMEZ(zoo,:)
   zoop = zooc * qpcMEZ(zoo,:)
+
+  ! Quota collectors
+  tfluxC = ZERO
+  tfluxN = ZERO
+  tfluxP = ZERO
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Physiological temperature and oxygen response
@@ -322,6 +257,11 @@
     rut_p = rut_p + ruMEZc*qpcMEZ(i,:)
   end do
 
+  ! Note that tfluxC include also intra-group predation
+  tfluxC = tfluxC + rut_c 
+  tfluxN = tfluxN + rut_n
+  tfluxP = tfluxP + rut_p
+
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Activity respiration and basal metabolism
   ! First compute the the energy cost of ingestion
@@ -330,7 +270,7 @@
   prI = ONE - p_puI(zoo) - p_peI(zoo)
   rrc = prI*rut_c + p_srs(zoo)*et*zooc
   call flux_vector(iiPel, ppO2o, ppO2o, -rrc/MW_C)
-  call flux_vector(iiPel, ppzooc, ppO3c, rrc)
+  call quota_flux(iiPel, ppzooc, ppzooc, ppO3c, rrc, tfluxC)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Specific rates of low oxygen mortality
@@ -348,74 +288,131 @@
   rq6p = p_peI(zoo)*rut_p + qpcMEZ(zoo,:)*(rdo_c + rd_c)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  ! Check the assimilation rate for Carbon, Nitrogen and Phosphorus
-  ! Note that activity respiration does not involve nutrient utilization
-  ! so more nutrients than carbon are taken up.
-  ! Then compute P:C and N:C ratios in the assimilation rate
-  ! Eq 41 in Vichi et al. 2007 (there is an error in the denominator,
-  ! the \Iota_c should be \Iota_i, with i=n,p)
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  ru_c = p_puI(zoo)*rut_c
-  ru_n = (p_puI(zoo) + prI)* rut_n
-  ru_p = (p_puI(zoo) + prI)* rut_p
-  pu_e_n  =   ru_n/( p_small+ ru_c)
-  pu_e_p  =   ru_p/( p_small+ ru_c)
-
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  ! Eliminate the excess of the non-limiting constituent
-  ! Determine whether C, P or N is the limiting element and assign the
-  ! value to variable nut_lim
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  nut_lim = iiC
-  temp_p  = pu_e_p/qpcMEZ(zoo,:)
-  temp_n  = pu_e_n/qncMEZ(zoo,:)
-
-  WHERE ( temp_p<temp_n .OR. abs(temp_p-temp_n)<p_small ) 
-      WHERE ( pu_e_p< qpcMEZ(zoo,:) )
-        nut_lim = iiP
-      END WHERE
-  ELSEWHERE
-      WHERE ( pu_e_n<qncMEZ(zoo,:) )
-        nut_lim = iiN
-      END WHERE
-  END WHERE
-
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  ! Compute the correction terms depending on the limiting constituent
-  ! Eq. 42 Vichi et al 2007 for a combination of N and P limitation
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  WHERE     ( nut_lim==iiC )
-      pe_R6c = ZERO
-      pe_N1p = max(ZERO, (ONE - p_peI(zoo))*rut_p - p_qpcMEZ(zoo)*ru_c)
-      pe_N4n = max(ZERO, (ONE - p_peI(zoo))*rut_n - p_qncMEZ(zoo)*ru_c)
-  ELSEWHERE ( nut_lim==iiP )
-      pe_N1p = ZERO
-      pe_R6c = max(ZERO, ru_c - (ONE - p_peI(zoo))*rut_p/p_qpcMEZ(zoo))
-      pe_N4n = max( ZERO, (ONE - p_peI(zoo))*rut_n - p_qncMEZ(zoo)*(ru_c - pe_R6c))
-  ELSEWHERE ( nut_lim==iiN )
-      pe_N4n = ZERO
-      pe_R6c = max(ZERO, ru_c - (ONE - p_peI(zoo))*rut_n/p_qncMEZ(zoo))
-      pe_N1p = max(ZERO, (ONE - p_peI(zoo))*rut_p - p_qpcMEZ(zoo)*(ru_c - pe_R6c))
-  END WHERE
-
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Nutrient remineralization 
   ! basal metabolism + excess of non-limiting nutrients
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  ren = p_srs(zoo)*et*eo*zoon + pe_N4n
-  rep = p_srs(zoo)*et*eo*zoop + pe_N1p
-  call flux_vector(iiPel, ppzoop, ppN1p, rep)
-  call flux_vector(iiPel, ppzoon, ppN4n, ren)
+  ren = p_srs(zoo)*et*eo*zoon 
+  rep = p_srs(zoo)*et*eo*zoop 
+  call quota_flux(iiPel, ppzoop, ppzoop, ppN1p, rep, tfluxP)
+  call quota_flux(iiPel, ppzoon, ppzoon, ppN4n, ren, tfluxN)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Fluxes to particulate organic matter
   ! Add the correction term for organic carbon release in case of
   ! nutrient limitation
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  rq6c = rq6c + pe_R6c
-  call flux_vector(iiPel, ppzooc,ppR6c, rq6c)
-  call flux_vector(iiPel, ppzoop,ppR6p, rq6p)
-  call flux_vector(iiPel, ppzoon,ppR6n, rq6n)
+  call quota_flux(iiPel, ppzooc, ppzooc,ppR6c, rq6c, tfluxC)
+  call quota_flux(iiPel, ppzoon, ppzoon,ppR6n, rq6n, tfluxN)
+  call quota_flux(iiPel, ppzoop, ppzoop,ppR6p, rq6p, tfluxP)
+
+  if ( ppzoon > 0 .and. ppzoop > 0 ) then
+     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+     ! Check the assimilation rate for Carbon, Nitrogen and Phosphorus
+     ! Note that activity respiration does not involve nutrient utilization
+     ! so more nutrients than carbon are taken up.
+     ! Then compute P:C and N:C ratios in the assimilation rate
+     ! Eq 41 in Vichi et al. 2007 (there is an error in the denominator,
+     ! the \Iota_c should be \Iota_i, with i=n,p)
+     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+     ru_c = p_puI(zoo)*rut_c
+     ru_n = (p_puI(zoo) + prI)* rut_n
+     ru_p = (p_puI(zoo) + prI)* rut_p
+     pu_e_n  =   ru_n/( p_small+ ru_c)
+     pu_e_p  =   ru_p/( p_small+ ru_c)
+
+     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+     ! Eliminate the excess of the non-limiting constituent
+     ! Determine whether C, P or N is the limiting element and assign the
+     ! value to variable limit
+     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+     limit = iiC
+     temp_p  = pu_e_p/qpcMEZ(zoo,:)
+     temp_n  = pu_e_n/qncMEZ(zoo,:)
+
+     WHERE ( temp_p<temp_n .OR. abs(temp_p-temp_n)<p_small ) 
+         WHERE ( pu_e_p< qpcMEZ(zoo,:) )
+           limit = iiP
+         END WHERE
+     ELSEWHERE
+         WHERE ( pu_e_n<qncMEZ(zoo,:) )
+           limit = iiN
+         END WHERE
+     END WHERE
+
+     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+     ! Compute the correction terms depending on the limiting constituent
+     ! Eq. 42 Vichi et al 2007 for a combination of N and P limitation
+     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+     WHERE     ( limit == iiC )
+         pe_R6c = ZERO
+         pe_N1p = max(ZERO, (ONE - p_peI(zoo))*rut_p - p_qpcMEZ(zoo)*ru_c)
+         pe_N4n = max(ZERO, (ONE - p_peI(zoo))*rut_n - p_qncMEZ(zoo)*ru_c)
+     ELSEWHERE ( limit == iiP )
+         pe_R6c = max(ZERO, ru_c - (ONE - p_peI(zoo))*rut_p/p_qpcMEZ(zoo))
+         pe_N1p = ZERO
+         pe_N4n = max( ZERO, (ONE - p_peI(zoo))*rut_n - p_qncMEZ(zoo)*(ru_c - pe_R6c))
+     ELSEWHERE ( limit == iiN )
+         pe_R6c = max(ZERO, ru_c - (ONE - p_peI(zoo))*rut_n/p_qncMEZ(zoo))
+         pe_N1p = max(ZERO, (ONE - p_peI(zoo))*rut_p - p_qpcMEZ(zoo)*(ru_c - pe_R6c))
+         pe_N4n = ZERO
+     END WHERE
+  else
+     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+     ! Eliminate the excess of the non-limiting constituent under fixed quota
+     ! Determine whether C, P or N is limiting (Total Fluxes Formulation)
+     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+     limit = nutlim(tfluxc,tfluxn,tfluxp,qncMEZ(zoo,:),qpcMEZ(zoo,:),iiC,iiN,iiP)
+   
+     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+     ! Compute the correction terms depending on the limiting constituent
+     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+     WHERE     ( limit == iiC )
+         pe_R6c = ZERO
+         pe_N1p = max(ZERO,tfluxp  - p_qpcMEZ(zoo)* tfluxc)
+         pe_N4n = max(ZERO,tfluxn  - p_qncMEZ(zoo)* tfluxc)
+     ELSEWHERE ( limit == iiP )
+         pe_N1p = ZERO
+         pe_R6c = max(ZERO, tfluxc  - tfluxp/p_qpcMEZ(zoo))
+         pe_N4n = max(ZERO, tfluxn  - tfluxp/p_qpcMEZ(zoo)*p_qncMEZ(zoo) )
+     ELSEWHERE ( limit == iiN )
+         pe_N4n = ZERO
+         pe_R6c = max(ZERO, tfluxc  - tfluxn/p_qncMEZ(zoo))
+         pe_N1p = max(ZERO, tfluxp  - tfluxn/p_qncMEZ(zoo)*p_qpcMEZ(zoo))
+     END WHERE
+
+#ifdef DEBUG
+     write(*,*) '+++++++++++++++'
+     if ( limit(1)==iiC ) then
+     write(*,*) 'tfluxp', tfluxp,'pe_N1p', tfluxp  - p_qpcMEZ(zoo)* tfluxc 
+     write(*,*) 'tfluxn', tfluxn,'pe_N4n', tfluxn  - p_qncMEZ(zoo)* tfluxc
+     write(*,*) 'tfluxc', tfluxc,'pe_R6c', ZERO 
+     write(*,*) 'ooooooooooooooo'
+     endif
+   
+     if ( limit(1)==iiP ) then
+     write(*,*) 'tfluxp', tfluxp,'pe_N1p', ZERO 
+     write(*,*) 'tfluxn', tfluxn,'pe_N4n', tfluxn - tfluxp/p_qpcMEZ(zoo)*p_qncMEZ(zoo)
+     write(*,*) 'tfluxc', tfluxc,'pe_R6c', tfluxc - tfluxp/p_qpcMEZ(zoo)
+     write(*,*) 'ooooooooooooooo'
+     endif
+   
+     if ( limit(1)==iiN ) then
+     write(*,*) 'tfluxp', tfluxp,'pe_N1p', tfluxp  - tfluxn/p_qncMEZ(zoo)*p_qpcMEZ(zoo)
+     write(*,*) 'tfluxn', tfluxn,'pe_N4n', ZERO
+     write(*,*) 'tfluxc', tfluxc,'pe_R6c', tfluxc  - tfluxn/p_qncMEZ(zoo) 
+     endif
+     write(*,*) '+++++++++++++++'
+#endif
+   
+  endif
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  ! Correction term for excess of non-limiting nutrients as organic carbon 
+  ! release (POC) and nutrient remineralization (PO4 and NH)
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  call flux_vector(iiPel, ppzooc, ppR6c, pe_R6c)
+  call flux_vector(iiPel, ppzoop, ppN1p, pe_N1p)
+  call flux_vector(iiPel, ppzoon, ppN4n, pe_N4n)
 
   end subroutine MesoZooDynamics
 !EOC

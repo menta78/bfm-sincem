@@ -99,7 +99,7 @@ CONTAINS
       !
       ! check consistency of light paramterizations
       if ( ln_dm2dc .AND. LightPeriodFlag .NE. 1) &
-                 CALL ctl_stop( ' The diurnal cycle (ln_dm2dc) is not compatible with the BFM LightPeriodFlag = 1.' )
+                 CALL ctl_stop( ' The diurnal cycle (ln_dm2dc) is compatible only with the BFM LightPeriodFlag = 1' )
 
       IF(ln_ctl) THEN            ! print mean trends (used for debugging)
          CALL prt_ctl_trc_init

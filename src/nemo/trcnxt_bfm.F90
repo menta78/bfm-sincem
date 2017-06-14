@@ -85,7 +85,7 @@ CONTAINS
 
       ! 0. Lateral boundary conditions on tra (T-point, unchanged sign)
       ! ---------------------------------============
-      CALL lbc_lnk_t( tra, jptra, 'T', 1. )
+      CALL lbc_lnk( tra, 'T', 1. )
 
       ! Check that the BFM compliant integrations are used
       IF(.NOT.lk_c1d) THEN

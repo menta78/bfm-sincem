@@ -24,6 +24,7 @@
   use mem
   use mem_Settling
   use mem_Phyto,  ONLY: p_rPIm
+  use init_var_bfm_local
 #ifdef BFM_GOTM
   use bio_var, ONLY: BOTindices
 #else
@@ -67,73 +68,10 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   flPTN6r(:)  =   ZERO
 
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  ! Compute nutrient quota in pelagic organic matter
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  do i = 1, iiPelDetritus
-    if ( ppPelDetritus(i,iiP) > 0 ) &
-      qpcOMT(i,:)  =  PelDetritus(i,iiP)/( p_small+ PelDetritus(i,iiC))
-    if ( ppPelDetritus(i,iiN) > 0 ) &
-      qncOMT(i,:)  =  PelDetritus(i,iiN)/( p_small+ PelDetritus(i,iiC))
-    if ( ppPelDetritus(i,iiS) > 0 ) &
-      qscOMT(i,:)  =   PelDetritus(i,iiS)/( p_small+ PelDetritus(i,iiC))
-#ifdef INCLUDE_PELFE
-    if ( ppPelDetritus(i,iiF) > 0 ) &
-      qfcOMT(i,:)  =   PelDetritus(i,iiF)/( p_small+ PelDetritus(i,iiC))
-#endif
-  end do
-
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  ! Compute nutrient quota in microzooplankton
-  ! in case of fixed quota the values are constant and assigned 
-  ! in Initialize.F90
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  do i = 1, iiMicroZooPlankton
-    if ( ppMicroZooPlankton(i,iiP) > 0 ) &
-      qpcMIZ(i,:)  =   MicroZooPlankton(i,iiP)/( p_small+ MicroZooPlankton(i,iiC))
-    if ( ppMicroZooPlankton(i,iiN) > 0 ) &
-      qncMIZ(i,:)  =   MicroZooPlankton(i,iiN)/( p_small+ MicroZooPlankton(i,iiC))
-  end do
-
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  ! Compute nutrient quota in mesozooplankton
-  ! in case of fixed quota the values are constant and assigned 
-  ! in Initialize.F90
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  do i = 1, iiMesoZooPlankton
-    if ( ppMesoZooPlankton(i,iiP) > 0 ) &
-      qpcMEZ(i,:)  =   MesoZooPlankton(i,iiP)/( p_small+ MesoZooPlankton(i,iiC))
-    if ( ppMesoZooPlankton(i,iiN) > 0 ) &
-      qncMEZ(i,:)  =   MesoZooPlankton(i,iiN)/( p_small+ MesoZooPlankton(i,iiC))
-  end do
-
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  ! Compute constituents quota in phytoplankton
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  do i = 1, iiPhytoPlankton
-    if ( ppPhytoPlankton(i,iiP) > 0 ) &
-      qpcPPY(i,:)  =   PhytoPlankton(i,iiP)/( p_small+ PhytoPlankton(i,iiC))
-    if ( ppPhytoPlankton(i,iiN) > 0 ) &
-      qncPPY(i,:)  =   PhytoPlankton(i,iiN)/( p_small+ PhytoPlankton(i,iiC))
-    if ( ppPhytoPlankton(i,iiS) > 0 ) &
-      qscPPY(i,:)  =   PhytoPlankton(i,iiS)/( p_small+ PhytoPlankton(i,iiC))
-    if ( ppPhytoPlankton(i,iiL) > 0 ) &
-      qlcPPY(i,:)  =   PhytoPlankton(i,iiL)/( p_small+ PhytoPlankton(i,iiC))
-#ifdef INCLUDE_PELFE
-    if ( ppPhytoPlankton(i,iiF) > 0 ) &
-      qfcPPY(i,:)  =   PhytoPlankton(i,iiF)/( p_small+ PhytoPlankton(i,iiC))
-#endif
-  end do
-
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  ! Compute nutrient quota in Pelagic Bacteria
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  do i = 1, (iiPelBacteria)
-    if ( ppPelBacteria(i,iiP) > 0 ) &
-    qpcPBA(i,:)  =   PelBacteria(i,iiP)/( p_small+ PelBacteria(i,iiC))
-    if ( ppPelBacteria(i,iiN) > 0 ) &
-    qncPBA(i,:)  =   PelBacteria(i,iiN)/( p_small+ PelBacteria(i,iiC))
-  end do
+  !---------------------------------------------
+  ! Update quotas of non- and living organic components
+  !---------------------------------------------
+  call upd_organic_quotas()
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Prescribe background costant sedimentation velocities

@@ -33,7 +33,7 @@
    use mem, only: ppO2o,ppN1p,ppN3n,ppN4n,ppN5s
 #ifdef INCLUDE_PELCO2
    use mem,        only: ppO3c, ppO3h, ppN6r
-   use mem_CO2,    only: AtmCO2, AtmSLP, AtmTDP
+   use mem_CO2,    only: AtmCO2, AtmSLP
 #endif
    use global_mem, only: RLEN,ZERO,LOGUNIT,NML_OPEN,NML_READ, &
                          error_msg_prn,ONE, bfm_lwp,NMLUNIT, SkipBFMCore
@@ -359,9 +359,11 @@
          Initvar(m)%varname=var_names(m)
          if (bfm_lwp) write(LOGUNIT, 158) InitVar(m)
       end do
-      ! Initialize internal constitutents of functional groups
-      call init_organic_constituents()
    end if
+
+   ! Initialize internal constitutents quota of functional groups
+   call ini_organic_quotas()
+
    if (bfm_lwp) then 
          LEVEL1 ' '
          LEVEL1 '         BFM INITIALIZATION ... DONE!          '
@@ -501,19 +503,14 @@
 
 #if defined INCLUDE_PELCO2 && ! defined CCSMCOUPLED
    ! control consistency between namelists setting
-   if (AtmCO2%init .eq. 4 .and. .NOT. ln_trc_sbc(ppO3c)) then
+   if (AtmCO2%init .eq. 2 .and. .NOT. ln_trc_sbc(ppO3c)) then
      LEVEL1 'CO2 data from Nemo not available in surface BC &
           for O3c (check namelist_top and BFM_General).'
      stop
    endif   
-   if (AtmSLP%init .eq. 4 .and. .NOT. ln_trc_sbc(ppO3h)) then
+   if (AtmSLP%init .eq. 2 .and. .NOT. ln_trc_sbc(ppO3h)) then
      LEVEL1 'Sea Level Pressure data from Nemo not available in surface BC &
           for O3h (check namelist_top and BFM_General).'
-     stop
-   endif
-   if (AtmTDP%init .eq. 4 .and. .NOT. ln_trc_sbc(ppN6r)) then
-     LEVEL1 'Dew Point Temperature data from Nemo not available in surface BC &
-          for N6r (check namelist_top and BFM_General).'
      stop
    endif
 #endif

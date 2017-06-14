@@ -148,7 +148,8 @@ CONTAINS
          !CALL lbc_lnk( pgtu(:,:,jn), 'U', -1. )   ;   CALL lbc_lnk( pgtv(:,:,jn), 'V', -1. )   ! Lateral boundary cond.
          !
       END DO
-      CALL lbc_lnk_t( pgtu, kjpt, 'U', -1. )   ;   CALL lbc_lnk_t( pgtv, kjpt, 'V', -1. )   ! Lateral boundary cond.
+      CALL lbc_lnk( pgtu, 'U', -1. )
+      CALL lbc_lnk( pgtv, 'V', -1. )   ! Lateral boundary cond.
 
       ! horizontal derivative of density anomalies (rd)
       IF( PRESENT( prd ) ) THEN         ! depth of the partial step level

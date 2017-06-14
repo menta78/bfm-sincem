@@ -103,7 +103,7 @@
   !                     to a specific component
   ! NAME          UNIT          DESCRIPTION
   ! p_small      [-]           Smallest numeric value (the model "zero")
-  ! slp0         [mbar]        Reference sea level pressure
+  ! p_atm0       [mbar]        Reference sea level pressure
   ! p_pe_R1c     [-]           Fractional content of C in cytoplasm 
   ! p_pe_R1n     [-]           Fractional content of N in cytoplasm
   ! p_pe_R1p     [-]           Fractional content of P in cytoplasm
@@ -119,7 +119,7 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   real(RLEN)   :: &
       p_small=1.0E-20_RLEN,  &
-      slp0=1013.25_RLEN
+      p_atm0 =1013.25_RLEN
   real(RLEN)   :: &
       p_pe_R1c=0.60_RLEN  ,     &
       p_pe_R1n=0.72_RLEN  ,     &
@@ -191,7 +191,7 @@
     CalcConservationFlag,CalcPhytoPlankton,CalcMicroZooPlankton,              &
     CalcPelChemistry,CalcMesoZooPlankton, CalcPelBacteria,                    &
     AssignPelBenFluxesInBFMFlag, AssignAirPelFluxesInBFMFlag,                 &
-    slp0,                                                                     &
+    p_atm0,                                                                     &
     p_pe_R1c, p_pe_R1n, p_pe_R1p, p_pe_R1s,                                   &
     ChlDynamicsFlag
 #ifdef INCLUDE_BEN

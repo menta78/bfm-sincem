@@ -19,16 +19,12 @@
   ! Modules (use of ONLY is strongly encouraged!)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-  use global_mem, ONLY:RLEN,ZERO,ONE,LOGUNIT
-  use constants, ONLY: MW_P, MW_N, MW_SI
+  use global_mem,   ONLY: RLEN,ZERO,ONE,LOGUNIT
+  use constants,    ONLY: MW_P, MW_N, MW_SI
   use mem
-
-
-  use mem_MesoZoo, ONLY: p_qncMEZ,p_qpcMEZ
-  use mem_MicroZoo, ONLY: p_qncMIZ,p_qpcMIZ
-  use mem_Param,  ONLY: CalcBenthicFlag,p_d_tot
+  use mem_Param,    ONLY: CalcBenthicFlag,p_d_tot
 #ifdef INCLUDE_BEN
-  use constants,  ONLY: BENTHIC_RETURN, BENTHIC_BIO, BENTHIC_FULL
+  use constants,    ONLY: BENTHIC_RETURN, BENTHIC_BIO, BENTHIC_FULL
 #endif
 
 !
@@ -81,55 +77,32 @@
   totpelp(:)=ZERO
   totpeln(:)=ZERO
   totpels(:)=ZERO
+  ! Pelagic Bacteria
+  do i=1, iiPelBacteria
+     totpelc(:)=totpelc(:) + PelBacteria(i,iiC)
+     totpeln(:)=totpeln(:) + PelBacteria(i,iiC)*qncPBA(i,:)
+     totpelp(:)=totpelp(:) + PelBacteria(i,iiC)*qpcPBA(i,:)
+  end do
+  ! PhytoPlankton
   do i=1, iiPhytoPlankton
-     s=PhytoPlankton(i,iiC)
-     totpelc(:)=totpelc(:) + s
-     s=PhytoPlankton(i,iiN)
-     totpeln(:)=totpeln(:) + s
-     s=PhytoPlankton(i,iiP)
-     totpelp(:)=totpelp(:) + s
-     j=ppPhytoPlankton(i,iiS)
-     if ( j/=0) then
-        s=PhytoPlankton(i,iiS)
-        totpels(:)=totpels(:) + s
-     end if
+     totpelc(:)=totpelc(:) + PhytoPlankton(i,iiC)
+     totpeln(:)=totpeln(:) + PhytoPlankton(i,iiC)*qncPPY(i,:)
+     totpelp(:)=totpelp(:) + PhytoPlankton(i,iiC)*qpcPPY(i,:)
+     totpels(:)=totpels(:) + PhytoPlankton(i,iiC)*qscPPY(i,:)
   end do
+  ! MicroZooplankton
   do i=1, iiMicroZooplankton
-     s=MicroZooplankton(i,iiC)
-     totpelc(:) = totpelc(:) + s
-     j=ppMicroZooPlankton(i,iiN)
-     if ( j /= 0) then
-        s = MicroZooplankton(i,iiN)
-     else
-        s = MicroZooplankton(i,iiC)*p_qncMIZ(i)
-     end if
-     totpeln(:)=totpeln(:) + s
-     j=ppMicroZooPlankton(i,iiP)
-     if ( j /= 0) then
-        s = MicroZooplankton(i,iiP)
-     else
-        s = MicroZooplankton(i,iiC)*p_qpcMIZ(i)
-     end if
-     totpelp(:)=totpelp(:) + s
+     totpelc(:)=totpelc(:) + MicroZooplankton(i,iiC)
+     totpeln(:)=totpeln(:) + MicroZooplankton(i,iiC)*qncMIZ(i,:)
+     totpelp(:)=totpelp(:) + MicroZooplankton(i,iiC)*qpcMIZ(i,:)
   end do
+  ! MesoZooPlankton
   do i=1, iiMesoZooPlankton
-     s=MesoZooPlankton(i,iiC)
-     totpelc(:)=totpelc(:) + s
-     j=ppMesoZooPlankton(i,iiN)
-     if ( j /= 0) then
-        s = MesoZooPlankton(i,iiN)
-     else
-        s = MesoZooPlankton(i,iiC)*p_qncMEZ(i)
-     end if
-     totpeln(:)=totpeln(:) + s
-    j=ppMesoZooPlankton(i,iiP)
-     if ( j /= 0) then
-        s = MesoZooPlankton(i,iiP)
-     else
-        s = MesoZooPlankton(i,iiC)*p_qpcMEZ(i)
-     end if
-     totpelp(:)=totpelp(:) + s
+     totpelc(:)=totpelc(:) + MesoZooPlankton(i,iiC)
+     totpeln(:)=totpeln(:) + MesoZooPlankton(i,iiC)*qncMEZ(i,:)
+     totpelp(:)=totpelp(:) + MesoZooPlankton(i,iiC)*qpcMEZ(i,:)
    end do
+  ! Pelagic Detritus
   do i=1, iiPelDetritus
      if ( ppPelDetritus(i,iiC)/=0) then
         s=PelDetritus(i,iiC)
@@ -146,20 +119,6 @@
      if ( ppPelDetritus(i,iiS)/=0) then
         s=PelDetritus(i,iiS)
         totpels(:)=totpels(:) + s
-     end if
-  end do
-  do i=1, iiPelBacteria
-     if ( ppPelBacteria(i,iiC)/=0) then
-        s=PelBacteria(i,iiC)
-        totpelc(:)=totpelc(:) + s
-     end if
-     if ( ppPelBacteria(i,iiN)/=0) then
-        s=PelBacteria(i,iiN)
-        totpeln(:)=totpeln(:) + s
-     end if
-     if ( ppPelBacteria(i,iiP)/=0) then
-        s=PelBacteria(i,iiP)
-        totpelp(:)=totpelp(:) + s
      end if
   end do
 
