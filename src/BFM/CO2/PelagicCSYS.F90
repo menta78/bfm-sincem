@@ -119,7 +119,7 @@
               write(LOGUNIT,'(''layer:'',I4,'' pH='',f12.6)') BoxNumber,pH(BoxNumber)
        endif
     end do
-  !write(*,*) 'Pcsys ', DIC, ALK, CO2,pCO2,pH  
+
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Changes in alkalinity due to N uptake (see BFM Manual Eq. 2.5.21)
   ! It is computed this way

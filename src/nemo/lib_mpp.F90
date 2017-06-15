@@ -72,8 +72,7 @@ MODULE lib_mpp
    PUBLIC   mpp_ini_north, mpp_lbc_north, mpp_lbc_north_e
    PUBLIC   mpp_min, mpp_max, mpp_sum, mpp_minloc, mpp_maxloc
    PUBLIC   mpp_max_multiple
-   PUBLIC   mpp_lnk_4d
-   PUBLIC   mpp_lnk_3d, mpp_lnk_3d_gather, mpp_lnk_2d, mpp_lnk_2d_e
+   PUBLIC   mpp_lnk_4d, mpp_lnk_3d, mpp_lnk_3d_gather, mpp_lnk_2d, mpp_lnk_2d_e
    PUBLIC   mpp_lnk_2d_9 , mpp_lnk_2d_multiple 
    PUBLIC   mppscatter, mppgather
    PUBLIC   mpp_ini_ice, mpp_ini_znl
@@ -2873,7 +2872,8 @@ CONTAINS
       INTEGER :: iflag
       !!----------------------------------------------------------------------
       !
-      ALLOCATE( ztab(jpiglo,4,num_fields), znorthloc(jpi,4,num_fields), zfoldwk(jpi,4,num_fields), znorthgloio(jpi,4,num_fields,jpni) )   ! expanded to 3 dimensions
+      ALLOCATE( ztab(jpiglo,4,num_fields), znorthloc(jpi,4,num_fields), zfoldwk(jpi,4,num_fields),   & 
+            &   znorthgloio(jpi,4,num_fields,jpni) )   ! expanded to 3 dimensions
       ALLOCATE( ztabl(jpi,4,num_fields), ztabr(jpi*jpmaxngh, 4,num_fields) )
       !
       ijpj   = 4

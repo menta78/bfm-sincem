@@ -28,7 +28,7 @@ MODULE lbclnk
    END INTERFACE
 
    INTERFACE lbc_lnk
-      MODULE PROCEDURE mpp_lnk_3d_gather, mpp_lnk_3d, mpp_lnk_2d, mpp_lnk_4d
+      MODULE PROCEDURE mpp_lnk_3d_gather, mpp_lnk_4d, mpp_lnk_3d, mpp_lnk_2d
    END INTERFACE
 
    INTERFACE lbc_bdy_lnk
@@ -45,7 +45,6 @@ MODULE lbclnk
 
    PUBLIC lbc_lnk       ! ocean lateral boundary conditions
    PUBLIC lbc_lnk_multi ! modified ocean lateral boundary conditions
-   PUBLIC lbc_lnk_t
    PUBLIC lbc_lnk_e
    PUBLIC lbc_bdy_lnk   ! ocean lateral BDY boundary conditions
    PUBLIC lbc_lnk_icb
@@ -257,7 +256,7 @@ CONTAINS
       CALL lbc_lnk( pt2dA, cd_typeA, psgnA ) 
 
       !! Look if more arrays to process
-      IF(PRESENT (psgnB) )CALL lbc_lnk( pt2dA, cd_typeA, psgnA ) 
+      IF(PRESENT (psgnB) )CALL lbc_lnk( pt2dB, cd_typeB, psgnB )
       IF(PRESENT (psgnC) )CALL lbc_lnk( pt2dC, cd_typeC, psgnC ) 
       IF(PRESENT (psgnD) )CALL lbc_lnk( pt2dD, cd_typeD, psgnD ) 
       IF(PRESENT (psgnE) )CALL lbc_lnk( pt2dE, cd_typeE, psgnE ) 
@@ -517,7 +516,7 @@ CONTAINS
       CALL lbc_lnk( pt2dA, cd_typeA, psgnA ) 
 
       !! Look if more arrays to process
-      IF(PRESENT (psgnB) )CALL lbc_lnk( pt2dA, cd_typeA, psgnA ) 
+      IF(PRESENT (psgnB) )CALL lbc_lnk( pt2dB, cd_typeB, psgnB )
       IF(PRESENT (psgnC) )CALL lbc_lnk( pt2dC, cd_typeC, psgnC ) 
       IF(PRESENT (psgnD) )CALL lbc_lnk( pt2dD, cd_typeD, psgnD ) 
       IF(PRESENT (psgnE) )CALL lbc_lnk( pt2dE, cd_typeE, psgnE ) 

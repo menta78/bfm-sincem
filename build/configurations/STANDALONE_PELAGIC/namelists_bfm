@@ -208,7 +208,7 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
 &bfm_save_nml
    var_save = ''
    ave_save = 'ETW','EIR','xEPS',
-          'DIC','pCO2' 'O3h','O5c','OCalc','OArag',
+          'DIC','pCO2' 'O3h','O5c','OCalc','OArag','pH',
           'Chla',
           'O2o','N1p','N3n','N4n','N5s',
           'B1c',
