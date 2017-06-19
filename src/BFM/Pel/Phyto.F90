@@ -553,12 +553,13 @@
   !  - temperature enhancement
   !  - density enhancement
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  qccPPY(phyto, :) = min(0.8_RLEN,p_caco3r(phyto)*tN*et*MM(phytoc, p_sheo(phyto)))
-  qccPPY(phyto, :) = max(0.02_RLEN,qccPPY(phyto, :))
-  ! Calcite production is parameterized as a flux between DIC and PIC
-  ! that affects alkalinity
-  call flux_vector( iiPel, ppO3c,ppO5c, qccPPY(phyto, :)*rr6c )
-  call flux_vector( iiPel, ppO3h,ppO3h, -C2ALK*qccPPY(phyto, :)*rr6c )
+  if ( p_caco3r(phyto) > ZERO ) then
+     qccPPY(phyto, :) = min(0.8_RLEN,p_caco3r(phyto)*tN*et*MM(phytoc, p_sheo(phyto)))
+     qccPPY(phyto, :) = max(0.02_RLEN,qccPPY(phyto, :))
+     ! Calcite production represented as a flux between DIC and PIC, impacting ALK
+     call flux_vector( iiPel, ppO3c,ppO5c, qccPPY(phyto, :)*rr6c )
+     call flux_vector( iiPel, ppO3h,ppO3h, -C2ALK*qccPPY(phyto, :)*rr6c )
+  endif
 #endif
 
    if ( ppphyton .EQ.  0 .or. ppphytop .EQ.  0 ) then
