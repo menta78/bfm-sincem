@@ -562,36 +562,6 @@
   endif
 #endif
 
-   if ( ppphyton .EQ.  0 .or. ppphytop .EQ.  0 ) then
-     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-     ! Eliminate the excess of the non-limiting constituent under fixed quota
-     ! Determine whether C, P or N is limiting (Total Fluxes Formulation)
-     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-     limit = nutlim(tfluxC,tfluxN,tfluxP,qncPPY(phyto,:),qpcPPY(phyto,:),iiC,iiN,iiP)
-
-     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-     ! Compute the correction terms depending on the limiting constituent
-     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-     WHERE     ( limit == iiC )
-         pe_R1p = max(ZERO,tfluxp  - p_qpcPPY(phyto)* tfluxc)
-         pe_R1n = max(ZERO,tfluxn  - p_qncPPY(phyto)* tfluxc)
-         pe_R1c = ZERO
-     ELSEWHERE ( limit == iiP )
-         pe_R1p = ZERO
-         pe_R1n = max(ZERO, tfluxn  - tfluxp/p_qpcPPY(phyto)*p_qncPPY(phyto) )
-         pe_R1c = max(ZERO, tfluxc  - tfluxp/p_qpcPPY(phyto))
-     ELSEWHERE ( limit == iiN )
-         pe_R1p = max(ZERO, tfluxp  - tfluxn/p_qncPPY(phyto)*p_qpcPPY(phyto))
-         pe_R1n = ZERO
-         pe_R1c = max(ZERO, tfluxc  - tfluxn/p_qncPPY(phyto))
-     END WHERE
-
-     call flux_vector(iiPel, ppphytoc, ppR1c, pe_R1c)
-     call flux_vector(iiPel, ppphytop, ppR1p, pe_R1p)
-     call flux_vector(iiPel, ppphyton, ppR1n, pe_R1n)
-
-endif
-
   ! End of computation section for process PhytoDynamics
 
   end subroutine PhytoDynamics
