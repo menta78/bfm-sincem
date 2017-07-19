@@ -279,8 +279,13 @@ if [[ ${PROC} ]] && ! [[ "$PROC" =~ ^[0-9]+$ ]] ; then
     exit
 fi
 
-
-
+# Print setting informations
+echo "bfm_configure for preset ${PRESET} with mode ${MODE}"
+echo "BFMDIR is ${BFMDIR}"
+if [[ "$MODE" == "NEMO" ]]; then 
+    echo "NEMODIR is ${NEMODIR}"
+fi
+echo ""
 
 # -----------------------------------------------------
 # Memory and namelist files GENERATION

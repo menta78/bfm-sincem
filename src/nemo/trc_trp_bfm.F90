@@ -160,8 +160,8 @@ SUBROUTINE trc_trp_bfm( kstp )
 
          CALL trc_zdf( kstp )     ! vertical mixing and after tracer fields
 #ifdef DEBUG
-         CALL prxy( LOGUNIT, 'trn:ZDF',trn(:,:,1,m), jpi, 1, jpj, 1, ZERO)
-         CALL prxy( LOGUNIT, 'tra:ZDF',tra(:,:,1,m), jpi, 1, jpj, 1, ZERO)
+         CALL prxy( LOGUNIT, 'trn:ZDF',trn(:,:,1,1), jpi, 1, jpj, 1, ZERO)
+         CALL prxy( LOGUNIT, 'tra:ZDF',tra(:,:,1,1), jpi, 1, jpj, 1, ZERO)
 #endif
 
 #if defined key_agrif

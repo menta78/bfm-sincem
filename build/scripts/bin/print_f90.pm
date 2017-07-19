@@ -1514,7 +1514,7 @@ sub func_INIT_NAMELIST {
     $line .= "${SPACE}  icontrol=1\n";
     $line .= "${SPACE}end if\n";
     $line .= "${num2} if ( icontrol == 0 ) then\n";
-    $line .= "${SPACE}  FATAL \'I could not read bfm_init_nml${subtype}\'\n";
+    $line .= "${SPACE}  FATAL \'Misspelled variable in bfm_init_nml${subtype}\'\n";
     $line .= "${SPACE}  stop \'init_var_bfm\'\n";
     $line .= "${SPACE}end if\n";
    
