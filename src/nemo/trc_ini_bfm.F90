@@ -74,6 +74,9 @@
    USE iom,   only: iom_close
    use c1d, only : lk_c1d
    use eosbn2,  only: nn_eos
+#ifdef CCSMCOUPLED
+   USE nemogcm, only: logfile
+#endif
 
    IMPLICIT NONE
 !
@@ -266,7 +269,11 @@
    ! Initialise ancillary arrays for output
    ! (also parallel initialisation is done here)
    !---------------------------------------------
+#ifdef CCSMCOUPLED
+   call init_bfm( TRIM( logfile(4:len(logfile)) ) )
+#else
    call init_bfm
+#endif
 
    !---------------------------------------------
    ! Initialise state variable names and diagnostics
