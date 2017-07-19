@@ -223,6 +223,8 @@
         !! GLOBAL definition of Pelagic (D3/D2) state variables
         !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
+        integer,parameter,public                :: ppNULL=0
+
         integer,parameter,public                :: %3d-state-pel-pp
         real(RLEN),public,dimension(:),pointer  :: %3d-state-pel-pointer
 

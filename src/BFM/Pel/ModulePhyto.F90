@@ -277,9 +277,10 @@
   end do
   ! Check if R2 has to be a transported tracer
   itrp = maxval(p_switchDOC)
-  if ( itrp > 1 ) then
-     D3STATETYPE(ppR2c)=ALLTRANSPORT
-     write(LOGUNIT,*) " Use R2c transport as a pytho group use it (p_switchDOC>1))"
+  if ( itrp > 1 .and. D3STATETYPE(ppR2c)==NOTRANSPORT) then
+     call bfm_error("InitPhyto","A pytho group use R2c (p_switchDOC>1) "//&
+                    "but transport is disabled because no bacteria use it."//&
+                    "Switch to BACT2 or BACT3 or set p_switchDOC=1.") 
   endif
 
   write(LOGUNIT,*) "#  Namelist is:"
