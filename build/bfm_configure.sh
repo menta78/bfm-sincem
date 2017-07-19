@@ -256,6 +256,12 @@ for option in "${OPTIONS_USR[@]}"; do
     [ ${VERBOSE} ] && eval [ \"\${$option}\" ]  && eval echo "- replacing ${opt_name}="\"\${$option}\"
 done
 
+if [ "$MODE" == "NEMO_CESM" ]; then
+    PROC=0
+    BFMDIR="${BFMDIR_DEFAULT}"
+    echo "setting BFM path to : ${BFMDIR}"
+fi
+
 #specify build dir of BFM
 blddir="${BFMDIR}/${TEMPDIR}/${PRESET}"
 #specify preset dir
@@ -268,7 +274,7 @@ if [[ ! $NEMODIR && ( "$MODE" == "NEMO" || "$MODE" == "NEMO_3DVAR" ) ]]; then
     echo ${ERROR_MSG}
     exit
 fi
-if [[ "$MODE" != "STANDALONE" && "$MODE" != "POM1D" && "$MODE" != "OGS" && "$MODE" != "NEMO" && "$MODE" != "NEMO_3DVAR" ]]; then 
+if [[ "$MODE" != "STANDALONE" && "$MODE" != "POM1D" && "$MODE" != "OGS" && "$MODE" != "NEMO" && "$MODE" != "NEMO_3DVAR" && "$MODE" != "NEMO_CESM" ]]; then 
     echo "ERROR: MODE value not valid ($MODE). Available values are: STANDALONE or OGS or POM1D or NEMO or NEMO_3DVAR."
     echo ${ERROR_MSG}
     exit
@@ -292,7 +298,7 @@ addproto=""
 if [ "$MODE" == "OGS" ]; then
    addproto="BFM_var_list.h BFM0D_Output_Ecology.F90 namelist.passivetrc"
 fi
-if [ "$MODE" == "NEMO" ]; then
+if [[ "$MODE" == "NEMO" || "$MODE" == "NEMO_CESM" ]]; then
    addproto="field_def_top.xml file_def_top.xml"
 fi
 
@@ -334,7 +340,6 @@ if [ ${GEN} ]; then
             -n "${NMLLIST}"  \
             -o ${blddir} || exit
     fi
-
 
     if [[ ${MODE} == "STANDALONE" || "$MODE" == "POM1D"  || "$MODE" == "OGS" ]]; then
         # list files
@@ -453,6 +458,24 @@ if [ ${GEN} ]; then
         cp ${blddir}/init_var_bfm.F90 ${BFMDIR}/src/share
         cp ${blddir}/INCLUDE.h ${BFMDIR}/src/BFM/include
         cp ${blddir}/bfm.fcm ${BFMDIR}/src/nemo${VER}
+
+    elif [ "$MODE" == "NEMO_CESM" ]; then
+        # Move BFM Layout files namelists to configuration folders
+        # note that here a relative path is used for CESM root dir
+        cd ${BFMDIR}
+        exedir="../cesm/models/ocn/nemo/BFM/configurations/${EXP}"
+        echo "Copy files to ${exedir}"
+        if [ ! -d ${exedir} ] ; then
+           mkdir -p ${exedir}
+           cp ${blddir}/*.?90     ${exedir}
+           cp ${blddir}/*.h       ${exedir}
+           cp ${blddir}/*.nml     ${exedir}
+           cp ${blddir}/*top.xml  ${exedir}
+           cp ${blddir}/*top_cfg  ${exedir}
+        else
+           echo "$EXP configuration already exists not overwriting files"
+           echo "You can check in ${blddir} for the latest ones"
+        fi
     fi
     echo "${PRESET} generation done!"
 fi
@@ -463,7 +486,7 @@ fi
 # -----------------------------------------------------
 
 
-if [ ${CMP} ]; then
+if [[ ${CMP} && "$MODE" != "NEMO_CESM" ]]; then
     if [ ! -d ${blddir} ]; then
         echo "ERROR: directory ${blddir} not exists"
         echo ${ERROR_MSG}
@@ -520,7 +543,7 @@ fi
 # -----------------------------------------------------
 
 
-if [ ${DEP} ]; then
+if [[ ${DEP} && "$MODE" != "NEMO_CESM" ]]; then
     [ ${VERBOSE} ] && echo "creating Experiment ${PRESET}"
 
     #set run dir path
