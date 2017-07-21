@@ -325,7 +325,8 @@ Vichi M., Lovato T., Lazzari P., Cossarini G., Gutierrez Mlot E., Mattia G., Mas
  The Biogeochemical Flux Model (BFM): Equation Description and User Manual.
  BFM version 5.1.
  BFM Report series N.
- 1, Release 1.1, August 2015, Bologna, Italy, http://bfm-community.eu, pp. 104
+ 1, Release 1.1, August 2015, Bologna, Italy, http://bfm-community.eu, pp.
+ 104
 \end_layout
 
 \begin_layout Address
@@ -3416,7 +3417,10 @@ With the 4-band wavelength parameterization the model considers differential
  The visible portion is divided equally in the 3 bands such as
 \begin_inset Formula 
 \begin{equation}
-E_{_{PAR}}(z)=\frac{\varepsilon_{_{PAR}}}{3}\,\,Q_{S}\,\left(e^{\int_{z}^{0}\lambda_{R}(Chl,z')dz'}+e^{\int_{z}^{0}\lambda_{G}(Chl,z')dz'}+e^{\int_{z}^{0}\lambda_{B}(Chl,z')dz'}\right)\label{eq:irradiance_rgb}
+\begin{array}{c}
+E_{_{PAR}}(z)=\frac{\varepsilon_{_{PAR}}}{3}\,\,Q_{S}\,\left(e^{\int_{z}^{0}\lambda_{R}(Chl,z')dz'}\right.+\\
+\left.+e^{\int_{z}^{0}\lambda_{G}(Chl,z')dz'}+e^{\int_{z}^{0}\lambda_{B}(Chl,z')dz'}\right)
+\end{array}\label{eq:irradiance_rgb}
 \end{equation}
 
 \end_inset
@@ -14969,20 +14973,24 @@ name "sub:Oxygen-anoxic-processes"
 \begin_layout Standard
 The dynamics of dissolved oxygen and carbon dioxide are important closures
  of global biogeochemical cycles.
- We do not describe here the exchange of gases at the air sea interface
- which is assumed to be a purely physical process and has been thoroughly
- investigated elsewhere, especially for CO
-\begin_inset Formula $_{2}$
-\end_inset
-
- 
+ The exchange of gases at the air sea interface is assumed to be a purely
+ physical process (as thoroughly discussed in 
 \begin_inset CommandInset citation
-LatexCommand citep
+LatexCommand citet
 key "olsen05"
 
 \end_inset
 
+) and it is here implemented following the parameterizations described in
+ 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "orr2017"
+
+\end_inset
+
 .
+ 
 \end_layout
 
 \begin_layout Standard
@@ -17163,26 +17171,26 @@ INCLUDE_PELCO2
  
 \begin_inset CommandInset citation
 LatexCommand citep
-key "zeebe01book"
+key "zeebe01book,blackford02"
 
 \end_inset
 
- and we propose here a slightly revised formulation with respect to 
+ and we here adopted the formulations described in 
 \begin_inset CommandInset citation
 LatexCommand citet
-key "blackford02"
+key "orr2015"
 
 \end_inset
 
-, which also takes into account the algorithms proposed by the Ocean Carbon
- Model Intercomparison Project 
+, by using the carbon chemistry constants recommended for best practices
+ 
 \begin_inset CommandInset citation
 LatexCommand citep
-key "doney04"
+key "dickson2007"
 
 \end_inset
 
-.
+ on the total pH scale.
  
 \end_layout
 
@@ -17302,9 +17310,9 @@ pCO_{2}=\frac{[CO_{2}]}{K_{0}}\label{eq:pco2}
 \begin_inset Formula 
 \begin{eqnarray}
 TA & = & [HCO_{3}^{-}]+2[CO_{3}^{2-}]+[B(OH)_{4}^{-}]+\nonumber \\
- &  & +[OH^{-}]+[HPO_{4}^{2-}]+2[PO_{4}^{3-}]+\label{eq:TA}\\
+ &  & +[OH^{-}]+[HPO_{4}^{2-}]+2[PO_{4}^{3-}]+\nonumber \\
  &  & +[H_{3}SiO_{4}^{-}]-[H^{+}]_{F}-[HSO_{4}^{-}]+\nonumber \\
- &  & -[HF]-[H_{3}PO_{4}]
+ &  & -[HF]-[H_{3}PO_{4}]\label{eq:TA}
 \end{eqnarray}
 
 \end_inset
@@ -17320,11 +17328,11 @@ The species appearing in this latter equation are expressed in terms of
 
 \begin_layout Standard
 \begin_inset Formula 
-\begin{align}
-TA & =f\,([H^{+}],\,DIC,\,K_{1},\,K_{2},\,K_{w},\,K_{b},\nonumber \\
- & \,K_{1p},\,K_{2p},\,K_{3p},\,K_{si},\,K_{s},\,K_{f},\,bt,\,st,\,ft,\label{eq:Ta_function}\\
- & \,O^{(3)},\,O^{(5)},\,N^{(5)},\,N^{(1)})
-\end{align}
+\begin{eqnarray}
+TA & = & f\,([H^{+}],\,DIC,\,K_{1},\,K_{2},\,K_{w},\,K_{b},\nonumber \\
+ & \, & K_{1p},\,K_{2p},\,K_{3p},\,K_{si},\,K_{s},\,K_{f},\,bt,\,st,\,ft,\nonumber \\
+ & \, & O^{(3)},\,O^{(5)},\,N^{(5)},\,N^{(1)})\label{eq:TA_Function}
+\end{eqnarray}
 
 \end_inset
 
@@ -17475,8 +17483,6 @@ and
 \end_inset
 
  are given as dependent on the temperature and salinity only.
- Currently, the model does not take into account changes of alkalinity due
- to calcification.
  
 \end_layout
 
@@ -17568,26 +17574,35 @@ reference "eq:TA"
 \begin_inset Formula $[H^{+}]$
 \end_inset
 
- by means of the Newton-Raphson convergence method.
- A dedicated diagnostic variable is also introduced to store the total hydrogen
- ions and to allow the restart of the model from previous simulations.
- The other carbon species are eventually computed from the carbonate equilibrium
- equations.
-\end_layout
-
-\begin_layout Standard
-Alternatively, the model allows the usage of a simplified computation of
- DIC equilibria as suggested by 
+ by means of the SolveSAPHE package 
 \begin_inset CommandInset citation
-LatexCommand citet
-key "follows06"
+LatexCommand citep
+key "munhoven2013"
 
 \end_inset
 
-, which does not imply an iterative procedure.
- This solution is suggested for coupled configurations because in that case
- the inaccuracy of the computation is less important due to the presence
- of advective and diffusive processes.
+.
+ A dedicated diagnostic variable is also introduced to store 
+\begin_inset Formula $pH$
+\end_inset
+
+ field that is necessary to restart the model from previous simulations.
+ The other carbon species are also computed from the carbonate equilibrium
+ equations.
+ The model includes a specific state variable to explicitly represent the
+ dynamics of pelagic Calcite (
+\begin_inset Formula $O^{(5)}$
+\end_inset
+
+) and the effects of calcification on alkalinity as described in 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "visinelli2016"
+
+\end_inset
+
+.
+ 
 \end_layout
 
 \begin_layout Standard
@@ -17636,6 +17651,23 @@ ic concentration of inorganic carbon or to set it constant to a certain
  value of the mixing ratio.
  Atmospheric partial pressure can also be computed or read from an external
  file.
+ The air-sea exchange of inorganic carbon is based on the refitted equations
+ from 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "wanninkhof2014"
+
+\end_inset
+
+ and are implemented followinf the apporach proposed by 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "orr2017"
+
+\end_inset
+
+.
+ 
 \end_layout
 
 \begin_layout Standard
@@ -17661,7 +17693,7 @@ centering{
 \size scriptsize
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="16" columns="3">
+<lyxtabular version="3" rows="8" columns="3">
 <features rotate="0" tabularvalignment="middle">
 <column alignment="left" valignment="top">
 <column alignment="left" valignment="top" width="2cm">
@@ -17699,55 +17731,6 @@ Units
 \series bold
 \size scriptsize
 Description
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" topline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size scriptsize
-pCO2Method
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size scriptsize
-Integer Switch
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" topline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size scriptsize
-Methods for computing pCO2 
-\end_layout
-
-\begin_layout Plain Layout
-
-\size scriptsize
-1 = AtmCO20* sea level pressure (slp0 in Param.nml or external input AtmSLP_N),
- 
-\end_layout
-
-\begin_layout Plain Layout
-
-\size scriptsize
-2 = Compute the pCO2 using the Magnus formula: Sea Level Pressure and Dew
- Point Temperature have to be provided
 \end_layout
 
 \end_inset
@@ -17796,7 +17779,7 @@ Set constant atmospheric CO2 concentration (ppm), also referred as the CO2
 \begin_layout Plain Layout
 
 \size scriptsize
-calcAtmpCO2
+MaxIterPHsolver
 \end_layout
 
 \end_inset
@@ -17807,7 +17790,7 @@ calcAtmpCO2
 \begin_layout Plain Layout
 
 \size scriptsize
-Logical
+Integer
 \end_layout
 
 \end_inset
@@ -17818,144 +17801,7 @@ Logical
 \begin_layout Plain Layout
 
 \size scriptsize
-Compute the atmospheric pCO2 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size scriptsize
-phstart
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size scriptsize
-pH
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size scriptsize
-Initial guess of the seawater pH.
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size scriptsize
-K1K2
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size scriptsize
-Integer Switch
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size scriptsize
-Acidity constants parameterization 
-\end_layout
-
-\begin_layout Plain Layout
-
-\size scriptsize
-1- Roy et al.
- (1993); DOE (1994); pH on total scale; 
-\end_layout
-
-\begin_layout Plain Layout
-
-\size scriptsize
-2- Mehrbach et al.
- (1973) refit by Dickson & Millero (1987); pH on Sea Water Scale; 
-\end_layout
-
-\begin_layout Plain Layout
-
-\size scriptsize
-3 - Mehrbach et al.(1973) refit by Lueker et al.
- (2000), pH on total scale;
-\end_layout
-
-\begin_layout Plain Layout
-
-\size scriptsize
-4 - Hansson (1973b) data as refitted by Dickson and Millero (1987), pH on
- Sea Water Scale.
- 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size scriptsize
-MethodCalcCO2
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size scriptsize
-Integer Switch
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size scriptsize
-Method for Carbonate System computation: 1 - Approximate static solution;
- 2 - Standard OCMIP iteration; 3 - Approximation by Follows et al.
- (2006).
- 
+Maximum number of iterations for SolveSAPHE (default 50) 
 \end_layout
 
 \end_inset
@@ -18003,7 +17849,7 @@ Compute the corrections of alkalinity due to biogeochemical processes
 \begin_layout Plain Layout
 
 \size scriptsize
-M2XACC
+p_kdca
 \end_layout
 
 \end_inset
@@ -18014,7 +17860,10 @@ M2XACC
 \begin_layout Plain Layout
 
 \size scriptsize
-Threshold
+\begin_inset Formula $d{}^{-1}$
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -18025,42 +17874,7 @@ Threshold
 \begin_layout Plain Layout
 
 \size scriptsize
-Accuracy of the iterative scheme for OCMIP (with MethodCalcCO2=2)
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size scriptsize
-M2PHDELT
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size scriptsize
-pH
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size scriptsize
-pH range for the root search in the OCMIP scheme (with MethodCalcCO2=2)
+Calcite dissolution rate constant
 \end_layout
 
 \end_inset
@@ -18073,7 +17887,7 @@ pH range for the root search in the OCMIP scheme (with MethodCalcCO2=2)
 \begin_layout Plain Layout
 
 \size scriptsize
-M2MAXIT
+p_nomega
 \end_layout
 
 \end_inset
@@ -18095,82 +17909,7 @@ Integer
 \begin_layout Plain Layout
 
 \size scriptsize
-maximum number of iterations for OCMIP (with MethodCalcCO2=2)
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size scriptsize
-Caconc0
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size scriptsize
-mol m
-\begin_inset Formula $^{-3}$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size scriptsize
-Calcium ion concentration (In "Seawater : Its composition, properties and
- behaviour", Open University Course Team, 1995)
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="left" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size scriptsize
-Canorm
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size scriptsize
-Logical
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size scriptsize
-Normalize Calcium ion concentration by sea water salinity
+Order of the dissolution rate dependence on Omega
 \end_layout
 
 \end_inset
@@ -18216,7 +17955,7 @@ Read external file with atmospheric CO
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" usebox="none">
+<cell alignment="left" valignment="top" bottomline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -18227,7 +17966,7 @@ AtmSLP_N
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" usebox="none">
+<cell alignment="left" valignment="top" bottomline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -18238,52 +17977,13 @@ Pa
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size scriptsize
-Read external file with Sea Level Pressure data (with pCO2Method=1 and 2).
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
 <cell alignment="left" valignment="top" bottomline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 
 \size scriptsize
-AtmTDP_N
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" bottomline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size scriptsize
-\begin_inset Formula $^{o}$
-\end_inset
-
-C
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" bottomline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size scriptsize
-Read external file with atmospheric Dew Point Temperature data (with pCO2Method
- = 2).
+Read external file with Sea Level Pressure data 
 \end_layout
 
 \end_inset
@@ -30651,8 +30351,10 @@ status open
 
 Test experiments have shown that the simulation times can be reduced up
  to 30%.
- The physiological assumption is that zooplankton releases in inorganic form
- the nutrients in excess of the given fixed quota.
+ The physiological assumption is that zooplankton releases in inorganic
+ form the nutrients in excess of the given fixed quota.
+ Similarly to the above example, it is possible to set a fixed nutrient:carbon
+ quota for MicroZooplankton, MesoZooplankton, and Pelagic Bacteria.
 \end_layout
 
 \begin_layout Chapter
