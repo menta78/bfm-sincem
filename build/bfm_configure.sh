@@ -298,7 +298,7 @@ if [ "$MODE" == "OGS" ]; then
    addproto="BFM_var_list.h BFM0D_Output_Ecology.F90 namelist.passivetrc"
 fi
 if [ "$MODE" == "NEMO" ]; then
-   addproto="field_def_top.xml file_def_top.xml"
+   addproto="field_def_bfm.xml file_def_bfm.xml"
 fi
 
 if [ ${GEN} ]; then

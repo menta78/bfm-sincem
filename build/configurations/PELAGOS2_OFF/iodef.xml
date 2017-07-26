@@ -12,7 +12,7 @@
 ============================================================================================================
     -->
     <field_definition src="./field_def.xml"/>
-    <field_definition src="./field_def_top.xml"/>
+    <field_definition src="./field_def_bfm.xml"/>
     <!-- 
 ============================================================================================================
 =                                           output files definition                                        =
@@ -20,7 +20,7 @@
 =                                         put the variables you want...                                    =
 ============================================================================================================
     -->
-    <file_definition src="./file_def_top.xml"/>    
+    <file_definition src="./file_def_bfm.xml"/>    
  
     <file_definition type="one_file" name="@expname@_@freq@_@startdate@_@enddate@" sync_freq="10d" min_digits="4">
     

@@ -22,6 +22,7 @@ MODULE trcini
    USE trcini_cfc      ! CFC      initialisation
    USE trcini_pisces   ! PISCES   initialisation
    USE trcini_c14b     ! C14 bomb initialisation
+   USE trcini_age      ! AGE      initialisation
    USE trcini_my_trc   ! MY_TRC   initialisation
    USE trcdta          ! initialisation from files
    USE daymod          ! calendar manager
