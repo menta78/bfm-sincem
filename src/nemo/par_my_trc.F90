@@ -13,25 +13,16 @@ MODULE par_my_trc
    USE par_pisces , ONLY : jp_pisces_2d    !: number of 2D diag in PISCES
    USE par_pisces , ONLY : jp_pisces_3d    !: number of 3D diag in PISCES
    USE par_pisces , ONLY : jp_pisces_trd   !: number of biological diag in PISCES
-
-   USE par_cfc    , ONLY : jp_cfc          !: number of tracers in CFC
-   USE par_cfc    , ONLY : jp_cfc_2d       !: number of tracers in CFC
-   USE par_cfc    , ONLY : jp_cfc_3d       !: number of tracers in CFC
-   USE par_cfc    , ONLY : jp_cfc_trd      !: number of tracers in CFC
-
-   USE par_c14b   , ONLY : jp_c14b         !: number of tracers in C14
-   USE par_c14b   , ONLY : jp_c14b_2d      !: number of tracers in C14
-   USE par_c14b   , ONLY : jp_c14b_3d      !: number of tracers in C14
-   USE par_c14b   , ONLY : jp_c14b_trd     !: number of tracers in C14
 #ifdef BFM_NEMO
    USE mem        , ONLY : NO_D3_BOX_STATES !: number of BFM pelagic tracers
 #endif
+
    IMPLICIT NONE
 
-   INTEGER, PARAMETER ::   jp_lm      =  jp_pisces     + jp_cfc     + jp_c14b     !: 
-   INTEGER, PARAMETER ::   jp_lm_2d   =  jp_pisces_2d  + jp_cfc_2d  + jp_c14b_2d  !:
-   INTEGER, PARAMETER ::   jp_lm_3d   =  jp_pisces_3d  + jp_cfc_3d  + jp_c14b_3d  !:
-   INTEGER, PARAMETER ::   jp_lm_trd  =  jp_pisces_trd + jp_cfc_trd + jp_c14b_trd !:
+   INTEGER, PARAMETER ::   jp_lm      =  jp_pisces     !: 
+   INTEGER, PARAMETER ::   jp_lm_2d   =  jp_pisces_2d  !:
+   INTEGER, PARAMETER ::   jp_lm_3d   =  jp_pisces_3d  !:
+   INTEGER, PARAMETER ::   jp_lm_trd  =  jp_pisces_trd !:
 
 #if defined key_my_trc
    !!---------------------------------------------------------------------
