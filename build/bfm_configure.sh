@@ -470,17 +470,12 @@ if [ ${GEN} ]; then
         cd ${BFMDIR}
         exedir="../cesm/models/ocn/nemo/BFM/configurations/${EXP}"
         echo "Copy files to ${exedir}"
-        if [ ! -d ${exedir} ] ; then
-           mkdir -p ${exedir}
-           cp ${blddir}/*.?90     ${exedir}
-           cp ${blddir}/*.h       ${exedir}
-           cp ${blddir}/*.nml     ${exedir}
-           cp ${blddir}/*top.xml  ${exedir}
-           cp ${blddir}/*top_cfg  ${exedir}
-        else
-           echo "$EXP configuration already exists not overwriting files"
-           echo "You can check in ${blddir} for the latest ones"
-        fi
+        mkdir -p ${exedir}
+        cp ${blddir}/*.?90     ${exedir}
+        cp ${blddir}/*.h       ${exedir}
+        cp ${blddir}/*.nml     ${exedir}
+        cp ${blddir}/*top.xml  ${exedir}
+        cp ${blddir}/*top_cfg  ${exedir}
     fi
     echo "${PRESET} generation done!"
 fi
