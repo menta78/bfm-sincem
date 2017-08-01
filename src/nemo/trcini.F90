@@ -21,7 +21,6 @@ MODULE trcini
    USE trcnam          ! Namelist read
    USE trcini_cfc      ! CFC      initialisation
    USE trcini_pisces   ! PISCES   initialisation
-   USE trcini_c14b     ! C14 bomb initialisation
    USE trcini_age      ! AGE      initialisation
    USE trcini_my_trc   ! MY_TRC   initialisation
    USE trcdta          ! initialisation from files
@@ -93,11 +92,14 @@ CONTAINS
       trn(:,:,:,:) = 0._wp
       tra(:,:,:,:) = 0._wp
       trb(:,:,:,:) = trn(:,:,:,:)
-      ! Note: there is no initial computation of partial step because it is done
-      ! runtime in trc_trp_bfm
-
+      ! Note: there is no initial computation of partial step because it is done runtime in trc_trp_bfm
+      ! 
+      IF( lk_cfc     )       CALL trc_ini_cfc          ! CFC       tracers
+      IF( lk_age     )       CALL trc_ini_age          ! AGE       tracer
       !
-      IF( nn_dttrc /= 1 )        CALL trc_sub_ini      ! Initialize variables for substepping passive tracers
+      IF( ln_rsttr   )       CALL trc_rst_read         ! restart from a file
+      !
+      IF( nn_dttrc /= 1 )    CALL trc_sub_ini          ! Initialize variables for substepping passive tracers
       !
       ! check consistency of light paramterizations
       if ( ln_dm2dc .AND. LightPeriodFlag .NE. 1) &

@@ -9,11 +9,17 @@ MODULE trcstp
    !!   trc_stp      : passive tracer system time-stepping
    !!----------------------------------------------------------------------
    USE oce_trc          ! ocean dynamics and active tracers variables
+   USE trcsms_cfc       ! CFCs & SF6 
+   USE trcsms_age       ! AGE tracer
+   USE trcwri_cfc
+   USE trcwri_age
    USE api_bfm,    ONLY: bio_calc
    USE global_mem, ONLY: LOGUNIT
    USE iom
    USE in_out_manager
    USE trcsub
+   USE trcrst
+   USE trcwri
    USE trcbc,      ONLY: trc_bc_read
    USE trcdiabfm,  ONLY: trc_dia_bfm
 
@@ -51,25 +57,37 @@ CONTAINS
       ! Check the main BFM flag
       !---------------------------------------------
       IF (bio_calc) THEN
-
-          IF( (nn_dttrc /= 1 ) .AND. (kt == nit000) ) THEN
-             ! this is now done in trcini.F90. may not be necessary here
-             !CALL trc_sub_ini                              ! Initialize variables for substepping passive tracers
-             !CALL trc_bc_read( kt )                        ! Read initial Boundary Conditions
-          ENDIF
-
-          IF ( nn_dttrc /= 1 )     CALL trc_sub_stp( kt )                    ! Averaging physical variables for sub-stepping
-
+          !
+          ! Averaging physical variables for sub-stepping
+          IF ( nn_dttrc /= 1 )     CALL trc_sub_stp( kt )
+          !
           !---------------------------------------------
           ! Proceed only every nn_dttrc
           !---------------------------------------------   
           IF ( MOD( kt , nn_dttrc ) == 0 ) THEN  
- 
-                                   CALL trc_bc_read ( kt )      ! read/update Boundary Conditions
-                                   CALL trc_bfm( kt )           ! main call to BFM
-                                   CALL trc_trp_bfm( kt )       ! transport of BFM tracers
-                                   CALL trc_dia_bfm( kt )       ! diagnostic output for BFM
-             IF ( nn_dttrc /= 1 )  CALL trc_sub_reset( kt )     ! reset physical variables after sub-stepping
+             ! 
+                                   CALL trc_bc_read  ( kt )   ! read/update Boundary Conditions
+                                   CALL trc_bfm      ( kt )   ! main call to BFM
+             ! TOP restart
+             IF( lk_age .or. lk_cfc )  &
+                         &         CALL trc_rst_opn  ( kt )
+             IF( lrst_trc )        CALL trc_rst_cal  ( kt, 'WRITE' )
+             ! TOP sms
+             IF( lk_cfc        )   CALL trc_sms_cfc  ( kt )   ! surface fluxes of CFC
+             IF( lk_age        )   CALL trc_sms_age  ( kt )   ! AGE tracer
+             ! 
+                                   CALL trc_trp_bfm  ( kt )   ! transport of BFM & TOP tracers
+                                   CALL trc_dia_bfm  ( kt )   ! diagnostic output for BFM
+             !
+             ! TOP output & restart
+             IF( lk_iomput     ) THEN 
+                IF( lk_age     )   CALL trc_wri_age
+                IF( lk_cfc     )   CALL trc_wri_cfc
+             ENDIF
+             IF( lrst_trc      )   CALL trc_rst_wri  ( kt )
+             !
+             ! reset physical variables after sub-stepping
+             IF( nn_dttrc /= 1 )   CALL trc_sub_reset( kt )
 
           ENDIF 
 
