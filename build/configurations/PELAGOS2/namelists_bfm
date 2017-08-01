@@ -210,7 +210,9 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
    InitVar(R1c)%init = 0,
    InitVar(R1c)%cbc  = .true.,
    InitVar(O3c)%init = 2,
+   InitVar(O3c)%cbc  = .true.,
    InitVar(O3h)%init = 2,
+   InitVar(O3h)%cbc  = .true.,
    filename_nml_conf = 'BFM_General.nml',
 /
 
@@ -763,6 +765,7 @@ p_paMEZ(2,:)=   0.0,    1.0
 &namtrc_run     
    nn_dttrc      =  1  
    ln_top_euler  = .true.
+   ln_rsttr      = .false.   !  start from a restart file (T) or not (F)
         filename_nml_conf = 'namelist_top_cfg',
 /
 
@@ -888,13 +891,13 @@ p_paMEZ(2,:)=   0.0,    1.0
 !   and the conversion factor rn_trfac(VARNAME)
 !-------------------------------------------------------------------------!
 &namtrc_dta      
-   sn_trcdta(O2o)  = 'DOX_WOA13-ORCA2_L31_monthly',  -12   ,  'DOX'     ,    .false.   , .true. , 'yearly'  , ''       , ''
-   sn_trcdta(N1p)  = 'PO4_WOA13-ORCA2_L31_monthly',  -12   ,  'PO4'     ,    .false.   , .true. , 'yearly'  , ''       , ''
-   sn_trcdta(N3n)  = 'NO3_WOA13-ORCA2_L31_monthly',  -12   ,  'NO3'     ,    .false.   , .true. , 'yearly'  , ''       , ''
-   sn_trcdta(N5s)  = 'SIL_WOA13-ORCA2_L31_monthly',  -12   ,  'SIL'     ,    .false.   , .true. , 'yearly'  , ''       , ''
-   sn_trcdta(N7f)  = 'DFE_SMOOTH-ORCA2_L31_annual', -12   ,  'DFE'     ,    .false.   , .true. , 'yearly'  , ''       , ''
-   sn_trcdta(O3c) = 'DIC_GLODAPv2-ORCA2_L31_annual' , -12   ,  'DIC'     ,    .false.   , .true. , 'yearly'  , ''       , ''
-   sn_trcdta(O3h) = 'ALK_GLODAPv2-ORCA2_L31_annual',  -12   ,  'ALK'     ,    .false.   , .true. , 'yearly'  , ''       , ''
+   sn_trcdta(O2o)  = 'DOX_WOA13-ORCA2_L31_monthly',  -12   ,  'DOX'  , .false. , .true. , 'yearly'  , '' , '' , ''
+   sn_trcdta(N1p)  = 'PO4_WOA13-ORCA2_L31_monthly',  -12   ,  'PO4'  , .false. , .true. , 'yearly'  , '' , '' , ''
+   sn_trcdta(N3n)  = 'NO3_WOA13-ORCA2_L31_monthly',  -12   ,  'NO3'  , .false. , .true. , 'yearly'  , '' , '' , ''
+   sn_trcdta(N5s)  = 'SIL_WOA13-ORCA2_L31_monthly',  -12   ,  'SIL'  , .false. , .true. , 'yearly'  , '' , '' , ''
+   sn_trcdta(N7f)  = 'DFE_SMOOTH-ORCA2_L31_annual',  -12   ,  'DFE'  , .false. , .true. , 'yearly'  , '' , '' , ''
+   sn_trcdta(O3c) = 'DIC_GLODAPv2-ORCA2_L31_annual', -12   ,  'DIC'  , .false. , .true. , 'yearly'  , '' , '' , ''
+   sn_trcdta(O3h) = 'ALK_GLODAPv2-ORCA2_L31_annual', -12   ,  'ALK'  , .false. , .true. , 'yearly'  , '' , '' , ''
    cn_dir        =  './'      !  root directory for the location of the data files
    rn_trfac(O2o)   =  44.661 !  conversion factor from ml/l to mmol/m3 (1 ml/l = 10^3/22.391 = 44.661 umol/l)
    rn_trfac(N1p)   =   1.0   !  no conversion
@@ -918,18 +921,18 @@ p_paMEZ(2,:)=   0.0,    1.0
 !-----------------------------------------------------------------------
 &namtrc_bc
    sn_trcsbc(N3n)  = 'dummy.nc',                 -1     ,  'ndep'   ,  .false. , .true.  , 'yearly'   , '', '', ''
-   sn_trcsbc(N7f)  = 'FEDEP_INCA-ORCA2_monthly', -1     , 'fedep'   ,  .false. , .true.  , 'yearly'   , ''       , ''
+   sn_trcsbc(N7f)  = 'FEDEP_INCA-ORCA2_monthly', -1     , 'fedep'   ,  .false. , .true.  , 'yearly'   , '', '', ''
    rn_trsfac(N3n)  = 1.0
    rn_trsfac(N7f)  =  2.0e-02        ! umol/m2/day, dissolution fraction 2%
-   sn_trccbc(N1p)  =  'ORCA2_GNEWS_RIVER_annual'  -12  'RIVERDIP'  .false.  .true.  'yearly'  ''  ''
-   sn_trccbc(N3n)  =  'ORCA2_GNEWS_RIVER_annual'  -12  'RIVERDIN'  .false.  .true.  'yearly'  ''  ''
-   sn_trccbc(N5s)  =  'ORCA2_GNEWS_RIVER_annual'  -12  'RIVERDSI'  .false.  .true.  'yearly'  ''  ''
-   sn_trccbc(N7f)  =  'ORCA2_GNEWS_RIVER_annual'  -12  'RIVERDFE'  .false.  .true.  'yearly'  ''  ''
-   sn_trccbc(R1c)  =  'ORCA2_GNEWS_RIVER_annual'  -12  'RIVERDOC'  .false.  .true.  'yearly'  ''  ''
-   sn_trccbc(R1n)  =  'ORCA2_GNEWS_RIVER_annual'  -12  'RIVERDON'  .false.  .true.  'yearly'  ''  ''
-   sn_trccbc(R1p)  =  'ORCA2_GNEWS_RIVER_annual'  -12  'RIVERDOP'  .false.  .true.  'yearly'  ''  ''
-   sn_trccbc(O3c)  =  'ORCA2_GNEWS_RIVER_annual'  -12  'RIVERDIC'  .false.  .true.  'yearly'  ''  ''
-   sn_trccbc(O3h)  =  'ORCA2_GNEWS_RIVER_annual'  -12  'RIVERDIC'  .false.  .true.  'yearly'  ''  ''
+   sn_trccbc(N1p)  =  'ORCA2_GNEWS_RIVER_annual'  -12  'RIVERDIP'  .false.  .true.  'yearly'  ''  ''  ''
+   sn_trccbc(N3n)  =  'ORCA2_GNEWS_RIVER_annual'  -12  'RIVERDIN'  .false.  .true.  'yearly'  ''  ''  ''
+   sn_trccbc(N5s)  =  'ORCA2_GNEWS_RIVER_annual'  -12  'RIVERDSI'  .false.  .true.  'yearly'  ''  ''  ''
+   sn_trccbc(N7f)  =  'ORCA2_GNEWS_RIVER_annual'  -12  'RIVERDFE'  .false.  .true.  'yearly'  ''  ''  ''
+   sn_trccbc(R1c)  =  'ORCA2_GNEWS_RIVER_annual'  -12  'RIVERDOC'  .false.  .true.  'yearly'  ''  ''  ''
+   sn_trccbc(R1n)  =  'ORCA2_GNEWS_RIVER_annual'  -12  'RIVERDON'  .false.  .true.  'yearly'  ''  ''  ''
+   sn_trccbc(R1p)  =  'ORCA2_GNEWS_RIVER_annual'  -12  'RIVERDOP'  .false.  .true.  'yearly'  ''  ''  ''
+   sn_trccbc(O3c)  =  'ORCA2_GNEWS_RIVER_annual'  -12  'RIVERDIC'  .false.  .true.  'yearly'  ''  ''  ''
+   sn_trccbc(O3h)  =  'ORCA2_GNEWS_RIVER_annual'  -12  'RIVERDIC'  .false.  .true.  'yearly'  ''  ''  ''
    rn_trcfac(N1p)  =  8.8464e+10    ! 1 mol P = 30.97 g; 1.e12*1.e3/30.97/365 conversion factor from Tg/y to mmol/d
    rn_trcfac(N3n)  =  1.9556e+11    ! 1 mol N = 14.01 g; 1.e12*1.e3/14.01/365 conversion factor from Tg/y to mmol/d
    rn_trcfac(N5s)  =  9.7534e+10    ! 1 mol Si = 28.09 g; 1.e12*1.e3/28.09/365 conversion factor from Tg/y to mmol/d

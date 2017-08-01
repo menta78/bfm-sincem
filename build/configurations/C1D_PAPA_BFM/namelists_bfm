@@ -784,6 +784,7 @@ p_paMEZ(2,:)=   0.0,    1.0
 &namtrc_run     
    nn_dttrc      =  1  
    ln_top_euler  = .true.
+   ln_rsttr      = .false.   !  start from a restart file (T) or not (F)
         filename_nml_conf = 'namelist_top_cfg',
 /
 
