@@ -178,15 +178,15 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
    O3c0 = 27060.00,
    O3h0 = 2660.0,
    O5c0 = 1.0e-3,
-   O4n0 = 200.0,
+   O4n0 = 0.0,
    P1c0 = 0.1, 
    P2c0 = 0.1, 
    Z4c0 = 0.1, 
    Z5c0 = 0.1, 
    B1c0 = 1.0, 
    R1c0 = 1.0, 
-   R2c0 = 0.1,
-   R3c0 = 1.0,
+   R2c0 = 0.0,
+   R3c0 = 0.0,
    R6c0 = 1.0,
 
    InitVar(O2o)%init = 2,
@@ -287,12 +287,12 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
 &CSYS_parameters
     AtmCO20          =  367.0E0  
     MaxIterPHsolver  =  50       
-    CalcBioAlk       =  .FALSE.  
-    AtmCO2_N         =  1        'CMIP5_scenarios_RCP_CO2_mixing_ratio.nc'  .TRUE.  'RCP85'   '1765-01-01 00:00:00'  'yearly'  .TRUE.  
-    AtmSLP_N         =  3        'AtmSLP.nc'                           .TRUE.   'AtmSLP'  '1764-07-01 00:00'  'dummy'   .TRUE.  
+    CalcBioAlk       =  .FALSE. 
     p_kdca           =  10.9     
     p_nomega         =  1        
     Co2fluxfac       =  1.0 
+    AtmCO2_N         =  1        'CMIP5_scenarios_RCP_CO2_mixing_ratio.nc'  .TRUE.  'RCP85'   '1765-01-01 00:00:00'  'yearly'  .TRUE.  
+    AtmSLP_N         =  3        'AtmSLP.nc'                           .TRUE.   'AtmSLP'  '1764-07-01 00:00'  'dummy'   .TRUE.  
 	filename_nml_conf = 'Carbonate_Dynamics.nml',
 /
 
@@ -746,7 +746,12 @@ p_paMEZ(1,:)=   1.0
 !-------------------------------------------------------------------------!
 &namtrc_run     
    nn_dttrc      =  1  
+   nn_writetrc   =  100      !  time step frequency for sn_tracer outputs
    ln_top_euler  = .true.
+   ln_rsttr      = .false.   !  start from a restart file (T) or not (F)
+   nn_rsttr      =   0       !  restart control = 0 initial time step is not compared to the restart file value
+   cn_trcrst_in  = "restart_trc"   !  suffix of pass. sn_tracer restart name (input)
+   cn_trcrst_out = "restart_trc"   !  suffix of pass. sn_tracer restart name (output)
         filename_nml_conf = 'namelist_top_cfg',
 /
 
@@ -886,13 +891,13 @@ p_paMEZ(1,:)=   1.0
 !   and the conversion factor rn_trfac(VARNAME)
 !-------------------------------------------------------------------------!
 &namtrc_dta      
-   sn_trcdta(O2o)  = 'DOX_1m_nomask'   ,  -12   ,  'DOX'     ,    .false.   , .true. , 'yearly'  , ''       , ''
-   sn_trcdta(N1p)  = 'PO4_1m_nomask'   ,  -12   ,  'PO4'     ,    .false.   , .true. , 'yearly'  , ''       , ''
-   sn_trcdta(N3n)  = 'NO3_1m_nomask'   ,  -12   ,  'NO3'     ,    .false.   , .true. , 'yearly'  , ''       , ''
-   sn_trcdta(N5s)  = 'SIL_1m_nomask'   ,  -12   ,  'SIL'     ,    .false.   , .true. , 'yearly'  , ''       , ''
-   sn_trcdta(N7f)  = 'DFE_1m_nomask'   ,  -12   ,  'DFE'     ,    .false.   , .true. , 'yearly'  , ''       , ''
-   sn_trcdta(O3c)  = 'DIC_1y_nomask'   ,  -12   ,  'DIC'     ,    .false.   , .true. , 'yearly'  , ''       , ''
-   sn_trcdta(O3h)  = 'ALK_1y_nomask'   ,  -12   ,  'ALK'     ,    .false.   , .true. , 'yearly'  , ''       , ''
+   sn_trcdta(O2o)  = 'DOX_1m_nomask'   ,  -12   ,  'DOX'     ,    .false.   , .true. , 'yearly'  , '' , '' , ''
+   sn_trcdta(N1p)  = 'PO4_1m_nomask'   ,  -12   ,  'PO4'     ,    .false.   , .true. , 'yearly'  , '' , '' , ''
+   sn_trcdta(N3n)  = 'NO3_1m_nomask'   ,  -12   ,  'NO3'     ,    .false.   , .true. , 'yearly'  , '' , '' , ''
+   sn_trcdta(N5s)  = 'SIL_1m_nomask'   ,  -12   ,  'SIL'     ,    .false.   , .true. , 'yearly'  , '' , '' , ''
+   sn_trcdta(N7f)  = 'DFE_1m_nomask'   ,  -12   ,  'DFE'     ,    .false.   , .true. , 'yearly'  , '' , '' , ''
+   sn_trcdta(O3c)  = 'DIC_1y_nomask'   ,  -12   ,  'DIC'     ,    .false.   , .true. , 'yearly'  , '' , '' , ''
+   sn_trcdta(O3h)  = 'ALK_1y_nomask'   ,  -12   ,  'ALK'     ,    .false.   , .true. , 'yearly'  , '' , '' , ''
    cn_dir          =  './'      !  root directory for the location of the data files
    rn_trfac(O2o)   =  44.661 !  conversion factor from ml/l to mmol/m3 (1 ml/l = 10^3/22.391 = 44.661 umol/l)
    rn_trfac(N1p)   =   1.0   !  no conversion
@@ -916,18 +921,18 @@ p_paMEZ(1,:)=   1.0
 !-----------------------------------------------------------------------
 &namtrc_bc
    sn_trcsbc(N3n)  =  'dummy.nc'       , -1     ,  'ndep'   ,  .false. , .true.  , 'yearly'   , '', '', ''
-   sn_trcsbc(N7f)  =  'IRON_DEPOSITION', -1     , 'fedep'   ,  .false. , .true.  , 'yearly'   , ''       , ''
+   sn_trcsbc(N7f)  =  'IRON_DEPOSITION', -1     , 'fedep'   ,  .false. , .true.  , 'yearly'   , '', '', ''
    rn_trsfac(N3n)  =  1.0
    rn_trsfac(N7f)  =  2.0e-02        ! umol/m2/day, dissolution fraction 2%
-   sn_trccbc(N1p)  =  'RIVER_LOADS'  -12  'RIVERDIP'  .false.  .true.  'yearly'  ''  ''
-   sn_trccbc(N3n)  =  'RIVER_LOADS'  -12  'RIVERDIN'  .false.  .true.  'yearly'  ''  ''
-   sn_trccbc(N5s)  =  'RIVER_LOADS'  -12  'RIVERDSI'  .false.  .true.  'yearly'  ''  ''
-   sn_trccbc(N7f)  =  'RIVER_LOADS'  -12  'RIVERDFE'  .false.  .true.  'yearly'  ''  ''
-   sn_trccbc(R1c)  =  'RIVER_LOADS'  -12  'RIVERDOC'  .false.  .true.  'yearly'  ''  ''
-   sn_trccbc(R1n)  =  'RIVER_LOADS'  -12  'RIVERDON'  .false.  .true.  'yearly'  ''  ''
-   sn_trccbc(R1p)  =  'RIVER_LOADS'  -12  'RIVERDOP'  .false.  .true.  'yearly'  ''  ''
-   sn_trccbc(O3c)  =  'RIVER_LOADS'  -12  'RIVERDIC'  .false.  .true.  'yearly'  ''  ''
-   sn_trccbc(O3h)  =  'RIVER_LOADS'  -12  'RIVERDIC'  .false.  .true.  'yearly'  ''  ''
+   sn_trccbc(N1p)  =  'RIVER_LOADS'  -12  'RIVERDIP'  .false.  .true.  'yearly'  ''  ''  ''
+   sn_trccbc(N3n)  =  'RIVER_LOADS'  -12  'RIVERDIN'  .false.  .true.  'yearly'  ''  ''  ''
+   sn_trccbc(N5s)  =  'RIVER_LOADS'  -12  'RIVERDSI'  .false.  .true.  'yearly'  ''  ''  ''
+   sn_trccbc(N7f)  =  'RIVER_LOADS'  -12  'RIVERDFE'  .false.  .true.  'yearly'  ''  ''  ''
+   sn_trccbc(R1c)  =  'RIVER_LOADS'  -12  'RIVERDOC'  .false.  .true.  'yearly'  ''  ''  ''
+   sn_trccbc(R1n)  =  'RIVER_LOADS'  -12  'RIVERDON'  .false.  .true.  'yearly'  ''  ''  ''
+   sn_trccbc(R1p)  =  'RIVER_LOADS'  -12  'RIVERDOP'  .false.  .true.  'yearly'  ''  ''  ''
+   sn_trccbc(O3c)  =  'RIVER_LOADS'  -12  'RIVERDIC'  .false.  .true.  'yearly'  ''  ''  ''
+   sn_trccbc(O3h)  =  'RIVER_LOADS'  -12  'RIVERDIC'  .false.  .true.  'yearly'  ''  ''  ''
    rn_trcfac(N1p)  =  8.8464e+10    ! 1 mol P = 30.97 g; 1.e12*1.e3/30.97/365 conversion factor from Tg/y to mmol/d
    rn_trcfac(N3n)  =  1.9556e+11    ! 1 mol N = 14.01 g; 1.e12*1.e3/14.01/365 conversion factor from Tg/y to mmol/d
    rn_trcfac(N5s)  =  9.7534e+10    ! 1 mol Si = 28.09 g; 1.e12*1.e3/28.09/365 conversion factor from Tg/y to mmol/d
