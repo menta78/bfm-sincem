@@ -2305,7 +2305,7 @@ sub func_XMLFILE {
        } 
     }  
     #print Dumper(\@meanvar) , "\n";
-    $line .= "${TAB8}<file id=\"file20\" name_suffix=\"_grid_bfm\" description=\"BFM variables\" >\n";
+    $line .= "${TAB8}<file id=\"file200\" name_suffix=\"_grid_bfm\" description=\"BFM variables\" >\n";
 
     # Variables requested as time average
     foreach my $name (@meanvar) {
