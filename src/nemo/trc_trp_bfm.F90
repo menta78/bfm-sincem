@@ -17,7 +17,7 @@ SUBROUTINE trc_trp_bfm( kstp )
    USE oce_trc         ! ocean dynamics and active tracers variables
    USE trc             ! ocean passive tracers variables
    USE trcnam_trp      ! passive tracers transport namelist variables
-   USE par_trc, ONLY: lk_trc_c1d
+   USE par_trc, ONLY: lk_trc_c1d, lk_cfc, lk_age
    USE trabbl          ! bottom boundary layer               (trc_bbl routine)
    USE trcbbl          ! bottom boundary layer               (trc_bbl routine)
    USE zdfkpp          ! KPP non-local tracer fluxes         (trc_kpp routine)
@@ -259,6 +259,10 @@ SUBROUTINE trc_trp_bfm( kstp )
             end if
 #endif
          END DO
+         !
+         ! Use NEMO clipping for TOP modules
+         IF( lk_cfc     )   CALL trc_rad_sms( kstp, trb, trn, jp_cfc0 , jp_cfc1               )  ! CFC model
+         IF( lk_age     )   CALL trc_rad_sms( kstp, trb, trn, jp_age0 , jp_age1               )  ! AGE tracer
       END IF
 
       if ( nn_timing == 1 )   CALL timing_stop('trc_trp_bfm')
