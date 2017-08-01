@@ -296,12 +296,11 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
     AtmCO20         =  370.0E0
     MaxIterPHsolver = 50
     CalcBioAlk      =  .FALSE.
-    AtmCO2_N        =  0         'CMIP5_Historical_GHG_1765_2005.dat'  .FALSE.  'CO2'     '1764-07-01 00:00'  'yearly'  .TRUE.
-    AtmSLP_N        =  0         'AtmSLP.nc'                           .TRUE.   'AtmSLP'  '1764-07-01 00:00'  'dummy'   .TRUE.
     p_kdca          =  10.9
     p_nomega        =  1
-    CalcBioAlk      =  .FALSE.
     Co2fluxfac      = 1.0
+    AtmCO2_N        =  0         'CMIP5_Historical_GHG_1765_2005.dat'  .FALSE.  'CO2'     '1764-07-01 00:00'  'yearly'  .TRUE.
+    AtmSLP_N        =  0         'AtmSLP.nc'                           .TRUE.   'AtmSLP'  '1764-07-01 00:00'  'dummy'   .TRUE.
 	filename_nml_conf = 'Carbonate_Dynamics.nml',
 /
 
