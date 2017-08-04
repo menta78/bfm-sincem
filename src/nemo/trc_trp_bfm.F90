@@ -219,7 +219,8 @@ SUBROUTINE trc_trp_bfm( kstp )
            ELSE ! non-trasported variables (values from D3STATE to fill in statistics)
               zmin = MINVAL(D3STATE(m,:))
               zmax = MAXVAL(D3STATE(m,:))
-              zmean  = SUM(D3STATE(m,:)) / NO_BOXES
+              zmean = 0._RLEN
+              if (NO_BOXES > 0 ) zmean = SUM(D3STATE(m,:)) / NO_BOXES
               zdrift = 0.0_RLEN
            ENDIF
            IF ( lwp ) THEN

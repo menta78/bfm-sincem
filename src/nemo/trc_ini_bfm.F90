@@ -35,7 +35,7 @@
    use mem,        only: ppO3c, ppO3h, ppN6r
    use mem_CO2,    only: AtmCO2, AtmSLP
 #endif
-   use global_mem, only: RLEN,ZERO,LOGUNIT,NML_OPEN,NML_READ, &
+   use global_mem, only: RLEN,ZERO,LOGUNIT,NML_OPEN,NML_READ, ALLTRANSPORT, &
                          error_msg_prn,ONE, bfm_lwp,NMLUNIT, SkipBFMCore
    use constants,  only: SEC_PER_DAY
    use api_bfm, only: ZEROS, SEAmask, BOTmask, SRFmask, &
@@ -422,6 +422,7 @@
 
    D3STATE_tot(:) = ZERO
    do m = 1,NO_D3_BOX_STATES
+      IF (D3STATETYPE(m)>=ALLTRANSPORT) THEN
          ! compute statistics (need to map to 3D shape for global sum)
          trn(:,:,:,m) = unpack(D3STATE(m,:),SEAmask,ZEROS)
          D3STATE_tot(m) = glob_sum( trn(:,:,:,m) * cvol(:,:,:)   )
@@ -432,7 +433,13 @@
             call mpp_max( zmax )      ! max over the global domain
          end if
          zmean  = D3STATE_tot(m) / areatot
-         if (lwp) write(LOGUNIT,9000) m, trim(var_names(stPelStateS+m-1)), zmean, zmin, zmax
+       ELSE
+         zmin = MINVAL(D3STATE(m,:))
+         zmax = MAXVAL(D3STATE(m,:))
+         zmean = 0._RLEN
+         if (NO_BOXES > 0 ) zmean = SUM(D3STATE(m,:)) / NO_BOXES
+       ENDIF
+       if (lwp) write(LOGUNIT,9000) m, trim(var_names(stPelStateS+m-1)), zmean, zmin, zmax
    end do
    if (lwp) write(LOGUNIT,*)
 9000  FORMAT(' tracer :',i2,'    name :',a10,'    mean :',e18.10,'    min :',e18.10, &
