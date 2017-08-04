@@ -29,7 +29,7 @@ MODULE par_my_trc
    !!   'key_my_trc'                     user defined tracers (MY_TRC)
    !!---------------------------------------------------------------------
    LOGICAL, PUBLIC, PARAMETER ::   lk_my_trc     = .TRUE.   !: PTS flag 
-   INTEGER, PUBLIC, PARAMETER ::   jp_my_trc     =  NO_D3_BOX_STATES     !: number of PTS tracers
+   INTEGER, PUBLIC, PARAMETER ::   jp_my_trc     =  NO_D3_BOX_STATES - 3    !: number of PTS tracers
    INTEGER, PUBLIC, PARAMETER ::   jp_my_trc_2d  =  0       !: additional 2d output arrays ('key_trc_diaadd')
    INTEGER, PUBLIC, PARAMETER ::   jp_my_trc_3d  =  0       !: additional 3d output arrays ('key_trc_diaadd')
    INTEGER, PUBLIC, PARAMETER ::   jp_my_trc_trd =  0       !: number of sms trends for MY_TRC
