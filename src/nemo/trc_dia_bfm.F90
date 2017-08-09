@@ -84,7 +84,7 @@ CONTAINS
    ! mg C/m3 --> umol/kg
    ! mmol eq/m3 --> umol/kg
    DIC(:) = O3c(:)/MW_C/ERHO(:)*1000.0_RLEN
-   ALK(:)  = O3h(:)/ERHO(:)*1000.0_RLEN
+   ALK(:) = O3h(:)/ERHO(:)*1000.0_RLEN
 #endif
    IF ( bfm_iomput ) THEN
       call bfm_iom(kt) 
