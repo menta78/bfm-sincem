@@ -15,9 +15,9 @@
 !
 !
 ! !USES:
-   use mem, only: NO_D3_BOX_STATES, NO_BOXES,          &
-                  NO_BOXES_X, NO_BOXES_Y, NO_BOXES_Z,  &
-                  NO_BOXES_XY, NO_D3_BOX_DIAGNOSS,     &
+   use mem, only: NO_D3_BOX_STATES, NO_BOXES,            &
+                  NO_BOXES_X, NO_BOXES_Y, NO_BOXES_Z,    &
+                  NO_BOXES_XY, NO_D3_BOX_DIAGNOSS, ERHO, &
                   NO_STATES,Depth,D3STATE,EPR,D3STATETYPE
 #ifdef INCLUDE_BEN
    use mem, only: NO_D2_BOX_STATES_BEN, D2STATE_BEN, &
@@ -59,7 +59,7 @@
    use trc, only : ln_trc_sbc, ln_trc_ini, ln_trc_obc, ln_trc_cbc, &
         ln_top_euler, areatot, cvol, &
         trn, ln_trcdmp
-   use oce_trc, only : ln_qsr_bio, glob_sum
+   use oce_trc, only : ln_qsr_bio, glob_sum, rhd, rau0
    use iom_def, only:jpdom_data
    use par_oce, only: jpi, jpj, jpk, &
         jpnij, &
@@ -96,7 +96,8 @@
    logical,allocatable  :: mask1d(:)
    integer              :: nc_id ! logical unit for data initialization
    character(len=40)    :: thistime
-   real(RLEN)           :: julianday
+   real(RLEN)           :: julianday , &
+                           PERMIL=ONE/1000.0_RLEN
    REAL(RLEN)           :: ztraf, zmin, zmax, zmean, zdrift
 !EOP
 !-----------------------------------------------------------------------
@@ -318,6 +319,8 @@
    Depth  = pack(rtmp3Da,SEAmask)
    ! Water column pressure form TEOS-10 [dbar]
    EPR = pack( gsw_p_from_z(-fsdept(:,:,:),SPREAD(gphit,DIM=3,NCOPIES=jpk)) , SEAmask)
+   ! Initial seawater in-situ density 
+   ERHO(:) = pack( (rhd(:,:,:) + 1._RLEN) * rau0, SEAmask)
 
    !-------------------------------------------------------
    ! Initialization from analytical profiles or data
@@ -366,6 +369,12 @@
          Initvar(m)%varname=var_names(m)
          if (bfm_lwp) write(LOGUNIT, 158) InitVar(m)
       end do
+#ifdef INCLUDE_PELCO2
+      ! Scale DIC and ALK from umol/kg to mmol/m3 using NEMO initial in situ density
+      if (bfm_lwp) write(LOGUNIT,*) 'trc_ini_bfm: Scale DIC and ALK 3D fields using NEMO in-situ density'
+      D3STATE(ppO3c,:) = D3STATE(ppO3c,:) * ERHO(:) * PERMIL
+      D3STATE(ppO3h,:) = D3STATE(ppO3h,:) * ERHO(:) * PERMIL
+#endif
    end if
 
    ! Initialize internal constitutents quota of functional groups
@@ -399,17 +408,18 @@
    ! if oceanpoints are availables for this subdomain
    !-------------------------------------------------------
    IF( .NOT. SkipBFMCore) THEN
-   if (bfm_init == 1) call read_rst_bfm(in_rst_fname)
-   if (bfm_init == 2) call read_rst_bfm_glo(in_rst_fname, narea, jpnij, &
-        jpiglo, jpjglo, jpk, &
-        nlcit, nlcjt, &
-        nldit, nldjt, &
-        nleit, nlejt, &
-        nimppt, njmppt, &
-        SEAmask )
+      if (bfm_init == 1) call read_rst_bfm(in_rst_fname)
+      if (bfm_init == 2) call read_rst_bfm_glo(in_rst_fname, narea, jpnij, &
+           jpiglo, jpjglo, jpk, &
+           nlcit, nlcjt, &
+           nldit, nldjt, &
+           nleit, nlejt, &
+           nimppt, njmppt, &
+           SEAmask )
    ELSE
       D3STATE(:,:) = ZERO
    ENDIF
+
    !-------------------------------------------------------
    ! compute and report global statistics in bfm.log
    !-------------------------------------------------------
