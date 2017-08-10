@@ -903,8 +903,8 @@ p_paMEZ(2,:)=   0.0,    1.0
    rn_trfac(N3n)   =   1.0   !  no conversion
    rn_trfac(N5s)   =   1.0   !  no conversion
    rn_trfac(N7f)   =   1.0   !  no conversion
-   rn_trfac(O3c)  =  12.011  !  conversion factor from umol/kg to mg/kg (scaled by rho in trc_ini_bfm)
-   rn_trfac(O3h)  =    1.0   !  (scaled by rho in trc_ini_bfm)
+   rn_trfac(O3c)  =   12.011e-03 !  conversion factor from umol(C)/kg to mg(C)/kg (scaled by rho in trc_ini_bfm)
+   rn_trfac(O3h)  =    1.0e-03   !  conversion factor from umol(eq)/kg to mmol(eq)/kg (scaled by rho in trc_ini_bfm)
         filename_nml_conf = 'namelist_top_cfg',
 /
 

@@ -93,8 +93,7 @@
    logical,allocatable  :: mask1d(:)
    integer              :: nc_id ! logical unit for data initialization
    character(len=40)    :: thistime
-   real(RLEN)           :: julianday , &
-                           PERMIL=ONE/1000.0_RLEN
+   real(RLEN)           :: julianday
    REAL(RLEN)           :: ztraf, zmin, zmax, zmean, zdrift
 !EOP
 !-----------------------------------------------------------------------
@@ -365,8 +364,8 @@
 #ifdef INCLUDE_PELCO2
       ! Scale DIC and ALK from umol/kg to mmol/m3 using NEMO initial in situ density
       if (bfm_lwp) write(LOGUNIT,*) 'trc_ini_bfm: Scale DIC and ALK 3D fields using NEMO in-situ density'
-      D3STATE(ppO3c,:) = D3STATE(ppO3c,:) * ERHO(:) * PERMIL
-      D3STATE(ppO3h,:) = D3STATE(ppO3h,:) * ERHO(:) * PERMIL
+      D3STATE(ppO3c,:) = D3STATE(ppO3c,:) * ERHO(:)
+      D3STATE(ppO3h,:) = D3STATE(ppO3h,:) * ERHO(:)
 #endif
    end if
 
