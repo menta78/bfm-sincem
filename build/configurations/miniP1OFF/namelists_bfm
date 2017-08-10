@@ -889,11 +889,11 @@ p_paMEZ(1,:)=   1.0
 !   and the conversion factor rn_trfac(VARNAME)
 !-------------------------------------------------------------------------!
 &namtrc_dta      
-   sn_trcdta(O2o)  = 'DOX_WOA13-ORCA1L50_monthly'   ,  -12   ,  'DOX'     ,    .false.   , .true. , 'yearly'  , '' , '' , ''
-   sn_trcdta(N1p)  = 'PO4_WOA13-ORCA1L50_monthly'   ,  -12   ,  'PO4'     ,    .false.   , .true. , 'yearly'  , '' , '' , ''
-   sn_trcdta(N3n)  = 'NO3_WOA13-ORCA1L50_monthly'   ,  -12   ,  'NO3'     ,    .false.   , .true. , 'yearly'  , '' , '' , ''
-   sn_trcdta(N5s)  = 'SIL_WOA13-ORCA1L50_monthly'   ,  -12   ,  'SIL'     ,    .false.   , .true. , 'yearly'  , '' , '' , ''
-   sn_trcdta(N7f)  = 'DFE_SMOOTH-ORCA1L50_monthly'  ,  -12   ,  'DFE'     ,    .false.   , .true. , 'yearly'  , '' , '' , ''
+   sn_trcdta(O2o)  = 'DOX_WOA13-ORCA1L50_monthly'   ,  -1    ,  'DOX'     ,    .false.   , .true. , 'yearly'  , '' , '' , ''
+   sn_trcdta(N1p)  = 'PO4_WOA13-ORCA1L50_monthly'   ,  -1    ,  'PO4'     ,    .false.   , .true. , 'yearly'  , '' , '' , ''
+   sn_trcdta(N3n)  = 'NO3_WOA13-ORCA1L50_monthly'   ,  -1    ,  'NO3'     ,    .false.   , .true. , 'yearly'  , '' , '' , ''
+   sn_trcdta(N5s)  = 'SIL_WOA13-ORCA1L50_monthly'   ,  -1    ,  'SIL'     ,    .false.   , .true. , 'yearly'  , '' , '' , ''
+   sn_trcdta(N7f)  = 'DFE_SMOOTH-ORCA1L50_monthly'  ,  -1    ,  'DFE'     ,    .false.   , .true. , 'yearly'  , '' , '' , ''
    sn_trcdta(O3c)  = 'DIC_GLODAPv2-ORCA1L50_annual' ,  -12   ,  'DIC'     ,    .false.   , .true. , 'yearly'  , '' , '' , ''
    sn_trcdta(O3h)  = 'ALK_GLODAPv2-ORCA1L50_annual' ,  -12   ,  'ALK'     ,    .false.   , .true. , 'yearly'  , '' , '' , ''
    cn_dir          =  './'      !  root directory for the location of the data files
@@ -902,8 +902,8 @@ p_paMEZ(1,:)=   1.0
    rn_trfac(N3n)   =   1.0   !  no conversion
    rn_trfac(N5s)   =   1.0   !  no conversion
    rn_trfac(N7f)   =   1.0   !  no conversion
-   rn_trfac(O3c)  =  12.288  !  conversion factor from umol/kg to mg/m3 (rho=1024 kg/m3)
-   rn_trfac(O3h)  =   1.024  !  conversion factor from umol/kg to umol(eq)/m3 (rho=1024 kg/m3)
+   rn_trfac(O3c)  =   12.011e-03 !  conversion factor from umol(C)/kg to mg(C)/kg (scaled by rho in trc_ini_bfm)
+   rn_trfac(O3h)  =    1.0e-03   !  conversion factor from umol(eq)/kg to mmol(eq)/kg (scaled by rho in trc_ini_bfm)
         filename_nml_conf = 'namelist_top_cfg',
 /
 
