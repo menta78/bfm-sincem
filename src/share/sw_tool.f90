@@ -16,7 +16,7 @@
 
    implicit none
 
-   ! Multiplicative factor to convert the  potential temperature from ITS90 i
+   ! Multiplicative factor to convert the potential temperature from ITS90
    ! to IPTS-68 scale (TEOS-10, t90_from_t68)
    real (RLEN), parameter :: tem9068 = 1.00024_RLEN
 
@@ -42,14 +42,14 @@
    ! p_ref        : reference pressure                       [dbar]
    ! sw_t_from_pt :                                          [degC ITS-90]
    ! Carry out inverse calculation by swapping P_ref (p_ref) and Pressure (p)
-   ! in routine that is normally used to compute potential temp from temp
+   ! in routine that is used to compute potential temp from in-situ temp
    !==========================================================================
    implicit none 
 
    real (RLEN), intent(in) :: sp, pt, p, p_ref
    real (RLEN) :: sw_t_from_pt
 
-   sw_t_from_pt = sw_pt_from_t(p, pt, p_ref, p)
+   sw_t_from_pt = sw_pt_from_t(sp, pt, p_ref, p)
 
    return
    end function

@@ -147,7 +147,7 @@ module mem_CSYS
   real(RLEN)  :: H, Hi, ta, tc, sit, pt, tfco2
   real(RLEN)  :: Bt, Ft, St
   real(RLEN)  :: lnk, Ks_0p, Kf_0p, deltav, deltak
-  real(RLEN)  :: tk, tk100, tk1002, tc2, invtk, dlogtk, is, is2, sqrtis
+  real(RLEN)  :: tk, tk100, tk1002, temp2, invtk, dlogtk, is, is2, sqrtis
   real(RLEN)  :: s, s2, sqrts, s15, scl 
   real(RLEN)  :: ptot, pr, pr2
   real(RLEN)  :: total2SWS, SWS2total, free2SWS, free2SWS_0p,total2SWS_0p, &
@@ -169,7 +169,7 @@ module mem_CSYS
   DATA a2 / 0.0_RLEN, 0.0_RLEN, 2.608_RLEN, -1.409_RLEN, 0.316_RLEN, -0.942_RLEN, &
             0.0_RLEN, 0.0_RLEN,-0.321_RLEN, -2.647_RLEN, -3.042_RLEN, -2.608_RLEN /
   DATA b0 /  3.08_RLEN, -1.13_RLEN, 2.84_RLEN, 5.13_RLEN, 4.53_RLEN, 3.91_RLEN, &
-            11.76_RLEN, 11.76_RLEN, 2.67_RLEN, 5.15_RLEN, 4.08_RLEN, 2.84 /
+            11.76_RLEN, 11.76_RLEN, 2.67_RLEN, 5.15_RLEN, 4.08_RLEN, 2.84_RLEN /
   DATA b1 / 0.0877_RLEN, -0.1475_RLEN, 0.0_RLEN,  0.0794_RLEN, 0.09_RLEN,  0.054_RLEN, &
             0.3692_RLEN,  0.3692_RLEN, 0.0427_RLEN, 0.09_RLEN, 0.0714_RLEN, 0.0_RLEN  /
   !DATA b2 / 12*0.0_RLEN / ! not used as it is zero
@@ -188,7 +188,7 @@ module mem_CSYS
   
   ! Absolute temperature (Kelvin) and related values
   tk     = temp - ZERO_KELVIN  !ZERO_KELVIN=-273.16; ETW is in degC; tk is in degK
-  tc2    = temp * temp
+  temp2  = temp * temp
   tk100  = tk / 100.0_RLEN
   tk1002 = tk100 * tk100
   invtk  = ONE / tk
@@ -368,7 +368,7 @@ module mem_CSYS
   ! Index: K1(1), K2(2), Kb(3), Kw(4), Ks(5), Kf(6), Kspc(7), Kspa(8),
   !           K1p(9), K2p(10), K3p(11), Ksi(12)
      do l = 1, 12
-        deltav  =  -a0(l) + a1(l)*temp + 1.0e-3_RLEN*a2(l)*tc2
+        deltav  =  -a0(l) + a1(l)*temp + 1.0e-3_RLEN*a2(l)*temp2
         deltak  = 1.0e-3_RLEN*(-b0(l) + b1(l)*temp)
         lnkpok0(l) = -deltav*invtk*pr + 0.5_RLEN*deltak*invtk*pr2
      end do
@@ -436,7 +436,7 @@ module mem_CSYS
   if ( pH < 0._RLEN ) then
      Hi = Hini_for_at(ta,tc,bt,K1,K2,Kb)
   else
-     Hi = (10.0_RLEN**(-pH)) * 1000._RLEN / rho ! (mol/L -> mol/kg)
+     Hi = 10.0_RLEN**(-pH)
   endif
 
   ! Solve for H+ using above result as the initial H+ value (mol/kg)
@@ -444,9 +444,8 @@ module mem_CSYS
                K0, K1, K2, Kb, Kw, Ks, Kf, K1p, K2p, K3p, Ksi, Hi )
   if (H < ZERO) CarbonateSystem = 1
 
-  ! Calculate pH from from H+ concentration (mol/kg -> mol/L)
-  pH = -ONE * LOG10( H * rho * PERMIL )
-
+  ! Calculate pH from from H+ concentration (mol/kg)
+  pH = -ONE * LOG10( H )
 
   ! Compute carbonate Alk (Ac) by difference: from total Alk and other Alk components
   HSO4 = St/(1.0_RLEN + Ks/(H/(1.0_RLEN + St/Ks)))
@@ -566,7 +565,7 @@ module mem_CSYS
     ! determines upper an lower bounds for the solution if required
     
     IMPLICIT NONE
-    REAL(KIND=RLEN) :: SOLVE_AT_GENERAL    ! [H+] in mol/L
+    REAL(KIND=RLEN) :: SOLVE_AT_GENERAL    ! [H+] in mol/kg
     
     ! Argument variables
     !--------------------
