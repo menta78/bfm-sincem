@@ -41,6 +41,9 @@ SUBROUTINE trc_bc_bfm ( kt, m )
    use sbc_oce,             only: ln_rnf
    use constants,           only: SEC_PER_DAY
    use print_functions
+#ifdef INCLUDE_PELFE
+   use mem_PelChem,         only: p_rDust
+#endif
  
    ! substitutions
 #  include "top_substitute.h90"
@@ -50,10 +53,12 @@ SUBROUTINE trc_bc_bfm ( kt, m )
    integer, intent(IN)     ::  m      ! BFM variable index
 
    !! * Local declarations
-   INTEGER  ::   ji, jj, jn             ! dummy loop indices
+   INTEGER  ::   ji, jj, jk, jn             ! dummy loop indices
    REAL(wp) ::   ztra, zsrau, zse3t     ! temporary scalars
    TYPE(FLD), DIMENSION(1) ::   sf_dta  ! temporary array of information on the field to read
-   REAL(wp), POINTER, DIMENSION(:,:  ) :: zsfx,field
+   REAL(wp), POINTER, DIMENSION(:,:  ) :: zsfx, field
+   REAL(wp), POINTER, DIMENSION(:,:,:) :: IronDep
+   REAL(wp) :: dustsink,  dustinp
    CHARACTER (len=25) :: charout
    !!---------------------------------------------------------------------
    !
@@ -61,6 +66,7 @@ SUBROUTINE trc_bc_bfm ( kt, m )
    !
    ! Allocate temporary workspace
    CALL wrk_alloc( jpi, jpj,      zsfx  )
+   CALL wrk_alloc( jpi, jpj, jpk, IronDep  )
 #ifdef DEBUG
    CALL wrk_alloc( jpi, jpj,      field  )
    field = 0.0_wp
@@ -68,6 +74,10 @@ SUBROUTINE trc_bc_bfm ( kt, m )
    !!----------------------------------------------------------------------
    ! initialization of density and scale factor
    zsrau = 1._wp / rau0
+#ifdef INCLUDE_PELFE
+   ! dust temporary array
+   if ( m .eq. ppN7f ) IronDep = 0._wp
+#endif
 
    ! Coupling online : 
    ! 1) constant volume: river runoff is added to the horizontal divergence (hdivn) in the subroutine sbc_rnf_div 
@@ -100,9 +110,34 @@ SUBROUTINE trc_bc_bfm ( kt, m )
              zse3t = 1. / fse3t(ji,jj,1)
              ! The units in BFM input files are 1/day
              tra(ji,jj,1,m) = tra(ji,jj,1,m) + rf_trsfac(jn) * sf_trcsbc(jn)%fnow(ji,jj,1) &
-                              * zse3t / SEC_PER_DAY 
+                              * zse3t / SEC_PER_DAY
+#ifdef INCLUDE_PELFE
+             ! Store surface flux to output in IRONDEPO
+             if ( m .eq. ppN7f ) &
+             IronDep(ji,jj,1) = rf_trsfac(jn) * sf_trcsbc(jn)%fnow(ji,jj,1) * zse3t / SEC_PER_DAY
+#endif
           END DO
        END DO
+
+#ifdef INCLUDE_PELFE
+       ! dust dissolution below the surface (Moore et al., 2008; Aumont et al.,2015)
+       if ( m .eq. ppN7f .AND. p_rDust > 0. ) then
+          ! dust sink length scale (1/m): dust assumed to be 0.01% (1/d) , sink speed p_rDust (m/d)
+          dustsink =  0.0001_wp * 1. / p_rDust
+          if (lwp) write(numout,*) " dust sink length scale : ", dustsink, p_rDust
+          DO jj = 2, jpt
+             DO ji = fs_2, fs_jpim1   ! vector opt.
+                !  dust (g/day/m2) - > (umolFe/day/m2) 
+                dustinp = 0.035 * 1.e06 / 55.85 * sf_trcsbc(jn)%fnow(ji,jj,1) 
+                DO jk = 2, jpkm1
+                   IronDep(ji,jj,jk) = dustinp * dustsink / SEC_PER_DAY * EXP( -fsdept(ji,jj,jk) / 540. )
+                   tra(ji,jj,jk,m) = tra(ji,jj,jk,m) + IronDep(ji,jj,jk)
+                END DO  
+             END DO
+          END DO
+          IRONDEPO(:) = pack(IronDep,SEAmask)
+       endif
+#endif
     END IF
 
     ! Add mass from prescribed river concentration if river values are given
@@ -132,6 +167,7 @@ SUBROUTINE trc_bc_bfm ( kt, m )
 #endif
 
    CALL wrk_dealloc( jpi, jpj,      zsfx  )       
+   CALL wrk_dealloc( jpi, jpj, jpk, IronDep  )
     IF( nn_timing == 1 )  CALL timing_stop('trc_bc_bfm')
 
    END SUBROUTINE trc_bc_bfm

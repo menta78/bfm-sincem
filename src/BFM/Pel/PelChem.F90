@@ -146,8 +146,8 @@
   fR6N7f(:)  =  p_sR6N7* eTq(  ETW(:),  p_q10R6N7)* R6f(:)
   call flux_vector( iiPel, ppR6f, ppN7f, fR6N7f(:) )
 
-  ! Scavenging to particles : Linear relaxation to the solubility (p_N7fsol)
-  fscavN7f(:) = max(ZERO,p_scavN7f*(N7f-p_N7fsol))
+  ! Scavenging to particles : Linear relaxation to the Iron Ligand concentration
+  fscavN7f(:) = max(ZERO,p_scavN7f*(N7f-p_N7fLigand))
   call flux_vector( iiPel, ppN7f, ppN7f, -fscavN7f(:) )
 
 #endif
