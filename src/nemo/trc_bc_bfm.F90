@@ -124,7 +124,6 @@ SUBROUTINE trc_bc_bfm ( kt, m )
        if ( m .eq. ppN7f .AND. p_rDust > 0. ) then
           ! dust sink length scale (1/m): dust assumed to be 0.01% (1/d) , sink speed p_rDust (m/d)
           dustsink =  0.0001_wp * 1. / p_rDust
-          if (lwp) write(numout,*) " dust sink length scale : ", dustsink, p_rDust
           DO jj = 2, jpt
              DO ji = fs_2, fs_jpim1   ! vector opt.
                 !  dust (g/day/m2) - > (umolFe/day/m2) 
