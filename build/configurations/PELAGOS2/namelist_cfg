@@ -15,6 +15,9 @@
    nn_leapy    =       0   !  Leap year calendar (1) or not (0)
    ln_rstart   = .false.   !  start from rest (F) or from a restart file (T)
    nn_istate   =       0   !  output the initial state (1) or not (0)
+   ln_mskland  = .false.   !  mask land points in NetCDF outputs (costly: + ~15%)
+   ln_cfmeta   = .false.   !  output additional data to netCDF files required for compliance with the CF metadata standard
+   ln_clobber  = .false.   !  clobber (overwrite) an existing file
 /
 !-----------------------------------------------------------------------
 &namcfg        !   parameters of the configuration

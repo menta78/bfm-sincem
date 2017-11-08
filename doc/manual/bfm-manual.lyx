@@ -3446,7 +3446,8 @@ The short-wave surface irradiance flux
 
  is obtained generally from data or from an atmospheric radiative transfer
  model.
- Three types of forcings are allowed depending on the value of 
+ Three different types of forcings can be set depending on the value of
+ 
 \family typewriter
 LightPeriodFlag
 \family default
@@ -3458,7 +3459,7 @@ Pelagic_Environment.nml
 \end_layout
 
 \begin_layout Enumerate
-Instantaneous irradiance (
+Instantaneous value (
 \family typewriter
 LightPeriodFlag=
 \family default
@@ -3490,7 +3491,8 @@ The discretized irradiance
 \begin_inset Formula $k$
 \end_inset
 
-, and three different choices are available according to the parameter 
+, and the computation of light is done according to one of the following
+ choices set with the parameter 
 \family typewriter
 LightLocationFlag
 \family default
@@ -3502,8 +3504,8 @@ Pelagic_Ecology.nml
 \end_layout
 
 \begin_layout Enumerate
-light at the upper interface 
-\begin_inset Formula $E_{PAR}=E_{PAR}^{k}$
+at the upper interface, thus 
+\begin_inset Formula $E_{PAR}=E_{PAR}^{k}\;$
 \end_inset
 
  (
@@ -3514,7 +3516,7 @@ LightLocationFlag=
 \end_layout
 
 \begin_layout Enumerate
-light in the middle of the cell as in 
+middle of the cell as in 
 \begin_inset CommandInset citation
 LatexCommand citet
 key "lazzari12"
@@ -3541,7 +3543,7 @@ E_{PAR}=E_{PAR}^{k}\exp\left(-\lambda^{k}\frac{\Delta z^{k}}{2}\right)
 \begin_layout Enumerate
 
 \lang english
-integrated light over the level depth as in 
+integrated over level depth as in 
 \begin_inset CommandInset citation
 LatexCommand citet
 key "vichi07_part1"
@@ -7115,7 +7117,7 @@ The uptake of DIN is the sum of the uptake of dissolved nitrate and ammonium
 \begin{flalign}
 \sum_{j=3,4}\left.\frac{dP_{n}}{dt}\right|_{N^{(j)}}^{upt}=\nonumber \\
  & \NSP\NSP\NSP\NSP\NSP\NSP\min\left(\left(a_{P}^{n}\frac{h_{P}^{n}}{h_{P}^{n}+N^{(4)}}N^{(3)}+a_{P}^{n}N^{(4)}\right)P_{c},\right.\nonumber \\
- & \NSP\NSP\NSP\NSP\left.n_{_{P}}^{opt}G_{P}+\nu_{P}\left(n_{_{P}}^{\max}-\frac{P_{n}}{P_{c}}\right)P_{c}\right)\label{eq:phytoplankton_upt_N}
+ & \NSP\NSP\NSP\NSP\left.n_{_{P}}^{max}G_{P}+\nu_{P}\left(n_{_{P}}^{\max}-\frac{P_{n}}{P_{c}}\right)P_{c}\right)\label{eq:phytoplankton_upt_N}
 \end{flalign}
 
 \end_inset
@@ -7197,7 +7199,7 @@ Phosphate uptake is simpler than N uptake as one single species is considered:
 \begin_layout Standard
 \begin_inset Formula 
 \begin{align}
-\left.\frac{dP_{p}}{dt}\right|_{N^{(1)}}^{upt} & =\min\left(a_{P}^{(1)}N^{(1)}P_{c},\,p_{P}^{opt}G_{P}+\right.\nonumber \\
+\left.\frac{dP_{p}}{dt}\right|_{N^{(1)}}^{upt} & =\min\left(a_{P}^{(1)}N^{(1)}P_{c},\,p_{P}^{max}G_{P}+\right.\nonumber \\
  & \left.+\nu_{P}\left(p_{P}^{\max}-\frac{P_{p}}{P_{c}}\right)P_{c}\right)\label{eq:phytoplankton_upt_P}
 \end{align}
 

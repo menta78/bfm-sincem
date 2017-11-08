@@ -302,9 +302,9 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   pe_R6 = min( p_qplc(phyto)/( qpcPPY(phyto, :)+ p_small), p_qnlc(phyto)/ &
           ( qncPPY(phyto, :)+ p_small))
-  pe_R6  =   min(  ONE,  pe_R6)
-  rr6c  =   pe_R6* sdo* phytoc
-  rr1c  =  ( ONE- pe_R6)* sdo* phytoc
+  pe_R6 = min(  ONE,  pe_R6)
+  rr6c  =     pe_R6     * sdo * phytoc
+  rr1c  = (ONE - pe_R6) * sdo * phytoc
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Respiration rate
@@ -424,15 +424,14 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Excretion of N and P to PON and POP
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-     rr6n  =  pe_R6* sdo* phyton
-     rr1n  =  sdo* phyton- rr6n
+  rr6n =     pe_R6     * sdo * phyton
+  rr1n = (ONE - pe_R6) * sdo * phyton
 
-     rr6p  =  pe_R6* sdo* phytop
-     rr1p  =  sdo* phytop- rr6p
+  rr6p =     pe_R6     * sdo * phytop
+  rr1p = (ONE - pe_R6) * sdo * phytop
 
   call quota_flux( iiPel, ppphyton, ppphyton,ppR6n, rr6n, tfluxN )  ! source/sink.n
   call quota_flux( iiPel, ppphyton, ppphyton,ppR1n, rr1n, tfluxN )  ! source/sink.n
-
 
   call quota_flux( iiPel, ppphytop, ppphytop,ppR6p, rr6p, tfluxP )  ! source/sink.p
   call quota_flux( iiPel, ppphytop, ppphytop,ppR1p, rr1p, tfluxP )  ! source/sink.p
@@ -478,7 +477,7 @@
      rumf  =   p_quf(phyto)* N7f(:)* phytoc  ! max potential uptake
      ! intracellular missing amount of Fe
      misf  =   sadap*max(ZERO,p_xqf(phyto)*p_qfcPPY(phyto)*phytoc - phytof)  
-     rupf  =   p_xqp(phyto)* run* p_qfcPPY(phyto)  ! Fe uptake based on C uptake
+     rupf  =   p_xqf(phyto)* run* p_qfcPPY(phyto)  ! Fe uptake based on C uptake
      runf  =   min(  rumf,  rupf+ misf)  ! actual uptake
      r  =   insw(runf)
      ! uptake from inorganic if shortage

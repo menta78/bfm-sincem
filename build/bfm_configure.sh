@@ -439,7 +439,7 @@ if [ ${GEN} ]; then
 
         #substitute BFM/src/nemo path in cpp according to the version
         [ ${VERBOSE} ] && echo "Changing nemo version to: \"$VER\""
-        sed -ie "s;inc.*;inc \$BFMDIR/src/nemo${VER}/bfm\.fcm;" ${NEMODIR}/NEMOGCM/CONFIG/${PRESET}/cpp_${PRESET}.fcm
+        sed -ie "s;^\s*inc.*;inc \$BFMDIR/src/nemo${VER}/bfm\.fcm;" ${NEMODIR}/NEMOGCM/CONFIG/${PRESET}/cpp_${PRESET}.fcm
 
 
         # Generate the specific bfm.fcm include file for makenemo

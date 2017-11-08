@@ -712,7 +712,8 @@ p_paMEZ(2,:)=   0.0,    1.0
 ! p_sR6N7     [1/d]            Specific remineralization rate of particulate
 ! p_sR1N7     [1/d]            Specific remineralization rate of dissolved
 ! p_scavN7f   [1/d]            Specific scavenging rate
-! p_N7fsol    [umolFe/m3]      Solubility concentration
+! p_N7fLigand [umolFe/m3]      Iron Ligand reference concentration in seawater
+! p_rDust     [m/d]            Dust sinking speed below surface
 !-------------------------------------------------------------------------!
 &PelChem_parameters
   p_q10N4N3 = 2.367
@@ -731,8 +732,9 @@ p_paMEZ(2,:)=   0.0,    1.0
   p_q10R6N7 = 1.50
     p_sR6N7 = 1.0e-02
     p_sR1N7 = 1.0e-01
-  p_scavN7f = 0.7e-04
-   p_N7fsol = 0.6
+  p_scavN7f = 0.01
+p_N7fLigand = 0.6
+    p_rDust = 2.0
 	filename_nml_conf = 'Pelagic_Environment.nml',
 /
 
