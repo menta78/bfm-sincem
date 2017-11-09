@@ -1,7 +1,7 @@
 !-----------------------------------------------------------------------
 !BOP
 !
-! !ROUTINE: pom_bfm.f
+! !ROUTINE: pom_bfm
 !
 ! !INTERFACE:
        subroutine pom_bfm_1d
@@ -13,94 +13,97 @@
 !
 !
 ! !USES:
-
-       use api_bfm
-       use Service
-       use constants,  only:SEC_PER_DAY
-       use POM
-       use Mem
-       IMPLICIT NONE
-
-! !INCLUDES:
-!       include time.h
 !
-! !INPUT PARAMETERS:
-   
+       use api_bfm,ONLY           :out_delta
+       use Service,ONLY           :ilong,savef
+       use constants,ONLY         :SEC_PER_DAY
+       use POM,ONLY               :time,time0,dti,intt
+       use global_mem, ONLY       :RLEN
+!
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+! Implicit typing is never allowed
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+!
+       IMPLICIT NONE
 !
 ! !REVISION HISTORY:
 !  Original author(s): M. Butenschoen,  M. Vichi, 
 !                      M. Zavatarelli, L. Polimene 
 !
-! !LOCAL VARIABLES:
-!----------------
-       real(RLEN) :: TT
-       save TT
-       logical ::  first
-       save first
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+! Local Variables
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+!
+!      -----MODEL TIME IN DAYS-----
+!
+       real(RLEN),save       :: TT
+!
+!      -----FLAG FOR TT INITIALISATION-----
+!
+       logical, save          ::first
        data first /.true./
-       integer :: ntime,k
-!----------------
-
-
+!
 !EOP
+!
 !-----------------------------------------------------------------------
 !BOC
-!-------------------------------------------------------
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 ! Pass physical variables into bfm
 ! compute extinction coefficients
 ! compute vertical light distribution
-!-------------------------------------------------------
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+!
        call env_forcing_pom_bfm_1d
-!       call flush(6)
-!-------------------------------------------------------
+!
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 ! calculate biological processes 
-!-------------------------------------------------------
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+!
        call EcologyDynamics
-!       call flush(6)
-!-------------------------------------------------------
-!VERTICAL DIFFUSION   and Integration of BFM state Vars    
-! SOURCE SPLITTING 
-!-------------------------------------------------------
-!      do k = 1, kb-1
-!     write(6,*) 'PO4 BEF VERTDIFF', D3state (2,k), N1p(k),D3SOURCE(2,k)
-!     enddo
-        call vertdiff_bio_1d 
-!       call flush(6)
-!-------------------------------------------------------
+!
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+! Vertical diffusion and Integration of BFM state Vars    
+! with source splitting method
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+!
+        call vdiff_SOS 
+!
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 !  leap frog integration of 2d state var's
-!-------------------------------------------------------
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+!
 #ifdef INCLUDE_BEN
-       call lf2d
-!        call flush(6)
+!
+      call lf2d
+!
 #endif
-!-------------------------------------------------------
-! update time
-!-------------------------------------------------------
-        ntime=iint
-!-------------------------------------------------------
-! Write output
-!-------------------------------------------------------
+!
+!      -----DEFINE TIME FOR BFM-----
+!
        if(first) then
+!
            TT=time-time0-(dti/SEC_PER_DAY)
            out_delta=savef
-!           TT = 0.0
-         first=.false.
+           first=.false.
+!
        endif
-          TT = TT + dti/SEC_PER_DAY
-!          write(6,*) 'TIME IN DIA', time, time0, TT
-!          call flush(6)
-       call pom_dia_bfm(time,ntime,TT)
-!         call flush(6)
-!-------------------------------------------------------
+!
+       TT = TT + dti/SEC_PER_DAY
+!
+!      -----MANAGE OUTPUT-----
+!
+       call pom_dia_bfm(intt,TT)
+!
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 ! Reset trend arrays
-!-------------------------------------------------------
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+!
        call ResetFluxes
-!         call flush(6)
+!
        return
-
+!
        end subroutine pom_bfm_1d
 
 !EOC
-!-----------------------------------------------------------------------
 
 

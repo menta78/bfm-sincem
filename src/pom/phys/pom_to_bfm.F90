@@ -1,40 +1,89 @@
 #include "INCLUDE.h"
 !
-!     PASS PHYSICAL VARIABLES TO BFM
+! !ROUTINE: Service
 !
-      subroutine pom_to_bfm
+! DESCRIPTION    
+!    This subroutine passes the physical variables to the BFM
+!
+! !INTERFACE
+   subroutine pom_to_bfm
+!
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+! Modules (use of ONLY is strongly encouraged!)
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+!
+      use global_mem,ONLY: RLEN
+!
 #ifdef NOPOINTERS
-      use mem
-#else
-      use Mem, ONLY: ETW, ESW, EIR, ESS,ERHO, ewind 
-#endif
-      use POM
-      use Service, ONLY: ISM
-      implicit none
-      real rcp,dep
-      real tauw
-      parameter (rcp=4.187E6)
-      integer :: k,ll
-!      REAL(RLEN) :: 
 !
-!     -----1D ARRAYS FOR BFM-----
+      use mem
+!
+#else
+!
+      use Mem, ONLY: ETW, ESW, EIR, ESS,ERHO,ewind,depth 
+!
+#endif
+!
+      use POM, ONLY: KB,rcp, TB, SB, RHO, H, DZ,SWRAD, WUSURF, WVSURF,WUBOT,WVBOT
+!
+      use Service, ONLY: ISM
+!
+!-------------------------------------------------------------------------!
+!
+!BOC
+!
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+! Implicit typing is never allowed
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+!
+      IMPLICIT NONE
+!
+! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!  Scalar Arguments
+! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+      real(RLEN) :: tauw,taub
+!
+!     -----LOOP COUNTER-----
+!
+      integer :: k
+!
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+! 1D ARRAYS FOR BFM
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 !
       do k = 1 , KB - 1
-             ETW(k) = tb(k)
-             ESW(k) = sb(k)
-             ERHO(k) = (rho(k)*1.E3)+1000.
-             ESS(k) = ISM(k)
-             Depth(k) = dz(k)*h   !   (G)
+!
+             ETW(k)   = tb(k)
+             ESW(k)   = sb(k)
+             ERHO(k)  = (rho(k)*1.E3_RLEN)+1.E3_RLEN
+             ESS(k)   = ISM(k)
+             Depth(k) = dz(k)*h  
+!
       end do
-!  Surface radiation in deg.C transformed in W.m-2
 !
-      EIR(1) = (-1)*SWRAD*rcp
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+! Surface radiation in deg.C transformed in W.m-2
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 !
-!    Wind approximate velocity calculation
-
-       tauw=sqrt(wusurf**2+wvsurf**2)*1.e3
-       ewind=sqrt(tauw/(1.25*.0014))
+      EIR(1) = (-1.0_RLEN)*SWRAD*rcp
+!
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+! Wind approximate velocity calculation
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+!
+      tauw=sqrt(wusurf**2+wvsurf**2)*1.e3_RLEN
+      ewind=sqrt(tauw/(1.25_RLEN*0.0014_RLEN))
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+! Bottom stress (N m/s) 
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+!
+      taub=sqrt(WUBOT**2+WVBOT**2)*1.e3_RLEN
+!
+      ETAUB = taub
 !
       return
-      end
-
+!
+      end subroutine pom_to_bfm
+!
+! EOC

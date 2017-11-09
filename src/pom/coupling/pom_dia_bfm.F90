@@ -1,90 +1,118 @@
 #include "INCLUDE.h"
 #include "cppdefs.h"
-!-----------------------------------------------------------------------
-!BOP
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  POM - Princeton Ocean Model 
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 !
-! !ROUTINE: pom_dia_bfm.F90
+! !ROUTINE: pom_dia_bfm
 !
-! !INTERFACE:
-   subroutine pom_dia_bfm(ltimed,kt,TT)
+!DESCRIPTION    
+!  This routine calculates means and writes the output in diagnostic mode
+!  writes also the restart
 !
-! !DESCRIPTION:
+! !INTERFACE
+   subroutine pom_dia_bfm(kt,TT)
 !
 ! !USES:
-   
+!
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+! Modules (use of ONLY is strongly encouraged!)
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+!   
    use global_mem, only:RLEN
    use netcdf_bfm, only: save_bfm, close_ncdf, ncid_bfm
    use netcdf_bfm, only: save_rst_bfm, ncid_rst
-   use mem
-   use api_bfm, only: out_delta,D3STATEB
+   use api_bfm, only: out_delta
    use constants,  only:SEC_PER_DAY
-   use Service, only: nitend,deltat
-
-   implicit none
+   use pom, ONLY: time, DTI,IEND
 !
-! !INPUT PARAMETERS:
-   real(RLEN),intent(in)    :: ltimed !time in days
-   integer, intent(in)      :: kt
-   real(RLEN)               :: TT
-! !LOCAL VARIABLES:
-!time in seconds
-   real(RLEN)               :: localtime 
-   integer                  :: time_to_save
-!
-!EOP
-!-----------------------------------------------------------------------
+!-------------------------------------------------------------------------!
 !BOC
-   localtime = ltimed*SEC_PER_DAY      !total seconds
-   time_to_save=nint(out_delta*SEC_PER_DAY/deltat)
-    if(kt.eq.1) then
-
-    write(6,*) 'IN POM_DIA', nitend,kt, time_to_save,localtime,ltimed, TT, deltat,out_delta
-    endif
-   !---------------------------------------------
-   ! Update means
-   !---------------------------------------------
+!
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+! Implicit typing is never allowed
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+!
+  IMPLICIT NONE
+!
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+! Implicit typing is never allowed
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+!
+!-----TIME COUNTER IN DAYS-----
+!
+   real(RLEN),intent(INOUT)    ::  TT 
+!
+!-----TIME MARCHING LOOP COUNTER-----
+!
+   integer, intent(in)      :: kt
+!
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+! Local Variables
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+!
+!  -----TIME IN SECONDS-----
+!
+   real(RLEN)               :: localtime 
+!
+!  -----SAVING FREQUENCY-----
+!
+   integer                  :: time_to_save !time in seconds
+!
+!-----------------------------------------------------------------------
+!
+!BOC
+!
+! -----TIME ELLAPSED (IN SECONDS) SINCE THE BEGINNING OF THE SIMULATION----
+!
+   localtime = time*SEC_PER_DAY   
+!
+! -----SAVING FREQUENCY IN TIME MARCHING LOOP ITERATIONS-----
+!
+   time_to_save=nint(out_delta*SEC_PER_DAY/DTI)
+!
+!  -----SUMMING UP THE FIELDS TO BE SAVED-----
+!
    call calcmean_bfm(ACCUMULATE)
-
-   !---------------------------------------------
-   ! Write diagnostic output
-   !---------------------------------------------
-   !   if ( lwp .AND. MOD( kt, nwritetrc ) == 0 ) then
-!   if ( MOD( kt, time_to_save ) == 0 ) then
-!     write(6,*) 'TT = ' , TT
-!     write(6,*) 'out_delta2 = ', out_delta
-!     if (TT .ge. out_delta)  then
-   if(TT+(deltat/SEC_PER_DAY).gt.out_delta) then
-!      write(6,*) 'pom_dia_bfm : write NetCDF passive tracer concentrations at ', kt, 'time-step'
-!      write(6,*) '~~~~~~~~~~~~ '
-      call flush(6)
+!
+!-----WRITE OUTPUT-----
+!
+   if(TT+(DTI/SEC_PER_DAY).gt.out_delta) then
+!
       call calcmean_bfm(MEAN)
       call save_bfm(localtime)
-!      TT = TT - int(TT)
-       TT = TT - nint(TT)
+!
+!     -----RESET TIME COUNTER-----
+!
+      TT = TT - nint(TT)
+!
    end if
-   !---------------------------------------------
-   ! Close the file (MAV: are we saving the last step?)
-   !---------------------------------------------
-    if ( kt >= nitend ) then
-       if(-TT.le.deltat/SEC_PER_DAY) then
-!      call save_rst_bfm(localtime)        !     (G)
-      write(6,*) 'D3STATE DOPO WRST ', D3STATE(ppP2c,1), D3STATE(ppP2c,NO_BOXES)
-      write(6,*) 'D3STATEB DOPO WRST ', D3STATEB(ppP2c,1), D3STATEB(ppP2c,NO_BOXES)
-      call flush(6)
-!      call close_ncdf(ncid_rst)
-      call close_ncdf(ncid_bfm)
-      write (6,*) 'POM_DIA: NETCDF RESTART WRITTEN, TIME--> ', ltimed,kt, nitend
-     endif
+!
+#ifndef BFM_POM
+!
+!-----WHEN RUNNING IN COUPLING WITH POM------
+!-----RESTART IS WRITTEN IN MAIN AFTER THE END-----
+!-----OF THE TIME MARCHING LOOP-----
+!----- 
+!-----WRITE RESTART-----
+!
+    if ( kt >= IEND ) then
+!
+!
+         if(-TT.le.DTI/SEC_PER_DAY) then
+!
+             call save_rst_bfm(localtime)       
+             call close_ncdf(ncid_rst)
+             call close_ncdf(ncid_bfm)
+             write (6,*) 'POM_DIA: NETCDF RESTART WRITTEN, TIME--> ', time,kt, iend,DTI,TT
+!
+        endif
+!
    endif
-
-!   !---------------------------------------------
-!   ! Reset the arrays
-!   !---------------------------------------------
-!   call ResetFluxes
+#endif
 !
    return
    end subroutine pom_dia_bfm
 
 !EOC
-
 
