@@ -90,6 +90,18 @@
 #endif
 #if defined INCLUDE_BEN
     if (allocated(D2FLUX_FUNC_BEN)) D2FLUX_FUNC_BEN(:,:) = ZERO
+#ifdef BFM_POM
+    jbotO2o(:) = ZERO
+    jbotO3c(:) = ZERO
+    jbotN1p(:) = ZERO
+    jbotN3n(:) = ZERO
+    jbotN4n(:) = ZERO
+#endif
+#endif
+
+#ifdef BFM_POM
+    jsurO2o(:) = ZERO
+    jsurO3c(:) = ZERO
 #endif
 
     ! reset surface and bottom fluxes
