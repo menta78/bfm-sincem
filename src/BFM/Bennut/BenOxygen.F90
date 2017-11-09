@@ -103,7 +103,6 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
   shiftD1m(:)  =  ( max(  p_mD1m,  D1mNew)- D1m(:))/ ONE_PER_DAY
-
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Damping the change of D1m in case of large changes
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -119,8 +118,8 @@
              write(LOGUNIT,*) "BFM Warning: BenOxygen proportion M3n(D1m)/M3n(0..D2m)=",r(1)
            endif
         end do
-     end if
      shiftD1m(:)= shiftD1m(:) * max(ZERO,min(ONE,r*2.0_RLEN));
+     end if
   end if
 
 
