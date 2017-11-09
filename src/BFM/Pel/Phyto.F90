@@ -520,6 +520,7 @@
            !  discarded with a p_tochl_relt relaxation.
            rate_Chl = rho_Chl*(sum-seo-sea-sra)*phytoc-(sdo+srs)*phytol - &
                       max(ZERO,(phytol-chl_opt))*p_tochl_relt(phyto)
+
       case (4) ! NIOZ
           ! total synthesis, only when there is net production (run > 0)
           ! The fixed loss rate due to basal respiration is introduced to have 
