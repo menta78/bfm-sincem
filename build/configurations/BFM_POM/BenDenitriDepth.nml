@@ -42,16 +42,15 @@
 !-------------------------------------------------------------------------!
 !BOC
 !
-!
-!  p_xdamping:  			# damping parameter
-!  p_pmM3n:  			# fraction of concentration nitrate at
-!  p_clM3n_D2:  			# minimum concentration below which no
+!  p_xdamping  		damping parameter
+!  p_pmM3n  	        fraction of concentration nitrate at
+!  p_clM3n_D2  	        minimum concentration below which no
 
 &BenDenitriDepth_parameters
-p_xdamping = 2.0,
-p_jlK3G4n = 0.0025,
-p_clM3n_D2 = 0.5,
-p_cmD2m = 0.295
+  p_xdamping =  2.0,
+  p_jlK3G4n  =  0.0025,
+  p_clM3n_D2 =  0.5,
+  p_cmD2m    =  0.295
 /
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 !END namelist

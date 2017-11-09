@@ -42,13 +42,11 @@
 !-------------------------------------------------------------------------!
 !BOC
 !
-!
-!        :  	 All parameter were copied from the .p-file:
-!  p_p:  	 adsorption distribution coefficeint
+!  p_p  	 adsorption distribution coefficeint
 
 &BenCO2Transport_parameters
-p_diff = 0.0001778,
-p_p = 0.0
+  p_diff =  0.0001778,
+  p_p    =  0.0
 /
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 !END namelist

@@ -242,7 +242,6 @@ end
   #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   jG2K3o        : Oxygen consumption by nitrification    : mmol O2/m2/d
   jG2K7o        : ReOxidation of Red.Equiv. in oxic layer: mmol O2/m2/d
-
   #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   # Variables in the benthic nurient model which represent the concentration
   # of the macro nutr. in the porewater of the different layers.
@@ -458,6 +457,9 @@ end
   ruPTn=P.n <- N3n+N4n: net nutrient uptake:mmoln /m3/d
   ruPTp=P.p <- N1p : net phosphate uptake : mmol P /m3/d
   exPP=(P.c->R1c+R2c+R6c): C excretion from phytoplankton :mg C/m3/d
+# GIULIA
+
+#
   ruZTc=(Z.c<-P.c+B1c+Z.c): gross secondary production:mg C/m3/d
   netZTc=(Z.c<-P.c+B1c+Z.c)-(Z.c->R1c+R6c): net secondary production:mg C/m3/d
   rrPTo=(O2o->*): pelagic respiration : mmol O2/m3/d
@@ -465,6 +467,22 @@ end
   rePTp=(N1p<-B1p+Z.p): pelagic mineralization: mmol P /m3/d
   reBn=(N4n<-B1n): bacterial mineralization : mmol N/m3/d
   ruBn=(N4n->B1n): bacterial uptake : mmol N/m3/d
+  reBp=(N1p<-B1p): bacterial mineralization : mmol P/m3/d
+  ruBp=(N1p->B1p): bacterial uptake : mmol P/m3/d
   fR2B1c=R2c->B1c: TEP uptake by bacteria: mg C/m3/d
   fP1Z4c=P1c->Z4c: diatom grazing by omniv.zooplankton: mg C/m3/d
+  fP2Z4c=P2c->Z4c: flagellates grazing by omniv.zooplankton: mg C/m3/d
+  fP3Z4c=P3c->Z4c: picophytoplankton grazing by omniv.zooplankton: mg C/m3/d
+  fP4Z4c=P4c->Z4c: large phytoplankton grazing by omniv.zooplankton: mg C/m3/d
+  fP1Z5c=P1c->Z5c: diatom grazing by microzooplankton: mg C/m3/d
+  fP2Z5c=P2c->Z5c: flagellates grazing by microzooplankton: mg C/m3/d
+  fP3Z5c=P3c->Z5c: picophytoplankton grazing by microzooplankton: mg C/m3/d
+  fP4Z5c=P4c->Z5c: large phytoplankton grazing by microzooplankton: mg C/m3/d
+  fP1Z6c=P1c->Z6c: diatom grazing by heterotrophic nanoflagellates: mg C/m3/d
+  fP2Z6c=P2c->Z6c: flagellates grazing by heterotrophic nanoflagellates: mg C/m3/d
+  fP3Z6c=P3c->Z6c: picophytoplankton grazing by heterotrophic nanoflagellates: mg C/m3/d
+  fP4Z6c=P4c->Z6c: large phytoplankton grazing by heterotrophic nanoflagellates: mg C/m3/d
+  fB1Z6c=B1c->Z6c: bacterial grazing by heterotrophic nanoflagellates: mg C/m3/d
+  fB1Z5c=B1c->Z5c: bacterial grazing by microzooplankton: mg C/m3/d
+
 end

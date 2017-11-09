@@ -43,14 +43,13 @@
 !BOC
 !
 !
-!        :  	 All parameter were copied from the .p-file:
-!  p_p:  	 adsorption distribution coefficeint
+!    p_p  	 adsorption distribution coefficeint
 
 &BenALkalinity
-p_diff =0.00058,
-p_p = 0.0
-p_qnh=1.0
-p_qoh=1.0
+  p_diff =  0.00058,
+  p_p    =  0.0
+  p_qnh  =  1.0
+  p_qoh  =  1.0
 /
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 !END namelist

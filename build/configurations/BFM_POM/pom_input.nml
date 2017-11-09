@@ -1,12 +1,25 @@
+!
+!  Define paths to data files
+!
+!  A model year has 360 days, therefore all months must have 30 days
+! 
+!  wind_input          [N/m^2]        U and V components of surface wind stress (ERA-interim)
+!  radiance_input      [W/m^2]        Net solar radiation (ERA-interim) 
+!  heat_input          [W/m^2]        Total heat flux (ERA-40) (?)
+!
+!  WTSURF = latent - sensible + thermal  
+
  &pom_input
-wind_input      =  '/nethome/gm11v07/Desktop/1D_INPUTS/MA21/windstress_mon_Mussap.da',
-surfaceS_input  =  '/nethome/gm11v07/Desktop/1D_INPUTS/MA21/Ssurf_16m.da',
-radiance_input  =  '/nethome/gm11v07/Desktop/1D_INPUTS/MA21/radiance_Mussap.da',
-ism_input       =  '/nethome/gm11v07/Desktop/1D_INPUTS/MA21/ism.da',
-Sal_input       =  '/nethome/gm11v07/Desktop/1D_INPUTS/MA21/ClimaS_MA21_16m.da',
-Temp_input      =  '/nethome/gm11v07/Desktop/1D_INPUTS/MA21/ClimaT_MA21_16m.da',
-Sprofile_input  =  '/nethome/gm11v07/Desktop/1D_INPUTS/MA21/Sinit_16m.da',
-Tprofile_input  =  '/nethome/gm11v07/Desktop/1D_INPUTS/MA21/Tinit_16m.da',
-heat_input      =  '/nethome/gm11v07/Desktop/1D_INPUTS/MA21/heatflux.da',
-surfNut_input   =  '/nethome/gm11v07/Desktop/1D_INPUTS/MA21/NutrientsARPAOGS.da'
+wind_input      =  '../../../TRST1D/MA21/windstress_mon_Mussap.da',
+surfaceS_input  =  '../../../TRST1D/MA21/Ssurf_16m.da',
+radiance_input  =  '../../../TRST1D/MA21/radiance_daily_Mussap.da',
+ism_input       =  '../../../TRST1D/MA21/ISM_16m_Mussap.da',
+Sal_input       =  '../../../TRST1D/MA21/ClimaS_MA21_16m.da',
+Temp_input      =  '../../../TRST1D/MA21/ClimaT_MA21_16m.da',
+Sprofile_input  =  '../../../TRST1D/MA21/Sinit_16m.da',
+Tprofile_input  =  '../../../TRST1D/MA21/Tinit_16m.da',
+heat_input      =  '../../../TRST1D/MA21/heatflux.da',
+surfNut_input   =  '../../../TRST1D/MA21/NutrientsARPAOGS.da',
+! restart file
+read_restart    =  './fort.70',
 /
