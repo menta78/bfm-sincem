@@ -48,7 +48,7 @@
    bio_calc     = .TRUE.
    bfm_init     = 0
    bfm_rstctl   = .FALSE.
-   bio_setup    = 3
+   bio_setup    = 2
    out_fname    = 'BFM_standalone_benthic'
    out_dir      = '.'
    out_title    = 'BFM_STANDALONE_BENTHIC'
