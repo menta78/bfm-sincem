@@ -79,7 +79,7 @@
    !---------------------------------------------
    integer          :: lon_id,lat_id,z_id,time_id
    integer          :: mask_id
-   integer          :: depth_id,ocepoint_id,surfpoint_id,botpoint_id
+   integer          :: depth_id,ocepoint_id,surfpoint_id,botpoint_id,dzdepth_id
    !---------------------------------------------
    ! Restart file ids
    !---------------------------------------------
@@ -220,6 +220,8 @@
    DEALLOCATE(dims)
    if (present(z)) &
       call check_err(NF90_DEF_VAR(ncid_bfm,'z',NF90_REAL,depth_dim,depth_id), fname)
+   if (present(dz)) &
+      call check_err(NF90_DEF_VAR(ncid_bfm,'dz',NF90_REAL,depth_dim,dzdepth_id), fname)
    if (present(column)) then
       ! in 1D case coordinate variables are real and store the depth
       call check_err(NF90_DEF_VAR( ncid_bfm, 'oceanpoint', NF90_REAL,ocepoint_dim,ocepoint_id), fname)
@@ -229,7 +231,7 @@
       call check_err(NF90_DEF_VAR( ncid_bfm, 'oceanpoint', NF90_INT,ocepoint_dim,ocepoint_id), fname)
       call check_err(NF90_DEF_VAR(ncid_bfm,'surfacepoint',NF90_INT,surfpoint_dim,surfpoint_id), fname)
       call check_err(NF90_DEF_VAR(ncid_bfm,'bottompoint',NF90_INT,botpoint_dim,botpoint_id), fname)
-   end if
+   end if   
    call check_err(NF90_DEF_VAR(ncid_bfm,'time',NF90_REAL,time_dim,time_id), fname)
    !---------------------------------------------
    ! define mask variables
@@ -252,6 +254,8 @@
    call check_err(set_attributes(ncid_bfm,lat_id,units='degrees_north'), fname)
    if (present(z)) &
       call check_err(set_attributes(ncid_bfm,depth_id,units='meters'), fname)
+   if (present(dz)) &
+      call check_err(set_attributes(ncid_bfm,dzdepth_id,units='meters'), fname)
 #ifndef NOT_STANDALONE
    call check_err(set_attributes(ncid_bfm,ocepoint_id,formula_term='water points'), fname)
    call check_err(set_attributes(ncid_bfm,ocepoint_id,compress='none'), fname)
@@ -331,7 +335,7 @@
    if (present(z)) &
       call check_err(store_data(ncid_bfm,depth_id,Z_SHAPE,NO_BOXES_Z,array=z), fname)
    if (present(dz)) &
-      call check_err(store_data(ncid_bfm,depth_id,Z_SHAPE,NO_BOXES_Z,array=dz), fname)
+      call check_err(store_data(ncid_bfm,dzdepth_id,Z_SHAPE,NO_BOXES_Z,array=dz), fname)
    if (present(oceanpoint)) &
       call check_err(store_data(ncid_bfm,ocepoint_id,G_SHAPE,NO_BOXES,iarray=oceanpoint), fname)
    if (present(bottompoint)) &
@@ -489,7 +493,7 @@
    call check_err(NF90_DEF_VAR(ncid_rst,'D2STATE_ICE_NAME',NF90_CHAR,(/chars_rdim, d2vars_rdim_ice/),d2state_name_rid_ice), fname)
    call check_err(NF90_DEF_VAR(ncid_rst,'D2STATE_ICE_UNITS',NF90_CHAR,(/chars_rdim, d2vars_rdim_ice/),d2state_units_rid_ice), fname)
    call check_err(NF90_DEF_VAR(ncid_rst,'D2STATE_ICE_LONG',NF90_CHAR,(/chars_rdim, d2vars_rdim_ice/),d2state_long_rid_ice), fname)
-#ifdef BFM_POM 
+#ifdef BFM_POM
    call check_err(NF90_DEF_VAR(ncid_rst,'D2STATEB_ICE',NF90_DOUBLE,dims,d2stateb_rid_ice), fname)
    if (nc_compres) call check_err(NF90_DEF_VAR_DEFLATE(ncid_rst,d2stateb_rid_ice,nc_shuffle,nc_deflate,nc_defllev))
 #endif
@@ -713,7 +717,7 @@ end subroutine init_netcdf_rst_bfm
 #ifdef INCLUDE_PELCO2
      call check_err(NF90_PUT_VAR(ncid_rst,ph_rid,D3DIAGNOS(pppH,:),start=(/1/),count=(/NO_BOXES/)), restfile)
 #endif
-#ifdef BFM_POM 
+#ifdef BFM_POM
      call check_err(NF90_PUT_VAR(ncid_rst,d3stateb_rid,D3STATEB(:,:),start,edges), restfile)
 #endif
 
