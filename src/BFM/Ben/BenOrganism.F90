@@ -39,9 +39,9 @@
 
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! The following vector functions are used: eTq, eramp, MM, PartQ
+  ! The following vector functions are used: eTq, eramp, MM, PartQ, MM_power
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  use mem_globalfun,   ONLY: eTq, eramp, MM, PartQ
+  use mem_globalfun,   ONLY: eTq, eramp, MM, PartQ, MM_power
 
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -148,7 +148,9 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
   et  =   eTq(  ETW_Ben(:),  p_q10(y))
-  eo  =   eramp( D1m(:),  p_sdm(y))
+
+  ! Same formulation as in Filter Feeders
+  eo  =   MM_power(  max(p_small,O2o_Ben(:)),  p_clO2o,3)
 
   ! As alternative the following function can be used
   ! eo = MM(pow(O2.o, 3.0), p_chdo);
@@ -347,12 +349,11 @@
   call flux_vector(iiBen, ppG2o,ppG2o,-( rrc/ MW_C))
   rtyc  =   rtyc- rrc
 
-
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Calculation of mortality
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-  sm  =   p_sd(y)* et !+ (1.0-eO) * 0.1
+  sm  =   p_sd(y)* et + (1.0-eO) * p_sdo(y)
 
   rq6c  =   yc* sm
   rq6n  =   yn* sm
@@ -395,7 +396,6 @@
     rep  =   rtyp- rtyc* p_qpcBOS(y)
   end where
 
-
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Correction for cases where initial conditions deviate strongly from
   ! Redfield C:N:P. In this way the C:N:P does not become too extreme
@@ -424,7 +424,6 @@
   rrBTo(:)  =   rrBTo(:)+ rrc/ MW_C
   reBTn(:)  =   reBTn(:)+ ren
   reBTp(:)  =   reBTp(:)+ rep
-
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Assign organism-dependent parameters
