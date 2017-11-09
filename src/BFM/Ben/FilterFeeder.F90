@@ -34,7 +34,7 @@
     jbotR6p, jbotR6s, jPIY3c, jZIY3c, jRIY3c, jRIY3n, jRIY3p, jRIY3s, ETW_Ben, &
     iiPhytoPlankton, PI_Benc, PI_Benn, PI_Benp, PI_Bens, sediPPY_Ben, sediR6_Ben, & 
     ZI_Fc, RI_Fc, ZI_Fn, ZI_Fp, RI_Fn, RI_Fp, RI_Fs, ppG3c, &
-    NO_BOXES_XY, Depth_ben, iiBen, iiPel, flux_vector, jbotO2o,jbotN1p,jbotN4n
+    NO_BOXES_XY, Depth_ben, iiBen, iiPel, flux, flux_vector, jbotO2o,jbotN1p,jbotN4n
 #ifdef INCLUDE_BENCO2
   use mem, ONLY: jbotO3c
 #endif
@@ -83,7 +83,8 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Local Variables
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  integer  :: i
+  integer    :: i
+  integer    :: kbot
   real(RLEN) :: clu
   real(RLEN),dimension(NO_BOXES_XY)  :: corr
   real(RLEN),dimension(NO_BOXES_XY)  :: fdepth
@@ -162,7 +163,6 @@
   real(RLEN),dimension(NO_BOXES_XY)  :: netto
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Physiological temperature response
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -186,6 +186,10 @@
      r =  PI_Benc(i,:) * MM( PI_Benc(i,:),  clu)
      call CorrectConcNearBed(Depth_Ben(:), sediPPY_Ben(i,:), p_height, & 
                                     p_max, p_vum*et*Y3c(:), corr)
+#ifdef BFM_POM
+     corr=ONE
+#endif
+
      food_PIc(i,:)=r*corr*p_PI
      food_PT(:)  =   food_PT(:)+ food_PIc(i,:)
   enddo
@@ -205,6 +209,11 @@
   r=   RI_Fc(:)* MM( RI_Fc(:),  clu)
   call CorrectConcNearBed(Depth_Ben(:), sediR6_Ben(:), p_height, & 
                                     p_max, p_vum*et*Y3c(:), corr)
+
+#ifdef BFM_POM
+  corr=ONE
+#endif
+
   RTc=r*corr
   food_RI=RTc*p_R6
   food  =   food+ food_RI
@@ -631,6 +640,27 @@
     jbotR6p(:)  =   jbotR6p(:)- reR6p
 
   endif
+
+#ifdef BFM_POM
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  !                      Zav & Giulia - February 2016
+  !
+  ! With BFM-POM 1D and the benthic compartment (> than simple benthic return), 
+  ! you need to add to the benthic-pelagic flux sedimentation from the filter
+  ! feeders (only). The other sedimentation is calculated in the physics.
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  do BoxNumberXY = 1,NO_BOXES_XY
+
+     kbot = BOTindices(BoxNumberXY)
+
+     call flux(kbot, iiPel, ppR6c, ppR6c, ( -jRIY3c(BoxNumberXY)/ Depth(kbot)) )
+     call flux(kbot, iiPel, ppR6c, ppR6c, ( -jRIY3n(BoxNumberXY)/ Depth(kbot)) )
+     call flux(kbot, iiPel, ppR6c, ppR6c, ( -jRIY3p(BoxNumberXY)/ Depth(kbot)) )
+     call flux(kbot, iiPel, ppR6s, ppR6s, ( -jRIY3s(BoxNumberXY)/ Depth(kbot)) )
+    
+  end do
+#endif
+
 #endif
 
   end subroutine FilterFeederDynamics
