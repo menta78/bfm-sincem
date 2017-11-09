@@ -34,13 +34,16 @@
 #ifdef NOPOINTERS
   use mem
 #else
-  use mem,  ONLY: G2o, K6r, K1p, K11p, K4n, K14n, Q6s, D1m, D2m
+  use mem,  ONLY: G2o, K6r, K1p, K11p, K4n, K14n, Q6s, D1m, D2m, N1p, N4n, Depth
   use mem, ONLY: ppG2o, ppK6r, ppK1p, ppK11p, ppK4n, ppK14n, ppQ6s, &
     ppD1m, ppD2m, jbotN3n, jbotN4n, jG2K7o, jbotN1p, jbotN5s, NO_BOXES_XY, iiBen, &
     iiPel, flux_vector
 #endif
   use mem_Param,  ONLY: p_qro, p_d_tot
   use mem_BenthicReturn2
+#ifdef BFM_POM
+  use POM, ONLY: KB
+#endif
 !  
 !
 ! !AUTHORS
@@ -81,22 +84,31 @@
   ! Local Variables
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   real(RLEN),dimension(NO_BOXES_XY)  :: rate
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Oxygen consumption in the sediments
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   rate = p_reminO2* max( ZERO, - G2o(:)/ D1m(:)+ K6r(:)/ p_qro/( &
-    p_d_tot- D1m(:)))* D1m(:)
+  p_d_tot- D1m(:)))* D1m(:)
   call flux_vector( iiBen, ppG2o,ppG2o,-( rate) )
   call flux_vector( iiBen, ppK6r,ppK6r,-( rate* p_qro) )
+  ! ReOxidation of Red.Equiv. in oxic layer
   jG2K7o(:)  =   rate
 
   !----------------------------------------------------------------------
   ! Phosphorus remineralization in the sediments
   !----------------------------------------------------------------------
+  ! rate is in mmol/m2 d !
+#ifdef BFM_POM
+  rate = p_reminN1*(K1p(:) - N1p(kb-1)*Depth(kb-1))
+#else
   rate  =   p_reminN1* K1p(:)
+#endif
+  jbotN1p(:) = rate 
+  !print*,'jbotN1p after rate',jbotN1p
+  !print *,'K1p(:),Depth(kb-1), N1p(kb-1)',K1p(:),Depth(kb-1), N1p(kb-1)
   ! jbotN1p is used in BenPelCoup to define the pelagic flux
   call flux_vector( iiBen, ppK1p,ppK1p,-( rate) )
-  jbotN1p(:)  =   rate
   rate  =   p_K11K1p* K11p(:)
   call flux_vector( iiBen, ppK11p,ppK1p, rate )
   ! K21.p is not used in this model version
@@ -104,13 +116,20 @@
   !----------------------------------------------------------------------
   ! Nitrogen remineralization in the sediments
   !----------------------------------------------------------------------
+  ! rate is in mmol/m2 d !
+#ifdef BFM_POM
+  rate = p_reminN4*(K4n(:) - N4n(kb-1)*Depth(kb-1))
+#else
   rate  =   p_reminN4* K4n(:)
+#endif
   ! K3.n is not used in this model version
   jbotN3n(:)  =   rate* p_pQIN3
   jbotN4n(:)  =   rate*( ONE - p_pQIN3)
+  !
   ! jbotN3n is used in BenPelCoup to define the pelagic flux
   ! jbotN4n is used in BenPelCoup to define the pelagic flux
-  call flux_vector( iiBen, ppK4n,ppK4n,-( jbotN3n(:)+ jbotN4n(:)) )
+  ! call flux_vector( iiBen, ppK4n,ppK4n,-( jbotN3n(:)+ jbotN4n(:)) ) - original
+  call flux_vector( iiBen, ppK4n,ppK4n,-rate )
   rate  =   p_K14K4n* K14n(:)
   call flux_vector( iiBen, ppK14n,ppK4n, rate )
 
