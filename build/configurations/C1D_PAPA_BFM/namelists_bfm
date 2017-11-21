@@ -734,7 +734,7 @@ p_paMEZ(2,:)=   0.0,    1.0
     p_sR1N7 = 1.0e-01
   p_scavN7f = 0.01
 p_N7fLigand = 0.6
-    p_rDust = 2.0
+    p_rDust = 1.0
 	filename_nml_conf = 'Pelagic_Environment.nml',
 /
 

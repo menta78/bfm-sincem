@@ -67,17 +67,10 @@ SUBROUTINE trc_bc_bfm ( kt, m )
    ! Allocate temporary workspace
    CALL wrk_alloc( jpi, jpj,      zsfx  )
    CALL wrk_alloc( jpi, jpj, jpk, IronDep  )
-#ifdef DEBUG
-   CALL wrk_alloc( jpi, jpj,      field  )
-   field = 0.0_wp
-#endif
+   !
    !!----------------------------------------------------------------------
    ! initialization of density and scale factor
    zsrau = 1._wp / rau0
-#ifdef INCLUDE_PELFE
-   ! dust temporary array
-   if ( m .eq. ppN7f ) IronDep = 0._wp
-#endif
 
    ! Coupling online : 
    ! 1) constant volume: river runoff is added to the horizontal divergence (hdivn) in the subroutine sbc_rnf_div 
@@ -101,69 +94,56 @@ SUBROUTINE trc_bc_bfm ( kt, m )
            tra(ji,jj,1,m) = tra(ji,jj,1,m) + ztra
       END DO
    END DO
-
-    ! read and add surface input flux if needed
-    IF (ln_trc_sbc(m)) THEN
-       jn = n_trc_indsbc(m)
-       DO jj = 2, jpj
-          DO ji = fs_2, fs_jpim1   ! vector opt.
-             zse3t = 1. / fse3t(ji,jj,1)
-             ! The units in BFM input files are 1/day
-             tra(ji,jj,1,m) = tra(ji,jj,1,m) + rf_trsfac(jn) * sf_trcsbc(jn)%fnow(ji,jj,1) &
-                              * zse3t / SEC_PER_DAY
-#ifdef INCLUDE_PELFE
-             ! Store surface flux to output in IRONDEPO
-             if ( m .eq. ppN7f ) &
-             IronDep(ji,jj,1) = rf_trsfac(jn) * sf_trcsbc(jn)%fnow(ji,jj,1) * zse3t / SEC_PER_DAY
-#endif
-          END DO
-       END DO
+ 
+   ! read and add surface input flux if needed
+   IF (ln_trc_sbc(m)) THEN
+      jn = n_trc_indsbc(m)
+      DO jj = 2, jpj
+         DO ji = fs_2, fs_jpim1   ! vector opt.
+            zse3t = 1. /  ( fse3t(ji,jj,1) * SEC_PER_DAY )
+            ! The units in BFM input files are 1/day
+            tra(ji,jj,1,m) = tra(ji,jj,1,m) + rf_trsfac(jn) * sf_trcsbc(jn)%fnow(ji,jj,1) * zse3t
+         END DO
+      END DO
+      ! store surface fluxes for BFM diagnostics
+      PELSURFACE(m,:) = pack( rf_trsfac(jn) * sf_trcsbc(jn)%fnow(:,:,1) , SEAmask(:,:,1))
 
 #ifdef INCLUDE_PELFE
-       ! dust dissolution below the surface (Moore et al., 2008; Aumont et al.,2015)
-       if ( m .eq. ppN7f .AND. p_rDust > 0. ) then
-          ! dust sink length scale (1/m): dust assumed to be 0.01% (1/d) , sink speed p_rDust (m/d)
-          dustsink =  0.0001_wp * 1. / p_rDust
-          DO jj = 2, jpt
-             DO ji = fs_2, fs_jpim1   ! vector opt.
-                !  dust (g/day/m2) - > (umolFe/day/m2) 
-                dustinp = 0.035 * 1.e06 / 55.85 * sf_trcsbc(jn)%fnow(ji,jj,1) 
-                DO jk = 2, jpkm1
-                   IronDep(ji,jj,jk) = dustinp * dustsink / SEC_PER_DAY * EXP( -fsdept(ji,jj,jk) / 540. )
-                   tra(ji,jj,jk,m) = tra(ji,jj,jk,m) + IronDep(ji,jj,jk)
-                END DO  
-             END DO
-          END DO
-          IRONDEPO(:) = pack(IronDep,SEAmask)
-       endif
+      ! dust dissolution below the surface (Moore et al., 2008; Aumont et al.,2015)
+      if ( m .eq. ppN7f .AND. p_rDust > 0. ) then
+         IronDep = 0._wp
+         ! dust sink length scale (1/m): dust assumed to be 0.01% (1/d) , sink speed p_rDust (m/d)
+         dustsink =  0.0001_wp * 1. / p_rDust
+         DO jj = 2, jpj
+            DO ji = fs_2, fs_jpim1   ! vector opt.
+               !  dust (g/day/m2) - > (umolFe/day/m2) 
+               dustinp = 0.035 * 1.e06 / 55.85 * sf_trcsbc(jn)%fnow(ji,jj,1) 
+               DO jk = 2, jpkm1
+                  IronDep(ji,jj,jk) = dustinp * dustsink / SEC_PER_DAY * EXP( -fsdept(ji,jj,jk) / 540. )
+                  tra(ji,jj,jk,m) = tra(ji,jj,jk,m) + IronDep(ji,jj,jk)
+               END DO  
+            END DO
+         END DO
+         IRONDEPO(:) = pack(IronDep,SEAmask)
+      endif
 #endif
-    END IF
-
-    ! Add mass from prescribed river concentration if river values are given
-    ! An istantaneous mixing in the cell volume is assumed, the time unit of BFM input files must be 1/day
-    IF (ln_rnf .AND. ln_trc_cbc(m)) THEN 
-       jn = n_trc_indcbc(m)
-        DO jj = 2, jpj
-           DO ji = fs_2, fs_jpim1   ! vector opt.
-              zse3t = 1. / (e1t(ji,jj)*e2t(ji,jj)*fse3t(ji,jj,1))
-              ztra = rn_rfact * rf_trcfac(jn) * sf_trccbc(jn)%fnow(ji,jj,1) * zse3t / SEC_PER_DAY
-              tra(ji,jj,1,m) = tra(ji,jj,1,m) + ztra
-#ifdef DEBUG
-              field(ji,jj) = ztra
-#endif
-           END DO
-        END DO
-    END IF
-
-#ifdef DEBUG
-    charout = TRIM( var_names(stPelStateS+m-1) )
-    WRITE(LOGUNIT,*) ''//charout//' trends in trc_sbc'
-    WRITE(LOGUNIT,*)
-    WRITE(LOGUNIT,*)'  level = 1'
-    CALL prxy( LOGUNIT, 'trend at level = 1',field(:,:), jpi, 1, jpj, 1, ZERO)
-    CALL prxy( LOGUNIT, 'trn at level = 1',trn(:,:,1,m), jpi, 1, jpj, 1, ZERO)
-    CALL wrk_dealloc( jpi, jpj,      field  )       
-#endif
+   END IF
+   !
+   ! Add mass from prescribed river concentration if river values are given
+   ! An istantaneous mixing in the cell volume is assumed, the time unit of BFM input files must be 1/day
+   zsfx = 0._wp
+   IF (ln_rnf .AND. ln_trc_cbc(m)) THEN 
+      jn = n_trc_indcbc(m)
+      DO jj = 2, jpj
+         DO ji = fs_2, fs_jpim1   ! vector opt.
+            zse3t = 1. / (e1e2t(ji,jj)*fse3t(ji,jj,1) * SEC_PER_DAY)
+            zsfx(ji,jj) = rn_rfact * rf_trcfac(jn) * sf_trccbc(jn)%fnow(ji,jj,1)
+            tra(ji,jj,1,m) = tra(ji,jj,1,m) + zsfx(ji,jj) * zse3t
+         END DO
+      END DO
+      ! store surface fluxes for BFM diagnostics
+      PELRIVER(m,:) = pack( zsfx(:,:) / e1e2t(:,:) , SEAmask(:,:,1))
+   END IF
 
    CALL wrk_dealloc( jpi, jpj,      zsfx  )       
    CALL wrk_dealloc( jpi, jpj, jpk, IronDep  )
