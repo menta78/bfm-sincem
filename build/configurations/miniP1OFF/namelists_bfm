@@ -194,6 +194,8 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
    InitVar(N1p)%cbc  = .true.,
    InitVar(N3n)%init = 2,
    InitVar(N3n)%cbc  = .true.,
+   InitVar(N3n)%sbc  = .true.,   
+   InitVar(N4n)%sbc  = .true.,  
    InitVar(N5s)%init = 2,
    InitVar(N5s)%cbc  = .true.,
    InitVar(N7f)%init = 2,
@@ -349,8 +351,8 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
        p_pu_ra = 0.6
      p_pu_ra_o = 0.2
          p_srs = 0.01
-      p_qncPBA = 0.0167
-      p_qpcPBA = 0.00185
+      p_qncPBA = 0.0126
+      p_qpcPBA = 0.7862e-3
         p_qlnc = 0.0167
         p_qlpc = 0.00185
          p_qun = 0.0
@@ -465,11 +467,11 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
         p_lN4 = 1.0,    1.0
        p_qnlc = 4.193e-3,4.193e-3
      p_qncPPY = 1.26e-2,1.26e-2
-        p_xqn = 2.0,    1.0
+        p_xqn = 1.25,    1.25
         p_qup = 0.025,  0.025
        p_qplc = 1.80e-4,1.80e-4
      p_qpcPPY = 7.86e-4,7.86e-4
-        p_xqp = 2.0,    1.0
+        p_xqp = 1.25,    1.25
    p_switchSi = 1,      0
        p_chPs = 1.0,    0.0
     p_Contois = 0.0,    0.0
@@ -482,7 +484,7 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
   p_switchChl = 1,      1
       p_sdchl = 0.2,    0.2
   p_alpha_chl = 1.38e-5, 0.46e-5
-     p_qlcPPY = 0.025,  0.015
+     p_qlcPPY = 0.035,  0.015
     p_epsChla = 0.03,   0.03
     p_EpEk_or = 0.0,    0.0
  p_tochl_relt = 0.0,    0.0
@@ -499,7 +501,7 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
 !                  P1      P2 
        p_qflc = 0.25e-3, 0.1e-3 
      p_qfcPPY = 0.5e-3,  0.3e-3
-        p_xqf = 1.0,     1.5
+        p_xqf = 1.0,     1.0
         p_quf = 2.0e-4,  2.0e-4
 	filename_nml_conf = 'Pelagic_Ecology.nml',
 /
@@ -582,8 +584,8 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
       p_chuc =  20.0
    p_minfood =  20.0
    p_pecaco3 =  0.5
-    p_qpcMIZ =  1.85d-3
-    p_qncMIZ =  1.67d-2
+    p_qpcMIZ =  0.7862e-3
+    p_qncMIZ =  0.0126
 ! Food matrix parameters: take care of the notation
 !               Z5
      p_paPBA =  0.2
@@ -634,8 +636,8 @@ p_paMIZ(1,:) =  0.2
         p_sd =  0.01
        p_sds =  2.0
    p_pecaco3 =  0.75
-    p_qpcMEZ =  1.67d-3
-    p_qncMEZ =  0.015
+    p_qpcMEZ =  0.7862e-3
+    p_qncMEZ =  0.0126
      p_clO2o =  30.0
 ! Food matrix parameters: take care of the notation
 !               P1      P2
@@ -646,7 +648,7 @@ p_paPPY(1,:) =  1.0,    0.0
 p_paMIZ(1,:)=   0.5
 !               Z4
 !       Z4
-p_paMEZ(1,:)=   1.0
+p_paMEZ(1,:)=   0.5
 	filename_nml_conf = 'Pelagic_Ecology.nml',
 /
 
@@ -822,6 +824,8 @@ p_paMEZ(1,:)=   1.0
 !   nn_trczdf_exp    number of sub-timestep for ln_trczdfexp=T
 !-------------------------------------------------------------------------!
 &namtrc_zdf        
+    ln_trczdf_exp  =  .false.
+    nn_trczdf_exp  =  3
         filename_nml_conf = 'namelist_top_cfg',
 /
 
@@ -918,9 +922,11 @@ p_paMEZ(1,:)=   1.0
 !              !             !  (if <0 mon)   !   name   !  (logical)   ! (T/F)   ! 'monthly'  ! filename ! pairing  | mask
 !-----------------------------------------------------------------------
 &namtrc_bc
-   sn_trcsbc(N3n)  = 'dummy.nc',                 -1     ,  'ndep'   ,  .false. , .true.  , 'yearly'   , '', '', ''
+   sn_trcsbc(N3n)  = 'ORCA1_ndep_1995-2016_clim', -1    ,  'NOy'   ,  .false. , .true.  , 'yearly'   , 'ORCA1_ndep_input4MIPs_weights_bicubic', '', ''
+   sn_trcsbc(N4n)  = 'ORCA1_ndep_1995-2016_clim', -1    ,  'NHx'   ,  .false. , .true.  , 'yearly'   , 'ORCA1_ndep_input4MIPs_weights_bicubic', '', ''
    sn_trcsbc(N7f)  = 'ORCA1_ORCA1_FEDEP_INCA_V9', -1    , 'fedep'   ,  .false. , .true.  , 'yearly'   , '', '', ''
-   rn_trsfac(N3n)  = 1.0
+   rn_trsfac(N3n)  =  6171428571.42857                          
+   rn_trsfac(N4n)  =  6171428571.42857 
    rn_trsfac(N7f)  =  2.0e-02        ! umol/m2/day, dissolution fraction 2%
    sn_trccbc(N1p)  =  'ORCA1_GNEWS_RIVER_annual'  -12  'RIVERDIP'  .false.  .true.  'yearly'  ''  ''  ''
    sn_trccbc(N3n)  =  'ORCA1_GNEWS_RIVER_annual'  -12  'RIVERDIN'  .false.  .true.  'yearly'  ''  ''  ''

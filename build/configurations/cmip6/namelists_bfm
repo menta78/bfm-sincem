@@ -194,6 +194,8 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
    InitVar(N1p)%cbc  = .true.,
    InitVar(N3n)%init = 2,
    InitVar(N3n)%cbc  = .true.,
+   InitVar(N3n)%sbc  = .true.,   
+   InitVar(N4n)%sbc  = .true.,  
    InitVar(N5s)%init = 2,
    InitVar(N5s)%cbc  = .true.,
    InitVar(N7f)%init = 2,
@@ -349,8 +351,8 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
        p_pu_ra = 0.6
      p_pu_ra_o = 0.2
          p_srs = 0.01
-      p_qncPBA = 0.0167
-      p_qpcPBA = 0.00185
+      p_qncPBA = 0.0126
+      p_qpcPBA = 0.7862e-3
         p_qlnc = 0.0167
         p_qlpc = 0.00185
          p_qun = 0.0
@@ -465,11 +467,11 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
         p_lN4 = 1.0,    1.0
        p_qnlc = 4.193e-3,4.193e-3
      p_qncPPY = 1.26e-2,1.26e-2
-        p_xqn = 2.0,    1.0
+        p_xqn = 1.25,    1.25
         p_qup = 0.025,  0.025
        p_qplc = 1.80e-4,1.80e-4
      p_qpcPPY = 7.86e-4,7.86e-4
-        p_xqp = 2.0,    1.0
+        p_xqp = 1.25,    1.25
    p_switchSi = 1,      0
        p_chPs = 1.0,    0.0
     p_Contois = 0.0,    0.0
@@ -482,7 +484,7 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
   p_switchChl = 1,      1
       p_sdchl = 0.2,    0.2
   p_alpha_chl = 1.38e-5, 0.46e-5
-     p_qlcPPY = 0.025,  0.015
+     p_qlcPPY = 0.035,  0.015
     p_epsChla = 0.03,   0.03
     p_EpEk_or = 0.0,    0.0
  p_tochl_relt = 0.0,    0.0
@@ -499,7 +501,7 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
 !                  P1      P2 
        p_qflc = 0.25e-3, 0.1e-3 
      p_qfcPPY = 0.5e-3,  0.3e-3
-        p_xqf = 1.0,     1.5
+        p_xqf = 1.0,     1.0
         p_quf = 2.0e-4,  2.0e-4
 	filename_nml_conf = 'Pelagic_Ecology.nml',
 /
@@ -533,7 +535,7 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
 &PAR_parameters
   LightPeriodFlag    =  1
   LightLocationFlag  =  3
-  ChlAttenFlag       =  1
+  ChlAttenFlag       =  2
   p_PAR        =  0.40
   p_eps0       =  0.0435
   p_epsIR      =  2.857
@@ -582,8 +584,8 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
       p_chuc =  20.0
    p_minfood =  20.0
    p_pecaco3 =  0.5
-    p_qpcMIZ =  1.85d-3
-    p_qncMIZ =  1.67d-2
+    p_qpcMIZ =  0.7862e-3
+    p_qncMIZ =  0.0126
 ! Food matrix parameters: take care of the notation
 !               Z5
      p_paPBA =  0.2
@@ -634,8 +636,8 @@ p_paMIZ(1,:) =  0.2
         p_sd =  0.01
        p_sds =  2.0
    p_pecaco3 =  0.75
-    p_qpcMEZ =  1.67d-3
-    p_qncMEZ =  0.015
+    p_qpcMEZ =  0.7862e-3
+    p_qncMEZ =  0.0126
      p_clO2o =  30.0
 ! Food matrix parameters: take care of the notation
 !               P1      P2
@@ -646,7 +648,7 @@ p_paPPY(1,:) =  1.0,    0.0
 p_paMIZ(1,:)=   0.5
 !               Z4
 !       Z4
-p_paMEZ(1,:)=   1.0
+p_paMEZ(1,:)=   0.5
 	filename_nml_conf = 'Pelagic_Ecology.nml',
 /
 
@@ -673,7 +675,8 @@ p_paMEZ(1,:)=   1.0
 ! p_sR6N7     [1/d]            Specific remineralization rate of particulate
 ! p_sR1N7     [1/d]            Specific remineralization rate of dissolved
 ! p_scavN7f   [1/d]            Specific scavenging rate
-! p_N7fsol    [umolFe/m3]      Solubility concentration
+! p_N7fLigand [umolFe/m3]      Iron Ligand reference concentration in seawater
+! p_rDust     [m/d]            Dust sinking speed below surface
 !-------------------------------------------------------------------------!
 &PelChem_parameters
   p_q10N4N3 = 2.367
@@ -684,7 +687,7 @@ p_paMEZ(1,:)=   1.0
     p_clN6r = 1.0
      p_rPAo = 1.0
   p_q10R6N5 = 1.49
-    p_sR6N5 = 0.02
+    p_sR6N5 = 0.01
 	filename_nml_conf = 'Pelagic_Environment.nml',
 /
 
@@ -692,8 +695,9 @@ p_paMEZ(1,:)=   1.0
   p_q10R6N7 = 1.50
     p_sR6N7 = 1.0e-02
     p_sR1N7 = 1.0e-01
-  p_scavN7f = 0.7e-04
-   p_N7fsol = 0.6
+  p_scavN7f = 0.01
+p_N7fLigand = 0.6
+    p_rDust = 2.0
 	filename_nml_conf = 'Pelagic_Environment.nml',
 /
 
@@ -920,10 +924,12 @@ p_paMEZ(1,:)=   1.0
 !              !             !  (if <0 mon)   !   name   !  (logical)   ! (T/F)   ! 'monthly'  ! filename ! pairing  | mask
 !-----------------------------------------------------------------------
 &namtrc_bc
-   sn_trcsbc(N3n)  =  'dummy.nc'       , -1     ,  'ndep'   ,  .false. , .true.  , 'yearly'   , '', '', ''
-   sn_trcsbc(N7f)  =  'IRON_DEPOSITION', -1     , 'fedep'   ,  .false. , .true.  , 'yearly'   , '', '', ''
-   rn_trsfac(N3n)  =  1.0
-   rn_trsfac(N7f)  =  2.0e-02        ! umol/m2/day, dissolution fraction 2%
+   sn_trcsbc(N3n)  =  'N_DEPOSITION'     , -1     ,  'NOy'   ,  .false. , .true.  , 'yearly'   , 'ndep_weight', '', ''
+   sn_trcsbc(N4n)  =  'N_DEPOSITION'     , -1     ,  'NHx'   ,  .false. , .true.  , 'yearly'   , 'ndep_weight', '', ''
+   sn_trcsbc(N7f)  =  'IRON_DEPOSITION'  , -1     ,  'dust'  ,  .false. , .true.  , 'yearly'   , ''           , '', ''
+   rn_trsfac(N3n)  =  6171428571.42857                          
+   rn_trsfac(N4n)  =  6171428571.42857 
+   rn_trsfac(N7f)  =  12.53357207        != Solub(0.02) X FeinDust(0.035) X g->ug (1e6) / Fe g->mol (55.85)
    sn_trccbc(N1p)  =  'RIVER_LOADS'  -12  'RIVERDIP'  .false.  .true.  'yearly'  ''  ''  ''
    sn_trccbc(N3n)  =  'RIVER_LOADS'  -12  'RIVERDIN'  .false.  .true.  'yearly'  ''  ''  ''
    sn_trccbc(N5s)  =  'RIVER_LOADS'  -12  'RIVERDSI'  .false.  .true.  'yearly'  ''  ''  ''
