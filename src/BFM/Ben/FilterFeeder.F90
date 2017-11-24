@@ -425,7 +425,7 @@
   reR6c  =   RI_Fc(:)* se_uQ6* choice
   reR6n  =   RI_Fn(:)* se_uQ6* choice *eNC
   reR6p  =   RI_Fp(:)* se_uQ6* choice *ePC
-
+  reR6s  =   ZERO 
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Benthic Detritus
