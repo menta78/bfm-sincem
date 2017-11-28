@@ -72,12 +72,6 @@ p_reminQ6n = 0.005,
 p_reminQ6p = 0.005,
 p_reminQ6s = 0.005,
 p_pQIN3 = 0.1
-!
-p_reminQ6c_imp = 2.6
-p_reminQ6n_N3n_imp = 0.1
-p_reminQ6n_N4n_imp = 1.0
-p_reminQ6s_imp = 0.75
-p_reminQ6p_imp = 0.007
 /
 
 
