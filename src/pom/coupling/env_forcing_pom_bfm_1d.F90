@@ -1,52 +1,86 @@
 #include "INCLUDE.h"
-
-!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-! MODEL  POM - Princeton Ocean Model 
-!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 !
+! **************************************************************
+! **************************************************************
+! **                                                          **
+! ** ONE-DIMENSIONAL BFM-POM  MODELING SYSTEM (BFM-POM1D)     **
+! **                                                          **
+! ** The modeling system originate from the direct on-line    **
+! ** coupling of the 1D Version of the Princeton Ocean model  **
+! ** "POM" and the Biological Flux Model "BFM".               **
+! **                                                          **
+! ** The whole modelling system and its documentation are     **
+! ** available for download from the BFM web site:            **
+! **                                                          **
+! **                  bfm-community.eu                        **
+! **                                                          **
+! ** For questions and/or information please address to the   **
+! ** BFM system team:                                         **
+! **                                                          **
+! **                 (bfm_st@lists.cmcc.it)                   **
+! **                                                          **
+! ** Version 1.0 2016                                         **
+! **                                                          **
+! ** This release has been finalised by Marco Zavatarelli,    **
+! ** Giulia Mussap and Nadia Pinardi. However, previous       **
+! ** significant contributions were provided also by          **
+! ** Momme Butenschoen and Marcello Vichi.                    **
+! ** Thanks are due to Prof. George L. Mellor that allowed us **
+! ** to modify use and distribute the one dimensional         **
+! ** version of the Princeton Ocean Model.                    **
+! **                                                          **
+! **                            Marco.Zavatarelli@unibo.it    **
+! **                                                          **
+! ** This program is free software; you can redistribute it   **
+! ** and/or modify it under the terms of the GNU General      **
+! ** Public License as published by the Free Software         **
+! ** Foundation.                                              **
+! ** This program is distributed in the hope that it will be  **
+! ** useful,but WITHOUT ANY WARRANTY; without even the        **
+! ** implied warranty of  MERCHANTEABILITY or FITNESS FOR A   **
+! ** PARTICULAR PURPOSE.  See the GNU General Public License  **
+! ** for more details.                                        **
+! ** A copy of the GNU General Public License is available at **
+! ** http://www.gnu.org/copyleft/gpl.html or by writing to    **
+! ** the Free Software Foundation, Inc. 59 Temple Place,      **
+! ** Suite 330, Boston, MA 02111, USA.                        **
+! **                                                          **
+! **************************************************************
+! **************************************************************
 !
 !DESCRIPTION    
 ! 
-!  This routine calculates the physical forcing functions
+!  This subroutine is called from subroutine pom_bfm_1d  and 
+!  calls the routines that provides BFM with all the needed information 
+!  about the physical environment:
+!
+!   pom_to_bfm: Transfers the  POM state variables into the correspondent
+!               BFM's.
+! 
+!   CalcVerticalExtinction: computes the light vertical extinction coefficients.
+!
+!   CalcLightDistribution: define the irradiance vertical profile.
 !
 ! !INTERFACE
+!
     SUBROUTINE env_forcing_pom_bfm_1d 
-!
-! !USES:
-!
-!-------------------------------------------------------------------------!
-!BOC
-!
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! Implicit typing is never allowed
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 !
       IMPLICIT NONE
 !
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  !    PASS PHYSICAL VARIABLES INTO BFM
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+!        -----TRANSFER PHYSICAL VARIABLES INTO BFM-----
 !
          call pom_to_bfm
 !
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  !  Calculation of vertical extinction coefficient
-  !  (input is ESSNO, PHYTOPLANKTON, DETRITUS AND BACTERIA BIOMASS)
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+!        -----COMPUTE VERTICAL EXTINCTION COEFFICIENTS-----
 !
          call CalcVerticalExtinction
 !
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  !  Calculation of the irradiation (forcing function)
-  !  (input is xEPSNO: vertical extinction)
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+!        -----COMPUTE THE IRRADIANCE VERTICAL PROFILE-----
 !
          call CalcLightDistribution
 !
       return
 !
       end subroutine env_forcing_pom_bfm_1d
-
-!EOC
 
 

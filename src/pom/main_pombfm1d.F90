@@ -1,30 +1,69 @@
 #include"cppdefs.h"
-!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-! This is the "main" program of the coupled numerical model originating by 
+! **************************************************************
+! **************************************************************
+! **                                                          **
+! ** ONE-DIMENSIONAL BFM-POM  MODELING SYSTEM (BFM-POM1D)     **
+! **                                                          **
+! ** The modeling system originate from the direct on-line    **
+! ** coupling of the 1D Version of the Princeton Ocean model  **
+! ** "POM" and the Biological Flux Model "BFM".               **
+! **                                                          **
+! ** The whole modelling system and its documentation are     **
+! ** available for download from the BFM web site:            **
+! **                                                          **
+! **                  bfm-community.eu                        **
+! **                                                          **
+! ** For questions and/or information please address to the   **
+! ** BFM system team:                                         **
+! **                                                          **
+! **                 (bfm_st@lists.cmcc.it)                   **
+! **                                                          **
+! ** Version 1.0 2016                                         **
+! **                                                          **
+! ** This release has been finalised by Marco Zavatarelli,    **
+! ** Giulia Mussap and Nadia Pinardi. However, previous       **
+! ** significant contributions were provided also by          **
+! ** Momme Butenschoen and Marcello Vichi.                    **
+! ** Thanks are due to Prof. George L. Mellor that allowed us **
+! ** to modify, use and distribute the one dimensional        **
+! ** version of the Princeton Ocean Model.                    **
+! **                                                          **
+! **                            Marco.Zavatarelli@unibo.it    **
+! **                                                          **
+! ** This program is free software; you can redistribute it   **
+! ** and/or modify it under the terms of the GNU General      **
+! ** Public License as published by the Free Software         **
+! ** Foundation.                                              **
+! ** This program is distributed in the hope that it will be  **
+! ** useful,but WITHOUT ANY WARRANTY; without even the        **
+! ** implied warranty of  MERCHANTEABILITY or FITNESS FOR A   **
+! ** PARTICULAR PURPOSE.  See the GNU General Public License  **
+! ** for more details.                                        **
+! ** A copy of the GNU General Public License is available at **
+! ** http://www.gnu.org/copyleft/gpl.html or by writing to    **
+! ** the Free Software Foundation, Inc. 59 Temple Place,      **
+! ** Suite 330, Boston, MA 02111, USA.                        **
+! **                                                          **
+! **************************************************************
+! **************************************************************
+!
+! DESCRIPTION
+!
+! This is the "main" program of the coupled numerical model originating by
 ! the direct on-line coupling of the 1D Version of the Princeton Ocean model
 ! "POM" and the Biological Flux Model "BFM".
-! The whole modelling system is available for download from the BFM web site:
 !
-! bfm-community.eu
-!
-! This release has been finalised by Marco Zavatarelli, Giulia Mussap and 
-! Nadia Pinardi. However, previous very significant past contributions were 
-! provided  also by Momme Butenschoen and Marcello Vichi. 
-! 
-!                                              Marco Zavatarelli@unibo.it
-!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!****************************************************************************
 !
       PROGRAM MAIN
 !
-!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-! Modules (use of ONLY is strongly encouraged!)
-!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+! -----MODULES (USE OF ONLY IS STRONGLY ENCOURAGED)-----
 !
       use global_mem,ONLY: RLEN,ZERO,PI,ONE
 !
       use constants, ONLY: SEC_PER_DAY
 !
-      use POM, ONLY: IDIAGN,                                              &    
+      use POM, ONLY: IDIAGN,                                              &
                      KL1, KL2,                                            &
                      IHOTST,                                              &
                      DTI,                                                 &
@@ -39,7 +78,6 @@
                      UMOL,                                                &
                      UMOLT,UMOLS,UMOLBFM,                                 &
                      SMOTH,                                               &
-                     RCP,                                                 &
                      DAYI,                                                &
                      KB,                                                  &
                      NBCT,NBCS,NBCBFM,                                    &
@@ -50,44 +88,37 @@
                      Z,ZZ,DZ,DZZ,DZR,                                     &
                      TF,T,TB,                                             &
                      SF,S,SB,                                             &
-                     RHO,                                                 & 
+                     RHO,                                                 &
                      UF,U,UB,VF,V,VB,                                     &
                      Q2F,Q2,Q2B,                                          &
                      L,                                                   &
                      Q2LF,Q2L,Q2LB,                                       &
-                     KM,KH,KQ,                                            & 
+                     KM,KH,KQ,                                            &
                      GM,GH,SM,SH,KN,SPROD,BPROD, A, C, VH, VHP,PROD,DTEF, &
-                     D,DT,                                                &
                      WUSURF,WVSURF,                                       &
                      WUBOT,WVBOT,                                         &
                      SWRAD,                                               &
                      WTSURF,                                              &
                      TSURF, SSURF,                                        &
+                     TSTAR, SSTAR,                                        &
                      WSSURF,                                              &
                      WTADV, WSADV,                                        &
-                     NRT            
+                     NRT,                                                 &
+                     Z0B, CBCMIN, CBC,                                    &
+                     D, DT,                                               &
+                     vonkarmann
 !
       use Service,ONLY: ilong, savef
 !
       use Forcing,ONLY: Forcing_manager
 !
-!------------------------------------------------------------------------!
-!
-!BOC
-!
-     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-     ! Implicit typing is never allowed
-     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+!     -----IMPLICIT TYPING IS NEVER ALLOWED-----
 !
       IMPLICIT NONE
 !
 !     -----NAMELIST READING UNIT------
 !
       integer(ilong),parameter            :: namlst=10
-!
-     ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-     !  Local Scalars
-     ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 !
 !     -----LOOP COUNTER-----
 !
@@ -101,53 +132,36 @@
 !
       REAL(RLEN),parameter         ::OMEGA=7.29E-5
 !
-!     -----INTERPOLATED CLIMATOLOGICAL T AND S PROFILES-----
+!     -----EXTERNAL SUBROUTINES-----
 !
-      REAL(RLEN),dimension(KB)   :: TSTAR,SSTAR
+      EXTERNAL DENS,            &
+               PROFQ,           &
+               PROFTS,          &
+               PROFUV,          &
+               CALCDEPTH,       &
+               get_TS_IC,       &
+               get_rst,         &
+               pom_ini_bfm_1d,  &
+               pom_bfm_1d,      &
+               restart_BFM_inPOM
 !
-!     -----FORCING COUNTERS-----
 !
-      INTEGER(ilong)               :: ICOUNTF,IDOUNTF,IFCHGE,IFDCHGE,&
-                                      IFDINT,IFINT,IFNCHGE, IFNINT
+!     -----INTRINSIC FUNCTIONS-----
 !
-!     -----MONTHLY CLIMATOLOGICAL T AND S PROFILES-----
+      INTRINSIC FLOAT,MOD,NINT,SIN,IFIX,MAX,LOG
 !
-      REAL(RLEN),SAVE              :: SCLIM1(KB),SCLIM2(KB),TCLIM1(KB),&
-                                      TCLIM2(KB)
-!
-     ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-     !  Local Arrays
-     ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-      REAL(RLEN),SAVE              :: WSU1,WSV1,SSS1,SSS2,SLUX1,SLUX2,SWRAD1,WTSURF1,QCORR1, &
-                                      QCORR2,NO3_1,NO3_2,NH4_1,NH4_2,PO4_1,PO4_2,SIO4_1,SIO4_2
-
-     ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-     !  External Subroutines
-     ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-!
-      EXTERNAL DENS,PROFQ,PROFT,PROFU,PROFV, CALCDEPTH
-!
-     ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-     !  Intrinsic Functions
-     ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-!
-      INTRINSIC FLOAT,MOD,NINT,SIN,IFIX
-!
-     ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-     !  NAMELIST READING
-     ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!     -----NAMELIST READING-----
 !
       NAMELIST /Params_POMBFM/ H,DTI,ALAT,IDIAGN,IDAYS,SMOTH,&
                                ihotst,UMOL,KL1,KL2,savef,NRT,NBCT,NBCS,NBCBFM,&
-                               UMOL,UMOLT,UMOLS,UMOLBFM,NTP,TRT,SRT,UPPERH,SSRT
+                               UMOL,UMOLT,UMOLS,UMOLBFM,NTP,TRT,SRT,UPPERH,SSRT, &
+                               CBCMIN,Z0B
 !
       OPEN(namlst,file='params_POMBFM.nml',status='old',action='read')
       READ(namlst,nml=Params_POMBFM)
       CLOSE(namlst)
-      WRITE(6,*)  'Depth is  ',h
-
 !
-!     -----GENERAL INITIALISATION-----
+!     -----GENERAL INITIALISATION (ZEROING)-----
 !
           Z(:)           = ZERO
           ZZ(:)          = ZERO
@@ -193,6 +207,8 @@
           DT(:)          = ZERO
           A(:)           = ZERO 
           C(:)           = ZERO
+          TSTAR(:)       = ZERO
+          SSTAR(:)       = ZERO
           WTADV(:)       = ZERO
           WSADV(:)       = ZERO
           WUSURF         = ZERO
@@ -204,10 +220,11 @@
           WSSURF         = ZERO
           TSURF          = ZERO
           SSURF          = ZERO
+          CBC            = ZERO
 !
-!     -----DEFINE VERTICAL COORDINATE-----
+!     -----DEFINE VERTICAL COORDINATE SYSTEM-----
 !
-      call calcdepth(z,zz,dz,dzz,kb,KL1,KL2)
+      call calcdepth
 !     
       dz(kb)=1.e-6_RLEN
       dzr(:)=ONE/dz(:)
@@ -215,12 +232,16 @@
 !
 !     -----CORIOLIS PARAMETER-----
 !
-!      COR = 1.e-4.0_RLEN*SIN(ALAT*2.0_RLEN*PI/360.0_RLEN)
       COR = 2.0_RLEN*OMEGA*SIN(ALAT*2.0_RLEN*PI/360.0_RLEN)
 !
 !     -----TWICE THE TIME STEP-----
 !
       DT2  = 2.0_RLEN*DTI
+!
+!     -----COMPUTE BOTTOM DRAG COEFFICIENT-----
+!
+      CBC=LOG((ZZ(KB-1)-Z(KB))*H/Z0B)
+      CBC=MAX(CBCMIN,vonkarmann**2/CBC**2)
 !
 !     -----ITERATIONS NEEDED TO CARRY OUT AN"IDAYS" SIMULATION-----
 !
@@ -238,166 +259,181 @@
 !       
 !                 -----DEFINE INITIAL DENSITY FIELD----
 !    
-                  call DENS(T,S,ZZ,H,RHO,KB)
+                  call DENS
 !
              case (1)
 !
 !                 -----READ RESTART-----
+!
                   call get_rst
 ! 
        end select 
 !
 #ifndef POM_only
-     ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-     !  Initialization of BFM 
-     ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! -----BFM SET-UP, INITIALISATION AND RESTART READING (IF REQUIRED)-----
+!
       call pom_ini_bfm_1d
+!
 #endif
-
-     ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-     !  Begin the time march 
-     ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 !
-      WRITE(6,*) 'Icount before time march loop = ',ICOUNTF
-
-!      -----BFM SET-UP, INITIALISATION AND RESTART READING (IF REQUIRED)-----
-!
-! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-!  Begin the time march 
-! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!     ***************************
+!     ***************************
+!     **                       **
+!     ** BEGIN THE TIME MARCH  **
+!     **                       **
+!     ***************************
+!     ***************************
 !
       DO intt = 1, IEND                        
 !
 !         -----COMPUTE TIME IN DAYS-----
 !
-          time = time0+(DTI*float(intt)*dayi)       
+          time = time0+(DTI*float(intt)*dayi)
 !
-!         -----TURBULENCE CLOSURE-----
+!         -----DEFINE ALL FORCINGS-----
+!
+          call forcing_manager
+!
+!         ----- MELLOR-YAMADA (1982) TURBULENCE CLOSURE-----
         
           Q2F(:)  = Q2B(:)
           Q2LF(:) = Q2LB(:)
 !
           call PROFQ(DT2)
 !
-!         -----DEFINE ALL FORCINGS-----
-!  
-          call forcing_manager
+!         -----T&S COMPUTATION (PROGNOSTIC MODE)-----
 !
-!         -----T&S COMPUTATION-----
-!
-     select case (IDIAGN)
+          select case (IDIAGN)
 !           
-          case (INT(ZERO))
+                 case (INT(ZERO))
 !
-!            *************************************
-!            *************************************
-!            **                                 **
-!            ** PROGNOSTIC MODE:                **
-!            ** T&S FULLY COMPUTED BY MODEL     **
-!            **                                 **
-!            *************************************
-!            *************************************
+!                -----COMPUTE LATERAL ADVECTION TERM FOR T&S-----
 !
-!            -----COMPUTE LATERAL ADVECTION TERM FOR T&S-----
+                 wtadv(:) = ZERO
+                 wsadv(:) = ZERO
 !
-             wtadv(:) = ZERO
-             wsadv(:) = ZERO
+                 IF(TRT.ne.ZERO) THEN
 !
-             IF(TRT.ne.ZERO) THEN
-!
-                do K = 1, KB
+                    do K = 1, KB
  
-                   if((-ZZ(K)*H).ge.upperH)   &
-                   wtadv(K) = (tstar(k)-T(k))/(TRT*SEC_PER_DAY)
+                       if((-ZZ(K)*H).ge.upperH)   &
+                       wtadv(K) = (tstar(k)-T(k))/(TRT*SEC_PER_DAY)
 !
-                enddo
+                   enddo
 !
-             ENDIF
+                 ENDIF
 !
-             IF(SRT.ne.ZERO) THEN
+                 IF(SRT.ne.ZERO) THEN
 !
-                do K = 1, KB
+                    do K = 1, KB
 !
-                   if((-ZZ(K)*H).ge.upperH)   &
-                   wsadv(K) = (sstar(k)-S(k))/(SRT*SEC_PER_DAY)
+                       if((-ZZ(K)*H).ge.upperH)   &
+                       wsadv(K) = (sstar(k)-S(k))/(SRT*SEC_PER_DAY)
 !
-                enddo
+                    enddo
 !
-             ENDIF
+                 ENDIF
 !
-!            -----COMPUTE SURFACE SALINITY FLUX-----
+!                -----COMPUTE SURFACE SALINITY FLUX-----
 !
-             wssurf = -(ssurf-S(1))*SSRT/SEC_PER_DAY
+                 wssurf = -(ssurf-S(1))*SSRT/SEC_PER_DAY
 !
-!            -----COMPUTE TEMPERATURE-----
+!                -----COMPUTE TEMPERATURE-----
 !
-             TF(:) = TB(:) + (WTADV(:) * DT2)
+                 TF(:) = TB(:) + (WTADV(:) * DT2) ! EXPLICIT LEAPFROG
 !
-             CALL PROFTS(TF,WTSURF,SWRAD,TSURF,NBCT,DT2,NTP,UMOLT)
+                 CALL PROFTS(TF,WTSURF,SWRAD,TSURF,NBCT,DT2,NTP,UMOLT)
 !
-!            -----COMPUTE SALINITY-----
+!                -----COMPUTE SALINITY-----
 !
-             SF(:) = SB(:) + (WSADV(:) * DT2)
+                 SF(:) = SB(:) + (WSADV(:) * DT2) ! EXPLICIT LEAPFROG
 !
-             CALL PROFTS(SF,WSSURF,ZERO,SSURF,NBCS,DT2,NTP,UMOLS)
-!!
-!            -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-!            !        MIXING THE TIMESTEP (ASSELIN)                            !
-!            -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+                 CALL PROFTS(SF,WSSURF,ZERO,SSURF,NBCS,DT2,NTP,UMOLS)
 !
-             T(:)  = T(:) + 0.5_RLEN * SMOTH * (TF(:) + TB(:) - 2.0_RLEN * T(:))
-             S(:)  = S(:) + 0.5_RLEN * SMOTH * (SF(:) + SB(:) - 2.0_RLEN * S(:))
+!                -----MIXING THE TIMESTEP (ASSELIN FILTER)-----
+!
+                 T(:)  = T(:) + 0.5_RLEN * SMOTH * (TF(:) + TB(:) - 2.0_RLEN * T(:))
+                 S(:)  = S(:) + 0.5_RLEN * SMOTH * (SF(:) + SB(:) - 2.0_RLEN * S(:))
+!
+          end select
+!
+!        **************************************************************
+!        **************************************************************
+!        **                                                          **
+!        **     JUMP HERE IF RUN IS IN DIAGNOSTIC MODE (IDIAGN=1).   **
+!        **     CLIMATOLOGICAL TIME VARYING T&S VERTICAL PROFILES    **
+!        **     HAVE BEEN COMPUTED VIA LINEAR INTERPOLATION FROM     **
+!        **     DATA in SUBROUTINE FORCING_MANAGER                   **
+!        **                                                          **
+!        **************************************************************
+!        **************************************************************
+!
+!        -----COMPUTE VELOCITY-----
+!
+         UF(:) = UB(:) + DT2 * COR * V(:) ! CORIOLIS TERM & EXPLICIT LEAPFROG
+!
+         call PROFUV(DT2,UF,WUSURF,WUBOT)
+!
+         VF(:) = VB(:) - DT2 * COR * U(:) ! CORIOLIS TERM & EXPLICIT LEAPFROG
+!
+         call PROFUV(DT2,VF,WVSURF,WVBOT)
 
-     end select
 !
-!     -----COMPUTE VELOCITY-----
+!        -----MIXING TIME STEP (ASSELIN FILTER)-----
 !
-      UF(:) = UB(:) + DT2 * COR * V(:)
-      call PROFU(DT2)
-      VF(:) = VB(:) - DT2 * COR * U(:)
-      call PROFV(DT2)
-
+         Q2(:)   = Q2(:)  + 0.5_RLEN * SMOTH * (Q2F(:)  + Q2B(:)  - 2.0_RLEN * Q2(:))
+         Q2L(:)  = Q2L(:) + 0.5_RLEN * SMOTH * (Q2LF(:) + Q2LB(:) - 2.0_RLEN * Q2L(:))
 !
-!     -----MIX TIME STEP (ASSELIN FILTER)-----
+         U(:)    = U(:)   + 0.5_RLEN * SMOTH * (UF(:)   + UB(:)   - 2.0_RLEN * U(:))
+         V(:)    = V(:)   + 0.5_RLEN * SMOTH * (VF(:)   + VB(:)   - 2.0_RLEN * V(:))
 !
-      Q2(:)   = Q2(:)  + 0.5_RLEN * SMOTH * (Q2F(:)  + Q2B(:)  - 2.0_RLEN * Q2(:))
-      Q2L(:)  = Q2L(:) + 0.5_RLEN * SMOTH * (Q2LF(:) + Q2LB(:) - 2.0_RLEN * Q2L(:))
+!        -----RESTORE TIME SEQUENCE-----
 !
-      U(:) = U(:) + 0.5_RLEN * SMOTH * (UF(:) + UB(:) - 2.0_RLEN * U(:))
-      V(:) = V(:) + 0.5_RLEN * SMOTH * (VF(:) + VB(:) - 2.0_RLEN * V(:))
+         Q2B(:)  = Q2(:)
+         Q2(:)   = Q2F(:)
+         Q2LB(:) = Q2L(:)
+         Q2L(:)  = Q2LF(:)
 !
-!     -----RESTORE TIME SEQUENCE-----
+         UB(:) = U(:)
+         U(:)  = UF(:)
+         VB(:) = V(:)
+         V(:)  = VF(:)
 !
-      Q2B(:)  = Q2(:)
-      Q2(:)   = Q2F(:)
-      Q2LB(:) = Q2L(:)
-      Q2L(:)  = Q2LF(:)
+         TB(:) = T(:)
+         T(:)  = TF(:)
+         SB(:) = S(:)
+         S(:)  = SF(:)
 !
-      UB(:) = U(:)
-      U(:)  = UF(:)
-      VB(:) = V(:)
-      V(:)  = VF(:)
+!        -----UPDATE DENSITY-----
 !
-      TB(:) = T(:)
-      T(:)  = TF(:)
-      SB(:) = S(:)
-      S(:)  = SF(:)
+         call DENS
 !
-!     -----UPDATE DENSITY-----
-!
-      call DENS(T,S,ZZ,H,RHO,KB)
-!
-!     -----PHYSICS HAS BEEN COMPUTED.....GO BFM!!!!-----
+!        **********************************************
+!        **********************************************
+!        **                                          **
+!        ** PHYSICS HAS BEEN COMPUTED.....GO BFM!!!  **
+!        **                                          **
+!        **********************************************
+!        **********************************************
 !
 #ifndef POM_only
 !
-      call pom_bfm_1d
+         call pom_bfm_1d
 !
 #endif
 !
-       END DO
+      END DO
 !
-!----- WRITING OF POM RESTART-----
+!     *******************************************
+!     *******************************************
+!     **                                       **
+!     **           END TIME MARCH              **
+!     **                                       **
+!     *******************************************
+!     *******************************************
+!
+!     ----- WRITING POM RESTART-----
 !
       WRITE (71) time,                      &
                  u,ub,v,vb,                 &
@@ -408,11 +444,10 @@
                  wubot,wvbot,               &
                  RHO
 !
-!-----BFM RESTART-----
+!     ----- WRITING BFM RESTART-----
 !
 #ifndef POM_only
-!
-!  -----WRITE RESTART -----
+
 !
       call restart_BFM_inPOM
 !

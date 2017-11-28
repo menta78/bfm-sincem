@@ -1,61 +1,107 @@
 #include "INCLUDE.h"
 #include "cppdefs.h"
-!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-! MODEL  POM - Princeton Ocean Model 
-!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! **************************************************************
+! **************************************************************
+! **                                                          **
+! ** ONE-DIMENSIONAL BFM-POM  MODELING SYSTEM (BFM-POM1D)     **
+! **                                                          **
+! ** The modeling system originate from the direct on-line    **
+! ** coupling of the 1D Version of the Princeton Ocean model  **
+! ** "POM" and the Biological Flux Model "BFM".               **
+! **                                                          **
+! ** The whole modelling system and its documentation are     **
+! ** available for download from the BFM web site:            **
+! **                                                          **
+! **                  bfm-community.eu                        **
+! **                                                          **
+! ** For questions and/or information please address to the   **
+! ** BFM system team:                                         **
+! **                                                          **
+! **                 (bfm_st@lists.cmcc.it)                   **
+! **                                                          **
+! ** Version 1.0 2016                                         **
+! **                                                          **
+! ** This release has been finalised by Marco Zavatarelli,    **
+! ** Giulia Mussap and Nadia Pinardi. However, previous       **
+! ** significant contributions were provided also by          **
+! ** Momme Butenschoen and Marcello Vichi.                    **
+! ** Thanks are due to Prof. George L. Mellor that allowed us **
+! ** to modify, use and distribute the one dimensional        **
+! ** version of the Princeton Ocean Model.                    **
+! **                                                          **
+! **                            Marco.Zavatarelli@unibo.it    **
+! **                                                          **
+! ** This program is free software; you can redistribute it   **
+! ** and/or modify it under the terms of the GNU General      **
+! ** Public License as published by the Free Software         **
+! ** Foundation.                                              **
+! ** This program is distributed in the hope that it will be  **
+! ** useful,but WITHOUT ANY WARRANTY; without even the        **
+! ** implied warranty of  MERCHANTEABILITY or FITNESS FOR A   **
+! ** PARTICULAR PURPOSE.  See the GNU General Public License  **
+! ** for more details.                                        **
+! ** A copy of the GNU General Public License is available at **
+! ** http://www.gnu.org/copyleft/gpl.html or by writing to    **
+! ** the Free Software Foundation, Inc. 59 Temple Place,      **
+! ** Suite 330, Boston, MA 02111, USA.                        **
+! **                                                          **
+! **************************************************************
+! **************************************************************
 !
 ! !ROUTINE: pom_ini_bfm
-!
-!
-!DESCRIPTION:
-!  Initialise the BFM in POM
-!  Main communication of array dimensions between
-!  BFM and POM
-!  Initialisation of variables and netcdf output
-!  THIS IS THE 1D VERSION
 !
 ! !INTERFACE:
 !
   subroutine pom_ini_bfm_1d
 !
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! Modules (use of ONLY is strongly encouraged!)
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+!  DESCRIPTION:
+!  BFM setup and initialisation when run in coupled mode with POM
+!
+!********************************************************************
+!
+!  -----MODULES (USE OF ONLY IS STRONGLY ENCOURAGED)-----
 !
    use mem
 !
-   use POM, ONLY: DTI, IEND, KB, H, DZ, ihotst, ALAT, ALON, ZZ, DZZ
+   use POM, ONLY: DTI,     &
+                  KB,      &
+                  H,       &
+                  DZ,      &
+                  ihotst,  &
+                  ALAT,    &
+                  ZZ,      &
+                  DZZ
 !
-   use global_mem, only:ZERO
+   use global_mem, ONLY:ZERO, &
+                        RLEN
 !
    use api_bfm
 !
-   use Service, ONLY: savef, deltat, nitend
+   use Service, ONLY: savef
 !
-   use netcdf_bfm, only: init_netcdf_bfm,init_save_bfm
-   use netcdf_bfm, only: init_netcdf_rst_bfm,read_rst_bfm
+   use netcdf_bfm, ONLY: init_netcdf_bfm,     &
+                         init_save_bfm,       &
+                         init_netcdf_rst_bfm, &
+                         read_rst_bfm
 
-! ----- Giulia -----
-   use time,      only: timestep
-! ------------------
-
-!------------------------------------------------------------------------!
+   use time, ONLY: timestep
 !
-!BOC
-!
-  !=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  !Implicit typing is never allowed
-  !=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+!  -----IMPLICIT TYPING IS NEVER ALLOWED-----
 !
    IMPLICIT NONE
 !
-!  ----COUNTER-----
+!  ---- LOOP COUNTERS-----
 !
    integer    :: k,i
 !  
-!  ----READING UNITS-----
+!  ----NAMELISTS READING READING UNITS-----
 !
    integer,parameter    :: namlst=10,unit=11
+!  
+!  -----DUMMY LONGITUDE VALUE (NOT USED IN 1D MODE)-----
+!
+   real(RLEN),parameter :: ALON=10.
 !
 !  ----OCEAN WET POINTS (IN 1D = 1)-----
 !
@@ -65,33 +111,19 @@
 !
                           surfpoint(:), &
 !
-!  ----OCEAN BOTTOM POINTS (IN 1 D=1)-----
+!  ----OCEAN BOTTOM POINTS (IN 1D=1)-----
 !
                           botpoint(:)
 !
-  !=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  !Model timestep
-  !=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+!  -----MODEL TIME STEP TRANSFERED TO BFM-----
 !
-     deltat=dti
+   timestep=dti
 !
-     timestep=deltat
-
-  !=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  !Iterations needed for an idays simulations
-  !=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+!  ----OUTPUT AVERAGING AND WRITING FREQUENCY TRANSFERED TO BFM-----
 !
-     nitend=iend
+   out_delta = savef
 !
-  !=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  !out_delta = saving frequency 
-  !=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-!
-     out_delta = savef
-!
-  !=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  !Set the BFM dimensions
-  !=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+!  ----SET THE BFM ARRAYS DIMENSION-----
 !
 !    *************************************************************************
 !    *************************************************************************
@@ -108,26 +140,29 @@
      NO_BOXES_Z=NO_BOXES
      NO_BOXES_XY=1
 !
-!   -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-!    Allocate masks for array packing
-!   -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+!   -----ALLOCATE AND SET LOGICAL MASKS FOR:-----
 !
-   allocate(SEAmask(NO_BOXES_X,NO_BOXES_Y,NO_BOXES_Z)) 
+!           --WHOLE WATER COLUMN---
+   allocate(SEAmask(NO_BOXES_X,NO_BOXES_Y,NO_BOXES_Z))
+!           ---BOTTOM---
    allocate(BOTmask(NO_BOXES_X,NO_BOXES_Y,NO_BOXES_Z))
+!           ---SURFACE--
    allocate(SRFmask(NO_BOXES_X,NO_BOXES_Y,NO_BOXES_Z))
 !
    SEAmask = .TRUE.
    BOTmask = .TRUE.
    SRFmask = .TRUE.
 !
-  !=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  !allocate ancillary pack mask
-  !=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+!  -----ALLOCATE SERVICE ARRAY AND INITIALISE (ZEROING)-----
 !
    allocate(ZEROS(NO_BOXES_X,NO_BOXES_Y,NO_BOXES_Z)) 
    ZEROS = ZERO
 !
+!  -----TOTAL NUMBER OF VARIABLES TO BE COMPUTED-----
+!
 #ifdef INCLUDE_BEN
+!
+!  -----PELAGIC+BENTHIC SETUP-----
 !
    NO_STATES   = NO_D3_BOX_STATES * NO_BOXES +   &
                  NO_D2_BOX_STATES_BEN 
@@ -137,127 +172,188 @@
 !
 #else
 !
+!  -----PELAGIC SETUP ONLY-----
+!
    NO_STATES   = NO_D3_BOX_STATES * NO_BOXES
 !
 #endif
 !
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! Compressed coordinates for netcdf output
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+!  -----COMPRESSED COORDINATES FOR NETCDF OUTPUT-----
 !
    lon_len = NO_BOXES_X 
    lat_len = NO_BOXES_Y
 !
+!  -----ALLOCATE LAND-SEA MASK----
+!
    allocate(ocepoint(NO_BOXES))
+!
+!  -----INITIALISE LAND (0) SEA (1) MASK. IN 1D ONLY SEA....-----
+!
    ocepoint = 1 
 !
-   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-   ! Prepares the array containing the indices of the
-   ! elements in pelagic BFM 1D arrays that have a benthic layer
-   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+!  *********************************************************
+!  *********************************************************
+!  **                                                     **
+!  ** ALLOCATE AND LOAD THE ARRAY CONTAINING THE INDICES  **
+!  ** OF THE PELAGIC GRIDPOINTS HAVING A WATER-SEDIMENT   **
+!  ** INTERFACE.                                          **
+!  **                                                     **
+!  ** IN 1D MODE ONLY THE GRID POINT AT K=KB-1            **
+!  ** EXCHANGES WITH THE SEDIMENTS                        **
+!  **                                                     **
+!  *********************************************************
+!  *********************************************************
 !
    allocate(BOTindices(NO_BOXES_XY)); BOTindices = KB-1
 !
-   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-   ! Prepares the array containing the indices of the
-   ! elements in pelagic BFM 1D arrays that have a surface layer
-   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+!  *********************************************************
+!  *********************************************************
+!  **                                                     **
+!  ** ALLOCATE AND LOAD THE ARRAY CONTAINING THE INDICES  **
+!  ** OF THE PELAGIC GRIDPOINTS HAVING A WATER-ATMOSPHERE **
+!  ** INTERFACE.                                          **
+!  **                                                     **
+!  ** IN 1D MODE ONLY THE GRID POINT AT K=1               **
+!  ** EXCHANGES WITH THE ATMOSPHERE                       **
+!  **                                                     **
+!  *********************************************************
+!  *********************************************************
 !
    allocate(SRFindices(NO_BOXES_XY)); SRFindices = 1
 !
-   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-   ! Initialise ancillary arrays for output
-   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+!  ***********************************************************************
+!  ***********************************************************************
+!  **                                                                   **
+!  ** READ THE BFM_GENERAL NAMELIST, ALLOCATE ARRAYS WITH ATTRIBUTES OF **
+!  ** STATE VARIABLES AND WRITE SETUP INFO IN RUN LOG.                  **
+!  **                                                                   **
+!  ***********************************************************************
+!  ***********************************************************************
 !
    call init_bfm(namlst)
 !
-   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-   ! Initialise state variable names and diagnostics
-   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+!  -----INITIALISE STATE VARIABLE NAMES AND DIAGNOSTICS (FOR NETCDF OUTPUT)-----
 !
    call set_var_info_bfm
 !
-   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-   ! Allocate memory and give initial values
-   ! the argument list is mandatory with BFM
-   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-!
+!  ****************************************************************************
+!  ****************************************************************************
+!  **                                                                        **
+!  ** ALLOCATE BFM ARRAYS AND PROVIDE A VERY GENERAL INITIALISATION.         **
+!  **                                                                        **
+!  ** N.B.: AT THIS STAGE THE INITIALISATION IS VERY GENERIC (UNIFORM IN     **
+!  ** SPACE CARBON CONTENT VALUES. THE CORRESPONDING NITROGEN, PHOSPHORUS    **
+!  ** AND SILICON CONTENT (IF ANY) IS DEFINED ON THE BASIS OF A "REDFIELD"   **
+!  ** RATIO ASSUMPTION.                                                      **
+!  ** A MORE PRECISE INITIALISATION CAN BE PROVIDED TROUGH THE USE OF THE    **
+!  ** SUBROUTINE SET_INITIAL CONDITION BELOW                                 **
+!  **                                                                        **
+!  ****************************************************************************
+!  ****************************************************************************
+!!
    call init_var_bfm(namlst,'bfm.nml',unit,bio_setup)
 !
-!       -----THE LEADING RESTART FLAG IS IHOTST, SO THE VALUE IN bfm_init-------
-!                          -----IS OVERWRITTEN-----
+!   ******************************************************************
+!   ******************************************************************
+!   **                                                              **
+!   ** FIX THE FLAG INDICATING THE "COLD"/"HOT" START               **
+!   **                                                              **
+!   ** N.B.: IN THE BFM-POM1D SETUP THE LEADING  "COLD"/'HOT"       **
+!   **       START FLAG IS IHOTST (DEFINED IN THE params_POMBFM     **
+!   **       NAMELIST.                                              **
+!   **       THE bfm_init VALUE READ IN BFM_GENERAL IS OVERWRITTEN  **
+!   **       WITH THE IHOTST VALUE                                  **
+!   **                                                              **
+!   ******************************************************************
+!   ******************************************************************
 !
-        bfm_init=ihotst
+    bfm_init=ihotst
 !
-!       -----SET THE THICKNESS OF THE KB-1 LAYERS-----
+!    -----SET THE THICKNESS OF THE WATER COLUMN LAYERS-----
 !
-        do k = 1 , NO_BOXES_Z
-               Depth(k) = dz(k)*h
-        end do
+    do k = 1 , NO_BOXES_Z
+       Depth(k) = dz(k)*h
+    end do
 !
-   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-   ! initialise netcdf output
-   ! MAV: CHECK THE MAPPING OF OCEPOINT
-   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+!  -----INITIALISE THE OUTPUT TIME AVERAGING PROCEDURE-----
 !
    call calcmean_bfm(INIT)
-
-   call init_netcdf_bfm(title=out_title,start_time='01-01-0000', &
-             time_unit=0,lat=alat,lon=alon,z=zz*h,dz=dzz*h,      &
-!             time_unit=0,lat=alat,lon=alon,z=zz,dz=dzz,      &
-             oceanpoint=ocepoint,                  &
-             surfacepoint=(/(i,i=1,NO_BOXES_XY)/), &
-             bottompoint=(/(i,i=1,NO_BOXES_XY)/))
 !
-   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-   ! Allocate and initialise additional 
-   ! integration arrays
-   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+!  -----INITIALISE NETCDF OUTPUT-----
 !
-   allocate(D3STATEB(NO_D3_BOX_STATES,NO_BOXES))
+   call init_netcdf_bfm(title=out_title,                      &
+                        start_time='01-01-0000',              &
+                        time_unit=0,                          &
+                        lat=alat,                             &
+                        lon=alon,                             &
+                        z=zz*h,                                 &
+                        dz=dzz*h,                               &
+                        oceanpoint=ocepoint,                  &
+                        surfacepoint=(/(i,i=1,NO_BOXES_XY)/), &
+                        bottompoint=(/(i,i=1,NO_BOXES_XY)/))
+!
+!  *******************************************************************
+!  *******************************************************************
+!  **                                                               **
+!  ** ALLOCATE AND INITIALISE  THE ARRAY TO BE LOADED WITH STATE    **
+!  ** VARIABLES (PELAGIC AND BENTHIC COMPUTED AT t=t-dt.            **
+!  ** THIS IS NEEDED FOR THE LEAPGROG NUMERICAL INTEGRATION SCHEME  **
+!  ** USED BY THE BFM-POM1D SYSTEM                                  **
+!  **                                                               **
+!  *******************************************************************
+!  *******************************************************************
+!
+   allocate(D3STATEB(NO_D3_BOX_STATES,NO_BOXES)) !PELAGIC
+!
+!  -----ZEROING-----
+!
    D3STATEB = ZERO
 !
 #ifdef INCLUDE_BEN
 !
-   allocate(D2STATEB_BEN(NO_D2_BOX_STATES_BEN,NO_BOXES_XY))
+   allocate(D2STATEB_BEN(NO_D2_BOX_STATES_BEN,NO_BOXES_XY)) ! BENTHIC
+!
+!  -----ZEROING-----
+!
    D2STATEB_BEN = ZERO
 !
 #endif   
 
-!  -----DEFINE INITIAL CONDITIONS-----
+!  -----DEFINE BETTER INITIAL CONDITIONS-----
 !
    call set_initial_conditions
 !
+!  -----SAVE INITIAL CONDITIONS IN OUTPUT FILE-----
+!
    call init_save_bfm
 !
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! Initialise prior time step for leap-frog
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+! -----IF "COLD" START (bfm-init=0) STATE VAR'S VALUES AT t AND t-DT ARE THE SAME-----
 !
-     D3STATEB = D3STATE
+!
+     D3STATEB = D3STATE !PELAGIC
 !
 #ifdef INCLUDE_BEN
-     D2STATEB_BEN = D2STATE_BEN
+!
+     D2STATEB_BEN = D2STATE_BEN ! BENTHIC
+!
 #endif
 !
-   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-   ! Read restart (Bfm_init = 1 in bfm.nml)
-   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+!  -----IF "HOT" START (Bfm_init = 1) READ BFM RESTART FILE -----
 !
-!======================GIULIA==============================================
-   call init_netcdf_rst_bfm(rst_fname,start_time='01-01-0000',  &
-             time_unit=0,lat=alat,lon=alon,z=zz,dz=dzz,   &
-             oceanpoint=ocepoint,      &
-             surfacepoint=(/(i,i=1,NO_BOXES_XY)/), &
-             bottompoint=(/(i,i=1,NO_BOXES_XY)/))
-!==========================================================================
+if (bfm_init == 1) call read_rst_bfm(rst_fname)
 !
-   !--------------------------------------------------
-   ! Read restart file (if flag)
-   ! Overwrite previous initialization
-   !--------------------------------------------------
-   write(6,*) 'before read rst'
-   if (bfm_init == 1) call read_rst_bfm(rst_fname)
+!      -----INITIALISE BFM RESTART FILE-----
+!
+       call init_netcdf_rst_bfm(rst_fname,                            &
+                                start_time='01-01-0000',              &
+                                time_unit=0,                          &
+                                lat=alat,                             &
+                                lon=alon,                             &
+                                z=zz*h,                                 &
+                                dz=dzz*h,                               &
+                                oceanpoint=ocepoint,                  &
+                                surfacepoint=(/(i,i=1,NO_BOXES_XY)/), &
+                                bottompoint=(/(i,i=1,NO_BOXES_XY)/))
 !
    return
 !

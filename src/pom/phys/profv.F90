@@ -44,6 +44,11 @@
       INTRINSIC LOG,MAX,SQRT
 
 
+     ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+     !  THE FOLLOWING SECTION SOLVES THE EQUATION                     
+     !  DT2*(KM*U')' - U= -UB                                        
+     ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
       DH = H
 
       DO K = 2,KB - 1
@@ -53,9 +58,6 @@
 
       VH(1) = A(1)/ (A(1)-1.)
       VHP(1) = (-DT2*WVSURF/ (-DZ(1)*DH)-VF(1))/ (A(1)-1.)
-
-   98 CONTINUE
-
       DO K = 2,KB - 2
           VHP(K) = 1./ (A(K)+C(K)* (1.-VH(K-1))-1.)
           VH(K) = A(K)*VHP(K)
@@ -63,6 +65,7 @@
       END DO
 
   104 CBC = MAX(.0025,.16/LOG((ZZ(KB-1)-Z(KB))*DH/.01)**2)
+      !write(*,*) CBC
       CBC = CBC*SQRT((.25* (UB(KB-1)+UB(KB-1)+UB(KB-1)+UB(KB-1)))**2+ &
            VB(KB-1)**2)
      ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -85,6 +88,7 @@
           A(K) = 0.
           C(K) = 0.
       END DO
+      !write(*,*) WVBOT, VF(KB-1)
 
       RETURN
 

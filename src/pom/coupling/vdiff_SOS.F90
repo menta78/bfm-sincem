@@ -1,92 +1,130 @@
-!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-! MODEL  POM - Princeton Ocean Model 
-!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 !
+! **************************************************************
+! **************************************************************
+! **                                                          **
+! ** ONE-DIMENSIONAL BFM-POM  MODELING SYSTEM (BFM-POM1D)     **
+! **                                                          **
+! ** The modeling system originate from the direct on-line    **
+! ** coupling of the 1D Version of the Princeton Ocean model  **
+! ** "POM" and the Biogeochemical Flux Model "BFM".           **
+! **                                                          **
+! ** The whole modelling system and its documentation are     **
+! ** available for download from the BFM web site:            **
+! **                                                          **
+! **                  bfm-community.eu                        **
+! **                                                          **
+! ** For questions and/or information please address to the   **
+! ** BFM system team:                                         **
+! **                                                          **
+! **                 (bfm_st@lists.cmcc.it)                   **
+! **                                                          **
+! ** Version 1.0 2016                                         **
+! **                                                          **
+! ** This release has been finalised by Marco Zavatarelli,    **
+! ** Giulia Mussap and Nadia Pinardi. However, previous       **
+! ** significant contributions were provided also by          **
+! ** Momme Butenschoen and Marcello Vichi.                    **
+! ** Thanks are due to Prof. George L. Mellor that allowed us **
+! ** to modify, use and distribute the one dimensional        **
+! ** version of the Princeton Ocean Model.                    **
+! **                                                          **
+! **                            Marco.Zavatarelli@unibo.it    **
+! **                                                          **
+! ** This program is free software; you can redistribute it   **
+! ** and/or modify it under the terms of the GNU General      **
+! ** Public License as published by the Free Software         **
+! ** Foundation.                                              **
+! ** This program is distributed in the hope that it will be  **
+! ** useful,but WITHOUT ANY WARRANTY; without even the        **
+! ** implied warranty of  MERCHANTEABILITY or FITNESS FOR A   **
+! ** PARTICULAR PURPOSE.  See the GNU General Public License  **
+! ** for more details.                                        **
+! ** A copy of the GNU General Public License is available at **
+! ** http://www.gnu.org/copyleft/gpl.html or by writing to    **
+! ** the Free Software Foundation, Inc. 59 Temple Place,      **
+! ** Suite 330, Boston, MA 02111, USA.                        **
+! **                                                          **
+! **************************************************************
+! **************************************************************
+
 ! !ROUTINE: vdiff_SOS
-!
-!DESCRIPTION	
-! 
-!  This routine calculates the vertical diffusivity of BFM
-!  biochemical components and integrates BFM state var's 
-!  with Source Splitting (SoS) method.
 !
 ! !INTERFACE
 !
   SUBROUTINE vdiff_SOS
 !
-! !USES:
 !
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! Modules (use of ONLY is strongly encouraged!)
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+!DESCRIPTION
 !
- use global_mem, ONLY:RLEN,ZERO
+!  This subroutine computes the forward in time BFM state variables
+!  according to the Source splitting coupling technique, as described in:
+! 
+!  Butenschoen M., Zavatarelli M., Vichi M. (2012)
+!  Sensitivity of a marine coupled physical biogeochemical model to time 
+!  resolution,integration scheme and time splitting method.
+!  Ocean Modeling, 52/53, 36-53.
 !
- use Service
+!********************************************************************
 !
- use api_bfm, ONLY:D3STATEB
+!    -----MODULES (USE OF ONLY IS STRONGLY ENCOURAGED)-----
 !
- use constants, ONLY: SEC_PER_DAY
+     use global_mem, ONLY:RLEN,ZERO
 !
- use mem_Param, ONLY: AssignAirPelFluxesInBFMFlag,                    &
-                      AssignPelBenFluxesInBFMFlag,p_small 
+     use Service
 !
- use mem_Settling
+     use api_bfm, ONLY:D3STATEB
 !
- use Mem, ONLY:D3STATE,D3SOURCE,NO_D3_BOX_STATES,                     &
-               ppO2o,                                                 &
-               ppO3c,                                                 &
-               ppN1p,ppN3n,ppN4n,ppN5s,                               &
-               ppR6c,ppR6n,ppR6p,ppR6s,                               &
-               ppP1c,ppP1n,ppP1p,ppP1s,ppP1l,                         &
-               ppP2c,ppP2n,ppP2p,ppP2l,                               &
-               ppP3c,ppP3n,ppP3p,ppP3l,                               &
-               ppP4c,ppP4n,ppP4p,ppP4l,                               &
-               sediR6,sediPPY,                                        &
-               iiP1,iiP2,iiP3,iiP4,                                   &
-               n1p,n3n,n4n,n5s,                                       &
-               jsurO2o,jsurO3c,                                       &
-               Depth,                                                 &
-               iiPhytoPlankton,                                       &
-               jbotN1p,jbotN4n,jbotN3n,                               &
-               jbotO2o,jbotO3c
+     use constants, ONLY: SEC_PER_DAY
 !
- use POM, ONLY:SMOTH,KB,H,DTI,DZR,NRT,NBCBFM,UMOLBFM,NTP,GRAV,        &
-               RHO
+     use mem_Param, ONLY: AssignAirPelFluxesInBFMFlag,                    &
+                          AssignPelBenFluxesInBFMFlag,p_small
 !
-!-------------------------------------------------------------------------!
+     use mem_Settling
 !
-!BOC
+     use Mem, ONLY:D3STATE,D3SOURCE,NO_D3_BOX_STATES,                     &
+                   ppO2o,                                                 &
+                   ppO3c,                                                 &
+                   ppN1p,ppN3n,ppN4n,ppN5s,                               &
+                   ppR6c,ppR6n,ppR6p,ppR6s,                               &
+                   ppP1c,ppP1n,ppP1p,ppP1s,ppP1l,                         &
+                   ppP2c,ppP2n,ppP2p,ppP2l,                               &
+                   ppP3c,ppP3n,ppP3p,ppP3l,                               &
+                   ppP4c,ppP4n,ppP4p,ppP4l,                               &
+                   sediR6,sediPPY,                                        &
+                   iiP1,iiP2,iiP3,iiP4,                                   &
+                   n1p,n3n,n4n,n5s,                                       &
+                   jsurO2o,jsurO3c,                                       &
+                   Depth,                                                 &
+                   iiPhytoPlankton,                                       &
+                   jbotN1p,jbotN4n,jbotN3n,                               &
+                   jbotO2o,jbotO3c
 !
-!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-! Implicit typing is never allowed
-!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+     use POM, ONLY:SMOTH,KB,H,DTI,DZR,NRT,NBCBFM,UMOLBFM,NTP,GRAV,RHO
+
+!     -----IMPLICIT TYPING IS NEVER ALLOWED-----
+!
 !
   IMPLICIT NONE
-! 
-!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-! Local Variables
-!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 !
 !-----COUNTER & FLAGS-----
 !
  integer                  :: k,m,n,nbc
 !
-!-----BFM STATE VAR. @ time t-DTI, t, T+DTI RESPECTIVELY-----
+!-----BFM STATE VAR. @ time t,  t+DTI, T-DTI RESPECTIVELY-----
 !
  real(RLEN)               :: fbio(KB), ffbio(KB), fbbio(KB) 
 !
-!-----SURFACE FLUX STORAGE FOR NUT'S O2 & CO2-----
+!-----SURFACE FLUX STORAGE-----
 !
  real(RLEN)               :: surflux
 !
-!-----BOTTOM FLUX STORAGE FOR NUT'S O2 & CO2-----
+!-----BOTTOM FLUX STORAGE-----
 !
  real(RLEN)               :: botflux       
 !
-!-----RELAXATION VELOCITY FOR NUT'S-----
+!-----RELAXATION VELOCITY FOR NUTRIENTS SURFACE FLUX-----
 !
- real(RLEN)               :: trelax
+ real(RLEN)               :: vrelax
 !
 !-----SEDIMENTATION VELOCITY-----
 !
@@ -99,43 +137,34 @@
 !
     dti2 = DTI*2.
 
-! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-! Relaxation of nutrients at surface
-! -=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 !
-    trelax=NRT/SEC_PER_DAY
+!-----COMPUTING RELAXATION VELOCITY FOR SURFACE NUTRIENTS FLUX-----
+!
+    vrelax=NRT/SEC_PER_DAY
 !
 !-----LOOP OVER BFM STATE VAR'S-----
 !
   do m = 1 , NO_D3_BOX_STATES
 !
-!    -----ZEROING-----
-!
-          surflux    = ZERO 
-          botflux    = ZERO
-          fbio(:)    = ZERO
-          fbbio(:)   = ZERO
-          ffbio(:)   = ZERO
-          sink(:)    = ZERO
-!
 !         -----LOAD BFM STATE VAR.-----
-!       
-          do k = 1 , KB - 1
 !
-              fbio(k)  = D3STATE(m,k)
-              fbbio(k) = D3STATEB(m,k)
+          fbio(:)  = D3STATE(m,:)
+          fbbio(:) = D3STATEB(m,:)
 !
-          end do
-
+!         -----ZEROING SINKING VELOCITY-----
+! 
+          sink(:)=ZERO
+!
+!         -----COSMETIC: VALUES AT K=KB ARE NOT USED-----
 !
           fbio(kb) =fbio(kb-1)
           fbbio(kb)=fbbio(kb-1)
 !
-! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-! Nutrients surface fluxes: 
-! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+!         -----SURFACE AND BOTTOM FLUXES-----
 !
           select case ( m )
+!
+!                -----OXYGEN-----
 !
                  case (ppO2o)
 !
@@ -143,75 +172,113 @@
 !
                        botflux = jbotO2o(1)/SEC_PER_DAY
 !
+!                -----CARBON DIOXYDE-----
+!
                  case (ppO3c)
 !
                        surflux= -(jsurO3c(1)/SEC_PER_DAY)
 !
                        botflux = jbotO3c(1)/SEC_PER_DAY
 !
+!                -----PHOSPHATE----
+!
                  case (ppN1p)
 !
-                      surflux = -(PO4SURF-n1p(1))*trelax
+                      surflux = -(PO4SURF-n1p(1))*vrelax
 !
                       botflux = jbotN1p(1)/SEC_PER_DAY
 !
+!                -----NITRATE-----
+!
                  case (ppN3n)
 !
-                      surflux = -(NO3SURF-n3n(1))*trelax
+                      surflux = -(NO3SURF-n3n(1))*vrelax
 
                       botflux = jbotN3n(1)/SEC_PER_DAY
 !
+!                -----AMMONIUM-----
+!
                  case (ppN4n)
 !
-                      surflux = -(NH4SURF-n4n(1))*trelax
+                      surflux = -(NH4SURF-n4n(1))*vrelax
 !
                       botflux = jbotN4n(1)/SEC_PER_DAY
 !
+!                -----SILICATE-----
+!
                  case (ppN5s)
 !
-                      surflux = -(SIO4SURF-n5s(1))*trelax
+                      surflux = -(SIO4SURF-n5s(1))*vrelax
+!
+!               ***************************************************
+!               ***************************************************
+!               **                                               **
+!               ** The simple benthic return module used in this **
+!               ** implemantation has no silicate regenerated in **
+!               ** the sediments                                 **
+!               **                                               **
+!               ***************************************************
+!               ***************************************************
+!
+                    botflux=ZERO
 !
                 case default
 !
+!               ***************************************************
+!               ***************************************************
+!               **                                               **
+!               ** The surface and bottom fluxes for the         **
+!               ** BFM state variables not considered above      **
+!               ** is nil.                                       **
+!               **                                               **
+!               ***************************************************
+!               ***************************************************
+!
                       surflux = ZERO
+!
+                      botflux = ZERO
 !
           end select
 !
-! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-! Sedimentation R6
-! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+!         *********************************************
+!         *********************************************
+!         **                                         **
+!         ** Computing sedimentation fluxes          **
+!         **                                         **
+!         *********************************************
+!         *********************************************
 !
           select case ( m )
+!
+!                -----PARTICULATE ORGANIC MATTER-----
 !
                  case (ppR6c:ppR6s)
 !
                        do k = 1 , KB - 1
 !
-!                         --------- Calculate sink via Stoke's Law ---------------------
-!                          sink(k) =-((GRAV*(dia_R6**2.0))/(18.0*visc))*(rhos/(RHO(k)+1.0)-1.0)
-!                         --------------------------------------------------------------
-                           sink(k) = -sediR6(k)/SEC_PER_DAY
+                          sink(k) = -sediR6(k)/SEC_PER_DAY
 !
                        end do
 !
-                       ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-                       ! Set the  detritus sinking vel. at   
-                       ! the water-sediment interface 
-                       ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
+!                      ***********************************************
+!                      ***********************************************
+!                      **                                           **
+!                      ** Set the  Particulate organic matter       **
+!                      ** sinking velocity (burial velocity) at the **
+!                      ** water-sediment interface.                 **
+!                      **                                           **
+!                      ***********************************************
+!                      ***********************************************
+!
                        sink(kb)=-p_burvel_R6/SEC_PER_DAY
                        if(ABS(sink(kb-1)).lt.ABS(sink(kb))) &
                        sink(kb) = sink(kb-1)
-
 !
                   end select
 !
-! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-! Sedimentation Phytoplankton 
-! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-
-          if (m.GE.ppP1c .AND. m.LE.ppP4l) then
+!         -----PHYTOPLANKTON-----
 !
+          if (m.GE.ppP1c .AND. m.LE.ppP4l) then
 !
                      select case (m)
 !
@@ -239,23 +306,37 @@
 !
                          enddo
 !
-                         ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-                         ! Set the plankton sinking vel. at
-                         ! the water-sediment interface
-                         ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
+!
+!                      ***********************************************
+!                      ***********************************************
+!                      **                                           **
+!                      ** Set the  Phytoplankton sinking velocity   **
+!                      ** (burial velocity) at the water-sediment   **
+!                      ** interface.                                **
+!                      **                                           **
+!                      ***********************************************
+!                      ***********************************************
+!
                        sink(kb)=-p_burvel_PI/SEC_PER_DAY
                        if(ABS(sink(kb-1)).lt.ABS(sink(kb))) &
                        sink(kb) = sink(kb-1)
-
-!-----------------------------------------------------------------
-
 !
         end if
 !
 !                 -----SINKING: UPSTREAM VERTICAL ADVECTION-----
 !
-                  call adverte(fbbio,fbio,ffbio,sink)
+!                 *******************************************************
+!                 *******************************************************
+!                 **                                                   **
+!                 ** The subroutine output the vertical advection      **
+!                 ** (sinking) flux stored into argument ffbio.        **
+!                 ** It is called for all the BFM pelagic state        **
+!                 ** variables, but for sink=0.0 it outputs ffbio=0.0  **
+!                 **                                                   **
+!                 *******************************************************
+!                 *******************************************************
+!
+                  call adverte(fbio,ffbio,sink)
 !
 !                 -----SOURCE SPLITTING LEAPFROG INTEGRATION-----
 !
@@ -265,8 +346,14 @@
 !
       end do
 !
-!     -----COMPUTE VERTICAL DIFFUSION AND TERMINATE INTEGRATION-----
-!     -----IMPLICIT LEAPFROGGING-----
+!     *******************************************************************
+!     *******************************************************************
+!     **                                                               **
+!     ** COMPUTE VERTICAL DIFFUSION AND TERMINATE COMPUTATION WITH     **
+!     ** IMPLICIT TIME INTEGRATION                                     **
+!     **                                                               **
+!     *******************************************************************
+!     *******************************************************************
 !
        CALL PROFTS(ffbio,surflux,botflux,ZERO,ZERO,NBCBFM,DTI2,NTP,UMOLBFM)
 !
@@ -278,9 +365,7 @@
 !
       end do
 !
-! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-! Mix the time step and restore time sequence
-! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+!     ---MIX SOLUTIONS AND RESTORE TIME SEQUENCE-----
 !
      do n = 1, KB-1
 !
@@ -294,70 +379,107 @@
 !
       end subroutine vdiff_sos
 !
-!
-!
-!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><
 !
 ! !ROUTINE: adverte
 !
-!DESCRIPTION    
-!
-!    SUBROUTINE TO HANDLE THE SINKING OF BFM STATE VAR'S
-!    SINKING IS TREATED AS DOWNWARD VERTICAL ADVECTION
-!    COMPUTED WITH UPSTREAM FINITE DIFFERENCES.
-!
-!                                          Marco.Zavatarelli@unibo.it
+! **************************************************************
+! **************************************************************
+! **                                                          **
+! ** ONE-DIMENSIONAL BFM-POM  MODELING SYSTEM (BFM-POM1D)     **
+! **                                                          **
+! ** The modeling system originate from the direct on-line    **
+! ** coupling of the 1D Version of the Princeton Ocean model  **
+! ** "POM" and the Biogeochemical Flux Model "BFM".           **
+! **                                                          **
+! ** The whole modelling system and its documentation are     **
+! ** available for download from the BFM web site:            **
+! **                                                          **
+! **                  bfm-community.eu                        **
+! **                                                          **
+! ** For questions and/or information please address to the   **
+! ** BFM system team:                                         **
+! **                                                          **
+! **                 (bfm_st@lists.cmcc.it)                   **
+! **                                                          **
+! ** Version 1.0 2016                                         **
+! **                                                          **
+! ** This release has been finalised by Marco Zavatarelli,    **
+! ** Giulia Mussap and Nadia Pinardi. However, previous       **
+! ** significant contributions were provided also by          **
+! ** Momme Butenschoen and Marcello Vichi.                    **
+! ** Thanks are due to Prof. George L. Mellor that allowed us **
+! ** to modify, use and distribute the one dimensional        **
+! ** version of the Princeton Ocean Model.                    **
+! **                                                          **
+! **                            Marco.Zavatarelli@unibo.it    **
+! **                                                          **
+! ** This program is free software; you can redistribute it   **
+! ** and/or modify it under the terms of the GNU General      **
+! ** Public License as published by the Free Software         **
+! ** Foundation.                                              **
+! ** This program is distributed in the hope that it will be  **
+! ** useful,but WITHOUT ANY WARRANTY; without even the        **
+! ** implied warranty of  MERCHANTEABILITY or FITNESS FOR A   **
+! ** PARTICULAR PURPOSE.  See the GNU General Public License  **
+! ** for more details.                                        **
+! ** A copy of the GNU General Public License is available at **
+! ** http://www.gnu.org/copyleft/gpl.html or by writing to    **
+! ** the Free Software Foundation, Inc. 59 Temple Place,      **
+! ** Suite 330, Boston, MA 02111, USA.                        **
+! **                                                          **
+! **************************************************************
+! **************************************************************
 !
 ! !INTERFACE
 !
-  SUBROUTINE adverte(FB,F,FF,W)
+  SUBROUTINE adverte(F,FDWDT,W)
 !
-! !USES:
+!DESCRIPTION
 !
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! Modules (use of ONLY is strongly encouraged!)
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+!    SUBROUTINE TO HANDLE THE SINKING OF BFM STATE VAR'S.
+!    SINKING IS TREATED AS DOWNWARD VERTICAL ADVECTION
+!    COMPUTED WITH UPSTREAM FINITE DIFFERENCES SCHEME.
+!
+!    THE DUMMY ARGUMENTS ARE:
+!    F:     ISTANTANEOUS STATE VARIABLE
+!    FDWDT: VERTICAL ADVECTION (SINKING) FLUX
+!    W:     SINKING VELOCITY (<0)
+!
+!*******************************************************************************
+!
+!     -----MODULES (USE OF ONLY IS STRONGLY ENCOURAGED)-----
 !
       use POM, ONLY:KB, DZR, H
 !
       use global_mem, ONLY:RLEN
-!-------------------------------------------------------------------------!
 !
-!BOC
+!    -----IMPLICIT TYPING IS NEVER ALLOWED----
 !
-!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-! Implicit typing is never allowed
-!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+     IMPLICIT NONE
 !
-  IMPLICIT NONE
-!   
-!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-! Local Variables
-!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+!    -----DUMMY ARGUMENTS-----
 !
- real(RLEN) :: FB(KB),F(KB),FF(KB)
- real(RLEN) :: W(KB)
- real(RLEN) :: DTI2
- integer :: k
+     real(RLEN) :: F(KB),    &  !STATE VAR. AT TIME=t
+                   FDWDT(KB)    !SINKING RATE
 !
-       F(KB)=F(KB-1)
-       FB(KB)=FB(KB-1)
+     real(RLEN) :: W(KB)     ! SINKING VELOCITY
 !
-! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=
-! Calculate vertical advection. Mind downward velocities are negative!
-! Upwind scheme:
-! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=
+!    -----LOOP COUNTER-----
 !
-      FF(1)=DZR(1)*F(1)*W(2)
+     integer :: k
+!
+!    -----VERTICAL ADVECTION: UPSTREAM SCHEME-----
+!
+     FDWDT(1)=DZR(1)*F(1)*W(2)
 
-      do K=2,KB-1
+     do K=2,KB-1
 !
-         FF(K)=DZR(K)*(F(K)*W(K+1)-F(K-1)*W(K)) 
+        FDWDT(K)=DZR(K)*(F(K)*W(K+1)-F(K-1)*W(K))
 !
-      end do
+     end do
 !
       return
 !
     end subroutine adverte 
 !
-!EOC

@@ -1,38 +1,82 @@
-!-----------------------------------------------------------------------
-!BOP
+!
+! **************************************************************
+! **************************************************************
+! **                                                          **
+! ** ONE-DIMENSIONAL BFM-POM  MODELING SYSTEM (BFM-POM1D)     **
+! **                                                          **
+! ** The modeling system originate from the direct on-line    **
+! ** coupling of the 1D Version of the Princeton Ocean model  **
+! ** "POM" and the Biological Flux Model "BFM".               **
+! **                                                          **
+! ** The whole modelling system and its documentation are     **
+! ** available for download from the BFM web site:            **
+! **                                                          **
+! **                  bfm-community.eu                        **
+! **                                                          **
+! ** For questions and/or information please address to the   **
+! ** BFM system team:                                         **
+! **                                                          **
+! **                 (bfm_st@lists.cmcc.it)                   **
+! **                                                          **
+! ** Version 1.0 2016                                         **
+! **                                                          **
+! ** This release has been finalised by Marco Zavatarelli,    **
+! ** Giulia Mussap and Nadia Pinardi. However, previous       **
+! ** significant contributions were provided also by          **
+! ** Momme Butenschoen and Marcello Vichi.                    **
+! ** Thanks are due to Prof. George L. Mellor that allowed us **
+! ** to modify, use and distribute the one dimensional        **
+! ** version of the Princeton Ocean Model.                    **
+! **                                                          **
+! **                            Marco.Zavatarelli@unibo.it    **
+! **                                                          **
+! ** This program is free software; you can redistribute it   **
+! ** and/or modify it under the terms of the GNU General      **
+! ** Public License as published by the Free Software         **
+! ** Foundation.                                              **
+! ** This program is distributed in the hope that it will be  **
+! ** useful,but WITHOUT ANY WARRANTY; without even the        **
+! ** implied warranty of  MERCHANTEABILITY or FITNESS FOR A   **
+! ** PARTICULAR PURPOSE.  See the GNU General Public License  **
+! ** for more details.                                        **
+! ** A copy of the GNU General Public License is available at **
+! ** http://www.gnu.org/copyleft/gpl.html or by writing to    **
+! ** the Free Software Foundation, Inc. 59 Temple Place,      **
+! ** Suite 330, Boston, MA 02111, USA.                        **
+! **                                                          **
+! **************************************************************
+! **************************************************************
 !
 ! !ROUTINE: pom_bfm
 !
 ! !INTERFACE:
+
        subroutine pom_bfm_1d
 !
 ! !DESCRIPTION:
-!  BFM coupling with POM
-!  Time-marching routines: trend computations (bio+transport)
-!  and integration
+!  This subroutine handles the BFM-POM1D coupling by:
+!    -Passing to BFM Information about the physical environment
+!    -Computing the Biogeochemical rates of change (BFM core)
+!    -Computing the Physical rates of change for The BFM State Var's
+!    -Integrating forward in time BFM state Var's with Source splitting
+!     method and leapFrog numerical scheme.
+!    -Handling the model output
+!    -Reset the BFM state Var's trend arrays at the end of each iteration
 !
+!*******************************************************************
 !
-! !USES:
+!     -----MODULES (USE OF ONLY IS STRONGLY ENCOURAGED)-----
 !
        use api_bfm,ONLY           :out_delta
-       use Service,ONLY           :ilong,savef
+       use Service,ONLY           :savef
        use constants,ONLY         :SEC_PER_DAY
-       use POM,ONLY               :time,time0,dti,intt
+       use POM,ONLY               :time,time0,dti,intt,ilong
+!
        use global_mem, ONLY       :RLEN
 !
-!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-! Implicit typing is never allowed
-!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+!     -----IMPLICIT TYPING IS NEVER ALLOWED-----
 !
        IMPLICIT NONE
-!
-! !REVISION HISTORY:
-!  Original author(s): M. Butenschoen,  M. Vichi, 
-!                      M. Zavatarelli, L. Polimene 
-!
-!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-! Local Variables
-!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 !
 !      -----MODEL TIME IN DAYS-----
 !
@@ -43,42 +87,44 @@
        logical, save          ::first
        data first /.true./
 !
-!EOP
-!
-!-----------------------------------------------------------------------
-!BOC
-!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-! Pass physical variables into bfm
-! compute extinction coefficients
-! compute vertical light distribution
-!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-!
+!      ********************************************
+!      ********************************************
+!      **                                        **
+!      ** Pass physical variables into BFM core  **
+!      ** Compute extinction coefficients        **
+!      ** compute vertical light distribution    **
+!      **                                        **
+!      ********************************************
+!      ********************************************
+
        call env_forcing_pom_bfm_1d
 !
-!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-! calculate biological processes 
-!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+!      -----EXECUTE BFM CORE-----
 !
        call EcologyDynamics
 !
-!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-! Vertical diffusion and Integration of BFM state Vars    
-! with source splitting method
-!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+!      *******************************************************************
+!      *******************************************************************
+!      **                                                               **
+!      ** Physical transport (Vertical diffusion and sinking) of        **
+!      ** BFM state Var's.                                              **
+!      ** Integration of BFM pelagic state Var's with Source Splitting  **
+!      ** method and Leapfrog numerical scheme                          **
+!      **                                                               **
+!      *******************************************************************
+!      *******************************************************************
 !
-        call vdiff_SOS 
+       call vdiff_SOS
 !
-!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-!  leap frog integration of 2d state var's
-!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+!      -----INTEGRATION OF SCALAR (BENTHIC) BFM STATE VAR'S WITH LEAPFROG SCHEME----
 !
 #ifdef INCLUDE_BEN
 !
-      call lf2d
+      call lf1d
 !
 #endif
 !
-!      -----DEFINE TIME FOR BFM-----
+!      -----DEFINE AND UPDATE TIME FOR OUTPUT WRITING-----
 !
        if(first) then
 !
@@ -92,11 +138,9 @@
 !
 !      -----MANAGE OUTPUT-----
 !
-       call pom_dia_bfm(intt,TT)
+       call pom_dia_bfm(TT)
 !
-!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-! Reset trend arrays
-!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+!      -----RESET BFM STATE VAR'S TREND ARRAYS-----
 !
        call ResetFluxes
 !

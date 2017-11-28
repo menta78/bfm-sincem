@@ -1,37 +1,80 @@
-!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-!ONE-DIMENSIONAL BFM-POM SYSTEM  
-!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-! !INTERFACE:
+!
+! **************************************************************
+! **************************************************************
+! **                                                          **
+! ** ONE-DIMENSIONAL BFM-POM  MODELING SYSTEM (BFM-POM1D)     **
+! **                                                          **
+! ** The modeling system originate from the direct on-line    **
+! ** coupling of the 1D Version of the Princeton Ocean model  **
+! ** "POM" and the Biological Flux Model "BFM".               **
+! **                                                          **
+! ** The whole modelling system and its documentation are     **
+! ** available for download from the BFM web site:            **
+! **                                                          **
+! **                  bfm-community.eu                        **
+! **                                                          **
+! ** For questions and/or information please address to the   **
+! ** BFM system team:                                         **
+! **                                                          **
+! **                 (bfm_st@lists.cmcc.it)                   **
+! **                                                          **
+! ** Version 1.0 2016                                         **
+! **                                                          **
+! ** This release has been finalised by Marco Zavatarelli,    **
+! ** Giulia Mussap and Nadia Pinardi. However, previous       **
+! ** significant contributions were provided also by          **
+! ** Momme Butenschoen and Marcello Vichi.                    **
+! ** Thanks are due to Prof. George L. Mellor that allowed us **
+! ** to modify use and distribute the one dimensional         **
+! ** version of the Princeton Ocean Model.                    **
+! **                                                          **
+! **                            Marco.Zavatarelli@unibo.it    **
+! **                                                          **
+! ** This program is free software; you can redistribute it   **
+! ** and/or modify it under the terms of the GNU General      **
+! ** Public License as published by the Free Software         **
+! ** Foundation.                                              **
+! ** This program is distributed in the hope that it will be  **
+! ** useful,but WITHOUT ANY WARRANTY; without even the        **
+! ** implied warranty of  MERCHANTEABILITY or FITNESS FOR A   **
+! ** PARTICULAR PURPOSE.  See the GNU General Public License  **
+! ** for more details.                                        **
+! ** A copy of the GNU General Public License is available at **
+! ** http://www.gnu.org/copyleft/gpl.html or by writing to    **
+! ** the Free Software Foundation, Inc. 59 Temple Place,      **
+! ** Suite 330, Boston, MA 02111, USA.                        **
+! **                                                          **
+! **************************************************************
+! **************************************************************
+!
+! INTERFACE:
 !
    MODULE POM
 !
-!................................................Marco.Zavatarelli@unibo.it
-!................................................G.Mussap@sincem.unibo.it
-!                                                    2014
-! -----DEFINITION AND ALLOCATION OF PARAMETERS, SCALAR AND ARRAYS USED (MOSTLY)-----
-! -----BY THE PHYSICAL COMPONENT OF THE SYSTEM-----
+!  DESCRIPTION
 !
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! Modules (use of ONLY is strongly encouraged!)
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+! This module contains definition and allocation of parameter, scalars and arrays
+! used (mostly) by the physical component od the BFM-POM1D system.
 !
-    use global_mem,ONLY: RLEN,ONE
-    use constants, ONLY: SEC_PER_DAY
+!***************************************************************************
 !
-!-------------------------------------------------------------------------!
+!     -----MODULES (USE OF ONLY IS STRONGLY ENCOURAGED)-----
 !
-!BOC
+      use global_mem,ONLY: RLEN,ONE
+      use constants, ONLY: SEC_PER_DAY
 !
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! Implicit typing is never allowed
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+!     -----IMPLICIT TYPING IS NEVER ALLOWED-----
 !
-   IMPLICIT NONE
+      IMPLICIT NONE
 !
 !     -----SET INTEGER PRECISION------
 !
       integer,parameter                 :: ilong=selected_int_kind(12)
+!
+!     -----VERTICAL LAYERS-----
+!
+      integer(ilong),parameter :: KB=31
 !
 !     -----SWITCH FOR PROGNOSTIC/DIAGNOSTIC SIMULATION-----
 !
@@ -46,13 +89,18 @@
 !
       integer(ilong)           ::IDIAGN
 !
-!     -----# OF SURFACE/BOTTOM LAYERS WITH LOG DISTRIBUTION-----
+!     -----DEFINE SURFACE AND BOTTOM LAYERS LOG DISTRIBUTION-----
 !
 !     *****************************************************
 !     *****************************************************
 !     **                                                 **
-!     ** KL1: SURFACE LAYERS                             **
-!     ** KL2: BOTTOM LAYERS                              **
+!     **  INTEGERS DEFINING THE NUMBER OF LOGARITHMIC    **
+!     **  LAYERS AT THE SURFACE AND BOTTOM (USED IN      **
+!     **  SUBROUTINE CALCDEPTH.                          **
+!     **  THE NUMBER OF SURFACE LOG. LAYERS IS KL1-2     **
+!     **  THE NUMBER OF BOTTOM  LOG. LAYERS IS KB-KL2-1  **
+!     **  FOR NO LOG. DISTRIBUTION EVERYWHERE SET:       **
+!     **  KL1=2 AND KL2=KB-1                             **
 !     **                                                 **
 !     *****************************************************
 !     *****************************************************
@@ -67,14 +115,13 @@
 !     ** IHOTST=0 "COLD" START FROM INITIAL CONDITION    **
 !     ** IHOTST=1 "HOT" START FROM RESTART FILE          **
 !     **                                                 **
-!     ** SEE SUBROUTINE "CALCDEPTH"                      **
 !     *****************************************************
 !     *****************************************************
 !
       integer(ilong)           ::IHOTST
 !
-!     -----MODEL TIME STEP-----
-! 
+!     -----MODEL TIME STEP (SECONDS)-----
+ ! 
       REAL(RLEN)               :: DTI
 !
 !     -----LENGTH OF THE RUN (DAYS)-----
@@ -89,7 +136,7 @@
 !
       integer(ilong)           :: intt
 !     
-!     -----RUNNING TIME-----
+!     -----RUNNING TIME (IN DAYS)-----
 !
       REAL(RLEN)               :: TIME
 !
@@ -97,7 +144,7 @@
 !
       REAL(RLEN)               :: TIME0
 !
-!     -----BOTTOM DEPTH-----
+!     -----BOTTOM DEPTH (METRES)-----
 !
       REAL(RLEN)               :: H
 !   
@@ -125,22 +172,26 @@
 !    
       REAL(RLEN)               :: NRT
 !
-!     -----PARAMETER FOR THE HASSELIN FILTER----
-!     -----(TIME STEP MIXING)-----
+!     -----PARAMETER FOR THE ASSELIN FILTER----
+!            -----(TIME STEP MIXING)-----
 !
       REAL(RLEN)               :: SMOTH
 !
+!     -----REFERENCE DENSITY OF FRESH WATER-----
+!
+      real(RLEN),parameter         :: RHO0=1000.0
+!
+!     -----REFERENCE DENSITY OF SEAWATER-----
+!
+      real(RLEN),parameter         :: RHOSEA=RHO0 + 25.0
+!
 !     -----SPECIFIC HEAT TIMES RHO0-----
 !
-      real(RLEN),parameter         :: RCP=4.187E6
+      real(RLEN),parameter         :: RCP=4.186*RHOSEA
 !
 !     -----1 DAY IN SECONDS (RECIPROCAL)-----
 !
       real(RLEN), Parameter        :: DAYI=ONE/SEC_PER_DAY
-!
-!     -----VERTICAL LAYERS-----
-!
-      integer(ilong),parameter :: KB=31
 !
 !     -----FLAGS TO CHOOSE T,S AND BFM TRACERS SURFACE B.C. IN PROFTS-----
 !
@@ -227,11 +278,27 @@
 !
       real(RLEN)               :: SWRAD
 !
+!     -----BOTTOM ROUGHNESS LENGTH-----
+!
+real(RLEN)                :: Z0B
+!
+!     -----MINIMUM ACHIEVABLE BOTTOM DRAG COEFF.-----
+!
+real(RLEN)                :: CBCMIN
+!
+!     -----VON KARMANN CONSTANT-----
+!
+real(RLEN), Parameter    :: vonkarmann=0.40_RLEN
+!
+!     -----BOTTOM DRAG COEFFICIENT-----
+!
+real(RLEN)               :: CBC
+!
 !     *****************************************
 !     *****************************************
 !     **                                     **
 !     ** N.B.                                **
-!     ** THE FOLLOWING SCALARS ARE USED ONLY **
+!     ** THE FOLLOWING SCALAR IS USED ONLY   **
 !     ** WHEN THE MODEL IS RUN IN PROGNOSTIC **
 !     ** MODE                                **
 !     **                                     **
@@ -242,6 +309,26 @@
 !
       real(RLEN)               :: WTSURF
 ! 
+!     ------PRESCRIBED T & S VERTICAL PROFILES-----
+!
+!     *****************************************
+!     *****************************************
+!     **                                     **
+!     ** INTERPOLATED, CLIMATOLOGICAL        **
+!     ** AND TIME VARYING.                   **
+!     ** USED IN BOTH MODES (IDIAGN=0/1)     **
+!     **                                     **
+!     ** IDIAGN=0: USED TO COMPUTE           **
+!     ** LATERAL T&S ADVECTIVE FLUXES        **
+!     **                                     **
+!     ** IDIAGN=1: PROVIDE THE COMPLETE      **
+!     ** T&S VERTICAL PROFILES.
+!     **                                     **
+!     *****************************************
+!     *****************************************
+!
+       real (RLEN),dimension (KB) :: TSTAR, SSTAR
+
 !     ------PRESCRIBED SURFACE T & S-----
 !
 !     *****************************************
@@ -250,6 +337,9 @@
 !     ** N.B.                                **
 !     ** TO BE USED (IF DESIRED) AS SURFACE  **
 !     ** T & S SURFACE BOUNDARY CONDITION    **
+!     ** (IDIAGN=1)                          **
+!     ** INTERPOLATED, CLIMATOLOGICAL        **
+!     ** AND TIME VARYING.                   **
 !     **                                     **
 !     *****************************************
 !     *****************************************
@@ -263,7 +353,7 @@
 !     -----LATERAL ADVECTION FLUX FOR T & S-----
 !
       real(RLEN), dimension(KB):: WTADV, WSADV
-!              
+!
       end module POM
 
 ! EOC

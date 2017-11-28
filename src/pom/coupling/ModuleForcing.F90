@@ -1,41 +1,71 @@
+! **************************************************************
+! **************************************************************
+! **                                                          **
+! ** ONE-DIMENSIONAL BFM-POM  MODELING SYSTEM (BFM-POM1D)     **
+! **                                                          **
+! ** The modeling system originate from the direct on-line    **
+! ** coupling of the 1D Version of the Princeton Ocean model  **
+! ** "POM" and the Biogeochemical Flux Model "BFM".           **
+! **                                                          **
+! ** The whole modelling system and its documentation are     **
+! ** available for download from the BFM web site:            **
+! **                                                          **
+! **                  bfm-community.eu                        **
+! **                                                          **
+! ** For questions and/or information please address to the   **
+! ** BFM system team:                                         **
+! **                                                          **
+! **                 (bfm_st@lists.cmcc.it)                   **
+! **                                                          **
+! ** Version 1.0 2016                                         **
+! **                                                          **
+! ** This release has been finalised by Marco Zavatarelli,    **
+! ** Giulia Mussap and Nadia Pinardi. However, previous       **
+! ** significant contributions were provided also by          **
+! ** Momme Butenschoen and Marcello Vichi.                    **
+! ** Thanks are due to Prof. George L. Mellor that allowed us **
+! ** to modify, use and distribute the one dimensional        **
+! ** version of the Princeton Ocean Model.                    **
+! **                                                          **
+! **                            Marco.Zavatarelli@unibo.it    **
+! **                                                          **
+! ** This program is free software; you can redistribute it   **
+! ** and/or modify it under the terms of the GNU General      **
+! ** Public License as published by the Free Software         **
+! ** Foundation.                                              **
+! ** This program is distributed in the hope that it will be  **
+! ** useful,but WITHOUT ANY WARRANTY; without even the        **
+! ** implied warranty of  MERCHANTEABILITY or FITNESS FOR A   **
+! ** PARTICULAR PURPOSE.  See the GNU General Public License  **
+! ** for more details.                                        **
+! ** A copy of the GNU General Public License is available at **
+! ** http://www.gnu.org/copyleft/gpl.html or by writing to    **
+! ** the Free Software Foundation, Inc. 59 Temple Place,      **
+! ** Suite 330, Boston, MA 02111, USA.                        **
+! **                                                          **
+! **************************************************************
+! **************************************************************
 !
-!!!!!!
-!WARNING THIS IS A TEST VERSION
-!(MONTHLY FREQUENCY)!!!!!!!
-!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-!ONE-DIMENSIONAL BFM-POM SYSTEM
-!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-!
-! !INTERFACE
   MODULE  Forcing
 !
+! DESCRIPTION
 !
-!................................................Marco.Zavatarelli@unibo.it
-!................................................G.Mussap@sincem.unibo.it
-!                                                    2014
+! DEFINITION AND ALLOCATION OF PARAMETERS, SCALAR AND ARRAYS USED---
+! TO DEFINE THE PHYSICAL AND  BIOGEOCHEMICAL FORCING
 !
-! -----DEFINITION AND ALLOCATION OF PARAMETERS, SCALAR AND ARRAYS USED---
-! -----TO DEFINE THE PHYSICAL AND  BIOGEOCHEMICAL FORCING-----
-! 
-! !USES:
+!**********************************************************************
 !
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! Modules (use of ONLY is strongly encouraged!)
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+! -----MODULES (USE OF ONLY IS STRONGLY ENCOURAGED)-----
 !
-  use POM,ONLY: KB,ilong
+  use POM,ONLY: KB, ilong
+!
   use global_mem, ONLY:RLEN
 !
-!-------------------------------------------------------------------------!
-!BOC
-!
-  !=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  ! Implicit typing is never allowed
-  !=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!     -----IMPLICIT TYPING IS NEVER ALLOWED-----
 !
   IMPLICIT NONE
 !
-!     -----MONTHLY SHORTWAVE RADIATION-----
+!     -----SHORTWAVE RADIATION DATA-----
 ! 
 !     ***************************************
 !     ***************************************
@@ -54,45 +84,41 @@
 !     ***************************************
 !     ***************************************
 !     ** N.B.!                             **
-!     ** THE FOLLOWING SCALARS ARE USED    **
+!     ** THE FOLLOWING 2 SCALARS ARE USED  **
 !     ** ONLY WHEN THE MODEL IS RUN IN     **
 !     ** PROGNOSTIC MODE.                  **
 !     ***************************************
 !     ***************************************
 !    
-!     -----MONTHLY LOSS TERM OF THE SURFACE HEAT FLUX-----
+!     -----LOSS TERM OF THE SURFACE HEAT FLUX DATA-----
 
        REAL (RLEN),SAVE                     :: WTSURF1,WTSURF2
 !
-!     ****************************************
-!     ****************************************
-!     ** N.B.                               **
-!     ** THE FOLLOWING ARE ALWAYS USED      **
-!     **                                    **
-!     ****************************************
-!     ****************************************
+!     -----HEAT FLUX CORRECTION TERM (NO MORE IN USE)------
 !
-!     -----PRESCRIBED T&S PROFILES-----
+      REAL (RLEN),SAVE                     :: QCORR1,QCORR2
+!     ***************************************
+!     ***************************************
+!     ** N.B.!                             **
+!     ** THE FOLLOWING SCALARS ARE ALWAYS  **
+!     ** USED.                             **
+!     **                                   **
+!     ***************************************
+!     ***************************************
 !
-      real(RLEN),public,dimension(KB),SAVE   :: TSTAR,SSTAR
-!
-!     -----MONTHLY WIND STRESS-----
+!     -----WIND STRESS DATA-----
 !
       REAL (RLEN),SAVE                       :: WSU1,WSU2,WSV1,WSV2
 !
-!     -----MONTHLY SURFACE SALINITY
-
-      REAL (RLEN),SAVE                       :: SSS1,SSS2
-!
-!     -----MONTHLY SURFACE NITRATE
+!     -----SURFACE NITRATE DATA-----
 !
       REAL (RLEN),SAVE                       :: NO3_1,NO3_2
 !
-!     -----MONTHLY SURFACE PHOSPHATE-----
+!     -----SURFACE PHOSPHATE DATA-----
 !
       REAL (RLEN),SAVE                       :: PO4_1,PO4_2
 !
-!     -----MONTHLY SURFACE AMMONIA-----
+!     -----MONTHLY SURFACE AMMONIA DATA-----
 !
       REAL (RLEN),SAVE                       :: NH4_1,NH4_2
 !
@@ -100,35 +126,90 @@
 !
       REAL (RLEN),SAVE                       :: SIO4_1,SIO4_2
 !
-!     -----MONTHLY PROFILES OF INORGANIC SUSPENDED MATTER-----
+!     -----VERTICAL PROFILES OF INORGANIC SUSPENDED MATTER DATA-----
 !
       real(RLEN),public,dimension(KB-1),SAVE :: ISM1,ISM2
 !
-!     -----MONTHLY PROFILES OF T & S-----
+!     -----VERTICAL PROFILES OF T & S-----
 !
       real(RLEN),public,dimension(KB),SAVE :: TCLIM1,TCLIM2
       real(RLEN),public,dimension(KB),SAVE :: SCLIM1,SCLIM2
-!
-       REAL (RLEN),SAVE                    :: SLUX1,QCORR1
+
 !
 !     -----INTERPOLATORS AND COUNTERS-----
 !
-      INTEGER(ilong),SAVE                   ::  ICOUNTF,IDOUNTF,          &
-                                                IFCHGE,IFDCHGE,           &
-                                                IFDINT,IFINT
+      INTEGER(ilong),SAVE                   ::  ICOUNTF,        &
+                                                IFCHGE,         &
+                                                IFINT
 !
-      REAL(RLEN),SAVE                       ::  RATIOF,RATIOD
+      REAL(RLEN),SAVE                       ::  RATIOF
 !
 contains
 !
 !
       SUBROUTINE FORCING_MANAGER
 !
-!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-! Modules (use of ONLY is strongly encouraged!)
-!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+! **************************************************************
+! **************************************************************
+! **                                                          **
+! ** ONE-DIMENSIONAL BFM-POM  MODELING SYSTEM (BFM-POM1D)     **
+! **                                                          **
+! ** The modeling system originate from the direct on-line    **
+! ** coupling of the 1D Version of the Princeton Ocean model  **
+! ** "POM" and the Biogeochemical Flux Model "BFM".           **
+! **                                                          **
+! ** The whole modelling system and its documentation are     **
+! ** available for download from the BFM web site:            **
+! **                                                          **
+! **                  bfm-community.eu                        **
+! **                                                          **
+! ** For questions and/or information please address to the   **
+! ** BFM system team:                                         **
+! **                                                          **
+! **                 (bfm_st@lists.cmcc.it)                   **
+! **                                                          **
+! ** Version 1.0 2016                                         **
+! **                                                          **
+! ** This release has been finalised by Marco Zavatarelli,    **
+! ** Giulia Mussap and Nadia Pinardi. However, previous       **
+! ** significant contributions were provided also by          **
+! ** Momme Butenschoen and Marcello Vichi.                    **
+! ** Thanks are due to Prof. George L. Mellor that allowed us **
+! ** to modify, use and distribute the one dimensional        **
+! ** version of the Princeton Ocean Model.                    **
+! **                                                          **
+! **                            Marco.Zavatarelli@unibo.it    **
+! **                                                          **
+! ** This program is free software; you can redistribute it   **
+! ** and/or modify it under the terms of the GNU General      **
+! ** Public License as published by the Free Software         **
+! ** Foundation.                                              **
+! ** This program is distributed in the hope that it will be  **
+! ** useful,but WITHOUT ANY WARRANTY; without even the        **
+! ** implied warranty of  MERCHANTEABILITY or FITNESS FOR A   **
+! ** PARTICULAR PURPOSE.  See the GNU General Public License  **
+! ** for more details.                                        **
+! ** A copy of the GNU General Public License is available at **
+! ** http://www.gnu.org/copyleft/gpl.html or by writing to    **
+! ** the Free Software Foundation, Inc. 59 Temple Place,      **
+! ** Suite 330, Boston, MA 02111, USA.                        **
+! **                                                          **
+! **************************************************************
+! **************************************************************
 !
-      use global_mem,ONLY: RLEN,ZERO,PI,ONE,NML_OPEN,NML_READ,error_msg_prn
+! DESCRIPTION
+!
+!This subroutine reads the physical and biogeochemical forcing data and carries
+! out the time linear interpolation.
+!
+! N.B. The subroutine is currently arranged to work with monthly climatological
+! data series. A more general version is going to be prepared.
+!
+!*******************************************************************************
+!
+! -----MODULES (USE OF ONLY IS STRONGLY ENCOURAGED)-----
+!
+      use global_mem,ONLY: RLEN,ZERO,ONE,NML_OPEN,NML_READ,error_msg_prn
 !
       use constants, ONLY: SEC_PER_DAY
 !
@@ -143,67 +224,56 @@ contains
                      SWRAD,                                               &
                      WTSURF,WSSURF,                                       &
                      TSURF,SSURF,                                         &
-                     TB,SB,                                               &
-                     ilong
+                     TSTAR,SSTAR,                                         &
+                     ilong,                                               &
+                     RHO0
 !
-      use Service,ONLY: ISM, savef, &
-                        PO4SURF,NO3SURF,NH4SURF,SIO4SURF,                 &
-                        wind_input,radiance_input,                        &
-                        ism_input,Sprofile_input,                         &
-                        Tprofile_input,surfNut_input,                     &
-                        Sal_input,Temp_input,heat_input,SurfaceS_input
-!------------------------------------------------------------------------!
+      use Service,ONLY: ISM,PO4SURF,NO3SURF,NH4SURF,SIO4SURF
 !
-!BOC
+! -----IMPLICIT TYPING IS NEVER ALLOWED-----
+!
+      IMPLICIT NONE
 !
 !     -----LOOP COUNTER-----
 !
       integer(ilong)               :: K
 !
-     ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-     !  Local Arrays
-     ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-!
-      INTEGER                      :: RLENGTH
-!
 !     -------INITIALISATION AND FIRST FORCING READING-----
 !
       if(intt==INT(ONE)) then
 !
-        CALL opendat(WSU1,WSV1,SSS1,SLUX1,ISM1,SCLIM1,TCLIM1,SB,&
-                 TB,SWRAD1,WTSURF1,QCORR1,NO3_1,NH4_1,PO4_1,&
-                 SIO4_1)
+!       -----INITIALISE (ZEROING)-----
+!   
+        SWRAD1       =ZERO
+        SWRAD2       =ZERO
+        WTSURF1      =ZERO
+        WTSURF2      =ZERO
+        WSU1         =ZERO
+        WSU2         =ZERO
+        WSV1         =ZERO
+        WSV2         =ZERO
+        NO3_1        =ZERO
+        NO3_2        =ZERO
+        PO4_1        =ZERO
+        PO4_2        =ZERO
+        NH4_1        =ZERO
+        NH4_2        =ZERO
+        SIO4_1       =ZERO
+        SIO4_2       =ZERO
+        TCLIM1(:)    =ZERO
+        TCLIM2(:)    =ZERO
+        SCLIM1(:)    =ZERO
+        SCLIM2(:)    =ZERO
+        ISM1(:)      =ZERO
+        ISM2(:)      =ZERO
 !
-!         -----DAY COUNTER----
-!
-          IDOUNTF=1
-!
-!         -----MONTH COUNTER-----
+!         -----DATA READING COUNTER-----
 !
           ICOUNTF =  1
 !
-!         -----TIME STEPS TO COVER ONE DAY-----
-!
-          IFDCHGE=INT(SEC_PER_DAY)/INT(DTI)
-!
 !         -----TIME STEPS TO COVER ONE MONTH----
 !
-          IFCHGE  = 30_ilong*IFDCHGE
-!
-!         -----DAY INTERPOLATOR---
-!
-!         ******************************************************************
-!         ******************************************************************
-!         **                                                              **
-!         ** THE DAILY   CLIMATOLOGICAL FORCING DATA ARE ASSUMED TO BE    **
-!         ** CENTERED AT h 00.00  OF EACH CLIMATOLOGICAL DAY. THEREFORE   **
-!         ** THE MONTH INTERPOLATOR (IFDINT) IS INITIALISED AT THE VALUE  **
-!         ** CORRESPONDING TO MIDNIGHT  MINUS 1 TIMESTEP.                 **
-!         **                                                              **
-!         ******************************************************************
-!         ******************************************************************
-!
-          IFDINT   = -INT(ONE)
+          IFCHGE  = 30_ilong*INT(SEC_PER_DAY)/INT(DTI)
 !
 !         -----MONTH INTERPOLATOR---
 !
@@ -219,6 +289,10 @@ contains
 !         ******************************************************************
 !
           IFINT   = (IFCHGE/2_ilong)-INT(ONE)
+!
+!         -----OPEN DATA FILES-----
+!
+          CALL opendat
 !
 !         *************************************************
 !         *************************************************
@@ -253,13 +327,9 @@ contains
 !
                  case(1)
 !
-!            ---------------DAILY----------------
-!                    READ (17,REC=IDOUNTF)   SWRAD1
-!                    READ (17,REC=IDOUNTF+1) SWRAD2
-!------------------------MONTHLY--------------------------
-                     READ (21,REC=ICOUNTF)   SWRAD1
-                     READ (21,REC=ICOUNTF+1) SWRAD2
-
+                    READ (21,REC=ICOUNTF)   SWRAD1
+                    READ (21,REC=ICOUNTF+1) SWRAD2
+!
            end select
 !
 !         ***********************************************************
@@ -310,24 +380,22 @@ contains
           READ(18,REC=ICOUNTF)   NO3_1,NH4_1,PO4_1,SIO4_1
           READ(18,REC=ICOUNTF+1) NO3_2,NH4_2,PO4_2,SIO4_2
 !
-!
 !         -----WIND STRESS CONVERTED TO POM UNITS (N/m2-->m2/s2)-----
 !
-          WSU1 = -WSU1*1.e-3_RLEN
-          WSU2 = -WSU2*1.e-3_RLEN
-          WSV1 = -WSV1*1.e-3_RLEN
-          WSV2 = -WSV2*1.e-3_RLEN
+          WSU1 = WSU1*(-ONE)/RHO0
+          WSU2 = WSU2*(-ONE)/RHO0
+          WSV1 = WSV1*(-ONE)/RHO0
+          WSV2 = WSV2*(-ONE)/RHO0
 !
 !         -----HEAT FLUX CONVERTED TO POM UNITS(W/m2-->deg.C*m/s)-----
 !
-          SWRAD1  = -SWRAD1/rcp
-          SWRAD2  = -SWRAD2/rcp
-          WTSURF1 = -WTSURF1/rcp
-          WTSURF2 = -WTSURF2/rcp
-!
-!         -----UPDATE THE DAY COUNTER-----
-!
-          IDOUNTF=IDOUNTF + INT(ONE)
+          SWRAD1  = SWRAD1*(-ONE)/rcp
+          SWRAD2  = SWRAD2*(-ONE)/rcp
+!   
+          IF(IDIAGN==INT(ZERO)) THEN
+             WTSURF1 = WTSURF1*(-ONE)/rcp
+             WTSURF2 = WTSURF2*(-ONE)/rcp
+          ENDIF
 !
 !         -----UPDATE THE MONTH COUNTER-----
 !
@@ -335,12 +403,16 @@ contains
 !
       endif
 !
-!     -----UPDATE INTERPOLATION COUNTERS-----
+!     -----END OF INITIALISATION AND FIRST DATA READING (intt=1)-----
 !
-      IFDINT = IFDINT + INT(ONE)
-      RATIOD = FLOAT(IFDINT)/FLOAT(IFDCHGE)
+!     -----BEGIN TIME INTERPOLATION-----
+!
+!     -----UPDATE INTERPOLATION COUNTER-----
 !
       IFINT  = IFINT + INT(ONE)
+!
+!     -----UPDATE INTERPOLATOR-----
+!
       RATIOF = FLOAT(IFINT)/FLOAT(IFCHGE)
 !
 !     -----INTERPOLATE WIND STRESS-----
@@ -348,21 +420,19 @@ contains
       WUSURF = WSU1 + RATIOF * (WSU2-WSU1)
       WVSURF = WSV1 + RATIOF * (WSV2-WSV1)
 !
-!
-!     -----INTERPOLATE HEAT FLUX-----
-!
       select case (IDIAGN)
 !
              case (INT(ZERO))
+!
+!                 -----PROGNOSTIC RUN: INTERPOLATE TOTAL HEAT FLUX-----
 !
                   WTSURF = WTSURF1 + RATIOF * (WTSURF2-WTSURF1)
                   SWRAD  = SWRAD1  + RATIOF * (SWRAD2-SWRAD1)
 !
              case (INT(ONE))
 !
-!               ------------DAILY----------------
-!                  SWRAD  = SWRAD1  + RATIOD * (SWRAD2-SWRAD1)
-!               ------------MONTHLY----------------
+!                  -----DIAGNOSTIC RUN: INTERPOLATE SOLAR RADIATION ONLY-----
+!
                   SWRAD  = SWRAD1  + RATIOF * (SWRAD2-SWRAD1)
 !
       end select
@@ -376,10 +446,14 @@ contains
 !
              case (INT(ZERO))
 !
+!                 -----PROGNOSTIC RUN: SAVE SST AND SSS FOR SURF. B.C.-----
+!
                   TSURF = TSTAR(1)
                   SSURF = SSTAR(1)
 !
              case (INT(ONE))
+!
+!                 -----DIAGNOSTIC RUN: THE WHOLE T&S PROFILES ARE PRESCRIBED-----
 !
                   TF(:) = TSTAR(:)
                   SF(:) = SSTAR(:)
@@ -397,32 +471,9 @@ contains
       PO4SURF  = PO4_1  + RATIOF * (PO4_2-PO4_1)
       SIO4SURF = SIO4_1 + RATIOF * (SIO4_2-SIO4_1)
 !
-!      IF (IFDINT==IFDCHGE.AND.IDIAGN==INT(ONE)) THEN
+!     -----END OF INTERPOLATION SECTION-----
 !
-!        ----A DAY HAS GONE...IT IS NECESSARY TO....-----
-!
-!        ----UPDATE DAY COUNTER....----
-!
-!         IDOUNTF = IDOUNTF+1
-!
-!        ----RESET INTERPOLATOR-----
-!
-!         IFDINT = INT(ZERO)
-!
-!        -----SHIFT THE DAILY DATA....-----
-!
-!         SWRAD1=SWRAD2
-!
-!        -----IF 360 DAYS HAVE GONE, RESTART THE READING SEQUENCE-----
-!
-!         if (IDOUNTF.GT.361) then
-!            IDOUNTF=2_ilong
-!            READ(17,REC=1) SWRAD1
-!            SWRAD1=-SWRAD1/rcp
-!         endif
-!
-!      ENDIF
-!
+!     -----BEGIN DATA UPDATE SECTION-----
 !
       IF (IFINT==IFCHGE) THEN
 !
@@ -431,21 +482,18 @@ contains
 !        -----....UPDATE MONTH COUNTER....-----
 !
          ICOUNTF = ICOUNTF + 1
-!
          PRINT *, 'ICOUNTF', ICOUNTF
 !
-!        -----....RESET INTERPOLATOR....-----
+!        -----....RESET INTERPOLATION COUNTER....-----
 !
          IFINT   = INT(ZERO)
 !
 !        -----....SHIFT THE MONTHLY DATA....-----
 !
+         SWRAD1     = SWRAD2
+         if (IDIAGN==INT(ZERO)) WTSURF1 = WTSURF2
          WSU1       = WSU2
          WSV1       = WSV2
-!         if (IDIAGN==INT(ZERO)) then
-            SWRAD1     = SWRAD2
-            WTSURF1    = WTSURF2
-!         endif
          NO3_1      = NO3_2
          NH4_1      = NH4_2
          PO4_1      = PO4_2
@@ -454,22 +502,40 @@ contains
          TCLIM1(:)  = TCLIM2(:)
          SCLIM1(:)  = SCLIM2(:)
 !
+!            -----IF 12 MONTHS HAVE GONE.... -----
+!
          IF (ICOUNTF.GT.13) THEN
 !
-!            -----IF 12 MONTHS HAVE GONE, RESTART THE READING SEQUENCE-----
+!            -----RESTART THE READING SEQUENCE-----
 !
              ICOUNTF = 2
 !
              READ (11,REC=1) WSU1,WSV1
-             WSU1 = -WSU1*1.e-3_RLEN
-             WSV1 = -WSV1*1.e-3_RLEN
 !
-!             if(IDIAGN==INT(ZERO)) then
-                READ(21,REC=1) SWRAD1,WTSURF1
-!               WTSURF1=WTSURF1-SWRAD1
-                WTSURF1=-WTSURF1/rcp
-                SWRAD1=-SWRAD1/rcp
-!             endif
+!            -----POM UNITS-----
+!
+             WSU1 = WSU1*(-ONE)/RHO0
+             WSV1 = WSV1*(-ONE)/RHO0
+!
+             select case (IDIAGN)
+!                   
+                    case(INT(ZERO))
+!
+                         READ(21,REC=1) SWRAD1,WTSURF1
+!          
+!                        -----POM UNITS-----
+!
+                         WTSURF1=WTSURF1*(-ONE)/rcp
+!
+                    case(INT(ONE))
+!
+                         READ(21,REC=1) SWRAD1
+!
+             end select
+!
+!            -----POM UNITS-----
+!
+             SWRAD1=SWRAD1*(-ONE)/rcp
 !
              READ(18,REC=1) NO3_1,NH4_1,PO4_1,SIO4_1
 !
@@ -489,26 +555,31 @@ contains
          READ(18,REC=ICOUNTF) NO3_2,NH4_2,PO4_2,SIO4_2
 !
          READ (11,REC=ICOUNTF) WSU2,WSV2
-         WSU2 = -WSU2*1.e-3_RLEN
-         WSV2 = -WSV2*1.e-3_RLEN
 !
-!         select case (IDIAGN)
+!        -----POM UNITS-----
 !
-!               case (INT(ZERO))
+         WSU2 = WSU2*(-ONE)/RHO0
+         WSV2 = WSV2*(-ONE)/RHO0
+!
+         select case (IDIAGN)
+!
+               case (INT(ZERO))
 !
                      READ (21,REC=ICOUNTF) SWRAD2,WTSURF2
-!                    WTSURF2=WTSURF2-SWRAD2
-                     WTSURF2=-WTSURF2/rcp
-                     SWRAD2 =-SWRAD2/rcp
 !
-!        ------------- DAILY -------------------
-!                case (INT(ONE))
+!                    -----POM UNITS-----
 !
-!                     READ (17,REC=IDOUNTF) SWRAD2
-!                     SWRAD2=-SWRAD2/rcp
-!        ----------------------------------------
+                     WTSURF2=WTSURF2*(-ONE)/rcp
 !
-!         end select
+               case (INT(ONE))
+!
+                     READ (21,REC=ICOUNTF) SWRAD2
+!
+        end select
+!
+!       -----POM UNITS-----
+!
+        SWRAD2=SWRAD2*(-ONE)/rcp
 !
          DO K = 1,KB
              READ (20,REC=(ICOUNTF-1)*KB+K) SCLIM2(K)
@@ -525,8 +596,4 @@ contains
 !
       end subroutine FORCING_MANAGER
  end module Forcing
-!EOC
-!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-! MODEL  POM - Princeton Ocean Model 
-!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   

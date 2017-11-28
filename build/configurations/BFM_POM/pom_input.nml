@@ -9,10 +9,8 @@
 !
 !  WTSURF = latent - sensible + thermal  
 
- &pom_input
+&pom_input
 wind_input      =  '../../../TRST1D/MA21/windstress_mon_Mussap.da',
-surfaceS_input  =  '../../../TRST1D/MA21/Ssurf_16m.da',
-radiance_input  =  '../../../TRST1D/MA21/radiance_daily_Mussap.da',
 ism_input       =  '../../../TRST1D/MA21/ISM_16m_Mussap.da',
 Sal_input       =  '../../../TRST1D/MA21/ClimaS_MA21_16m.da',
 Temp_input      =  '../../../TRST1D/MA21/ClimaT_MA21_16m.da',

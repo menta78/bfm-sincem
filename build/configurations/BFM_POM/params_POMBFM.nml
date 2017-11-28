@@ -26,6 +26,8 @@
 ! TRT,SRT                   [ ]           Relaxation time for t & S lateral advection
 ! upperh                    [m]           Depth at which lat eadv start
 ! SSRT                      [m/d]         Relaxation time for surface salinity flux
+! CBCMIN 
+! Z0B 
 !
  &Params_POMBFM
  H       =  16.,
@@ -51,6 +53,8 @@
  SRT     =  1,
  UPPERH  =  5.0,
  SSRT    =  5.68   
+ CBCMIN  =  0.0025
+ Z0B     =  0.01
 / 
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 !END namelist

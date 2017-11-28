@@ -1,4 +1,3 @@
-!
 ! **************************************************************
 ! **************************************************************
 ! **                                                          **
@@ -6,7 +5,7 @@
 ! **                                                          **
 ! ** The modeling system originate from the direct on-line    **
 ! ** coupling of the 1D Version of the Princeton Ocean model  **
-! ** "POM" and the Biological Flux Model "BFM".               **
+! ** "POM" and the Biogeochemical Flux Model "BFM".           **
 ! **                                                          **
 ! ** The whole modelling system and its documentation are     **
 ! ** available for download from the BFM web site:            **
@@ -25,7 +24,7 @@
 ! ** significant contributions were provided also by          **
 ! ** Momme Butenschoen and Marcello Vichi.                    **
 ! ** Thanks are due to Prof. George L. Mellor that allowed us **
-! ** to modify use and distribute the one dimensional         **
+! ** to modify, use and distribute the one dimensional        **
 ! ** version of the Princeton Ocean Model.                    **
 ! **                                                          **
 ! **                            Marco.Zavatarelli@unibo.it    **
@@ -47,104 +46,106 @@
 ! **************************************************************
 ! **************************************************************
 !
-! !ROUTINE: get_TS_IC
+! !ROUTINE: PROFUV 
 !
 ! !INTERFACE
 !
-     subroutine get_TS_IC
+      Subroutine PROFUV(DT2,VELF,SSTRESS,BSTRESS)
 !
 !DESCRIPTION
 !
-! This subroutine opens and reads files containing the T&S initial conditions
-! Files are read in direct access mode
-! The path to the T&S I.C. file specified in namelist pom_input.
+! This subroutine solves for the vertical profile of the velocity
+! zonal and meridional components.
+! It handles the surface and bottom boundary conditions.
 !
-!***********************************************************************************
+! The routine dummy arguments are:
+! DT2: twice the time step
+! VELF: The velocity component to be computed
+! SSTRESS: The surface stress
+! Bstress: The bottom stress.
+!
+!*****************************************************************
 !
 !     -----MODULES (USE OF ONLY IS STRONGLY ENCOURAGED)-----
 !
-      use global_mem, ONLY: error_msg_prn, NML_OPEN, NML_READ
-!
-      use Service, ONLY: wind_input,     &
-                         ism_input,      &
-                         Sal_input,      &
-                         Temp_input,     &
-                         Sprofile_input, &
-                         Tprofile_input, &
-                         heat_input,     &
-                         surfNut_input,  &
-                         read_restart
-!    
-      use pom, ONLY: KB,T,TB,S,SB
+      use global_mem,ONLY: RLEN, ZERO
+      use POM,ONLY: H,A,C,KM,DZ,DZZ,VH,VHP,UB,VB,UMOL,CBC,KB
 !
 !     -----IMPLICIT TYPING IS NEVER ALLOWED-----
 !
       IMPLICIT NONE
 !
-!     -----LOOP COUNTER-----
+!     -----SCALAR ARGUMENTS-----
 !
-      INTEGER :: K
+      REAL(RLEN) :: DT2, SSTRESS,BSTRESS
 !
-!      -----RECORD LENGTH-----
+!    -----ARRAY ARGUMENT-----
 !
-      INTEGER :: RLENGTH
+     REAL(RLEN), dimension (KB) :: VELF
 !
-!     -----NAMELIST READING UNIT-----
+!     -----LOOP COUNTERS (DOWNWARD AND UPWARD)-----
 !
-      integer,parameter  :: namlst=10
+      INTEGER :: K,KI
 !
-!    -----OPEN AND READ NAMELIST WITH T&S I.C. FILE PATH-----
+!     -----INTRINSIC FUNCTION-----
 !
-       namelist /pom_input/ wind_input,     &
-                            ism_input,      &
-                            Sal_input,      &
-                            Temp_input,     &
-                            Sprofile_input, &
-                            Tprofile_input, &
-                            heat_input,     &
-                            surfNut_input,  &
-                            read_restart
+      INTRINSIC SQRT
 !
-       open(namlst,file='pom_input.nml',status='old',action='read',err=100)
-       read(namlst,nml=pom_input, err=102)
-       rewind(namlst)
-       close(namlst)
+!    *******************************************************
+!    *******************************************************
+!    **                                                   **
+!    ** THE FOLLOWING SECTION SOLVES THE EQUATION         **
+!    ** DT2*(KM*U')' - U= -UB                             **
+!    **                                                   **
+!    *******************************************************
+!    *******************************************************
 !
-!    -----OPEN FILE WITH SALINITY I.C.----
+      DO K = 2,KB - 1
 !
-       inquire(IOLENGTH=rlength) SB(1)
-       open(29,file=Sprofile_input,form='unformatted',access='direct',recl=rlength)
+          A(K-1) = -DT2* (KM(K)+UMOL)/ (DZ(K-1)*DZZ(K-1)*H*H)
+          C(K) = -DT2* (KM(K)+UMOL)/ (DZ(K)*DZZ(K-1)*H*H)
 !
+      END DO
 !
-!    -----OPEN FILE WITH TEMPERATURE I.C.----
+      VH(1) = A(1)/ (A(1)-1.)
 !
+      VHP(1) = (-DT2*SSTRESS/ (-DZ(1)*H)-VELF(1))/ (A(1)-1.)
 !
-       inquire(IOLENGTH=rlength) TB(1)
-       open(10,file=Tprofile_input,form='unformatted',access='direct',recl=rlength)
+      DO K = 2,KB - 2
 !
+          VHP(K) = 1./ (A(K)+C(K)* (1.-VH(K-1))-1.)
+          VH(K) = A(K)*VHP(K)
+          VHP(K) = (C(K)*VHP(K-1)-VELF(K))*VHP(K)
 !
-!    -----READ T&S INITIAL CONDITIONS-----
+      END DO
 !
-     DO K = 1,KB
+      BSTRESS = CBC*SQRT(UB(KB-1)**2+VB(KB-1)**2)
 !
-           READ (29,REC=K) SB(K)
-           READ (10,REC=K) TB(K)
+      VELF(KB-1) = (C(KB-1)*VHP(KB-2)-VELF(KB-1))/ &
+                   (BSTRESS*DT2/                   &
+                   (-DZ(KB-1)*H)-1.- (VH(KB-2)-1.)*C(KB-1))
 !
-     END DO
+      DO K = 2,KB - 1
 !
-!    -----COLD START: T@(t)=T@(t-dt)-----
+          KI = KB - K
+          VELF(KI) = VH(KI)*VELF(KI+1) + VHP(KI)
 !
-     T(:)=TB(:)
-     S(:)=SB(:)
+      END DO
 !
-     return
+!     -----COMPUTE NEW BOTTOM STRESS-----
 !
-!    -----PRINT IF PROBLEMS WITH NML OPENING-----
+      BSTRESS = -BSTRESS*VELF(KB-1)
 !
-100   call error_msg_prn(NML_OPEN,"get_TS_IC.F90","problem opening pom_input.nml")
+!     -----HOUSE CLEANING-----
 !
-!    -----PRINT IF PROBLEMS WITH NML READING-----
+      DO K = 1,KB
 !
-102   call error_msg_prn(NML_READ,"get_TS_IC.F90","pom_input")
+          VH(K)  = ZERO
+          VHP(K) = ZERO
+          A(K)   = ZERO
+          C(K)   = ZERO
+      END DO
+
+      RETURN
 !
-      end subroutine get_TS_IC
+      end subroutine PROFUV
