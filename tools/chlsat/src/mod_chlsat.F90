@@ -40,6 +40,7 @@ module mod_chlsat
    character(LEN=20)  :: chla_name,eps_name
    real(RLEN)         :: tolerance=ZERO
    logical            :: compute_eps=.FALSE.,compute_chlsat=.TRUE.,compute_intpp=.FALSE.
+   character(LEN=20)  :: opt_chlsat='MEAN'
    real(RLEN)         :: p_eps0=0.0435_RLEN, p_epsChla=0.03
    character(LEN=100) :: gpp_fname,rsp_fname
    character(LEN=20)  :: gpp_name,rsp_name
@@ -63,7 +64,7 @@ module mod_chlsat
    real(RLEN),                         intent(in)  :: tau
    real(RLEN),dimension(jpi,jpj,ntime),intent(out) :: ezd,chlsat
    integer                                         :: i,j,k,t
-   real(RLEN)                                      :: store,dep
+   real(RLEN)                                      :: optsum,dep
    real(RLEN)                                      :: expterm,optlen,norm
 
    ezd(:,:,:) = ZERO
@@ -71,28 +72,41 @@ module mod_chlsat
    do t = 1,ntime
       do j = 1,jpj
          do i = 1,jpi
-          store = ZERO
+          optsum = ZERO
           dep = ZERO
           norm = ZERO
           if (mask(i,j,1) > ZERO) then
             do k = 1,jpk-1
                optlen = eps(i,j,k,t)*e3t(i,j,k)
-               store = store + optlen
+               optsum = optsum + optlen
                dep = dep + e3t(i,j,k)
-               if ((store .lt. tau) .and. (mask(i,j,k)>ZERO)) then
-                  expterm = exp(-optlen) 
-                  chlsat(i,j,t) = chlsat(i,j,t)+chla(i,j,k,t)*expterm
-
-                  norm = norm+expterm
+               if ((optsum .lt. tau) .and. (mask(i,j,k)>ZERO)) then
+                  ! compute satellite like chlorophyll
+                  SELECT CASE ( TRIM(opt_chlsat) )                
+                     ! Mean of chla over the optical extinction depth
+                     CASE ( 'MEAN' )
+                        chlsat(i,j,t) = chlsat(i,j,t)+chla(i,j,k,t)*e3t(i,j,k)
+                        norm = norm + e3t(i,j,k)
+                     ! Formula of Vichi et al. (2007)
+                     CASE ( 'V07' )
+                        expterm = exp(-optlen) 
+                        chlsat(i,j,t) = chlsat(i,j,t)+chla(i,j,k,t)*expterm
+                        norm = norm+expterm
+                     ! Modified Vichi et al. (2007) using cumulative optical extinction
+                     CASE ( 'V07mod' )
+                        expterm = exp(-optsum)
+                        chlsat(i,j,t) = chlsat(i,j,t)+chla(i,j,k,t)*expterm
+                        norm = norm+exp(-optsum)
+                  END SELECT
                else
                   ! special case if absorption is high in the first layer
-                  if (k==1) then
+                  if ( k==1 ) then
                      ezd(i,j,t) = e3t(i,j,1)
                      chlsat(i,j,t) = chla(i,j,1,t)
-                  else
+                  else ! store data
                      ezd(i,j,t) = dep - e3t(i,j,k)*0.5_RLEN
                      chlsat(i,j,t) = chlsat(i,j,t)/norm
-                  end if
+                  endif
                   exit
                end if
             end do

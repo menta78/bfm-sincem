@@ -26,7 +26,7 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Modules (use of ONLY is strongly encouraged!)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  use global_mem, ONLY:RLEN,ZERO
+  use global_mem, ONLY:RLEN,ZERO,ONE
 #ifdef NOPOINTERS
   use mem
 #else
@@ -146,8 +146,12 @@
   fR6N7f(:)  =  p_sR6N7* eTq(  ETW(:),  p_q10R6N7)* R6f(:)
   call flux_vector( iiPel, ppR6f, ppN7f, fR6N7f(:) )
 
-  ! Scavenging to particles : Linear relaxation to the Iron Ligand concentration
-  fscavN7f(:) = max(ZERO,p_scavN7f*(N7f-p_N7fLigand))
+  ! Scavenging of free dissolved Iron
+  ! Adsorption onto Particulate Organic Matter (Eq.11 in Parekh et al.,2015 - GBC )
+  fscavN7f(:) = max ( ZERO, p_scavOrg * N7f * (R6c(:)**0.58_RLEN) )
+  
+  ! Inorganic component ( Linear relaxation to the Iron Ligand concentration )
+  fscavN7f(:) = fscavN7f(:) + max(ZERO,p_scavIng*(N7f-p_N7fLigand))
   call flux_vector( iiPel, ppN7f, ppN7f, -fscavN7f(:) )
 
 #endif

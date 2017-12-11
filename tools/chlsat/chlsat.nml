@@ -13,6 +13,10 @@
 !xyzname          string        Name of xyz dimensions in file (provide 3 fields)
 !coorname         string        Name of xyz coordinate variables in file (provide 3 fields)
 !compute_chlsat   logical       Compute chlsat (true by default useful only for NPP)
+!opt_chlsat       string        Select type of satellite-like computation :
+!                                MEAN   - compute mean value over optical depth "
+!                                V07    - use Eq. 2 from Vichi et al. 2007 (doi:10.1016/j.jmarsys.2006.03.014)"
+!                                V07mod - modified version of V07 with cumulative optical extinction "
 !compute_eps      logical       Use attenuation coefficient from output
 !                               or computed using the BFM formula from Chl 
 !                               concentration, neglecting ISM and detritus
@@ -35,12 +39,13 @@
    inp_dir='.'
    out_dir='.'
    compute_chlsat=.true.
+   opt_chlsat='V07mod'
    mask_fname='chlmask.nc'
    chla_fname='bfm_output.nc'
    chla_name='Chla'
    dimsname= 'x' 'y' 'deptht' 'time_counter'
    coorname= 'nav_lon' 'nav_lat' 'deptht' 'time_counter'
-   compute_eps=.true.
+   compute_eps=.false.
    p_eps0=0.0435
    p_epsChla=0.03
    eps_fname='bfm_output.nc'

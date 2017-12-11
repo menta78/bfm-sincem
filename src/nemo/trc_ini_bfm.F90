@@ -69,11 +69,15 @@
         n_trc_index, rf_trfac, trc_dta, trc_dta_init
    use trcbc, only : trc_bc_init
    use dom_oce
-   use lib_mpp, only : lk_mpp, mpp_max, mpp_min
+   use lib_mpp, only : lk_mpp, mpp_max, mpp_min, mpp_sum
    use in_out_manager, only: numout, nitend, nit000, lwp
-   USE iom,   only: iom_close
+   USE iom,   only: iom_open,iom_get,iom_close
    use c1d, only : lk_c1d
    use eosbn2,  only: nn_eos
+#ifdef INCLUDE_PELFE
+   use mem_PelChem,         only: p_rN7fsed
+   use trcini, only: ironsed
+#endif
 #ifdef CCSMCOUPLED
    USE nemogcm, only: logfile
 #endif
@@ -97,7 +101,7 @@
    integer              :: nc_id ! logical unit for data initialization
    character(len=40)    :: thistime
    real(RLEN)           :: julianday
-   REAL(RLEN)           :: ztraf, zmin, zmax, zmean, zdrift
+   REAL(RLEN)           :: ztraf, zmin, zmax, zmean, zdrift, zexp, zdexp
 !EOP
 !-----------------------------------------------------------------------
 !BOC
@@ -538,7 +542,38 @@
      stop
    endif
 #endif
-
+ 
+#ifdef INCLUDE_PELFE
+   ALLOCATE (ironsed(jpi,jpj,jpk))
+   ironsed = ZERO 
+   ! Prepare Iron release from seabed sediments
+   if ( p_rN7fsed > 0. ) then
+      LEVEL1 ''
+      LEVEL1 'SEABED IRON FLUX : Read fraction mask from bottom_fraction.nc'
+      LEVEL1 '  Apply constant Iron flux : ', p_rN7fsed
+      ! read btmfrac mask (vertical seabed fraction) from bottom_fraction.nc
+      CALL iom_open ( 'bottom_fraction.nc', m )
+      CALL iom_get  ( m, 1, 'btmfrac' , ironsed(:,:,:), 1 )
+      CALL iom_close( m )
+      ! iron release dpenedence on depth (metamodel of Middelburg et al.,1996)
+      DO k = 1, jpk
+         DO j = 1, jpj
+            DO i = 1, jpi
+               zexp  = MIN( 8.,( gdept_0(i,j,k) / 500. )**(-1.5) )
+               zdexp = -0.9543 + 0.7662 * LOG( zexp ) - 0.235 * LOG( zexp )**2
+               ironsed(i,j,k) = ironsed(i,j,k) * MIN( 1., EXP( zdexp ) / 0.5 )
+            END DO
+         END DO
+      END DO
+      ! 
+      ztraf = SUM(ironsed * spread(e1e2t,3,jpk) * p_rN7fsed * 365. * 1.e-15 * tmask )
+      CALL mpp_sum (ztraf)
+      LEVEL1 '  Total iron load from Sediment [Gmol/y] : ', ztraf
+      ! 
+      ironsed = ironsed * p_rN7fsed / ( SEC_PER_DAY * fse3t(:,:,:) )
+      !
+   endif
+#endif
    ! control consistency with NEMO EOS and BFM available conversions
    if ( nn_eos .eq. -1 ) then
       LEVEL1 'Conversions for NEMO TEOS-10 not available. Use directly CT and SA as state variables'

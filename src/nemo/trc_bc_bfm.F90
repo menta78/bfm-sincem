@@ -42,7 +42,8 @@ SUBROUTINE trc_bc_bfm ( kt, m )
    use constants,           only: SEC_PER_DAY
    use print_functions
 #ifdef INCLUDE_PELFE
-   use mem_PelChem,         only: p_rDust
+   use mem_PelChem,         only: p_rDust, p_rN7fsed
+   use trcini,              only: ironsed
 #endif
  
    ! substitutions
@@ -106,7 +107,7 @@ SUBROUTINE trc_bc_bfm ( kt, m )
          END DO
       END DO
       ! store surface fluxes for BFM diagnostics
-      PELSURFACE(m,:) = pack( rf_trsfac(jn) * sf_trcsbc(jn)%fnow(:,:,1) , SEAmask(:,:,1))
+      !PELSURFACE(m,:) = pack( rf_trsfac(jn) * sf_trcsbc(jn)%fnow(:,:,1) , SEAmask(:,:,1))
 
 #ifdef INCLUDE_PELFE
       ! dust dissolution below the surface (Moore et al., 2008; Aumont et al.,2015)
@@ -142,8 +143,14 @@ SUBROUTINE trc_bc_bfm ( kt, m )
          END DO
       END DO
       ! store surface fluxes for BFM diagnostics
-      PELRIVER(m,:) = pack( zsfx(:,:) / e1e2t(:,:) , SEAmask(:,:,1))
+      !PELRIVER(m,:) = pack( zsfx(:,:) / e1e2t(:,:) , SEAmask(:,:,1))
    END IF
+   !
+#ifdef INCLUDE_PELFE
+   ! Add sediment flux of Dissolved Iron (Moore et al., 2008)
+   if ( m .eq. ppN7f .AND. p_rN7fsed > 0._wp ) tra(:,:,:,m) = tra(:,:,:,m) + ironsed(:,:,:)
+#endif
+   
 
    CALL wrk_dealloc( jpi, jpj,      zsfx  )       
    CALL wrk_dealloc( jpi, jpj, jpk, IronDep  )

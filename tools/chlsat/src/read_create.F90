@@ -39,13 +39,26 @@ subroutine read_create
   namelist /chlsat_nml/ inp_dir,out_dir,out_fname,chla_fname,eps_fname,      &
   &                     chla_name,eps_name,mask_fname,tolerance,compute_eps, &
   &                     p_eps0,p_epsChla,gpp_fname,rsp_fname,gpp_name,rsp_name, &
-  &                     compute_intpp,compute_chlsat,dimsname,coorname
+  &                     compute_intpp,compute_chlsat,dimsname,coorname,opt_chlsat
 
      ! Reading directory names and file name specifications
      open(namlst,file=trim(cf_nml),action='read',status='old',err=99)
      read(namlst,nml=chlsat_nml,err=98)
      close(namlst)
-
+   
+     ! check chlsat option
+     if (compute_chlsat) then
+        if (trim(opt_chlsat) == "MEAN" .OR. trim(opt_chlsat) == "V07" .OR. trim(opt_chlsat) == "V07mod" ) then
+           write(*,*) "Compute chlsat with "//trim(opt_chlsat)//" algorithm."
+           write(*,*)
+        else 
+           write(*,*) "Unrecognized option for chlsat algorithm (opt_chlsat). Available options are: "
+           write(*,*) " MEAN   - compute mean value over optical extinction depth "
+           write(*,*) " V07    - use Eq. 2 from Vichi et al. 2007 (doi:10.1016/j.jmarsys.2006.03.014)"
+           write(*,*) " V07mod - modified version of V07 using cumulative optical extinction "
+           stop
+        endif
+     endif
 
      ! open input files, read dimensions and get data 
      fname1 = trim(inp_dir)//"/"//trim(chla_fname)
