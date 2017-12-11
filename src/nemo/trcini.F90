@@ -37,6 +37,7 @@ MODULE trcini
    PRIVATE
    
    PUBLIC   trc_init   ! called by opa
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:) :: ironsed   !: Seabed supply of iron
 
     !! * Substitutions
 #  include "domzgr_substitute.h90"
