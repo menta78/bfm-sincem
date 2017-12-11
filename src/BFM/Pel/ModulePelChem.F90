@@ -92,9 +92,11 @@
   real(RLEN)  :: p_q10R6N7   ! Q10 temperature dependence
   real(RLEN)  :: p_sR6N7     ! Specific remineralization rate (d-1)
   real(RLEN)  :: p_sR1N7     ! Specific remineralization rate from chelated iron (d-1)
-  real(RLEN)  :: p_scavN7f   ! Specific scavenging rate (d-1)
+  real(RLEN)  :: p_scavOrg   ! Specific scavenging rate organic matter (m3 mgC-1 d-1)
+  real(RLEN)  :: p_scavIng   ! Specific scavenging rate inorganic (d-1)
   real(RLEN)  :: p_N7fLigand ! Iron Ligand concentration in seawater (umol Fe/m3)
   real(RLEN)  :: p_rDust     ! Dust sinking speed below surface (m/d)
+  real(RLEN)  :: p_rN7fsed   ! Iron released from seabed sediments(umolFe/m2/d)
 #endif
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! SHARED PUBLIC FUNCTIONS (must be explicited below "contains")
@@ -109,8 +111,8 @@
   namelist /PelChem_parameters/ p_sN4N3, p_q10N4N3, p_q10R6N5, p_rOS, p_clO2o, &
     p_clN6r, p_sN3O4n, p_rPAo, p_sR6N5
 #ifdef INCLUDE_PELFE
-  namelist /PelChem_parameters_iron/ p_q10R6N7, p_sR6N7, p_sR1N7, p_scavN7f, &
-    p_N7fLigand, p_rDust
+  namelist /PelChem_parameters_iron/ p_q10R6N7, p_sR6N7, p_sR1N7, p_scavOrg, &
+    p_scavIng, p_N7fLigand, p_rDust, p_rN7fsed
 #endif
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
