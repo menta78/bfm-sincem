@@ -33,11 +33,11 @@
   use mem,  ONLY: K4n,K14n,K24n,K3n,K1p,K11p,K21p,K6r,K16r,K26r,K5s,D1m,D2m,D6m,D7m,G2o;
   use mem,  ONLY: H1c, H2c,H1n,H2n,H1p,H2p,Q1c,Q1n,Q1p,Q11c,Q11n,Q11p,N3n_Ben,N4n_Ben
   use mem,  ONLY: KNH4,KNO3,KRED,KPO4,KSIO3
-  use mem,  ONLY: ppD1m,ppG2o, ppD2m,reBTn, reBTp, reATn, reATp,ppG3c,rrATo,rrBTo
+  use mem,  ONLY: ppD1m,ppG2o, ppD2m,reBTn, reBTp, reATn, reATp,rrATo,rrBTo
   use mem,  ONLY: jbotO2o,rrBTo,jG2K3o,jG2K7o,shiftD1m,shiftD2m,ETW_Ben
   use mem,  ONLY:    NO_BOXES_XY, BoxNumberXY_ben, ERHO_Ben
 #ifdef INCLUDE_BENCO2
-  use mem,  ONLY:KCO2,G3c,G13c,G23c,KALK,G3h,G13h,G23h,O3h_Ben
+  use mem,  ONLY:KCO2,G3c,G13c,G23c,KALK,G3h,G13h,G23h,O3h_Ben,ppG3c
 #endif
 #endif
   use bennut_interface, ONLY: CalculateFromSet

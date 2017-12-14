@@ -33,10 +33,10 @@
     ppK1p, ppD6m, ppD7m, ppD8m, ppD9m, ppD1m, rrBTo, reBTn, reBTp, jbotR6c, jbotR6n, &
     jbotR6p, jbotR6s, jPIY3c, jZIY3c, jRIY3c, jRIY3n, jRIY3p, jRIY3s, ETW_Ben, &
     iiPhytoPlankton, PI_Benc, PI_Benn, PI_Benp, PI_Bens, sediPPY_Ben, sediR6_Ben, & 
-    ZI_Fc, RI_Fc, ZI_Fn, ZI_Fp, RI_Fn, RI_Fp, RI_Fs, ppG3c, &
+    ZI_Fc, RI_Fc, ZI_Fn, ZI_Fp, RI_Fn, RI_Fp, RI_Fs, &
     NO_BOXES_XY, Depth_ben, iiBen, iiPel, flux_vector, jbotO2o,jbotN1p,jbotN4n
 #ifdef INCLUDE_BENCO2
-  use mem, ONLY: jbotO3c
+  use mem, ONLY: jbotO3c, ppG3c
 #endif
  use mem,  ONLY: Source_D2_vector_ben
 #endif
