@@ -253,25 +253,22 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
 !-------------------------------------------------------------------------!
 &bfm_save_nml
    var_save = ''
-   ave_save = 'ETW','O2o','DIC',
+   ave_save = 'O2o','O3h','DIC','ALK','pCO2','pH',
           'O5c','OCalc','OArag',
-          'EIR',
-          'xEPS',
-          'Chla',
-          'N1p','N3n','N4n','N5s',
-          'B1c',
-          'P1c','P2c','P3c','P4c',
-          'P1l','P2l','P3l','P4l',
-          'P1n','P2n','P3n','P4n',
-          'P1p','P2p','P3p','P4p',
-          'Z3c','Z4c','Z5c','Z6c',
-          'R1c','R2c','R6c',
-          'R1n','R6n',
-          'R1p','R6p',
-          'P1s','R6s',
-          'eiPPY_iiP1','eiPPY_iiP2','eiPPY_iiP3','eiPPY_iiP4',
-          'sunPPY_iiP1','sunPPY_iiP2','sunPPY_iiP3','sunPPY_iiP4',
-          'ruPTc','resPP','resZT','ruPTn','ruPTp','exPP','ruZTc','netZTc','rePTp','reBn','ruBn','fR2B1c','fP1Z4c', 'rrPTo'
+          'N1p','N3n','N4n','N5s','N7f',
+          'P1c','P1l','P1f','P2c','P2l','P3c','P3l',
+          'Z4c','Z5c','Z6c','B1c',
+          'R1c','R2c','R6c','R6f','Chla','R1n','R1p',
+          'P1n','P2n','P3n',
+          'P1p','P2p','P3p',
+          'jbotR6c','jsurO2o','jsurO3c',
+          'remN5s',
+          'EICE','ETW','EIR','EWIND','xEPS',
+          'R6p','R6n','R6s','B1p','B1n','Z5p','Z6p','Z5n','Z6n',
+          'Y1c','Y2c','Y3c','Y4c','Y5c','H1c','H2c',
+          'Q6c','Q6n','Q6p','Q6s','Q1c','Q1n','Q1p',
+          'K1p','K3n','K4n','K5s',
+          'ruBOSc','ruBBAc'
 	filename_nml_conf = 'BFM_General.nml',
 /
 
