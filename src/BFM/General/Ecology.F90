@@ -90,15 +90,15 @@
            call PelForcingForBenDynamics
            call BenthicSystemDynamics
            call BenthicNutrient2Dynamics
+           call ControlBennutBuffersDynamics
 
          case ( BENTHIC_FULL )  ! Full benthic nutrients
            call PelForcingForBenDynamics
            call BenthicSystemDynamics
            call BenthicNutrient3Dynamics
+           call ControlBennutBuffersDynamics
 
        end select
-
-       call ControlBennutBuffersDynamics
 
        call BentoPelCoupDynamics
 

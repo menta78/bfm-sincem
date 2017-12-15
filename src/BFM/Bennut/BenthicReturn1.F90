@@ -40,7 +40,7 @@
     ppK3n, ppK4n, ppQ6s, ppK5s, jbotO2o, ppO2o, jbotN1p, ppN1p, jbotN3n, ppN3n, jbotN4n, ppN4n, jbotN5s, ppN5s, &
     NO_BOXES_XY, iiBen, iiPel, flux_vector
   use mem_BenthicReturn1
-  use mem_Param, ONLY: CalcConservationFlag
+  use mem_Param, ONLY: CalcConservationFlag, AssignPelBenFluxesInBFMFlag
 
 !  
 !
@@ -82,6 +82,8 @@
   ! Local Variables
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   real(RLEN),dimension(NO_BOXES_XY)  :: rate
+
+  if ( .NOT. AssignPelBenFluxesInBFMFlag ) return
 
   rate  =   p_reminQ6c* Q6c(:)
   call flux_vector( iiBen, ppQ6c,ppQ6c,-( rate) )

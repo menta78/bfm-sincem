@@ -31,6 +31,8 @@
   use mem, ONLY: NO_BOXES_XY, ppQ6c, ppQ6n, ppQ6p, ppQ6s, ppQ1c, ppQ1n, ppQ1p,&
     ppD6m, ppD7m, ppD8m, ppD9m, jbotR6c, jbotR6n, jbotR6p, jbotR6s, jbotR1c,  &
     jbotR1n, jbotR1p, iiBen, iiPel, flux_vector
+  use constants,  ONLY: BENTHIC_RETURN
+  use mem_Param,  ONLY: CalcBenthicFlag, AssignPelBenFluxesInBFMFlag
 #endif
 !  
 !
@@ -73,6 +75,7 @@
   REAL(RLEN)            :: Delta
   real(RLEN), external  :: GetDelta
 
+  if (.NOT. AssignPelBenFluxesInBFMFlag ) return 
   ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Calculated Fluxes from Pelagic to Benthic
   ! These fluxes are the sum of sedimentation flux + the flux of
@@ -92,6 +95,8 @@
   ! Calculation of changes in the depth distribution state variables 
   ! due to sedimentation of detritus (burial is thus also included)
   ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+   if  (CalcBenthicFlag <= BENTHIC_RETURN) return
+
    Delta=GetDelta( )
    call RecalcPenetrationDepth( D1m(:), D6m(:), &
         -jbotR6c(:)*Delta, Q6c(:),newDm(:) )
