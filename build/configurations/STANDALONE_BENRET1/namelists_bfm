@@ -110,7 +110,7 @@
 !-------------------------------------------------------------------------!
 &Param_parameters
 ! Switches : 
-            CalcPelagicFlag = .FALSE.
+            CalcPelagicFlag = .TRUE.
             CalcBenthicFlag =  1
        CalcConservationFlag = .FALSE.
           CalcTransportFlag = .FALSE.
@@ -124,7 +124,7 @@
      CalcMesoZooPlankton(1) = .TRUE.
      CalcMesoZooPlankton(2) = .TRUE.
            CalcPelChemistry = .TRUE.
-AssignPelBenFluxesInBFMFlag = .FALSE.
+AssignPelBenFluxesInBFMFlag = .TRUE.
 AssignAirPelFluxesInBFMFlag = .TRUE.
             ChlDynamicsFlag = 2
 ! Parameters : 
@@ -848,11 +848,11 @@ p_paMEZ(2,:)=   0.0,    1.0
    forcing_file      = '',
    use_external_data = .false.,
    data_file         = '',
-   botdep_c    = 350.0,
-   botdep_n    = 3.24,
-   botdep_p    = 0.21,
-   botdep_si   = 0.1151,
-   botox_o     = 0.0,
+   botdep_c    = 0.0  !350.0,
+   botdep_n    = 0.0  !3.24,
+   botdep_p    = 0.0  !0.21,
+   botdep_si   = 0.0  !0.1151,
+   botox_o     = 0.0  !0.0,
 	filename_nml_conf = 'Standalone.nml',
 /
 
