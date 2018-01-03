@@ -379,6 +379,16 @@ contains
 !
           READ(18,REC=ICOUNTF)   NO3_1,NH4_1,PO4_1,SIO4_1
           READ(18,REC=ICOUNTF+1) NO3_2,NH4_2,PO4_2,SIO4_2
+#ifdef SAVEFORCING
+          write(400,'(1i8, 8e18.8)') ICOUNTF, WSU1,WSV1,SWRAD1,NO3_1,NH4_1,PO4_1,SIO4_1
+          write(401,'(1i8,40e18.8)') ICOUNTF, ISM1
+          write(402,'(1i8,40e18.8)') ICOUNTF, SCLIM1
+          write(403,'(1i8,40e18.8)') ICOUNTF, TCLIM1
+          write(400,'(1i8, 8e18.8)') ICOUNTF+1, WSU2,WSV2,SWRAD2,NO3_2,NH4_2,PO4_2,SIO4_2
+          write(401,'(1i8,40e18.8)') ICOUNTF+1, ISM2
+          write(402,'(1i8,40e18.8)') ICOUNTF+1, SCLIM2
+          write(403,'(1i8,40e18.8)') ICOUNTF+1, TCLIM2
+#endif
 !
 !         -----WIND STRESS CONVERTED TO POM UNITS (N/m2-->m2/s2)-----
 !
@@ -556,11 +566,6 @@ contains
 !
          READ (11,REC=ICOUNTF) WSU2,WSV2
 !
-!        -----POM UNITS-----
-!
-         WSU2 = WSU2*(-ONE)/RHO0
-         WSV2 = WSV2*(-ONE)/RHO0
-!
          select case (IDIAGN)
 !
                case (INT(ZERO))
@@ -577,8 +582,14 @@ contains
 !
         end select
 !
+#ifdef SAVEFORCING
+          write(400,'(1i8, 8e18.8)') ICOUNTF, WSU2,WSV2,SWRAD2,NO3_2,NH4_2,PO4_2,SIO4_2
+          flush(400)
+#endif
 !       -----POM UNITS-----
 !
+        WSU2 = WSU2*(-ONE)/RHO0
+        WSV2 = WSV2*(-ONE)/RHO0
         SWRAD2=SWRAD2*(-ONE)/rcp
 !
          DO K = 1,KB
@@ -590,6 +601,12 @@ contains
              READ (19,REC=(ICOUNTF-1)*(KB-1)+K) ISM2(K)
          END DO
 !
+#ifdef SAVEFORCING
+          write(401,'(1i8,40e18.8)') ICOUNTF, ISM2
+          write(402,'(1i8,40e18.8)') ICOUNTF, SCLIM2
+          write(403,'(1i8,40e18.8)') ICOUNTF, TCLIM2
+          flush(401) ; flush(402) ; flush(403)
+#endif
       END IF
 !
       return

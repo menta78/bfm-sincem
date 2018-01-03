@@ -82,7 +82,7 @@
                         ism_input,      & ! Inorganic suspended matter Initial Conditions
                         read_restart      ! Model restart file
 !
-     use pom, ONLY :    TB, SB
+     use pom, ONLY :    TB, SB, ZZ, H
 !
      use forcing, ONLY: WSU1,WSV1,                 &
                         ISM1,                      &
@@ -165,6 +165,17 @@
      write(6,*) 'open 18 done'
 
       write(6,*) 'open units done'
+!
+#ifdef SAVEFORCING
+     open(400,file="surface_forcing.txt")
+     write(400,'(a8,8a18)') 'MONTH','WSU','WSV','SWRAD','NO3','NH4','PO4','SIO4'
+     open(401,file="suspmat_forcing.txt")
+     write(401,'(a8,40f18.8)') 'MONTH',ABS(zz*h)
+     open(402,file="salvert_forcing.txt")
+     write(402,'(a8,40f18.8)') 'MONTH',ABS(zz*h)
+     open(403,file="temvert_forcing.txt")
+     write(403,'(a8,40f18.8)') 'MONTH',ABS(zz*h)
+#endif
 !
      return
 !
