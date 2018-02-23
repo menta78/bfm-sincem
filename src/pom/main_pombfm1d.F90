@@ -343,13 +343,13 @@
 !
                  TF(:) = TB(:) + (WTADV(:) * DT2) ! EXPLICIT LEAPFROG
 !
-                 CALL PROFTS(TF,WTSURF,SWRAD,TSURF,NBCT,DT2,NTP,UMOLT)
+                 CALL PROFTS(TF,WTSURF,ZERO,SWRAD,TSURF,NBCT,DT2,NTP,UMOLT)
 !
 !                -----COMPUTE SALINITY-----
 !
                  SF(:) = SB(:) + (WSADV(:) * DT2) ! EXPLICIT LEAPFROG
 !
-                 CALL PROFTS(SF,WSSURF,ZERO,SSURF,NBCS,DT2,NTP,UMOLS)
+                 CALL PROFTS(SF,WSSURF,ZERO,ZERO,SSURF,NBCS,DT2,NTP,UMOLS)
 !
 !                -----MIXING THE TIMESTEP (ASSELIN FILTER)-----
 !
