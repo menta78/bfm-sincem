@@ -40,7 +40,7 @@
  KL1     =  7,
  KL2     =  25,
  SAVEF   =  1,
- NRT     =  0.6,
+ NRT     =  0.2,
  NBCT    =  2,
  NBCS    =  1,
  NBCBFM  =  1,
