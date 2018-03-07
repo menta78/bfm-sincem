@@ -4,7 +4,7 @@
 ! !ROUTINE: trc_sink_bfm.F90
 !
 ! !INTERFACE:
-   subroutine trc_sink_bfm(ws_in,m)
+   subroutine trc_sink_bfm(ws_in,m,flux)
 
 ! !DESCRIPTION:
 !
@@ -22,6 +22,7 @@
 !   \point
 !  \end{equation}
 !
+! This routine assumes upward positive velocities
 !
 ! !USES:
 ! OPA modules
@@ -36,6 +37,7 @@
 ! !INPUT PARAMETERS:
       REAL(wp), INTENT(IN)  :: ws_in(jpi,jpj,jpk)
       integer , INTENT(IN)  :: m
+      REAL(wp), INTENT(OUT) :: flux(jpi,jpj,jpk)
 !
 ! !REVISION HISTORY:
 !  Original author(s): Lars Umlauf (GOTM team)
@@ -53,6 +55,7 @@
 
 !  initialize interface fluxes with zero
    cu   = 0.0_wp
+   flux = 0.0_wp
 !-------------------------------
 ! Set first level velocity to 0
 ! and shift array downward
@@ -98,6 +101,7 @@
    cu(:,:,jpk) = 0.0_wp
 
 ! add the vertical advection trend to general tracer trend 
+! the flux is computed at the cell center
    Yc=0.0_wp
    Yd=0.0_wp
    do jj = 1, jpj      
@@ -105,6 +109,7 @@
          do jk = 1, jpkm1
             tra(ji,jj,jk,m) = tra(ji,jj,jk,m) + &
                  (cu(ji,jj,jk+1)-cu(ji,jj,jk))/fse3t(ji,jj,jk)
+            flux(ji,jj,jk) = 0.5 * ( cu(ji,jj,jk+1) + cu(ji,jj,jk) ) * tmask(ji,jj,jk)
          end do
       end do 
    end do 

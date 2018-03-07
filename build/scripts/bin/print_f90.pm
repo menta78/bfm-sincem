@@ -2259,9 +2259,15 @@ sub func_XMLFIELD  {
                           my $nameC = $name . $const;
                           my $unitC = ${$param->getComponents()}{$const};
                           if (length($spec)) {
-                             $comm  = "flux of " . $name . $const . " at " . $spec ;
-                             $nameC = "j". $spec_short . $name . $const  ;
-                             $unitC = decreaseUnit( ${$param->getComponents()}{$const} );
+                             if ( $spec eq "sinking" ) {
+                                $comm  = "sinking of " . $name . $const ;
+                                $nameC = substr($spec,0,4) . $name . $const  ;
+                                $unitC = decreaseUnit( ${$param->getComponents()}{$const} );
+                             } else {
+                                $comm  = "flux of " . $name . $const . " at " . $spec ;
+                                $nameC = "j". $spec_short . $name . $const  ;
+                                $unitC = decreaseUnit( ${$param->getComponents()}{$const} );
+                             }
                           }
                           $line .= "${TAB6}<field id=\"${nameC}\"${TAB6}long_name=\"${comm}\"${TAB5}unit=\"${unitC}\"/>\n";
                       }
@@ -2269,9 +2275,15 @@ sub func_XMLFIELD  {
               }else{
                   my $unit = $param->getUnit();
                   if (length($spec)) {
-                     $comm = "flux of " . $name . " at " . $spec ;
-                     $name = "j". $spec_short . $name ;
-                     $unit = decreaseUnit($param->getUnit());
+                     if ( $spec eq "sinking" ) {
+                        $comm  = "sinking of " . $name ;
+                        $name = substr($spec,0,4) . $name ;
+                        $unit = decreaseUnit($param->getUnit());
+                     } else {
+                        $comm = "flux of " . $name . " at " . $spec ;
+                        $name = "j". $spec_short . $name ;
+                        $unit = decreaseUnit($param->getUnit());
+                     }
                   }                
                   $line .= "${TAB6}<field id=\"${name}\"${TAB6}long_name=\"${comm}\"${TAB5}unit=\"${unit}\"/>\n";
               }

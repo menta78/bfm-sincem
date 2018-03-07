@@ -239,7 +239,8 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
           'ruZOOc','remZOOn','remZOOp','remPBAn','remPBAp',
           'fscavN7f','remN7f','remN5s',
           'EICE','ETW','EIR','EWIND','xEPS',
-          'R6p','R6n','R6s','B1p','B1n','Z5p','Z6p','Z5n','Z6n'
+          'R6p','R6n','R6s','B1p','B1n','Z5p','Z6p','Z5n','Z6n',
+          'sinkP1c','sinkR6c'
 	filename_nml_conf = 'BFM_General.nml',
 /
 
