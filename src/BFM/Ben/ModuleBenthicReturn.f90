@@ -14,7 +14,7 @@
 !   structure of the code based on ideas of M. Vichi.
 !
 ! !INTERFACE
-  module mem_BenthicReturn1
+  module mem_BenthicReturn
 !
 ! !USES:
 
@@ -73,14 +73,14 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! SHARED PUBLIC FUNCTIONS (must be explicited below "contains")
 
-  public InitBenthicReturn1
+  public InitBenthicReturn
   contains
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  subroutine InitBenthicReturn1()
+  subroutine InitBenthicReturn()
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  namelist /BenthicReturn1_parameters/ p_reminQ1c, p_reminQ1n, p_reminQ1p, &
+  namelist /BenthicReturn_parameters/ p_reminQ1c, p_reminQ1n, p_reminQ1p, &
     p_reminQ6c, p_reminQ6n, p_reminQ6p, p_reminQ6s, p_pQIN3
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
@@ -91,12 +91,12 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 write(LOGUNIT,*) "#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
-   write(LOGUNIT,*) "#  Reading BenthicReturn1 parameters.."
-open(NMLUNIT,file='BenthicReturn1.nml',status='old',action='read',err=100)
-    read(NMLUNIT,nml=BenthicReturn1_parameters,err=101)
+   write(LOGUNIT,*) "#  Reading BenthicReturn parameters.."
+open(NMLUNIT,file='Benthic_Environment.nml',status='old',action='read',err=100)
+    read(NMLUNIT,nml=BenthicReturn_parameters,err=101)
     close(NMLUNIT)
     write(LOGUNIT,*) "#  Namelist is:"
-    write(LOGUNIT,nml=BenthicReturn1_parameters)
+    write(LOGUNIT,nml=BenthicReturn_parameters)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   !END compute
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -104,11 +104,11 @@ open(NMLUNIT,file='BenthicReturn1.nml',status='old',action='read',err=100)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Local Error Messages
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-100 call error_msg_prn(NML_OPEN,"InitBenthicReturn1.f90","BenthicReturn1.nml")
-101 call error_msg_prn(NML_READ,"InitBenthicReturn1.f90","BenthicReturn1_parameters")
+100 call error_msg_prn(NML_OPEN,"InitBenthicReturn1.f90","Benthic_Environment.nml")
+101 call error_msg_prn(NML_READ,"InitBenthicReturn1.f90","BenthicReturn_parameters")
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  end  subroutine InitBenthicReturn1
-  end module mem_BenthicReturn1
+  end  subroutine InitBenthicReturn
+  end module mem_BenthicReturn
 !BOP
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model 

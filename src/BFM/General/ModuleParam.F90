@@ -164,6 +164,9 @@
       p_qpQIc, &
       p_qsQIc
 #endif
+#ifdef BENTHIC_RETURN
+      logical,public :: CalcBenOrganisms=.FALSE., CalcBenBacteria=.FALSE.
+#endif
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Seaice model parameters

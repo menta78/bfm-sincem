@@ -27,11 +27,13 @@
 #ifdef NOPOINTERS
   use mem
 #else
-  use mem,  ONLY: Q6c, Q6n, Q6p, Q6s, Q1c, Q1n, Q1p, D1m, D6m, D7m, D8m, D9m
+  use mem,  ONLY: Q6c, Q6n, Q6p, Q6s, Q1c, Q1n, Q1p
   use mem, ONLY: NO_BOXES_XY, ppQ6c, ppQ6n, ppQ6p, ppQ6s, ppQ1c, ppQ1n, ppQ1p,&
-    ppD6m, ppD7m, ppD8m, ppD9m, jbotR6c, jbotR6n, jbotR6p, jbotR6s, jbotR1c,  &
+    jbotR6c, jbotR6n, jbotR6p, jbotR6s, jbotR1c,  &
     jbotR1n, jbotR1p, iiBen, iiPel, flux_vector
-  use constants,  ONLY: BENTHIC_RETURN
+#if defined BENTHIC_BIO || defined BENTHIC_FULL
+  use mem, ONLY: D1m, D6m, D7m, D8m, D9m, ppD6m, ppD7m, ppD8m, ppD9m
+#endif
   use mem_Param,  ONLY: CalcBenthicFlag, AssignPelBenFluxesInBFMFlag
 #endif
 !  
@@ -91,27 +93,28 @@
   call flux_vector( iiBen, ppQ1n,ppQ1n, -jbotR1n(:) )
   call flux_vector( iiBen, ppQ1p,ppQ1p, -jbotR1p(:) )
 
+#if defined BENTHIC_BIO || defined BENTHIC_FULL
   ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Calculation of changes in the depth distribution state variables 
   ! due to sedimentation of detritus (burial is thus also included)
   ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-   if  (CalcBenthicFlag <= BENTHIC_RETURN) return
-
-   Delta=GetDelta( )
-   call RecalcPenetrationDepth( D1m(:), D6m(:), &
-        -jbotR6c(:)*Delta, Q6c(:),newDm(:) )
-   call flux_vector(iiBen, ppD6m,ppD6m,(newDM(:)- D6m(:))/Delta)
-   call RecalcPenetrationDepth( D1m(:), D7m(:), &
-        -jbotR6n(:)*Delta, Q6n(:),newDm(:) )
-   call flux_vector(iiBen, ppD7m,ppD7m,(newDM(:)- D7m(:))/Delta)
-   call RecalcPenetrationDepth( D1m(:), D8m(:), &
-        -jbotR6p(:)*Delta, Q6p(:),newDm(:) )
-   call flux_vector(iiBen, ppD8m,ppD8m,(newDM(:)- D8m(:))/Delta)
-   call RecalcPenetrationDepth(D1m(:), D9m(:), &
-        -jbotR6s(:)*Delta, Q6s(:),newDm(:) )
-   call flux_vector(iiBen, ppD9m,ppD9m,(newDM(:)- D9m(:))/Delta)
+  Delta=GetDelta( )
+  call RecalcPenetrationDepth( D1m(:), D6m(:), &
+       -jbotR6c(:)*Delta, Q6c(:),newDm(:) )
+  call flux_vector(iiBen, ppD6m,ppD6m,(newDM(:)- D6m(:))/Delta)
+  call RecalcPenetrationDepth( D1m(:), D7m(:), &
+       -jbotR6n(:)*Delta, Q6n(:),newDm(:) )
+e call flux_vector(iiBen, ppD7m,ppD7m,(newDM(:)- D7m(:))/Delta)
+  call RecalcPenetrationDepth( D1m(:), D8m(:), &
+       -jbotR6p(:)*Delta, Q6p(:),newDm(:) )
+  call flux_vector(iiBen, ppD8m,ppD8m,(newDM(:)- D8m(:))/Delta)
+  call RecalcPenetrationDepth(D1m(:), D9m(:), &
+       -jbotR6s(:)*Delta, Q6s(:),newDm(:) )
+  call flux_vector(iiBen, ppD9m,ppD9m,(newDM(:)- D9m(:))/Delta)
+#endif
 
 #endif
+
   end subroutine SedimentationDynamics
 
 !EOC

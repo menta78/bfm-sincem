@@ -22,7 +22,7 @@
 !
 !
 ! !INTERFACE
-  subroutine BenthicReturn1Dynamics
+  subroutine BenthicReturnDynamics
 !
 ! !USES:
 
@@ -30,7 +30,7 @@
   ! Modules (use of ONLY is strongly encouraged!)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-  use global_mem, ONLY:RLEN
+  use global_mem, ONLY:RLEN, ONE
 #ifdef NOPOINTERS
   use mem,  ONLY: D2STATE_BEN, D2DIAGNOS
 #else
@@ -39,8 +39,9 @@
   use mem, ONLY: ppQ6c, ppQ1c, ppQ6p, ppQ1p, ppK1p, ppQ6n, ppQ1n, &
     ppK3n, ppK4n, ppQ6s, ppK5s, jbotO2o, ppO2o, jbotN1p, ppN1p, jbotN3n, ppN3n, jbotN4n, ppN4n, jbotN5s, ppN5s, &
     NO_BOXES_XY, iiBen, iiPel, flux_vector
-  use mem_BenthicReturn1
+  use mem_BenthicReturn
   use mem_Param, ONLY: CalcConservationFlag, AssignPelBenFluxesInBFMFlag
+  use constants,    ONLY: MW_C
 
 !  
 !
@@ -87,11 +88,11 @@
 
   rate  =   p_reminQ6c* Q6c(:)
   call flux_vector( iiBen, ppQ6c,ppQ6c,-( rate) )
-  jbotO2o(:)  =  - rate/ 12.D+00
+  jbotO2o(:)  =  - rate/ MW_C
 
   rate  =   p_reminQ1c* Q1c(:)
   call flux_vector( iiBen, ppQ1c,ppQ1c,-( rate) )
-  jbotO2o(:)  =   jbotO2o(:)- rate/ 12.D+00
+  jbotO2o(:)  =   jbotO2o(:)- rate/ MW_C
 
   rate  =   p_reminQ6p* Q6p(:)
   call flux_vector( iiBen, ppQ6p,ppQ6p,-( rate) )
@@ -101,38 +102,30 @@
   call flux_vector( iiBen, ppQ1p,ppQ1p,-( rate) )
   jbotN1p(:)  =   jbotN1p(:)+ rate
 
-  ! K1.p is not used in this model version
-  ! activated only for mass conservation check
-  if (CalcConservationFlag) &
-  call flux_vector( iiBen, ppK1p,ppK1p,-(- jbotN1p(:)) )
-
   rate  =   p_reminQ6n* Q6n(:)
   call flux_vector( iiBen, ppQ6n,ppQ6n,-( rate) )
   jbotN3n(:)  =   rate* p_pQIN3
-  jbotN4n(:)  =   rate*( 1.0D+00- p_pQIN3)
+  jbotN4n(:)  =   rate*( ONE - p_pQIN3)
 
   rate  =   p_reminQ1n* Q1n(:)
   call flux_vector( iiBen, ppQ1n,ppQ1n,-( rate) )
   jbotN3n(:)  =   jbotN3n(:)+ rate* p_pQIN3
-  jbotN4n(:)  =   jbotN4n(:)+ rate*( 1.0D+00- p_pQIN3)
-
-  ! K3.n and K4.n are not used in this model version
-  ! activated only for mass conservation check
-  if (CalcConservationFlag) then
-     call flux_vector( iiBen, ppK3n,ppK3n,-(- jbotN3n(:)) )
-     call flux_vector( iiBen, ppK4n,ppK4n,-(- jbotN4n(:)) )
-  end if
+  jbotN4n(:)  =   jbotN4n(:)+ rate*( ONE - p_pQIN3)
 
   rate  =   p_reminQ6s* Q6s(:)
   call flux_vector( iiBen, ppQ6s,ppQ6s,-( rate) )
   jbotN5s(:)  =   rate
 
-  ! K5.s is not used in this model version
-  ! activated only for mass conservation check
-  if (CalcConservationFlag) &
-  call flux_vector( iiBen, ppK5s,ppK5s,-(- jbotN5s(:)) )
+  ! K1p, K3n, K4n, K5s are not used in the benthic return setup,
+  ! but are activated only for mass conservation check
+  if (CalcConservationFlag) then 
+     call flux_vector( iiBen, ppK1p,ppK1p,-(- jbotN1p(:)) ) 
+     call flux_vector( iiBen, ppK3n,ppK3n,-(- jbotN3n(:)) ) 
+     call flux_vector( iiBen, ppK4n,ppK4n,-(- jbotN4n(:)) )
+     call flux_vector( iiBen, ppK5s,ppK5s,-(- jbotN5s(:)) )
+  endif
 
-  end subroutine BenthicReturn1Dynamics
+  end subroutine BenthicReturnDynamics
 !EOC
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model 

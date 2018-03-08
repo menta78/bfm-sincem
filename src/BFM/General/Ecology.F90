@@ -23,7 +23,6 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   use global_mem, ONLY:RLEN
   use mem,  ONLY: iiBen, iiPel, iiReset, flux
-  use constants,  ONLY: BENTHIC_RETURN, BENTHIC_BIO, BENTHIC_FULL
   use mem_Param,  ONLY: CalcPelagicFlag, CalcBenthicFlag, CalcConservationFlag
   use api_bfm, ONLY: LOGUNIT
 #ifdef INCLUDE_SEAICE
@@ -76,47 +75,43 @@
 
   end if
 
-#ifdef INCLUDE_BEN
+  call SettlingDynamics
+
   if ( CalcBenthicFlag > 0 ) then
 
-         call SettlingDynamics
-  
-       select case ( CalcBenthicFlag)
+#ifdef BENTHIC_RETURN
+     ! Simple benthic return
+     call BenthicReturnDynamics
+     call BentoPelCoupDynamics
+     call SedimentationDynamics
+#endif
 
-         case ( BENTHIC_RETURN )  ! Simple benthic return
-           call BenthicReturn1Dynamics
+#ifdef BENTHIC_BIO
+     ! Intermediate benthic return
+     call PelForcingForBenDynamics
+     call BenthicSystemDynamics
+     call BenthicNutrient2Dynamics
+     call ControlBennutBuffersDynamics
+     call BentoPelCoupDynamics
+     call SedimentationDynamics
+#endif
 
-         case ( BENTHIC_BIO )  ! Intermediate benthic return
-           call PelForcingForBenDynamics
-           call BenthicSystemDynamics
-           call BenthicNutrient2Dynamics
-           call ControlBennutBuffersDynamics
-
-         case ( BENTHIC_FULL )  ! Full benthic nutrients
-           call PelForcingForBenDynamics
-           call BenthicSystemDynamics
-           call BenthicNutrient3Dynamics
-           call ControlBennutBuffersDynamics
-
-       end select
-
-       call BentoPelCoupDynamics
-
-       call SedimentationDynamics
+#ifdef BENTHIC_FULL
+     ! Full benthic nutrients
+     call PelForcingForBenDynamics
+     call BenthicSystemDynamics
+     call BenthicNutrient3Dynamics
+     call ControlBennutBuffersDynamics
+     call BentoPelCoupDynamics
+     call SedimentationDynamics
+#endif
 
   else 
-       ! This case considers an inactive benthic system 
-       ! (the benthic arrays are defined but not used)
-       ! only the net sink at the bottom is computed
-       call SettlingDynamics
-       call BentoPelCoupDynamics
+     ! This case considers an inactive benthic system 
+     ! (the benthic arrays are defined but not used)
+     ! only the net sink at the bottom is computed
+      call BentoPelCoupDynamics
   endif
-#else
-  ! only the net sink at the bottom is computed
-  call SettlingDynamics
-  call BentoPelCoupDynamics
-
-#endif
 
   if (CalcConservationFlag) &
      call CheckMassConservationDynamics

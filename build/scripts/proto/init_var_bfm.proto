@@ -43,7 +43,7 @@ MODULE init_var_bfm_local
                         CalcSeaiceFlag,   &
                         CalcPelChemistry, &
                         CalcTransportFlag
-#ifdef INCLUDE_BEN
+#if defined BENTHIC_BIO || defined BENTHIC_FULL
    use mem_BenBac
    use mem_BenOrganism
 #endif

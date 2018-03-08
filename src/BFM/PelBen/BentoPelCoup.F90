@@ -46,7 +46,7 @@
     jbotO2o, jbotN1p, jbotN3n, jbotN4n, jbotN5s, jbotN6r, jbotR6c, jbotR6n, &
     jbotR6p, jbotR6s, jbotR1c, jbotR1n, jbotR1p, PELBOTTOM, &
     iiP1, iiC, iiN, iiP, iiL, iiS, iiBen, iiPel, flux
-#ifdef INCLUDE_BEN
+#if defined BENTHIC_BIO || defined BENTHIC_FULL
   use mem, ONLY: jPIY3c, jZIY3c, ZI_Fc, jRIY3c, jRIY3n, jRIY3p, jRIY3s
 #endif
 #ifdef INCLUDE_PELFE
@@ -65,7 +65,6 @@
 #else
  use api_bfm, ONLY: BOTindices
 #endif
- use constants, ONLY: BENTHIC_RETURN, BENTHIC_BIO, BENTHIC_FULL
  use mem_Param, ONLY: CalcBenthicFlag
  use mem_Param, ONLY: AssignPelBenFluxesInBFMFlag, p_small
 
@@ -116,10 +115,10 @@
   real(RLEN)  :: uptake
   real(RLEN)  :: Pc,Zc
 
-#ifdef INCLUDE_BEN
+#if defined BENTHIC_BIO || defined BENTHIC_FULL
   ! fluxes from pelagic to benthic organisms only when Benthic model
   ! is more than BENTHIC_RETURN
-  if  (CalcBenthicFlag > BENTHIC_RETURN) then
+  if  (CalcBenthicFlag > 1) then
    do BoxNumberXY = 1,NO_BOXES_XY
       kbot = BOTindices(BoxNumberXY)
       ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -212,7 +211,7 @@
   end if ! benthic model includes benthos
 #endif
 
-   if ( AssignPelBenFluxesInBFMFlag) then
+   if ( .NOT. AssignPelBenFluxesInBFMFlag) return
    ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
    ! All Fluxes to Benthic from Pelagic defined for the
    ! Pelagic State variables (done only if BFM computes them)
@@ -320,7 +319,6 @@
           Depth(kbot)) )
 #endif
       end do ! loop over NO_BOXES_XY
-   end if ! AssignPelBenFluxesInBFMFlag
 
   end subroutine  BentoPelCoupDynamics
 !EOC

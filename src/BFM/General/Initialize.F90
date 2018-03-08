@@ -23,23 +23,27 @@
   use mem_Phyto
   use mem_PAR
   use mem_Settling
-#ifdef INCLUDE_BEN
+#ifdef BENTHIC_RETURN
+    use mem_BenthicReturn
+#endif
+#if defined BENTHIC_BIO || defined BENITHIC_FULL 
+  use mem_BenBac
   use mem_BenOrganism
   use mem_FilterFeeder
-  use mem_BenBac
   use mem_Bioturbation
-  use mem_BenthicReturn1
   use mem_BenthicReturn2
+  use mem_BenOxygen
+  use mem_ControlBennutBuffers
+#if defined BENITHIC_FULL
   use mem_BenthicNutrient3
   use mem_BenAmmonium
   use mem_BenNitrate
-  use mem_BenOxygen
   use mem_BenAnoxic
   use mem_BenDenitriDepth
   use mem_BenPhosphate
   use mem_BenSilica
   use mem_BenQ1Transport
-  use mem_ControlBennutBuffers
+#endif
 #endif
 #ifdef INCLUDE_PELCO2
   use mem_CO2
@@ -111,44 +115,48 @@
       call InitPAR
       call InitSettling
       call InitPelGlobal
-#ifdef INCLUDE_BEN
+
       ! Benthic initialization is done only if there is an active model
       ! When INCLUDE_BEN is defined, 
       ! CalcBenthicFlag=0 is used to test the benthic memory only
-      select case ( CalcBenthicFlag) 
-         case ( BENTHIC_RETURN )  ! Simple benthic return
-            call InitBenthicReturn1
-         case ( BENTHIC_BIO )  ! Intermediate benthic return
-            call InitBenOrganism
-            call InitFilterFeeder
-            call InitBenBac
-            call InitBioturbation
-            call InitBenthicReturn2
-            call InitBenOxygen
-            call InitControlBennutBuffers
-         case ( BENTHIC_FULL )  ! Full benthic nutrients
-            call InitBenOrganism
-            call InitFilterFeeder
-            call InitBenBac
-            call InitBioturbation
-            call InitBenthicReturn1
-            call InitBenthicReturn2
-            call InitBenthicNutrient3
-            call InitBenAmmonium
-            call InitBenNitrate
-            call InitBenOxygen
-            call InitBenAnoxic
-            call InitBenDenitriDepth
-            call InitBenPhosphate
-            call InitBenSilica
-            call InitBenQ1Transport
-            call InitControlBennutBuffers
+#ifdef BENTHIC_RETURN
+      ! Simple benthic return
+      call InitBenthicReturn
+#endif
+#ifdef BENTHIC_BIO
+      ! Intermediate benthic return
+      call InitBenOrganism
+      call InitFilterFeeder
+      call InitBenBac
+      call InitBioturbation
+      call InitBenthicReturn2
+      call InitBenOxygen
+      call InitControlBennutBuffers
+#endif
+#ifdef BENTHIC_FULL
+      ! Full benthic nutrients
+      call InitBenOrganism
+      call InitFilterFeeder
+      call InitBenBac
+      call InitBioturbation
+      call InitBenthicReturn1
+      call InitBenthicReturn2
+      call InitBenthicNutrient3
+      call InitBenAmmonium
+      call InitBenNitrate
+      call InitBenOxygen
+      call InitBenAnoxic
+      call InitBenDenitriDepth
+      call InitBenPhosphate
+      call InitBenSilica
+      call InitBenQ1Transport
+      call InitControlBennutBuffers
 #ifdef INCLUDE_BENCO2
-            call InitBenCO2Transport
-            call InitBenAlkalinity
+      call InitBenCO2Transport
+      call InitBenAlkalinity
 #endif
-      end select
 #endif
+
 #ifdef INCLUDE_PELCO2
       call InitCO2
 #endif
