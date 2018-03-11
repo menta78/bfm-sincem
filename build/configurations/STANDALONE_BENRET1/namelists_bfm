@@ -112,7 +112,7 @@
 ! Switches : 
             CalcPelagicFlag = .TRUE.
             CalcBenthicFlag =  1
-       CalcConservationFlag = .FALSE.
+       CalcConservationFlag = .TRUE.
           CalcTransportFlag = .FALSE.
        CalcPhytoPlankton(1) = .TRUE.
        CalcPhytoPlankton(2) = .TRUE.
