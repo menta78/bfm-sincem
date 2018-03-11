@@ -118,7 +118,7 @@
 #if defined BENTHIC_BIO || defined BENTHIC_FULL
   ! fluxes from pelagic to benthic organisms only when Benthic model
   ! is more than BENTHIC_RETURN
-  if  (CalcBenthicFlag > 1) then
+  if  (CalcBenthicFlag ) then
    do BoxNumberXY = 1,NO_BOXES_XY
       kbot = BOTindices(BoxNumberXY)
       ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

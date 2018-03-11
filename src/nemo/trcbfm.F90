@@ -105,7 +105,7 @@
       end do
    end if
 #ifdef INCLUDE_BEN
-   if (CalcBenthicFlag /= 0) then
+   if (CalcBenthicFlag ) then
       do j=1,NO_D2_BOX_STATES_BEN
          if (D2STATETYPE_BEN(j) .ge. 0) then
 #ifndef EXPLICIT_SINK

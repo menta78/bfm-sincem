@@ -90,13 +90,13 @@
   !  Open the namelist file(s)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-write(LOGUNIT,*) "#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
-   write(LOGUNIT,*) "#  Reading BenthicReturn parameters.."
-open(NMLUNIT,file='Benthic_Environment.nml',status='old',action='read',err=100)
-    read(NMLUNIT,nml=BenthicReturn_parameters,err=101)
-    close(NMLUNIT)
-    write(LOGUNIT,*) "#  Namelist is:"
-    write(LOGUNIT,nml=BenthicReturn_parameters)
+  write(LOGUNIT,*) "#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+  write(LOGUNIT,*) "#  Reading BenthicReturn parameters.."
+  open(NMLUNIT,file='Benthic_Environment.nml',status='old',action='read',err=100)
+  read(NMLUNIT,nml=BenthicReturn_parameters,err=101)
+  close(NMLUNIT)
+  write(LOGUNIT,*) "#  Namelist is:"
+  write(LOGUNIT,nml=BenthicReturn_parameters)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   !END compute
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=

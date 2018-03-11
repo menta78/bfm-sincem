@@ -62,15 +62,16 @@
   call  flux(1,iiReset,1,1,0.0)
 #endif
 
-  select case ( CalcBenthicFlag)
+#if defined BENTHIC_FULL
+  if ( CalcBenthicFlag) then
 
-    case ( BENTHIC_FULL )  ! Full benthic nutrients
       call PelForcingForBenDynamics
       InitializeModel=1
       call InitBenthicNutrient3Dynamics
       InitializeModel=0
 
-  end select
+  endif
+#endif
 
   end
 !BOP

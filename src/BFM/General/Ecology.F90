@@ -77,7 +77,7 @@
 
   call SettlingDynamics
 
-  if ( CalcBenthicFlag > 0 ) then
+  if ( CalcBenthicFlag ) then
 
 #ifdef BENTHIC_RETURN
      ! Simple benthic return

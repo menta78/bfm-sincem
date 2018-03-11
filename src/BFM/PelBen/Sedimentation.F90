@@ -34,7 +34,7 @@
 #if defined BENTHIC_BIO || defined BENTHIC_FULL
   use mem, ONLY: D1m, D6m, D7m, D8m, D9m, ppD6m, ppD7m, ppD8m, ppD9m
 #endif
-  use mem_Param,  ONLY: CalcBenthicFlag, AssignPelBenFluxesInBFMFlag
+  use mem_Param,  ONLY: AssignPelBenFluxesInBFMFlag
 #endif
 !  
 !

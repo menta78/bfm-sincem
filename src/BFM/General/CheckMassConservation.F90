@@ -222,6 +222,7 @@
         write(LOGUNIT,*) "------> Change in Si larger than specified precision:",p_prec,totsyss(1)/initials-ONE
      end if
      if (flag)  then
+        write(LOGUNIT,*) "Check also usage of AssignAirPelFluxesInBFMFlag and AssignPelBenFluxesInBFMFlag in BFM_General.nml"
         call flush(LOGUNIT)
         stop "Mass conservation violation in BFM! Check log file."
      end if

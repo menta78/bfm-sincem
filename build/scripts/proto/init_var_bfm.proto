@@ -438,30 +438,32 @@ END MODULE init_var_bfm_local
       case (0)
          LEVEL2 "Fully coupled system, Pelagic, Benthic, Seaice"
       case (1) ! Pelagic only
-         LEVEL2 "Pelagic-only setup (bio_setup=1), Switching off other systems"
-         CalcBenthicFlag = 0
+         LEVEL2 "Pelagic-only setup (bio_setup=1), Switching off other systems & related fluxes"
+         CalcBenthicFlag = .FALSE.
+         AssignPelBenFluxesInBFMFlag = .FALSE.
          CalcSeaiceFlag  = .FALSE.
          %value-init-calc-ben .FALSE.
          %value-init-calc-ice .FALSE.
       case (2) ! Benthic only
-         LEVEL2 "Benthic-only setup (bio_setup=2), Switching off other systems"
+         LEVEL2 "Benthic-only setup (bio_setup=2), Switching off other systems & related fluxes"
          CalcPelagicFlag = .FALSE.
          CalcSeaiceFlag  = .FALSE.
          %value-init-calc-pel .FALSE.
          %value-init-calc-ice .FALSE.
       case (3) ! Pelagic-Benthic coupling
-         LEVEL2 "Pelagic-Benthic setup (bio_setup=3), Switching off other systems"
+         LEVEL2 "Pelagic-Benthic setup (bio_setup=3), Switching off seaice system & related fluxes"
          CalcSeaiceFlag  = .FALSE.
          %value-init-calc-ice .FALSE.
       case (4) ! SeaIce only
-         LEVEL2 "Seaice-only setup (bio_setup=4), Switching off other systems"
+         LEVEL2 "Seaice-only setup (bio_setup=4), Switching off other systems & related fluxes"
          CalcPelagicFlag = .FALSE.
-         CalcBenthicFlag = 0
+         CalcBenthicFlag = .FALSE.
          %value-init-calc-pel .FALSE.
          %value-init-calc-ben .FALSE.
       case (5) ! Pelagic-SeaIce coupling
-         LEVEL2 "Pelagic-Seaice setup (bio_setup=5), Switching off other systems"
-         CalcBenthicFlag = 0
+         LEVEL2 "Pelagic-Seaice setup (bio_setup=5), Switching off benthic system & related fluxes"
+         CalcBenthicFlag = .FALSE.
+         AssignPelBenFluxesInBFMFlag = .FALSE.
          %value-init-calc-ben .FALSE.
    end select
 
@@ -469,16 +471,19 @@ END MODULE init_var_bfm_local
    !---------------------------------------------
    ! Check benthic model
    !---------------------------------------------
-   select case (CalcBenthicFlag)
-     case (0)
-        LEVEL3 "Benthic model is: not used"
-     case (1)
+   if (CalcBenthicFlag) then
+#if defined BENTHIC_RETURN
         LEVEL3 "Benthic model is: simple nutrient return"
-     case (2)
+#endif
+#if defined BENTHIC_BIO
         LEVEL3 "Benthic model is: benthos + intermediate nutrient return"
-     case (3)
+#endif
+#if defined BENTHIC_FULL
         LEVEL3 "Benthic model is: benthos + Ruardij & Van Raaphorst"
-   end select
+#endif
+   else
+        LEVEL3 "Benthic model is: not used"
+   endif
 #endif
 
 #if defined key_obcbfm

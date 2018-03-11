@@ -88,8 +88,8 @@
   !                                           phytoplankton
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   logical   :: CalcPelagicFlag=.TRUE.  
-  integer   :: CalcBenthicFlag=0      ! Switch for Benthic system
-  logical   :: CalcSeaiceFlag=.TRUE.  ! Switch for Seaice system
+  logical   :: CalcBenthicFlag=.TRUE.   ! Switch for Benthic system
+  logical   :: CalcSeaiceFlag=.TRUE.    ! Switch for Seaice system
 
   logical   :: CalcTransportFlag=.FALSE.  
   logical   :: CalcConservationFlag=.TRUE.  

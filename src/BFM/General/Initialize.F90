@@ -118,7 +118,6 @@
 
       ! Benthic initialization is done only if there is an active model
       ! When INCLUDE_BEN is defined, 
-      ! CalcBenthicFlag=0 is used to test the benthic memory only
 #ifdef BENTHIC_RETURN
       ! Simple benthic return
       call InitBenthicReturn
