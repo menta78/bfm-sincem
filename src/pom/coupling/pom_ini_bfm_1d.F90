@@ -103,18 +103,6 @@
 !
    real(RLEN),parameter :: ALON=10.
 !
-!  ----OCEAN WET POINTS (IN 1D = 1)-----
-!
-   integer,allocatable  :: ocepoint(:), &
-!  
-!  -----OCEAN SURFACE POINTS (IN 1D=1)-----
-!
-                          surfpoint(:), &
-!
-!  ----OCEAN BOTTOM POINTS (IN 1D=1)-----
-!
-                          botpoint(:)
-!
 !  -----MODEL TIME STEP TRANSFERED TO BFM-----
 !
    timestep=dti
