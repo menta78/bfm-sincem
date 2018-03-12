@@ -218,7 +218,7 @@
 !  ***********************************************************************
 !  ***********************************************************************
 !
-   call init_bfm(namlst)
+   call init_bfm
 !
 !  -----INITIALISE STATE VARIABLE NAMES AND DIAGNOSTICS (FOR NETCDF OUTPUT)-----
 !
