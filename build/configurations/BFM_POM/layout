@@ -128,6 +128,7 @@ end
 3d-state -if-exist INCLUDE_PELCO2
   group Inorganic[ch] (CAR): mg C/m3 : mmol eq/m3
      O3: Dissolved Inorganic Carbon: Alkalinity 
+     O5[-h]: Calcite
   end
 end
 
@@ -164,11 +165,10 @@ end
                 Y5      : Benthic predators
     end
 
-    Q6[cnps]    :Particulate organic carbon  :mg C/m2:mmol N/m2:mmol P/m2:mmolSi/m2
-
-    group BenDetritus[cnp] (BMT) :mg C/m2:mmol N/m2:mmol P/m2
-                Q1      : Labile organic carbon
-                Q11     : Labile organic carbon
+    group BenDetritus[cnps] (BOM) :mg C/m2:mmol N/m2:mmol P/m2:mmol S/m2
+                Q1[-s]      : Labile organic carbon
+                Q11[-s]     : Labile organic carbon
+                Q6        : Particulate organic Matter
     end
 
     group BenBacteria[cnp] (BBA) :mg C/m2:mmol N/m2:mmol P/m2
@@ -256,6 +256,20 @@ end
     M3n         : nitrate in porewater (pore-waters):mmol N/m3
     M5s         : silicate in oxic_denitrification layer (pore-waters):mmol Si/m3
     M6r         : reduction equivalent in porewater (pore-waters):mmol S--/m3
+
+    #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    # Variables holding quota of elements in species
+    #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    qpcBBA(BenBacteria)         : Quotum P/C in Benthic Bacteria :mmol P/mg C
+    qncBBA(BenBacteria)         : Quotum N/C in Benthic Bacteria :mmol N/mg C
+
+    qpcBOS(BenOrganisms)        : Quotum P/C in Benthic Organisms : mmol P/mg C
+    qncBOS(BenOrganisms)        : Quotum N/C in Benthic Organisms : mmol N/mg C
+
+    qpcBOM(BenDetritus)         : Quotum P/C in Benthic Organic Matter:mmol N/mg C
+    qncBOM(BenDetritus)         : Quotum N/C in Benthic Organic Matter:mmol P/mg C
+    qscBOM(BenDetritus)         : Quotum Si/C in Benthic Organic Matter:mmol Si/mg C
 
 end
 
@@ -401,6 +415,7 @@ end
     qncPPY(PhytoPlankton)	: Quotum N/C in Phytoplankton : mmol N/mg C 
     qscPPY(PhytoPlankton)	: Quotum Si/C in Phytoplankton : mmol Si/mg C 
     qlcPPY(PhytoPlankton)	: Quotum Chl/C in Phytoplankton : mg Chl /mg C
+    qccPPY(PhytoPlankton)   : Quotum PIC/POC in Phytoplankton : mg C/mg C
 
     qpcMEZ(MesoZooPlankton)	: Quotum P/C in Mesozooplankton :mmol P/mg C 
     qncMEZ(MesoZooPlankton)	: Quotum N/C in Mesozooplankton :mmol N/mg C 
@@ -423,6 +438,7 @@ end
     sediMEZ(MesoZooPlankton)  : MesoZooPlankton sedimentation rate :m/d
     sediR2                    : Detritus sedimentation rate:m/d
     sediR6                    : Detritus sedimentation rate:m/d
+    sediO5                    : Calcite sedimentation rate         :m/d
 
    #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
    # Sinking rates of phytoplankton and detritus
