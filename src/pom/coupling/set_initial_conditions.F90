@@ -174,7 +174,7 @@
 #ifdef INCLUDE_BEN
 !
      open(NMLUNIT,file='BFM_General.nml',status='old',action='read',err=102)
-     read(NMLUNIT,nml=bfm_init_nml_ben,err=102)
+     read(NMLUNIT,nml=bfm_init_nml_ben,err=103)
      close(NMLUNIT)
 !
 #endif
@@ -480,9 +480,10 @@
 !
 !    -----PRINT IF ERRORS WITH NAMELISTS READING-----
 !
- 100 call error_msg_prn(NML_OPEN,"InitParam.f90","BFM_General.nml")
- 101 call error_msg_prn(NML_READ,"InitParam.f90","Param_parameters")
- 102 call error_msg_prn(NML_READ,"InitParam.f90","Param_parameters_ben")
+ 100 call error_msg_prn(NML_OPEN,"set_initial_conditions","bfm_init_nml")
+ 101 call error_msg_prn(NML_READ,"set_initial_conditions","bfm_init_nml")
+ 102 call error_msg_prn(NML_READ,"set_initial_conditions","bfm_init_nml_ben")
+ 103 call error_msg_prn(NML_READ,"set_initial_conditions","bfm_init_nml_ben")
 !
       end subroutine set_initial_conditions
 !
