@@ -10,14 +10,14 @@
 !  WTSURF = latent - sensible + thermal  
 
 &pom_input
-wind_input      =  '../../../TRST1D/MA21/windstress_mon_Mussap.da',
-ism_input       =  '../../../TRST1D/MA21/ISM_16m_Mussap.da',
-Sal_input       =  '../../../TRST1D/MA21/ClimaS_MA21_16m.da',
-Temp_input      =  '../../../TRST1D/MA21/ClimaT_MA21_16m.da',
-Sprofile_input  =  '../../../TRST1D/MA21/Sinit_16m.da',
-Tprofile_input  =  '../../../TRST1D/MA21/Tinit_16m.da',
-heat_input      =  '../../../TRST1D/MA21/heatflux.da',
-surfNut_input   =  '../../../TRST1D/MA21/NutrientsARPAOGS.da',
+wind_input      =  '../MA21_POM_inputs/windstress_mon_Mussap.da',
+ism_input       =  '../MA21_POM_inputs/ISM_16m_Mussap.da',
+Sal_input       =  '../MA21_POM_inputs/ClimaS_MA21_16m.da',
+Temp_input      =  '../MA21_POM_inputs/ClimaT_MA21_16m.da',
+Sprofile_input  =  '../MA21_POM_inputs/Sinit_16m.da',
+Tprofile_input  =  '../MA21_POM_inputs/Tinit_16m.da',
+heat_input      =  '../MA21_POM_inputs/heatflux.da',
+surfNut_input   =  '../MA21_POM_inputs/NutrientsARPAOGS.da',
 ! restart file
 read_restart    =  './fort.70',
 /

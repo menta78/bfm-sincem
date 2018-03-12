@@ -35,10 +35,13 @@
 !                        1. pelagic
 !                        2. benthic
 !                        3. pelagic and benthic
+!                        4. sea ice
+!                        5. pelagic and sea ice
 ! out_fname      string  Name of NetCDF output file
 ! out_dir        string  Path to the output file
 ! out_title      string  Name of the experiment in NetCDF file
 ! out_delta      integer Output is saved every out_delta timesteps
+!                        Use -1 to store with real monthly frequency
 ! parallel_log   logical Set true in parallel jobs for a single log file 
 !-------------------------------------------------------------------------!
 &bfm_nml
@@ -49,6 +52,7 @@
    out_fname    = 'BFM_POM_benthic'
    out_dir      = '.'
    out_title    = 'BFM_POM_BENTHIC'
+   in_rst_fname = 'in_bfm_restart'
    out_delta    = 300  !every 30 days
    parallel_log = .FALSE.
 	filename_nml_conf = 'BFM_General.nml',
@@ -82,35 +86,18 @@
 !                                       time integration
 ! AssignAirPelFluxesInBFMFlag   logical Air-sea fluxes are added to the
 !                                       time integration
-! ChlDynamicsFlag               numeric Choose the dynamics of Chl-a
-!                                       1 = diagnostic, optimal light property
-!                                           in phytoplankton 
-!                                           (Ebenhoeh et al 1995, ERSEM-II) 
-!                                       2 = state variable, constituent of 
-!                                           phytoplankton
-! LightPeriodFlag               numeric Choose the light averaging period
-!                                       1 = Instantanous irradiance
-!                                       2 = Daylight average with explicit
-!                                           photoperiod                                       
-!                                       3 = Daily average
-! LightLocationFlag             numeric Choose the parameterization of light
-!                                       location in the discrete grid
-!                                       1 = Light at the top of the cell
-!                                       2 = Light in the middle of the cell
-!                                       3 = Average Light in the cell
-! check_fixed_quota             numeric Check whether zooplankton have fixed quota
+! ChlDynamicsFlag    numeric Choose the dynamics of Chl-a
+!                            1 = diagnostic, optimal light property
+!                                in phytoplankton
+!                                (Ebenhoeh et al 1995, ERSEM-II)
+!                            2 = state variable, constituent of
+!                                phytoplankton
 !
 ! Global Parameters : used throughout the model and not related 
 !                     to a specific component
 ! NAME          UNIT          DESCRIPTION
 ! p_small      [-]           Smallest numeric value (the model "zero")
 ! slp0         [mbar]        Reference sea level pressure
-! p_PAR        [-]           Fraction of Photosynthetically Available Radiation
-! p_eps0       [1/m]         Background extinction coefficient
-! p_epsESS     [m2/g]        Specific attenuation coefficient of
-!                            suspended sediments
-! p_epsR6      [m2/mgC]      Specific attenuation coefficient of particulate
-!                            detritus
 ! p_pe_R1c     [-]           Fractional content of C in cytoplasm 
 ! p_pe_R1n     [-]           Fractional content of N in cytoplasm
 ! p_pe_R1p     [-]           Fractional content of P in cytoplasm
@@ -140,24 +127,15 @@
 AssignPelBenFluxesInBFMFlag = .TRUE.
 AssignAirPelFluxesInBFMFlag = .FALSE.
             ChlDynamicsFlag = 2
-            LightPeriodFlag = 1
-          LightLocationFlag = 3
-          check_fixed_quota = 0
 ! Parameters : 
                     p_small = 1.0e-20
-                       slp0 = 1013.25E0
-                      p_PAR = 0.50
-                     p_eps0 = 0.12
-                    p_epsR6 = 0.1d-3
-                   p_epsESS = 0.04d-3
+                     p_atm0 = 1013.25E0
                    p_pe_R1c = 0.60
                    p_pe_R1n = 0.72
                    p_pe_R1p = 0.832
                       p_qro = 0.5
                p_qon_dentri = 1.25
                 p_qon_nitri = 1.0 
-                    p_poro0 = 0.7
-                    p_d_tot = 0.30
 	filename_nml_conf = 'BFM_General.nml',
 /
 
@@ -166,13 +144,15 @@ AssignAirPelFluxesInBFMFlag = .FALSE.
 !-------------------------------------------------------
 ! Benthic flags and parameters :
 &Param_parameters_ben
-        CalcBenOrganisms(1) = .TRUE.
-        CalcBenOrganisms(2) = .TRUE.
-        CalcBenOrganisms(3) = .TRUE.
-        CalcBenOrganisms(4) = .TRUE.
-        CalcBenOrganisms(5) = .TRUE.
-         CalcBenBacteria(1) = .TRUE.
-         CalcBenBacteria(2) = .TRUE.
+        CalcBenOrganisms(1) = .FALSE.
+        CalcBenOrganisms(2) = .FALSE.
+        CalcBenOrganisms(3) = .FALSE.
+        CalcBenOrganisms(4) = .FALSE.
+        CalcBenOrganisms(5) = .FALSE.
+         CalcBenBacteria(1) = .FALSE.
+         CalcBenBacteria(2) = .FALSE.
+                    p_poro0 = 0.7
+                    p_d_tot = 0.30
                  p_InitSink = 100.0
                   p_d_tot_2 = 0.35
                   p_clD1D2m = 0.01
@@ -201,6 +181,7 @@ AssignAirPelFluxesInBFMFlag = .FALSE.
    O2o0 = 280.0,
    O3c0 = 27060.00,
    O3h0 = 2660.0,
+   O5c0 = 1.0e-3,
    O4n0 = 200.0,
    P1c0 = 10.0,
    P2c0 = 5.0,
@@ -215,7 +196,7 @@ AssignAirPelFluxesInBFMFlag = .FALSE.
    R2c0 = 0.1,
    R3c0 = 1.0,
    R6c0 = 1.0,
-	filename_nml_conf = 'BFM_General.nml',
+   filename_nml_conf = 'BFM_General.nml',
 /
 
 !-------------------------------------------------------------------------!
@@ -224,7 +205,6 @@ AssignAirPelFluxesInBFMFlag = .FALSE.
 !Benthic initialisation of standard variables
 !<variablename>0 = <realvalue>
 !-------------------------------------------------------------------------!
-
 &bfm_init_nml_ben
    Y1c0  = 30.0,
    Y2c0  = 610.0,
@@ -291,24 +271,14 @@ AssignAirPelFluxesInBFMFlag = .FALSE.
 ! NAME         [UNIT]/KIND            DESCRIPTION
 ! p_burvel_R6     [m/d]              Bottom Burial Velocity for detritus 
 ! p_burvel_R2     [m/d]              Bottom Burial Velocity for dissolved
-! p_burvel_PI     [m/d]              Bottom Burial Velocity for plankton
-! dia_R6          [m]                Diameter of R6: Particulate Organic Detritus
-! rhos            [kg/dm3]           Density of Suspended Sediment Material
-! visc            [m2/s]             Molecular kinematic viscosity
-! svel            [m/s]              Velocity of Resuspension
-! waveh0          [m]                Multiplicator for storm waves
-! method          []                 Tipe of calculation of bottom stress
-! strsc           [kg m2/s2]         Critical bottom stress
-! depv            []                 define the stress used: 0 = Soul ; 1 = Wang
-! wavep0          []                 Define the wave regime: 0 = Base Waves
+! p_burvel_PI     [m/d]              Bottom Burial Velocity for plankton 
+! p_burvel_O5     [m/d]              Bottom Burial Velocity for calcite
 !-------------------------------------------------------------------------!
 &Settling_parameters
   p_burvel_R6 = 0.5,
+  p_burvel_O5 = 30.,
   p_burvel_R2 = 0.0,
   p_burvel_PI = 5.0
-    dia_R6            =  24.E-6
-    rhos              =  1.100
-    visc              =  1.3E-6
 	filename_nml_conf = 'Benthic_Environment.nml',
 /
 
@@ -318,41 +288,17 @@ AssignAirPelFluxesInBFMFlag = .FALSE.
 !NAMELIST CO2_parameters 
 !-------------------------------------------------------------------------!
 ! CARBONATE SYSYEM SETTING
-! NAME           [UNIT]/KIND             DESCRIPTION
-! AtmCO20        [ppmv]           Initial atmospheric concentration of CO2
-! calcAtmpCO2    logical          Compute the partial pressure of Atmospheric CO2
-! pCO2Method     integer          pCO2 computation method: 1=MixRatio*slp0, 2=Magnus formula 
-! phstart        [pH]             Initial pH value
-! K1K2           integer          Switch for the acidity constants parameterization
-!                                 1 : Roy et al. (1993); DOE (1994); pH on total scale
-!                                 2 : Default. OCMIP STANDARD; pH on Sea Water Scale
-!                                     Mehrbach et al (1973) refit by Dickson & Millero (1987)
-!                                 3 : Mehrbach et al (1973) refit by Lueker et al. (2000)
-!                                     pH on total scale
-!                                 4 : Hansson (1973b) data as refitted by Dickson and 
-!                                     Millero (1987);  pH on Sea Water Scale 
-! MethodCalcCO2  numeric          Switch for the choice of [H+] numerical computation 
-!                                 1 : Approximate static solution 
-!                                 2 : Default. Standard OCMIP iteration 
-!                                 3 : Follows et al., Ocean Modelling 2006 
-! CalcBioAlkFlag logical          Compute biological processes corrections on total alkalinity
-!              ---------  Parameters for MethodCalcCO2=2 -----------
-! M2XACC         real             Accuracy of the iterative scheme for OCMIP (default 1.E-10)                                
-! M2PHDELT       [pH]             Delta of pH for the root search (realized pH+/-DELT)
-!                                 in the OCMIP scheme (default 0.5)
-! M2MAXIT        integer          Maximum number of iterations for OCMIP (default 100 )
-!              ----------------------------------------------------- 
-! Caconc0        [mol/m3]         Calcium ion concentration 
-!                                 ["Seawater : Its composition, properties and behaviour" 
-!                                 (2nd Edition), Open University Course Team, 1995]
-!                                 Seawater concentration   = 412 mg / l 
-!                                                        -> atomic weight = 40.078 g / mol
-!                                 therefore, concentration = 10.279 mmol / l = 10.279 mol / m3
-! Canorm          logical         Normalize Calcium ion concentration by sea water salinity
+! NAME            [UNIT]/KIND             DESCRIPTION
+! AtmCO20          [ppmv]           Initial atmospheric concentration of CO2
+! MaxIterPHsolver  integer          Maximum number of iterations for SolveSAPHE (default 50)
+! CalcBioAlk       logical          Compute biological processes corrections on total alkalinity
+! Co2fluxfac        real            Multiplier to enhance air-sea co2 exchange rate
+!              ---------  Parameters for calcium and calcite ---------
+! p_kdca          [d-1]           Calcite dissolution rate constant
+! p_nomega        [-]             Order of the dissolution rate dependence on Omega
 !              ---------  EXTERNAL DATA INPUT STRUCTURES -----------
 ! AtmCO2_N       structure        Read external data for atmospheric CO2 values
 ! AtmSLP_N       structure        Read external data for atmospheric sea level pressure
-! AtmTDP_N       structure        Read external data for atmospheric dew-point temperature
 ! Example of general input structure for the data structure:
 !          ! Read  !   File                               ! NetCDF  !  Var    !
 !          ! Input !   name                               ! Logical !  name   !
@@ -361,27 +307,21 @@ AssignAirPelFluxesInBFMFlag = .FALSE.
 !          !  yyyymmdd         ! Frequency  !  interp  !
 !           '1764-07-01 00:00' ,  'yearly'  ,  .TRUE.
 !
-! Convention for Input reading : 0 = use constant value (default if structure is not initialized) 
-!                               2 = read timeseries file ( e.g. CO2 mixing ratios)
-!                               4 = field from a coupled model (e.g. atmospheric SLP from OGCM)
+! Convention for Input reading : 0 = use constant value (default if struct is not initialized)
+!                                1 = read timeseries file ( e.g. CO2 mixing ratios)
+!                                2 = read 2D fields using NEMO fldread
+!                                3 = field from a coupled model (e.g. atmospheric SLP from OGCM)
 ! NOTE: The file "CMIP5_Historical_GHG_1765_2005.dat" is located in "$BFMDIR/tools" folder
 !-----------------------------------------------------------------------------------!
-&CO2_parameters
-   AtmCO20       = 370.0E0
-   calcAtmpCO2   = .FALSE.
-   pCO2Method    = 1  
-   AtmCO2_N  =    0  , 'CMIP5_Historical_GHG_1765_2005.dat' , .FALSE.  , 'CO2'   , '1764-07-01 00:00' ,  'yearly'  ,  .TRUE.
-   AtmSLP_N  =    0  , 'AtmSLP.nc' , .TRUE.  ,'AtmSLP' , '1764-07-01 00:00'  , 'dummy' ,  .TRUE.
-   AtmTDP_N  =    0  , 'AtmTDP.nc' , .TRUE.  ,'AtmTDP' , '1764-07-01 00:00'  , 'dummy' ,  .TRUE.
-   phstart       = 8.12E0
-   K1K2          = 2
-   MethodCalcCO2 = 2
-  CalcBioAlkFlag = .TRUE.
-          M2XACC = 1.0E-10
-        M2PHDELT = 0.3
-         M2MAXIT = 100
-         Caconc0 = 10.279E0
-         Canorm  = .TRUE.
+&CSYS_parameters
+    AtmCO20         =  370.0E0
+    MaxIterPHsolver = 50
+    CalcBioAlk      =  .FALSE.
+    p_kdca          =  10.9
+    p_nomega        =  1
+    Co2fluxfac      = 1.0
+    AtmCO2_N        =  0         'CMIP5_Historical_GHG_1765_2005.dat'  .FALSE.  'CO2'     '1764-07-01 00:00'  'yearly'  .TRUE.
+    AtmSLP_N        =  0         'AtmSLP.nc'                           .TRUE.   'AtmSLP'  '1764-07-01 00:00'  'dummy'   .TRUE.
 	filename_nml_conf = 'Carbonate_Dynamics.nml',
 /
 
@@ -422,7 +362,6 @@ AssignAirPelFluxesInBFMFlag = .FALSE.
 ! p_rec       [1/d]            Relaxation timescale for semi-labile excretion
 ! p_pu_ea_R3  [-]              Excretion of semi-refractory DOC
 !-------------------------------------------------------------------------!
-
 &PelBacteria_parameters
 !                B1
      p_version = 3
@@ -453,7 +392,6 @@ AssignAirPelFluxesInBFMFlag = .FALSE.
     p_pu_ea_R3 = 0.015
         filename_nml_conf = 'Pelagic_Ecology.nml',
 /
-
 
 !-------------------------------------------------------------------------!
 !NAMELIST Phyto_parameters, Phyto_parameters_iron, PAR_parameters, LightAdaptation_parameters
@@ -507,9 +445,12 @@ AssignAirPelFluxesInBFMFlag = .FALSE.
 !  p_qus       [m3/mgC/d]     Membrane affinity for Si
 !  p_qslc      [mmolSi/mgC]   Minimum quotum Si:C 
 !  p_qscPPY    [mmolSi/mgC]   Reference quotum Si:C
+!                             Brzezinski (1985) 0.13 mol/mol
 !                   ---- nutrient stressed sinking ----
 !  p_esNI      [-]            Nutrient stress threshold for sinking
-!  p_res       [m/d]          Maximum Sinking velocity (m/d)
+!  p_res       [m/d]          Maximum Sinking vel city (m/d)
+!                   ---- Calcification ----
+!  p_caco3r    [-]            Reference PIC:POC (rain) ratio
 !              --------- Chlorophyll parameters -----------
 !  p_switchChl [1-4]          Switch for Chla-a synthesis 
 !  p_sdchl     [1/d]          Specific turnover rate for Chla 
@@ -526,15 +467,14 @@ AssignAirPelFluxesInBFMFlag = .FALSE.
 !  p_qfcPPY    [umolFe/mgC]   Reference quotum Fe:C
 !  p_xqf       [-]            Multiplication factor for luxury storage
 !              --------- Light parameters ERSEM-II -----------
-!  p_iswLtyp                  Shape of the productivity function
-!  p_isw                      Switch between parameterizations
-!  p_chELiPPY    [W/m2]         Maximum Iopt
-!  p_clELiPPY    [W/m2]         Minimum Iopt
-!  p_ruELiPPY    [1/d]          Maximum daily shift in Iopt (1/d)
+!  p_iswLtyp   [0-6]          Shape of the productivity function
+!  p_chELiPPY  [W/m2]         Maximum Iopt
+!  p_clELiPPY  [W/m2]         Minimum Iopt
+!  p_ruELiPPY  [1/d]          Maximum daily shift in Iopt (1/d)
 !  p_addepth   [m]            Adaptation depth. Meaningless with high-res models
-!
+!              --------- Sinking parameters -----------
+!  p_rPIm      [m/d]          Phytoplankton background sinking rate
 !-------------------------------------------------------------------------!
-
 &Phyto_parameters
 !               P1      P2      P3      P4
         p_q10 = 2.0,    2.0,    2.0,    2.0
@@ -567,6 +507,7 @@ AssignAirPelFluxesInBFMFlag = .FALSE.
      p_qscPPY = 8.5e-3, 0.0,    0.0,    0.0
        p_esNI = 0.7,    0.75,   0.75,   0.75
        p_res  = 5.0,    0.0,    0.0,    5.0 
+     p_caco3r = 0.0,    0.3,    0.0,    0.0
   p_switchChl = 3,      3,      3,      3
       p_sdchl = 0.2,    0.2,    0.2,    0.2
   p_alpha_chl = 0.7e-5, 1.1e-5, 1.52e-5,6.8e-6
@@ -574,6 +515,12 @@ AssignAirPelFluxesInBFMFlag = .FALSE.
     p_epsChla = 0.03,   0.03,   0.03,   0.03
     p_EpEk_or = 3.0,    3.0,    3.0,    3.0
  p_tochl_relt = 0.25,    0.25,    0.25,    0.25
+    p_iswLtyp = 5,      5,      5,      5
+    p_addepth = 50.0,   50.0,   50.0,   50.0
+  p_chELiPPY  = 100.0,  100.0,  100.0,  100.0
+  p_clELiPPY  = 8.0,    10.0,   6.0,    12.0
+  p_ruELiPPY  = 0.2,    0.25,   0.3,    0.15
+       p_rPIm = 0.0,    0.0,    0.0,    0.0
 	filename_nml_conf = 'Pelagic_Ecology.nml',
 /
 
@@ -581,19 +528,42 @@ AssignAirPelFluxesInBFMFlag = .FALSE.
 	filename_nml_conf = 'Pelagic_Ecology.nml',
 /
 
+!-------------------------------------------------------------------------!
+!NAMELIST PAR_parameters
+!-------------------------------------------------------------------------!
+! LightPeriodFlag    numeric Choose the light averaging period
+!                            1 = Instantanous irradiance
+!                            2 = Daily average
+!                            3 = Daylight average with explicit
+!                                photoperiod
+! LightLocationFlag  numeric Choose the parameterization of light
+!                            location in the discrete grid
+!                            1 = Light at the top of the cell
+!                            2 = Light in the middle of the cell
+!                            3 = Average Light in the cell
+! ChlAttenFlag	     numeric Choose the PAR attenuation due to Chl
+!                            1 = broadband linear attenuation 
+!                            2 = 3-band tabulated attenuation coefficients
+!                                (Morel, 1988; Lengaigne et al, 2007)
+! p_PAR        [-]           Fraction of Photosynthetically Available Radiation
+! p_eps0       [1/m]         Background extinction coefficient
+! p_epsIR      [1/m]         Infrared extinction coefficient
+!                            (to use with ChlAttenFlag=2)
+! p_epsESS     [m2/g]        Specific attenuation coefficient of
+!                            suspended sediments
+! p_epsR6      [m2/mgC]      Specific attenuation coefficient of particulate
+!                            detritus
+!-------------------------------------------------------------------------!
 &PAR_parameters
-!               P1      P2      P3      P4
-  p_iswLtyp =   5,      5,      5,      5
-
-	filename_nml_conf = 'Pelagic_Ecology.nml',
-/
-&LightAdaptation_parameters
-        p_isw =   1,      1,      1,      1
-    p_addepth =   50.0,   50.0,   50.0,   50.0
-  p_chELiPPY  =   100.0,  100.0,  100.0,  100.0
-  p_clELiPPY  =   8.0,    10.0,   6.0,    12.0
-  p_ruELiPPY  =   0.2,    0.25,   0.3,    0.15
-	filename_nml_conf = 'Pelagic_Ecology.nml',
+  LightPeriodFlag    =  1
+  LightLocationFlag  =  3
+  ChlAttenFlag       =  1
+  p_PAR        =  0.50
+  p_eps0       =  0.12
+  p_epsIR      =  2.857
+  p_epsESS     =  0.04d-3
+  p_epsR6      =  0.1d-3
+	filename_nml_conf = 'Pelagic_Environment.nml',
 /
 
 !-------------------------------------------------------------------------!
@@ -613,16 +583,16 @@ AssignAirPelFluxesInBFMFlag = .FALSE.
 ! p_chuc       [mgC/m3]        Half-saturation Food concentration for Type II
 ! p_minfood    [mgC/m3]        Half-saturation food concentration for
 !                              preference factor
+! p_pecaco3    [-]             Portion of egested calcified shells during grazing
 ! p_qncMIZ     [mmolN/mgC]     Maximum quotum P:C
 ! p_qpcMIZ     [mmolN/mgC]     Maximum quotum N:C
 ! p_paPBA(z,b) [-]             Availability of pelagic Bacteria group b 
 !                              to Zooplankton group z
-! p_paPPY(z,p) [-]             Availabili0ty of PhytoPlankton group p
+! p_paPPY(z,p) [-]             Availability of PhytoPlankton group p
 !                              to Zooplankton group z
 ! p_paMIZ(z,m) [-]             Availability of MicroZooplankton group m
 !                              to Zooplankton group z
 !-------------------------------------------------------------------------!
-
 &MicroZoo_parameters
 !              Z5      Z6
        p_q10 =  2.0,    2.0
@@ -635,8 +605,11 @@ AssignAirPelFluxesInBFMFlag = .FALSE.
       p_chro =  30.0,     30.0 
       p_chuc =  200.0,  200.0
    p_minfood =  50.0,   50.0
+   p_pecaco3 =  0.5,    0.5
     p_qpcMIZ =  1.85d-3,1.85d-3
     p_qncMIZ =  1.67d-2,1.67d-2
+! Food matrix parameters: take care of the notation
+!               Z5      Z6
      p_paPBA =  0.1,    1.0
 !               P1      P2      P3      P4
 !       Z5
@@ -650,7 +623,6 @@ p_paMIZ(1,:) =  1.0,    1.0
 p_paMIZ(2,:) =  0.0,    0.2
         filename_nml_conf = 'Pelagic_Ecology.nml',
 /
-
 
 !-------------------------------------------------------------------------!
 !NAMELIST MesoZoo_parameters
@@ -668,6 +640,7 @@ p_paMIZ(2,:) =  0.0,    0.2
 ! p_sds        [-]             Exponent of density-dependent mortality
 ! p_qpcMEZ     [mmolP/mgC]     Maximum quotum P:C
 ! p_qncMEZ     [mmolN/mgC]     Maximum quotum N:C
+! p_clO2o      [mmolO2/m3]     Half-saturation oxygen concentration
 ! p_paPPY(z,p) [-]             Availability of PhytoPlankton group p
 !                              to Zooplankton group z
 ! p_paMIZ(z,m) [-]             Availability of MicroZooplankton group m
@@ -675,7 +648,6 @@ p_paMIZ(2,:) =  0.0,    0.2
 ! p_paMEZ(z,m) [-]             Availability of MesoZooplankton group m
 !                              to Zooplankton group z
 !-------------------------------------------------------------------------!
-
 &MesoZoo_parameters
 !               Z3      Z4
        p_q10 =  2.0,    2.0
@@ -687,9 +659,11 @@ p_paMIZ(2,:) =  0.0,    0.2
        p_sdo =  0.01,   0.01
         p_sd =  0.02,   0.01
        p_sds =  2.0,    2.0
+   p_pecaco3 =  0.75,   0.75
     p_qpcMEZ =  1.67d-3,1.67d-3
     p_qncMEZ =  0.015,  0.015
      p_clO2o =  30.0,   30.0
+! Food matrix parameters: take care of the notation
 !               P1      P2      P3      P4
 !       Z3
 p_paPPY(1,:) =  0.0,    0.0,    0.0,    0.0
@@ -707,7 +681,6 @@ p_paMEZ(1,:)=   1.0,    1.0
 p_paMEZ(2,:)=   0.0,    1.0
         filename_nml_conf = 'Pelagic_Ecology.nml',
 /
-
 
 !-------------------------------------------------------------------------!
 !NAMELIST PelChem_parameters, PelChem_parameters_iron
@@ -744,7 +717,6 @@ p_paMEZ(2,:)=   0.0,    1.0
      p_rPAo = 1.0
   p_q10R6N5 = 1.49
     p_sR6N5 = 0.5
-
 	filename_nml_conf = 'Pelagic_Environment.nml',
 /
 
@@ -752,31 +724,26 @@ p_paMEZ(2,:)=   0.0,    1.0
 	filename_nml_conf = 'Pelagic_Environment.nml',
 /
 
-&PelChem_parameters_NO_BACT
-    p_sR6O3 = 0.1
-    p_sR6N1 = 0.1
-    p_sR6N4 = 0.1
-    p_sR1O3 = 0.1
-    p_sR1N1 = 0.1
-    p_sR1N4 = 0.1
-    p_sR2O3 = 0.1
-    p_sR3O3 = 0.1
-        filename_nml_conf = 'Pelagic_Environment.nml',
-/
-
 !-------------------------------------------------------------------------!
 !NAMELIST PelGlobal_parameters
 !-------------------------------------------------------------------------!
 ! Sinking rates of Pelagic Variables
 !  : for mem_PelGlobal filled by InitPelGlobal
-! NAME        UNIT      DESCRIPTION
-! p_rR6m      [m/d]     detritus sinking rate
-! p_rPIm      [m/d]     phytoplankton background sinking rate
+! NAME           UNIT      DESCRIPTION
+! p_rR6m         [m/d]   detritus sinking rate
+! p_rO5m         [m/d]   calcite sinking rate
+! KSINK_rPPY      [m]    prescribe sinking rate for phytoplankton below this
+!                        depth threshold to p_rR6m value. Use 0.0 to disable.
+! AggregateSink  logic   use aggregation = true to enhance the sink rate
+!                        and bypass the prescribed sinking
+! depth_factor    [m]    depth factor for aggregation method
 !-------------------------------------------------------------------------!
 &PelGlobal_parameters
-  p_rR6m = 1.5
-!               P1      P2      P3      P4
-  p_rPIm =      0.0,    0.0,    0.0,    0.0
+  p_rR6m         = 1.5
+  p_rO5m         = 30.0
+  KSINK_rPPY     = 0.0
+  AggregateSink  = .FALSE.
+  depth_factor   = 2000.0
 	filename_nml_conf = 'Pelagic_Environment.nml',
 /
 

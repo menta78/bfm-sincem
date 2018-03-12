@@ -63,18 +63,16 @@
 !  p_iK1                    BenthicPhosphate(p_IK1) =1,2 --> K1p K11p
 !  p_iQ1                    BenDetritus(p_IQ1) =1,2 --> Q1 Q11
 
-&BenBac_parameters
+&BenBacteria_parameters
 !
 !              H1            H2
 !
   p_cdm    =   0.001,        0.01,
-  p_qpc    =   0.00125,      0.00125,
+  p_qpcBBA    =   0.00125,      0.00125,
   p_qlpc   =   0.00063,      0.00063,
-  p_qnc    =   0.0167,       0.0167,
+  p_qncBBA    =   0.0167,       0.0167,
   p_qlnc   =   0.0083,       0.0083,
   p_q10    =   2.0,          2.0,
-! p_suhQ6  =   0.1,          0.1,
-! p_sulQ6  =   0.02,         0.02,
   p_suhQ6  =   0.01,         0.01,
   p_sulQ6  =   0.002,        0.002,
   p_sum    =   8.38,         8.38,

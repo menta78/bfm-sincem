@@ -42,33 +42,28 @@
 !-------------------------------------------------------------------------!
 !BOC
 !
-!  p_q10       [-]              Characteristic Q10 coefficient
-!  p_su        [1/d]            Potential specific growth rate
-!  p_chu       [mg C m^-2]      Michaelis-Menten constant for food limitation
-!  p_clu       [mg C m^-3]      Feeding threshold
-!  p_pue       [-]              Excreted fraction of uptake
-!  p_pur       [-]              Respired fraction of uptake  used for digesting
-!  p_pudil     [-]              Selectivity for nutrients
-!  p_sr        [1/d]            Respiration rate
-!  p_puQ6                       Food matrix detritus on the sediment (Q6)
-!  p_pueQ6     [-]              Excreted fraction of detritus uptake
-!  p_cm        [m]              Preferred depth in sediments
-!  p_clm       [m]              Minimum depth in sediments
-!  p_sd        [1/d]            Specific mortality rate
-!  p_sdm       [1/d]            Max.specific nutrient-stress lysis rate
-!  p_sdo       [1/d]            Mortality rate due to oxygen limitation
-!  p_qn        [mmolN/mgC]      Maximum nutrient quota N:C
-!  p_qp        [mmolP/mgC]      Maximum nutrient quota P:C
-!  p_clO2o     [mmolO2/m3]      Half-saturation O2 concentration
-!  p_Yn(Y1)                     Y1 > YI
-!  p_Yn(Y2)                     Y2 > YI
-!  p_Yn(Y3)                     Y3 > YI
-!  p_Yn(Y4)                     Y4 > YI
-!  p_Yn(Y5)                     Y5 > YI
-!  p_Hn(H1)                     H1 > YI
-!  p_Hn(H2)                     H2 > YI
+!
+!  p_q10:
+!  p_su:
+!  p_chu:
+!  p_clu:
+!  p_pue:
+!  p_pur:
+!  p_pudil:
+!  p_sr:
+!  p_sd:
+! p_qncBOS    [mmolN/mgC]      Optimal N/C ratio
+! p_qpcBOS    [mmolP/mgC]      Optimal P/C ratio
+!  p_Yn(Y1):  	 Y1 > YI
+!  p_Yn(Y2):  	 Y2 > YI
+!  p_Yn(Y3):  	 Y3 > YI
+!  p_Yn(Y4):  	 Y4 > YI
+!  p_Yn(Y5):  	 Y5 > YI
+!  p_Hn(H1):  	 H1 > YI
+!  p_Hn(H2):  	 H2 > YI
+!  p_puQ6:  	 H2 > YI
 
-&BenOrganism_parameters
+&BenOrganisms_parameters
 !
 !               Y1        Y2        Y3               Y4        Y5
 !
@@ -87,8 +82,8 @@
   p_sd     =    0.002,    0.001,    0.000000e+00,    0.02,     0.003,
   p_sdm    =    0.005,    0.005,    0.000000e+00,    0.005,    0.005,
   p_sdo    =    0.1,      0.1,      0.000000e+00,    0.1,      0.1,
-  p_qn     =    0.0119,   0.0119,   0.000000e+00,    0.0119,   0.0119,
-  p_qp     =    0.000793, 0.000793, 0.000000e+00,    0.000793, 0.000793,
+  p_qncBOS     =    0.0119,   0.0119,   0.000000e+00,    0.0119,   0.0119,
+  p_qpcBOS     =    0.000793, 0.000793, 0.000000e+00,    0.000793, 0.000793,
   p_clO2o  =    30.0,     30.0,     0.000000e+00,    30.0,     30.0,
 
 ! Consumers
