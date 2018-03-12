@@ -36,13 +36,12 @@
 #else
   use mem,  ONLY: Q6c, Q1c, Q6p, Q1p, K1p, Q6n, Q1n, K3n, K4n, Q6s, K5s
 #endif
-  use mem, ONLY: ppQ6c, ppQ1c, ppQ6p, ppQ1p, ppK1p, ppQ6n, ppQ1n, &
-    ppK3n, ppK4n, ppQ6s, ppK5s, jbotO2o, ppO2o, jbotN1p, ppN1p, jbotN3n, ppN3n, jbotN4n, ppN4n, jbotN5s, ppN5s, &
+  use mem, ONLY: ppQ6c, ppQ1c, ppQ6p, ppQ1p, ppQ6n, ppQ1n, ppK1p, ppK3n, ppK4n, ppQ6s, ppK5s, &
+    jbotO2o, jbotN1p, jbotN3n, jbotN4n, jbotN5s, jbotO3c, jbotO3h, &
     NO_BOXES_XY, iiBen, iiPel, flux_vector
   use mem_BenthicReturn
   use mem_Param, ONLY: CalcConservationFlag, AssignPelBenFluxesInBFMFlag
-  use constants,    ONLY: MW_C
-
+  use constants, ONLY: MW_C
 !  
 !
 ! !AUTHORS
@@ -88,33 +87,37 @@
 
   rate  =   p_reminQ6c* Q6c(:)
   call flux_vector( iiBen, ppQ6c,ppQ6c,-( rate) )
-  jbotO2o(:)  =  - rate/ MW_C
+  jbotO2o(:)  = - rate / MW_C
+  jbotO3c(:)  = rate
+  jbotO3h(:)  = rate
 
   rate  =   p_reminQ1c* Q1c(:)
   call flux_vector( iiBen, ppQ1c,ppQ1c,-( rate) )
-  jbotO2o(:)  =   jbotO2o(:)- rate/ MW_C
+  jbotO2o(:)  = jbotO2o(:) - rate / MW_C
+  jbotO3c(:)  = jbotO3c(:) + rate
+  jbotO3h(:)  = jbotO3h(:) + rate
 
   rate  =   p_reminQ6p* Q6p(:)
   call flux_vector( iiBen, ppQ6p,ppQ6p,-( rate) )
-  jbotN1p(:)  =   rate
+  jbotN1p(:)  = rate
 
   rate  =   p_reminQ1p* Q1p(:)
   call flux_vector( iiBen, ppQ1p,ppQ1p,-( rate) )
-  jbotN1p(:)  =   jbotN1p(:)+ rate
+  jbotN1p(:)  = jbotN1p(:)+ rate
 
   rate  =   p_reminQ6n* Q6n(:)
   call flux_vector( iiBen, ppQ6n,ppQ6n,-( rate) )
-  jbotN3n(:)  =   rate* p_pQIN3
-  jbotN4n(:)  =   rate*( ONE - p_pQIN3)
+  jbotN3n(:)  = rate* p_pQIN3
+  jbotN4n(:)  = rate*( ONE - p_pQIN3)
 
   rate  =   p_reminQ1n* Q1n(:)
   call flux_vector( iiBen, ppQ1n,ppQ1n,-( rate) )
-  jbotN3n(:)  =   jbotN3n(:)+ rate* p_pQIN3
-  jbotN4n(:)  =   jbotN4n(:)+ rate*( ONE - p_pQIN3)
+  jbotN3n(:)  = jbotN3n(:)+ rate* p_pQIN3
+  jbotN4n(:)  = jbotN4n(:)+ rate*( ONE - p_pQIN3)
 
   rate  =   p_reminQ6s* Q6s(:)
   call flux_vector( iiBen, ppQ6s,ppQ6s,-( rate) )
-  jbotN5s(:)  =   rate
+  jbotN5s(:)  = rate
 
   ! K1p, K3n, K4n, K5s are not used in the benthic return setup,
   ! but are activated only for mass conservation check

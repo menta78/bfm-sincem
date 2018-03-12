@@ -54,7 +54,7 @@
 #endif
 #if defined INCLUDE_PELCO2
   use mem, ONLY: ppO5c, jbotO5c
-#if defined INCLUDE_BENCO2
+#if defined INCLUDE_BENCO2 || defined BENTHIC_RETURN
   use mem, ONLY: ppO3h, ppO3c,jbotO3c,jbotO3h
 #endif
 #endif
@@ -199,14 +199,10 @@
       ! Net detritus Fluxes to Benthic from Pelagic by Y3
       ! net flux= uptake - excretion of food : flux may be negative!
       ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-      call flux(kbot, iiPel, ppR6c, ppR6c, -( jRIY3c(BoxNumberXY)/ &
-         Depth(kbot)) )
-      call flux(kbot, iiPel, ppR6n, ppR6n, -( jRIY3n(BoxNumberXY)/ &
-         Depth(kbot)) )
-      call flux(kbot, iiPel, ppR6p, ppR6p, -( jRIY3p(BoxNumberXY)/ &
-         Depth(kbot)) )
-      call flux(kbot, iiPel, ppR6s, ppR6s, -( jRIY3s(BoxNumberXY)/ &
-         Depth(kbot)) )
+      call flux(kbot, iiPel, ppR6c, ppR6c, -(jRIY3c(BoxNumberXY)/Depth(kbot)) )
+      call flux(kbot, iiPel, ppR6n, ppR6n, -(jRIY3n(BoxNumberXY)/Depth(kbot)) )
+      call flux(kbot, iiPel, ppR6p, ppR6p, -(jRIY3p(BoxNumberXY)/Depth(kbot)) )
+      call flux(kbot, iiPel, ppR6s, ppR6s, -(jRIY3s(BoxNumberXY)/Depth(kbot)) )
    end do ! loop over NO_BOXES_XY
   end if ! benthic model includes benthos
 #endif
@@ -216,109 +212,78 @@
    ! All Fluxes to Benthic from Pelagic defined for the
    ! Pelagic State variables (done only if BFM computes them)
    ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-      do BoxNumberXY = 1,NO_BOXES_XY
-         kbot = BOTindices(BoxNumberXY)
-        ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        ! Nutrient Fluxes to Benthic from Pelagic
-        ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        call flux(kbot, iiPel, ppO2o, ppO2o, jbotO2o(BoxNumberXY)/ &
-          Depth(kbot) )
-        call flux(kbot, iiPel, ppN1p, ppN1p, jbotN1p(BoxNumberXY)/ &
-          Depth(kbot) )
-        call flux(kbot, iiPel, ppN3n, ppN3n, jbotN3n(BoxNumberXY)/ &
-          Depth(kbot) )
-        call flux(kbot, iiPel, ppN4n, ppN4n, jbotN4n(BoxNumberXY)/ &
-          Depth(kbot) )
-        call flux(kbot, iiPel, ppN5s, ppN5s, jbotN5s(BoxNumberXY)/ &
-          Depth(kbot) )
-        call flux(kbot, iiPel, ppN6r, ppN6r, jbotN6r(BoxNumberXY)/ &
-          Depth(kbot) )
+   do BoxNumberXY = 1,NO_BOXES_XY
+      kbot = BOTindices(BoxNumberXY)
+      ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+      ! Nutrient Fluxes to Benthic from Pelagic
+      ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+      call flux(kbot, iiPel, ppO2o, ppO2o, jbotO2o(BoxNumberXY)/Depth(kbot) )
+      call flux(kbot, iiPel, ppN1p, ppN1p, jbotN1p(BoxNumberXY)/Depth(kbot) )
+      call flux(kbot, iiPel, ppN3n, ppN3n, jbotN3n(BoxNumberXY)/Depth(kbot) )
+      call flux(kbot, iiPel, ppN4n, ppN4n, jbotN4n(BoxNumberXY)/Depth(kbot) )
+      call flux(kbot, iiPel, ppN5s, ppN5s, jbotN5s(BoxNumberXY)/Depth(kbot) )
+      call flux(kbot, iiPel, ppN6r, ppN6r, jbotN6r(BoxNumberXY)/Depth(kbot) )
 #if defined INCLUDE_PELCO2
-        call flux(kbot, iiPel, ppO5c, ppO5c, jbotO5c(BoxNumberXY)/ &
-          Depth(kbot))
-#if defined INCLUDE_BENCO2
-        call flux(kbot, iiPel, ppO3c, ppO3c, jbotO3c(BoxNumberXY)/ &
-          Depth(kbot) )
-        ! convert the units from mmol/m3/d to umol/kg/d
-        call flux(kbot, iiPel, ppO3h, ppO3h, jbotO3h(BoxNumberXY)/&
-          Depth(kbot))
+      call flux(kbot, iiPel, ppO5c, ppO5c, jbotO5c(BoxNumberXY)/Depth(kbot))
+#if defined INCLUDE_BENCO2 || defined BENTHIC_RETURN
+      call flux(kbot, iiPel, ppO3c, ppO3c, jbotO3c(BoxNumberXY)/Depth(kbot) )
+      ! convert the units from mmol/m3/d to umol/kg/d
+      call flux(kbot, iiPel, ppO3h, ppO3h, jbotO3h(BoxNumberXY)/Depth(kbot))
 #endif
 #endif
 
-        ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        ! PhytoPlankton Fluxes to Benthic from Pelagic (mostly by Y3 uptake)
-        ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        do i = 1 , ( iiPhytoPlankton)
-              j = ppPhytoPlankton(i,iiC)
-              call flux(kbot, iiPel, j, j, PELBOTTOM(j,BoxNumberXY)/ &
-                Depth(kbot) )
-              j = ppPhytoPlankton(i,iiN)
-              call flux(kbot, iiPel, j, j, PELBOTTOM(j,BoxNumberXY)/ &
-                Depth(kbot) )
-              j = ppPhytoPlankton(i,iiP)
-              call flux(kbot, iiPel, j, j, PELBOTTOM(j,BoxNumberXY)/ &
-                Depth(kbot) )
-              j = ppPhytoPlankton(i,iiL)
-              call flux(kbot, iiPel, j, j, PELBOTTOM(j,BoxNumberXY)/ &
-                Depth(kbot) )
-              j = ppPhytoPlankton(i,iiS)
-              if ( j> 0) then
-                call flux(kbot, iiPel, j, j, PELBOTTOM(j,BoxNumberXY)/ &
-                  Depth(kbot) )
-              end if
+      ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+      ! PhytoPlankton Fluxes to Benthic from Pelagic (mostly by Y3 uptake)
+      ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+      do i = 1 , ( iiPhytoPlankton)
+         j = ppPhytoPlankton(i,iiC)
+         call flux(kbot, iiPel, j, j, PELBOTTOM(j,BoxNumberXY)/Depth(kbot) )
+         j = ppPhytoPlankton(i,iiN)
+         call flux(kbot, iiPel, j, j, PELBOTTOM(j,BoxNumberXY)/Depth(kbot) )
+         j = ppPhytoPlankton(i,iiP)
+         call flux(kbot, iiPel, j, j, PELBOTTOM(j,BoxNumberXY)/Depth(kbot) )
+         j = ppPhytoPlankton(i,iiL)
+         call flux(kbot, iiPel, j, j, PELBOTTOM(j,BoxNumberXY)/Depth(kbot) )
+         j = ppPhytoPlankton(i,iiS)
+         if ( j > 0 ) &
+           call flux(kbot, iiPel, j, j, PELBOTTOM(j,BoxNumberXY)/Depth(kbot) )
 #ifdef INCLUDE_PELFE
-              j = ppPhytoPlankton(i,iiF)
-              if ( j> 0) then
-                call flux(kbot, iiPel, j, j, PELBOTTOM(j,BoxNumberXY)/ &
-                  Depth(kbot) )
-              end if
+         j = ppPhytoPlankton(i,iiF)
+         if ( j > 0 ) &
+           call flux(kbot, iiPel, j, j, PELBOTTOM(j,BoxNumberXY)/Depth(kbot) )
 #endif
-        end do
+      end do
 
-        do i = 1 , ( iiMicroZooPlankton)
-              j = ppMicroZooPlankton(i,iiC)
-              call flux(kbot, iiPel, j, j, PELBOTTOM(j,BoxNumberXY)/ &
-                Depth(kbot) )
-              j = ppMicroZooPlankton(i,iiN)
-              if ( j> 0) then
-                call flux(kbot, iiPel, j, j, PELBOTTOM(j,BoxNumberXY)/ &
-                  Depth(kbot) )
-              endif
-              j = ppMicroZooPlankton(i,iiP)
-              if ( j> 0) then
-                call flux(kbot, iiPel, j, j, PELBOTTOM(j,BoxNumberXY)/ &
-                  Depth(kbot) )
-              endif
-        end do
+      do i = 1 , ( iiMicroZooPlankton)
+         j = ppMicroZooPlankton(i,iiC)
+         call flux(kbot, iiPel, j, j, PELBOTTOM(j,BoxNumberXY)/Depth(kbot) )
+         j = ppMicroZooPlankton(i,iiN)
+         if ( j > 0) &
+           call flux(kbot, iiPel, j, j, PELBOTTOM(j,BoxNumberXY)/Depth(kbot) )
+         j = ppMicroZooPlankton(i,iiP)
+         if ( j > 0) &
+           call flux(kbot, iiPel, j, j, PELBOTTOM(j,BoxNumberXY)/Depth(kbot) )
+      end do
 
-        ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        ! Total Sedimentation flux to Benthic from Pelagic defined
-        ! for the detritus state variables.
-        ! (See sedimentation for definition of the fluxes of benthic &
-        ! variables)
-        ! !!!!!!! ALL DETRITUS FLUXES TO THE SEDIMENT ARE DIRECTED VIA R6 TO Q6 !!!!!!!!
-        ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        call flux(kbot, iiPel, ppR6c, ppR6c, ( jbotR6c(BoxNumberXY)/ &
-          Depth(kbot)) )
-        call flux(kbot, iiPel, ppR6n, ppR6n, ( jbotR6n(BoxNumberXY)/ &
-          Depth(kbot)) )
-        call flux(kbot, iiPel, ppR6p, ppR6p, ( jbotR6p(BoxNumberXY)/ &
-          Depth(kbot)) )
-        call flux(kbot, iiPel, ppR6s, ppR6s, ( jbotR6s(BoxNumberXY)/ &
-          Depth(kbot)) )
-        call flux(kbot, iiPel, ppR1c, ppR1c, ( jbotR1c(BoxNumberXY)/ &
-          Depth(kbot)) )
-        call flux(kbot, iiPel, ppR1n, ppR1n, ( jbotR1n(BoxNumberXY)/ &
-          Depth(kbot)) )
-        call flux(kbot, iiPel, ppR1p, ppR1p, ( jbotR1p(BoxNumberXY)/ &
-          Depth(kbot)) )
+      ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+      ! Total Sedimentation flux to Benthic from Pelagic defined
+      ! for the detritus state variables.
+      ! (See sedimentation for definition of the fluxes of benthic &
+      ! variables)
+      ! !!!!!!! ALL DETRITUS FLUXES TO THE SEDIMENT ARE DIRECTED VIA R6 TO Q6 !!!!!!!!
+      ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+      call flux(kbot, iiPel, ppR6c, ppR6c, (jbotR6c(BoxNumberXY)/Depth(kbot)) )
+      call flux(kbot, iiPel, ppR6n, ppR6n, (jbotR6n(BoxNumberXY)/Depth(kbot)) )
+      call flux(kbot, iiPel, ppR6p, ppR6p, (jbotR6p(BoxNumberXY)/Depth(kbot)) )
+      call flux(kbot, iiPel, ppR6s, ppR6s, (jbotR6s(BoxNumberXY)/Depth(kbot)) )
+      call flux(kbot, iiPel, ppR1c, ppR1c, (jbotR1c(BoxNumberXY)/Depth(kbot)) )
+      call flux(kbot, iiPel, ppR1n, ppR1n, (jbotR1n(BoxNumberXY)/Depth(kbot)) )
+      call flux(kbot, iiPel, ppR1p, ppR1p, (jbotR1p(BoxNumberXY)/Depth(kbot)) )
 #ifdef INCLUDE_PELFE
-        call flux(kbot, iiPel, ppR1f, ppR1f, ( jbotR1f(BoxNumberXY)/ &
-          Depth(kbot)) )
-        call flux(kbot, iiPel, ppR6f, ppR6f, ( jbotR6f(BoxNumberXY)/ &
-          Depth(kbot)) )
+      call flux(kbot, iiPel, ppR1f, ppR1f, (jbotR1f(BoxNumberXY)/Depth(kbot)) )
+      call flux(kbot, iiPel, ppR6f, ppR6f, (jbotR6f(BoxNumberXY)/Depth(kbot)) )
 #endif
-      end do ! loop over NO_BOXES_XY
+   end do ! loop over NO_BOXES_XY
 
   end subroutine  BentoPelCoupDynamics
 !EOC
