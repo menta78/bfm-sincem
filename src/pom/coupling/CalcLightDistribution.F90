@@ -44,7 +44,7 @@
   use global_mem, ONLY:RLEN
   use constants,  ONLY: HOURS_PER_DAY, E2W
 
-  use mem_Param,  ONLY: p_PAR  ! DailyIrrAtSurface
+  use mem_PAR,  ONLY: p_PAR  ! DailyIrrAtSurface
 
 !
 !-------------------------------------------------------------------------!
