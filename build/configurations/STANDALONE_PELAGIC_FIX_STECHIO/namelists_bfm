@@ -66,14 +66,11 @@
 ! Global Switches : turn on/off or choose model components 
 ! NAME                          KIND    DESCRIPTION
 ! CalcPelagicFlag               logical Pelagic System
-! CalcBenthicFlag               numeric Benthic system
-!                                       0 = No Benthic System
-!                                       The following are Not Yet Activated
-!                                       1 = Simple Benthic Return
-!                                       2 = Benthic organisms and intermediate 
-!                                           complexity nutrient regeneration 
-!                                       3 = Benthic organisms and full nutrient 
-!                                           regeneration (early diagenesis)
+! CalcBenthicFlag               logical Benthic system
+!    Selected using fortran MACROS from compset configuration :
+!      BENTHIC_RETURN : Simple Benthic Return 
+!      BENTHIC_BIO    : Benthic organisms and intermediate complexity nutrient regeneration
+!      BENTHIC_FULL   : Benthic organisms and full nutrient regeneration (early diagenesis)
 ! CalcTransportFlag             logical Compute Transport Term (when coupled
 !                                       with a OGCM)
 ! CalcConservationFlag          logical Mass Conservation Check
@@ -111,7 +108,7 @@
 &Param_parameters
 ! Switches : 
             CalcPelagicFlag = .TRUE.
-            CalcBenthicFlag = 0
+            CalcBenthicFlag = .FALSE.
        CalcConservationFlag = .TRUE.
           CalcTransportFlag = .FALSE.
        CalcPhytoPlankton(1) = .TRUE.
