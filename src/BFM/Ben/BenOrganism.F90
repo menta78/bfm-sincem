@@ -150,7 +150,11 @@
   et  =   eTq(  ETW_Ben(:),  p_q10(y))
 
   ! Same formulation as in Filter Feeders
+#ifdef BFM_POM
   eo  =   MM_power(  max(p_small,O2o_Ben(:)),  p_clO2o(y),3)
+#else
+  eo = eramp( D1m(:), p_sdm(y))
+#endif
 
   ! As alternative the following function can be used
   ! eo = MM(pow(O2.o, 3.0), p_chdo);
