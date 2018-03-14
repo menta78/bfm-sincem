@@ -166,11 +166,10 @@ end
                 Y5      : Benthic predators
     end
 
-    Q6[cnps]    :Particulate organic carbon  :mg C/m2:mmol N/m2:mmol P/m2:mmolSi/m2
-
-    group BenDetritus[cnp] (BMT) :mg C/m2:mmol N/m2:mmol P/m2
-                Q1      : Labile organic carbon
-                Q11     : Labile organic carbon
+    group BenDetritus[cnps] (BOM) : mg C/m2: mmol N/m2 : mmol P/m2 : mmol Si/m2
+                Q1[-s]    : Labile organic Matter
+                Q11[-s]   : Labile organic Matter
+                Q6        : Particulate organic Matter
     end
 
     group BenBacteria[cnp] (BBA) :mg C/m2:mmol N/m2:mmol P/m2
@@ -259,6 +258,20 @@ end
     M3n         : nitrate in porewater (pore-waters):mmol N/m3
     M5s         : silicate in oxic_denitrification layer (pore-waters):mmol Si/m3
     M6r         : reduction equivalent in porewater (pore-waters):mmol S--/m3
+
+    #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    # Variables holding quota of elements in species
+    #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    qpcBBA(BenBacteria)         : Quotum P/C in Benthic Bacteria :mmol P/mg C
+    qncBBA(BenBacteria)         : Quotum N/C in Benthic Bacteria :mmol N/mg C
+
+    qpcBOS(BenOrganisms)        : Quotum P/C in Benthic Organisms : mmol P/mg C
+    qncBOS(BenOrganisms)        : Quotum N/C in Benthic Organisms : mmol N/mg C
+
+    qpcBOM(BenDetritus)         : Quotum P/C in Benthic Organic Matter:mmol N/mg C
+    qncBOM(BenDetritus)         : Quotum N/C in Benthic Organic Matter:mmol P/mg C
+    qscBOM(BenDetritus)         : Quotum Si/C in Benthic Organic Matter:mmol Si/mg C
 
 end
 
