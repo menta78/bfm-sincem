@@ -75,15 +75,10 @@
 
   end if
 
-  call SettlingDynamics
-
   if ( CalcBenthicFlag ) then
-
 #ifdef BENTHIC_RETURN
      ! Simple benthic return
      call BenthicReturnDynamics
-     call BentoPelCoupDynamics
-     call SedimentationDynamics
 #endif
 
 #ifdef BENTHIC_BIO
@@ -91,9 +86,6 @@
      call PelForcingForBenDynamics
      call BenthicSystemDynamics
      call BenthicNutrient2Dynamics
-     call ControlBennutBuffersDynamics
-     call BentoPelCoupDynamics
-     call SedimentationDynamics
 #endif
 
 #ifdef BENTHIC_FULL
@@ -101,17 +93,10 @@
      call PelForcingForBenDynamics
      call BenthicSystemDynamics
      call BenthicNutrient3Dynamics
-     call ControlBennutBuffersDynamics
-     call BentoPelCoupDynamics
-     call SedimentationDynamics
 #endif
-
-  else 
-     ! This case considers an inactive benthic system 
-     ! (the benthic arrays are defined but not used)
-     ! only the net sink at the bottom is computed
-      call BentoPelCoupDynamics
   endif
+  
+  call PelagicBenthicCoupling
 
   if (CalcConservationFlag) &
      call CheckMassConservationDynamics

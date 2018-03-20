@@ -35,45 +35,40 @@
 #ifdef NOPOINTERS
    use mem
 #else
-   use mem, ONLY: R1c, R2c, R6c, R1n, R6n, R1p, R6p, R6s, PhytoPlankton, D3STATE
-   use mem, ONLY: ppR1c, ppR6c, ppR1n, ppR6n, ppR1p, ppR6p, ppR6s, ppR2c, &
-     ppO2o, ppN1p, ppN3n, ppN4n, ppN5s, ppN6r, & 
-     ppPhytoPlankton, ppMicroZooPlankton, &
-     NO_BOXES_XY, Depth, jbotR6c, jbotR6n, jbotR6p, &
-     jbotR6s, jbotR1c, jbotR1n, jbotR1p, sediPPY, sediR2, sediR6, iiPhytoPlankton, iiMicroZooPlankton, &
-     jbotO2o, jbotN1p, jbotN3n, jbotN4n, jbotN5s, jbotN6r, &
-     iiC, iiN, iiP, iiL, iiS, iiLastElement, iiBen, iiPel, PELBOTTOM, flux, flux_vector, &
-     qpcPPY, qncPPY, qscPPY, qlcPPY
+   use mem, ONLY: D3STATE, PELBOTTOM, PhytoPlankton, NO_BOXES_XY, Depth,  &
+           PhytoPlankton, ppPhytoPlankton, iiPhytoPlankton,               &
+           ppMicroZooPlankton, iiMicroZooPlankton,                        &
+           R1c, R2c, R6c, R1n, R6n, R1p, R6p, R6s,                        &
+           ppR1c, ppR6c, ppR1n, ppR6n, ppR1p, ppR6p, ppR6s, ppR2c,        &
+           ppO2o, ppN1p, ppN3n, ppN4n, ppN5s, ppN6r,                      &
+           jbotR6c, jbotR6n, jbotR6p, jbotR6s, jbotR1c, jbotR1n, jbotR1p, &
+           jbotO2o, jbotN1p, jbotN3n, jbotN4n, jbotN5s, jbotN6r,          &
+           sediPPY, sediR2, sediR6, qpcPPY, qncPPY, qscPPY, qlcPPY,       &
+           iiC, iiN, iiP, iiL, iiS, iiLastElement, iiBen, iiPel,          &
+           flux, flux_vector
 #ifdef INCLUDE_PELFE
-   use mem, ONLY: iiF,R6f,ppR6f,jbotR6f, qfcPPY
+   use mem, ONLY: iiF, R6f, ppR6f, jbotR6f, qfcPPY
 #endif
 #ifdef INCLUDE_PELCO2
    use mem, ONLY: sediO5, O5c, jbotO5c, ppO5c
 #if defined INCLUDE_BENCO2 || defined BENTHIC_RETURN
-  use mem, ONLY: ppO3h, ppO3c,jbotO3c,jbotO3h
+  use mem, ONLY: ppO3h, ppO3c, jbotO3c, jbotO3h
 #endif
 #endif
 #ifdef INCLUDE_BEN
   use mem, ONLY: Q6c, Q6n, Q6p, Q6s, Q1c, Q1n, Q1p
   use mem, ONLY: ppQ6c, ppQ6n, ppQ6p, ppQ6s, ppQ1c, ppQ1n, ppQ1p
 #endif
-
 #endif
-
-   use mem_Param,  ONLY: p_pe_R1c, p_pe_R1n, p_pe_R1p
    use mem_Settling
-   use mem_PelBac, ONLY: p_suhR1,p_sulR1,p_suR2,p_suR6, &
-                         p_qncPBA,p_qpcPBA
-
-   use mem_Param, ONLY: CalcBenthicFlag, AssignPelBenFluxesInBFMFlag, p_small
-
+   use mem_Param, ONLY: p_pe_R1c, p_pe_R1n, p_pe_R1p , p_small,   &
+                 CalcBenthicFlag, AssignPelBenFluxesInBFMFlag
+   use mem_PelBac, ONLY: p_suhR1, p_sulR1, p_suR2, p_suR6,        &
+                         p_qncPBA, p_qpcPBA
 #if defined BENTHIC_BIO || defined BENTHIC_FULL
-   use mem, ONLY: jPIY3c, jZIY3c, ZI_Fc, jRIY3c, jRIY3n, jRIY3p, jRIY3s
+   use mem, ONLY: jPIY3c, jZIY3c, ZI_Fc, jRIY3c, jRIY3n, jRIY3p, jRIY3s, 
+                  D1m, D6m, D7m, D8m, D9m, ppD6m, ppD7m, ppD8m, ppD9m
 #endif
-#if defined BENTHIC_BIO || defined BENTHIC_FULL
-  use mem, ONLY: D1m, D6m, D7m, D8m, D9m, ppD6m, ppD7m, ppD8m, ppD9m
-#endif
-
 #ifdef BFM_GOTM
  use bio_var, ONLY: BOTindices
 #else

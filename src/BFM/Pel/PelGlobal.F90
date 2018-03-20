@@ -80,7 +80,7 @@
   ! Check also Settling.F90
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   sediR2(:)     = ZERO
-  if(BOTindices(1) .NE.0) sediR2(BOTindices) = ZERO
+  if(BOTindices(1) .NE.0) sediR2(BOTindices) = p_burvel_R2
   sediR6(:)  =   p_rR6m
   if(BOTindices(1) .NE.0) sediR6(BOTindices) = p_burvel_R6
 #if defined INCLUDE_PELCO2
