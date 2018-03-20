@@ -196,10 +196,6 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
 !<variablename>0 = <realvalue>
 !-------------------------------------------------------------------------!
 &bfm_init_nml_ben
-   K1p0  = 0.0, 
-   K3n0  = 0.0, 
-   K4n0  = 0.0, 
-   K5s0  = 0.0, 
    Q6c0  = 10265.19,
    Q6n0  = 200.0,
    Q6p0  = 25.0,
@@ -230,8 +226,6 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
           'EICE','ETW','EIR','EWIND','xEPS',
           'R6p','R6n','R6s','B1p','B1n','Z5p','Z6p','Z5n','Z6n',
           'Q6c','Q6n','Q6p','Q6s','Q1c','Q1n','Q1p',
-          'K1p','K3n','K4n','K5s',
-          'ruBOSc','ruBBAc'
 	filename_nml_conf = 'BFM_General.nml',
 /
 
@@ -254,7 +248,7 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
 /
 
 !-------------------------------------------------------------------------!
-! NAMELIST BenthicReturn_parameters !-------------------------------------!
+! NAMELIST BenthicReturn_parameters
 !-------------------------------------------------------------------------!
 ! NAME         [UNIT]/KIND            DESCRIPTION
 ! p_reminQ1c    [d-1]       Remineralization rate of DOC

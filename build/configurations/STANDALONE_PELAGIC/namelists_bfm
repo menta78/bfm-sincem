@@ -108,8 +108,8 @@
 &Param_parameters
 ! Switches : 
             CalcPelagicFlag = .TRUE.
-            CalcBenthicFlag = .TRUE.
-       CalcConservationFlag = .FALSE.
+            CalcBenthicFlag = .FALSE.
+       CalcConservationFlag = .TRUE.
           CalcTransportFlag = .FALSE.
        CalcPhytoPlankton(1) = .TRUE.
        CalcPhytoPlankton(2) = .TRUE.

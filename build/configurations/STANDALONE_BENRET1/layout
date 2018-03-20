@@ -157,19 +157,10 @@ end
   #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   # Benthic State Vars
   #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
     group BenDetritus[cnps] (BOM) : mg C/m2: mmol N/m2 : mmol P/m2 : mmol Si/m2
                 Q1[-s]    : Labile organic Matter
                 Q6        : Particulate organic Matter
     end
-
-  #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  #     Benthic nutrient
-  #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    K1p       : Phosphate in sediments     : mmol P/m2
-    K3n       : Nitrate in sediments       : mmol N/m2
-    K4n       : Ammonium in sediments      : mmol N/m2
-    K5s       : Silicate in sediments      : mmol Si/m2
 end
 
 2d-variable-ben -if-exist INCLUDE_BEN

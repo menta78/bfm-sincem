@@ -34,9 +34,9 @@
 #ifdef NOPOINTERS
   use mem,  ONLY: D2STATE_BEN, D2DIAGNOS
 #else
-  use mem,  ONLY: Q6c, Q1c, Q6p, Q1p, K1p, Q6n, Q1n, K3n, K4n, Q6s, K5s
+  use mem,  ONLY: Q6c, Q1c, Q6p, Q1p, Q6n, Q1n, Q6s
 #endif
-  use mem, ONLY: ppQ6c, ppQ1c, ppQ6p, ppQ1p, ppQ6n, ppQ1n, ppK1p, ppK3n, ppK4n, ppQ6s, ppK5s, &
+  use mem, ONLY: ppQ6c, ppQ1c, ppQ6p, ppQ1p, ppQ6n, ppQ1n, ppQ6s,  &
     jbotO2o, jbotN1p, jbotN3n, jbotN4n, jbotN5s, jbotO3c, jbotO3h, &
     NO_BOXES_XY, iiBen, iiPel, flux_vector
   use mem_BenthicReturn
@@ -118,15 +118,6 @@
   rate  =   p_reminQ6s* Q6s(:)
   call flux_vector( iiBen, ppQ6s,ppQ6s,-( rate) )
   jbotN5s(:)  = rate
-
-  ! K1p, K3n, K4n, K5s are not used in the benthic return setup,
-  ! but are activated only for mass conservation check
-  if (CalcConservationFlag) then 
-     call flux_vector( iiBen, ppK1p,ppK1p,-(- jbotN1p(:)) ) 
-     call flux_vector( iiBen, ppK3n,ppK3n,-(- jbotN3n(:)) ) 
-     call flux_vector( iiBen, ppK4n,ppK4n,-(- jbotN4n(:)) )
-     call flux_vector( iiBen, ppK5s,ppK5s,-(- jbotN5s(:)) )
-  endif
 
   end subroutine BenthicReturnDynamics
 !EOC
