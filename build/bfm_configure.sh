@@ -366,13 +366,12 @@ if [ ${GEN} ]; then
         find ${BFMDIR}/src/BFM/PelBen -name "*.?90" -print >> BFM.lst
         if echo "$cppdefs" | grep -q "\-DINCLUDE_BEN" ; then
             [ $VERBOSE ] && echo "include BENTHIC in BFM.lst"        
-            find ${BFMDIR}/src/BFM/Ben -maxdepth 1 -name "*.?90" -print >> BFM.lst
             if echo "$cppdefs" | grep -q "\-DBENTHIC_BIO" ; then
-               find ${BFMDIR}/src/BFM/Ben/Bio -name "*.?90" -print >> BFM.lst
+               find ${BFMDIR}/src/BFM/BenBio -name "*.?90" -print >> BFM.lst
             fi
             if echo "$cppdefs" | grep -q "\-DBENTHIC_FULL" ; then
-               find ${BFMDIR}/src/BFM/Ben/Bio -name "*.?90" -print >> BFM.lst
-               find ${BFMDIR}/src/BFM/Ben/Full -name "*.?90" -print >> BFM.lst
+               find ${BFMDIR}/src/BFM/BenBio -name "*.?90" -print >> BFM.lst
+               find ${BFMDIR}/src/BFM/BenFull -name "*.?90" -print >> BFM.lst
             fi
         fi
         if echo "$cppdefs" | grep -q "\-DINCLUDE_SEAICE" ; then
@@ -451,13 +450,12 @@ if [ ${GEN} ]; then
         # some macros are default with NEMO
         if echo "$cppdefs" | grep -q "\-DINCLUDE_BEN" ; then
             [ $VERBOSE ] && echo "include BENTHIC in bfm.fcm"
-            FCMBen="src::bfm::ben             ${BFMDIR}/src/BFM/Ben"
             if echo "$cppdefs" | grep -q "\-DBENTHIC_BIO" ; then
-               FCMBen="${FCMBen}\&src::bfm::benbio             ${BFMDIR}/src/BFM/Ben/Bio"
+               FCMBen="${FCMBen}\&src::bfm::benbio             ${BFMDIR}/src/BFM/BenBio"
             fi
             if echo "$cppdefs" | grep -q "\-DBENTHIC_FULL" ; then
-               FCMBen="${FCMBen}\&src::bfm::benbio             ${BFMDIR}/src/BFM/Ben/Bio"
-               FCMBen="${FCMBen}\&src::bfm::benfull            ${BFMDIR}/src/BFM/Ben/Full"
+               FCMBen="${FCMBen}\&src::bfm::benbio             ${BFMDIR}/src/BFM/BenBio"
+               FCMBen="${FCMBen}\&src::bfm::benfull            ${BFMDIR}/src/BFM/BenFull"
             fi 
         fi
         if echo "$cppdefs" | grep -q "\-DINCLUDE_SEAICE" ; then

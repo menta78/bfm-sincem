@@ -440,7 +440,6 @@ END MODULE init_var_bfm_local
       case (1) ! Pelagic only
          LEVEL2 "Pelagic-only setup (bio_setup=1), Switching off other systems & related fluxes"
          CalcBenthicFlag = .FALSE.
-         AssignPelBenFluxesInBFMFlag = .FALSE.
          CalcSeaiceFlag  = .FALSE.
          %value-init-calc-ben .FALSE.
          %value-init-calc-ice .FALSE.
@@ -463,7 +462,6 @@ END MODULE init_var_bfm_local
       case (5) ! Pelagic-SeaIce coupling
          LEVEL2 "Pelagic-Seaice setup (bio_setup=5), Switching off benthic system & related fluxes"
          CalcBenthicFlag = .FALSE.
-         AssignPelBenFluxesInBFMFlag = .FALSE.
          %value-init-calc-ben .FALSE.
    end select
 
