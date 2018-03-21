@@ -61,7 +61,10 @@
   integer, parameter :: RLEN = dp                       ! default
   real(RLEN), parameter ::ZERO=0.0_RLEN
   real(RLEN), parameter ::ONE=1.0_RLEN
-  real(RLEN), parameter ::PI=3.141592653589793_RLEN
+  real(RLEN), parameter ::PI=3.14159265359_RLEN
+#ifdef BFM_POM
+  real(RLEN), parameter ::BASETEMP= 15.0_RLEN
+#else
   real(RLEN), parameter ::BASETEMP= 10.0_RLEN
   !=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Control logical units for files I/O
