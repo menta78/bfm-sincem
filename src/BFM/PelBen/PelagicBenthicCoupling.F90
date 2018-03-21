@@ -55,10 +55,8 @@
   use mem, ONLY: ppO3h, ppO3c, jbotO3c, jbotO3h
 #endif
 #endif
-#ifdef INCLUDE_BEN
   use mem, ONLY: Q6c, Q6n, Q6p, Q6s, Q1c, Q1n, Q1p
   use mem, ONLY: ppQ6c, ppQ6n, ppQ6p, ppQ6s, ppQ1c, ppQ1n, ppQ1p
-#endif
 #endif
    use mem_Settling
    use mem_Param, ONLY: p_pe_R1c, p_pe_R1n, p_pe_R1p , p_small,   &
@@ -381,7 +379,6 @@
            call flux(kbot, iiPel, j, j, PELBOTTOM(j,Box)/Depth(kbot) )
       enddo
       !
-#ifdef INCLUDE_BEN
    !
    ! ------------------------------------------------------------------
    ! FLUXES for Benthic-Pelagic Coupling
@@ -419,9 +416,7 @@ e        call flux_vector(iiBen, ppD7m,ppD7m,(newDM(:)- D7m(:))/Delta)
 #endif
 
       endif 
-
-#endif
-   !
+      !
    enddo FLUXES_XY_LOOP
    !
    deallocate( jbotR1PPY, jbotR2R1, jbotR6PPY, jbotR2R6 )

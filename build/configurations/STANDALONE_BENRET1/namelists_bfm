@@ -161,6 +161,32 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
 !-------------------------------------------------------------------------!
 !Pelagic initialisation of standard variables
 !<variablename>0 = <realvalue>
+!
+! Initialization with InitVar structure 
+!----------------------------------------
+! NOTE:
+! This part is still experimental and will be improved in the future
+!----------------------------------------
+! BFM variable information for data input
+! available fields:
+! integer init: select the initialization
+!               0 = homogeneous
+!               1 = analytical (linear)
+!               2 = from file
+! options for init==1
+!   real anv1: value in the surface layer
+!   real anz1: thickness of the surface layer
+!   real anv2: value in the bottom layer
+!   real anz2: starting depth of the bottom layer
+! options for init==2 
+! * Options currently used when coupled with NEMO
+!   logical obc: variable has open boundary data
+!   logical sbc: variable has surface boundary data
+!   logical cbc: variable has coastal boundary data
+! * Options not used when coupled with NEMO because
+!   overridden by values in namelist_top_cfg
+!   char filename: name of the input file
+!   char  varname: name of the var in input file
 !-------------------------------------------------------------------------!
 &bfm_init_nml
    O2o0 = 300.0,
@@ -213,18 +239,28 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
 !-------------------------------------------------------------------------!
 &bfm_save_nml
    var_save = ''
-   ave_save = 'O2o','O3h','DIC','ALK','pCO2','pH',
-          'O5c','OCalc','OArag',
-          'N1p','N3n','N4n','N5s',
-          'P1c','P1l','P1f','P2c','P2l','P3c','P3l',
-          'Z4c','Z5c','Z6c','B1c',
-          'R1c','R2c','R6c','R6f','Chla','R1n','R1p',
-          'P1n','P2n','P3n',
-          'P1p','P2p','P3p',
-          'jbotR6c','jsurO2o','jsurO3c',
-          'remN5s',
-          'EICE','ETW','EIR','EWIND','xEPS',
-          'R6p','R6n','R6s','B1p','B1n','Z5p','Z6p','Z5n','Z6n',
+   ave_save = 'ETW','EIR','xEPS',
+          'DIC','pCO2' 'O3h','O5c','OCalc','OArag','pH',
+          'Chla',
+          'O2o','N1p','N3n','N4n','N5s',
+          'B1c',
+          'P1c','P2c','P3c','P4c',
+          'P1l','P2l','P3l','P4l',
+          'P1n','P2n','P3n','P4n',
+          'P1p','P2p','P3p','P4p',
+          'Z3c','Z4c','Z5c','Z6c',
+          'R1c','R2c','R6c',
+          'R1n','R6n',
+          'R1p','R6p',
+          'P1s','R6s',
+          'ruPPYc','resPBAc','resZOOc',
+          'ruPPYn','ruPPYp','ruPPYs','exPPYc',
+          'ruZOOc','remZOOn','remZOOp','remPBAn','remPBAp',
+          'qpcPBA_iiB1', 'qncPBA_iiB1',
+          'qpcMEZ_iiZ3', 'qncMEZ_iiZ3', 'qpcMEZ_iiZ4', 'qncMEZ_iiZ4',
+          'qpcMIZ_iiZ5', 'qncMIZ_iiZ5', 'qpcMIZ_iiZ6', 'qncMIZ_iiZ6'
+          'qpcPPY_iiP1', 'qncPPY_iiP1', 'qlcPPY_iiP1', 'qpcPPY_iiP2', 'qncPPY_iiP2', 'qlcPPY_iiP2',
+          'qpcPPY_iiP3', 'qncPPY_iiP3', 'qlcPPY_iiP3', 'qpcPPY_iiP4', 'qncPPY_iiP4', 'qlcPPY_iiP4',
           'Q6c','Q6n','Q6p','Q6s','Q1c','Q1n','Q1p',
 	filename_nml_conf = 'BFM_General.nml',
 /
@@ -243,7 +279,7 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
   p_burvel_R6 = 1.5,
   p_burvel_O5 = 30.0,
   p_burvel_R2 = 0.0,
-  p_burvel_PI = 0.0
+  p_burvel_PI = 0.01
 	filename_nml_conf = 'Benthic_Environment.nml',
 /
 

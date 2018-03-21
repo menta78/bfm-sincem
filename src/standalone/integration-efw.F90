@@ -25,12 +25,10 @@
 #endif
 #endif
 
-#if defined INCLUDE_BEN
    use mem, ONLY: NO_D2_BOX_STATES_BEN, D2SOURCE_BEN, &
         D2STATE_BEN, D2STATETYPE_BEN
 #ifdef EXPLICIT_SINK
    use mem, ONLY: D2SINK_BEN
-#endif
 #endif
    use standalone
    use api_bfm
@@ -68,11 +66,9 @@
    integer,dimension(2,2)    :: blccc_ice
    logical                   :: cut_ice
 #endif
-#if defined INCLUDE_BEN
    real(RLEN)                :: min2D_ben
    integer,dimension(2,2)    :: blccc_ben
    logical                   :: cut_ben
-#endif
 
 !EOP
 !-----------------------------------------------------------------------
@@ -84,9 +80,8 @@
 #if defined INCLUDE_SEAICE
    bbccc2D_ice=D2STATE_ICE
 #endif
-#if defined INCLUDE_BEN
    bbccc2D_ben=D2STATE_BEN
-#endif
+
    TLOOP : DO
    ! Integration step:
       DO j=1,NO_D3_BOX_STATES
@@ -111,7 +106,6 @@
       END DO
 #endif
 
-#if defined INCLUDE_BEN
       DO j=1,NO_D2_BOX_STATES_BEN
          IF (D2STATETYPE_BEN(j).ge.0) THEN
 #ifndef EXPLICIT_SINK
@@ -121,7 +115,6 @@
 #endif
          END IF
       END DO
-#endif
 
       nmin=nmin+nstep 
    !  Check for negative concentrations
@@ -133,11 +126,10 @@
       cut_ice = ( min2D_ice .lt. eps )
       cut = ( cut .OR. cut_ice )
 #endif
-#if defined INCLUDE_BEN
       min2D_ben=minval(D2STATE_BEN)
       cut_ben = ( min2D_ben .lt. eps )
       cut = ( cut .OR. cut_ben )
-#endif
+
       IF ( cut ) THEN ! cut timestep
          IF (nstep.eq.1) THEN
             LEVEL1 'Necessary Time Step too small! Exiting from the following systems:'
@@ -167,7 +159,6 @@
             end if
 #endif
 
-#if defined INCLUDE_BEN
             if (cut_ben) then
                blccc_ben(:,2)=minloc(D2STATE_BEN)
 #ifndef EXPLICIT_SINK
@@ -179,7 +170,7 @@
                LEVEL1 'Value: ',D2STATE_BEN(blccc_ben(1,2),blccc_ben(2,2)),' Rate: ', &
                            bbccc2D_ben(blccc_ben(1,2),blccc_ben(2,2))
             end if
-#endif
+
             LEVEL1 'EXIT at  time ',timesec
             STOP 'integration-efw'
          END IF
@@ -189,9 +180,7 @@
 #if defined INCLUDE_SEAICE
          D2STATE_ICE=bbccc2D_ice
 #endif
-#if defined INCLUDE_BEN
          D2STATE_BEN=bbccc2D_ben
-#endif
          dtm1=delt
          delt=nstep*mindelt
          timesec=ntime*maxdelt

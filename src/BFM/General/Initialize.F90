@@ -114,8 +114,6 @@
       call InitSettling
       call InitPelGlobal
 
-      ! Benthic initialization is done only if there is an active model
-      ! When INCLUDE_BEN is defined, 
       ! Simple benthic return
       call InitBenthicReturn
 #ifdef BENTHIC_BIO

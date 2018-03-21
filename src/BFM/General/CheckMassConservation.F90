@@ -203,23 +203,23 @@
      initials = totsyss(1)
   else
      prec = precision(prevsysc)
-     write(*,*) "---> CheckMassConservation"
-     write(*,*) "---> defined precision digits: sp=6 dp=12; operational: ",prec
-     write(*,"(A,2D22.15)") "---> C:",totsysc(1),prevsysc
-     write(*,"(A,2D22.15)") "---> N:",totsysn(1),prevsysn
+     write(LOGUNIT,*) "---> CheckMassConservation"
+     write(LOGUNIT,*) "---> defined precision digits: sp=6 dp=12; operational: ",prec
+     write(LOGUNIT,"(A,2D22.15)") "---> C:",totsysc(1),prevsysc
+     write(LOGUNIT,"(A,2D22.15)") "---> N:",totsysn(1),prevsysn
      if (abs(totsysn(1)/initialn-ONE)>p_prec) then
         flag = .TRUE.
-        write(*,*) "------> Change in N larger than specified precision:",p_prec,totsysn(1)/initialn-ONE
+        write(LOGUNIT,*) "------> Change in N larger than specified precision:",p_prec,totsysn(1)/initialn-ONE
      end if
-     write(*,"(A,2D22.15)") "---> P:",totsysp(1),prevsysp
+     write(LOGUNIT,"(A,2D22.15)") "---> P:",totsysp(1),prevsysp
      if (abs(totsysp(1)/initialp-ONE)>p_prec) then
         flag = .TRUE.
-        write(*,*) "------> Change in P larger than specified precision:",p_prec,totsysp(1)/initialp-ONE
+        write(LOGUNIT,*) "------> Change in P larger than specified precision:",p_prec,totsysp(1)/initialp-ONE
      end if
-     write(*,"(A,2D22.15)") "---> Si:",totsyss(1),prevsyss
+     write(LOGUNIT,"(A,2D22.15)") "---> Si:",totsyss(1),prevsyss
      if (abs(totsyss(1)/initials-ONE)>p_prec) then
         flag = .TRUE.
-        write(*,*) "------> Change in Si larger than specified precision:",p_prec,totsyss(1)/initials-ONE
+        write(LOGUNIT,*) "------> Change in Si larger than specified precision:",p_prec,totsyss(1)/initials-ONE
      end if
      if (flag)  then
         write(LOGUNIT,*) "Check also usage of AssignAirPelFluxesInBFMFlag and AssignPelBenFluxesInBFMFlag in BFM_General.nml"

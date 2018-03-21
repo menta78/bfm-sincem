@@ -49,6 +49,7 @@ end
   SUNQ	       : Daylength in hours : h
   EWIND : Wind speed : m/s
   EICE  : Sea-ice fraction: -
+  ETAUB : Bottom Stress : N m/s
 end
 3d-variable-pel
   ETW   : temperature : C

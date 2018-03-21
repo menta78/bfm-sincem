@@ -185,7 +185,7 @@
    real(RLEN),allocatable,dimension(:),public  :: D2STATE_BEN_tot
 
 
-#ifdef BFM_NEMO
+#if defined BFM_NEMO || defined BFM_POM
    !---------------------------------------------
    ! Additional 1D arrays
    !---------------------------------------------
@@ -213,56 +213,6 @@
    real(RLEN),allocatable,dimension(:,:),public  :: D2STATEB_ICE
 #endif
    real(RLEN),allocatable,dimension(:,:),public  :: D2STATEB_BEN
-
-   !---------------------------------------------
-   ! Additional allocatable temporary arrays
-   !---------------------------------------------
-   logical,allocatable,dimension(:),public        :: btmp1D
-   logical,allocatable,dimension(:,:),public      :: btmp2D
-   logical,allocatable,dimension(:,:,:),public    :: btmp3D
-   integer,allocatable,dimension(:),public        :: itmp1D
-   integer,allocatable,dimension(:,:),public      :: itmp2D
-   integer,allocatable,dimension(:,:,:),public    :: itmp3D
-   real(RLEN),allocatable,dimension(:),public     :: rtmp1D
-   real(RLEN),allocatable,dimension(:,:),public   :: rtmp2D
-   real(RLEN),allocatable,dimension(:,:,:),public :: rtmp3Da
-   real(RLEN),allocatable,dimension(:,:,:),public :: rtmp3Db
-#endif
-
-#ifdef BFM_POM
-   !---------------------------------------------
-   ! Additional 1D arrays
-   !---------------------------------------------
-   ! absolute indices ocean, surface and bottom points
-   integer,allocatable,dimension(:),public     :: ocepoint
-   integer,allocatable,dimension(:),public     :: surfpoint, botpoint
-
-   !---------------------------------------------
-   ! Additional 3D arrays
-   !---------------------------------------------
-   real(RLEN),allocatable,dimension(:,:,:),public  :: ZEROS
-   ! 3D boolean Land-sea mask
-   logical,allocatable,dimension(:,:,:),public     :: SEAmask
-   ! 3D boolean sea-bottom mask
-   logical,allocatable,dimension(:,:,:),public     :: BOTmask
-   ! 3D boolean mask of the surface points
-   logical,allocatable,dimension(:,:,:),public     :: SRFmask
-
-   !---------------------------------------------
-   ! 3D Indices of the wet points
-   !---------------------------------------------
-   integer,allocatable,dimension(:),public         :: iwet,jwet,kwet
-
-   !---------------------------------------------
-   ! Additional integration arrays
-   ! for leapfrog scheme
-   !---------------------------------------------
-   real(RLEN),allocatable,dimension(:,:),public  :: D3STATEB
-#if defined INCLUDE_SEAICE
-   real(RLEN),allocatable,dimension(:,:),public  :: D2STATEB_ICE
-#endif
-   real(RLEN),allocatable,dimension(:,:),public  :: D2STATEB_BEN
-
 
    !---------------------------------------------
    ! Additional allocatable temporary arrays

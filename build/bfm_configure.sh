@@ -320,11 +320,6 @@ if [ ${GEN} ]; then
     rm -rf *
     cp ${presetdir}/* ${blddir}
     
-    # add INCLUDE_BEN if any benthic module is need (BENTHIC_RETURN, BENTHIC_BIO, BENTHIC_FULL)
-    if [[ ${CPPDEFS} =~ "BENTHIC_RETURN" || ${CPPDEFS} =~ "BENTHIC_BIO" || ${CPPDEFS} =~ "BENTHIC_FULL" ]] ; then
-      CPPDEFS="${CPPDEFS} INCLUDE_BEN"
-    fi
- 
     #add -D to cppdefs
     cppdefs=`echo ${CPPDEFS} | sed -e 's/\([a-zA-Z_0-9]*\)/-D\1/g'`
 
@@ -364,16 +359,16 @@ if [ ${GEN} ]; then
         find ${BFMDIR}/src/BFM/Forcing -name "*.?90" -print >> BFM.lst
         find ${BFMDIR}/src/BFM/CO2 -name "*.?90" -print >> BFM.lst
         find ${BFMDIR}/src/BFM/PelBen -name "*.?90" -print >> BFM.lst
-        if echo "$cppdefs" | grep -q "\-DINCLUDE_BEN" ; then
-            [ $VERBOSE ] && echo "include BENTHIC in BFM.lst"        
-            if echo "$cppdefs" | grep -q "\-DBENTHIC_BIO" ; then
-               find ${BFMDIR}/src/BFM/BenBio -name "*.?90" -print >> BFM.lst
-            fi
-            if echo "$cppdefs" | grep -q "\-DBENTHIC_FULL" ; then
-               find ${BFMDIR}/src/BFM/BenBio -name "*.?90" -print >> BFM.lst
-               find ${BFMDIR}/src/BFM/BenFull -name "*.?90" -print >> BFM.lst
-            fi
+        if echo "$cppdefs" | grep -q "\-DBENTHIC_BIO" ; then
+           [ $VERBOSE ] && echo "include BENTHIC_BIO in BFM.lst"        
+           find ${BFMDIR}/src/BFM/BenBio -name "*.?90" -print >> BFM.lst
         fi
+        if echo "$cppdefs" | grep -q "\-DBENTHIC_FULL" ; then
+           [ $VERBOSE ] && echo "include BENTHIC_FULL in BFM.lst"        
+           find ${BFMDIR}/src/BFM/BenBio -name "*.?90" -print >> BFM.lst
+           find ${BFMDIR}/src/BFM/BenFull -name "*.?90" -print >> BFM.lst
+        fi
+        
         if echo "$cppdefs" | grep -q "\-DINCLUDE_SEAICE" ; then
             [ $VERBOSE ] && echo "include SEAICE in BFM.lst"
             find ${BFMDIR}/src/BFM/Seaice -name "*.?90" -print >> BFM.lst
@@ -448,16 +443,15 @@ if [ ${GEN} ]; then
 
         # Generate the specific bfm.fcm include file for makenemo
         # some macros are default with NEMO
-        if echo "$cppdefs" | grep -q "\-DINCLUDE_BEN" ; then
-            [ $VERBOSE ] && echo "include BENTHIC in bfm.fcm"
-            if echo "$cppdefs" | grep -q "\-DBENTHIC_BIO" ; then
-               FCMBen="${FCMBen}\&src::bfm::benbio             ${BFMDIR}/src/BFM/BenBio"
-            fi
-            if echo "$cppdefs" | grep -q "\-DBENTHIC_FULL" ; then
-               FCMBen="${FCMBen}\&src::bfm::benbio             ${BFMDIR}/src/BFM/BenBio"
-               FCMBen="${FCMBen}\&src::bfm::benfull            ${BFMDIR}/src/BFM/BenFull"
-            fi 
+        if echo "$cppdefs" | grep -q "\-DBENTHIC_BIO" ; then
+           [ $VERBOSE ] && echo "include BENTHIC_BIO in bfm.fcm"
+           FCMBen="${FCMBen}\&src::bfm::benbio             ${BFMDIR}/src/BFM/BenBio"
         fi
+        if echo "$cppdefs" | grep -q "\-DBENTHIC_FULL" ; then
+           [ $VERBOSE ] && echo "include BENTHIC_FULL in bfm.fcm"
+           FCMBen="${FCMBen}\&src::bfm::benbio             ${BFMDIR}/src/BFM/BenBio"
+           FCMBen="${FCMBen}\&src::bfm::benfull            ${BFMDIR}/src/BFM/BenFull"
+        fi 
         if echo "$cppdefs" | grep -q "\-DINCLUDE_SEAICE" ; then
             [ $VERBOSE ] && echo "include SEAICE in bfm.fcm"
             FCMIce="src::bfm::seaice          ${BFMDIR}/src/BFM/Seaice"

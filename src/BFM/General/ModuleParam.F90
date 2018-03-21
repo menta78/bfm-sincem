@@ -195,13 +195,11 @@
     p_atm0,                                                                     &
     p_pe_R1c, p_pe_R1n, p_pe_R1p, p_pe_R1s,                                   &
     ChlDynamicsFlag
-#ifdef INCLUDE_BEN
   namelist /Param_parameters_ben/                                             &
     p_sedlevels, p_sedsigma,p_d_tot, p_poro0,                                 &
     CalcBenOrganisms,CalcBenBacteria,                                         &
     calc_init_bennut_states, p_qnQIc, p_qpQIc, p_qsQIc,                       &
     p_InitSink, p_d_tot_2, p_clD1D2m, p_clDxm, p_q10diff
-#endif
 #ifdef INCLUDE_SEAICE
   namelist /Param_parameters_ice/                                             &
     CalcSeaiceAlgae,CalcSeaiceZoo,CalcSeaiceBacteria
@@ -217,10 +215,8 @@
    LEVEL1 "#  Reading BFM parameters .."
    open(NMLUNIT,file='BFM_General.nml',status='old',action='read',err=100)
    read(NMLUNIT,nml=Param_parameters,err=101)
-#ifdef INCLUDE_BEN
    rewind(NMLUNIT)
    read(NMLUNIT,nml=Param_parameters_ben,err=102)
-#endif
 #ifdef INCLUDE_SEAICE
    rewind(NMLUNIT)
    read(NMLUNIT,nml=Param_parameters_ice,err=103)
@@ -231,9 +227,7 @@
     write(LOGUNIT,*) "#  Reading Param parameters.. "
     write(LOGUNIT,*) "#  Namelist is:"
     write(LOGUNIT,nml=Param_parameters)
-#ifdef INCLUDE_BEN
     write(LOGUNIT,nml=Param_parameters_ben)
-#endif
 #ifdef INCLUDE_SEAICE
     write(LOGUNIT,nml=Param_parameters_ice)
 #endif
