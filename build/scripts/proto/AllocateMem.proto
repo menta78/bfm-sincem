@@ -73,10 +73,8 @@
 %2d-state-ice-alloc
 %2d-diagnos-ice-alloc
 #endif
-#ifdef INCLUDE_BEN
 %2d-state-ben-alloc
 %2d-diagnos-ben-alloc
-#endif
 #endif
 
 %1d-variables-pel-alloc
@@ -85,10 +83,8 @@
 %1d-variables-ice-alloc
 %1d-intvar-ice-alloc
 #endif
-#ifdef INCLUDE_BEN
 %1d-variables-ben-alloc
 %1d-intvar-ben-alloc
-#endif
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Allocation of Pelagic variables
@@ -104,13 +100,11 @@
 %2d-state-ice-alloc-pointer
 #endif
 
-#ifdef INCLUDE_BEN
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Allocation of Benthic variables
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 %3d-state-ben-alloc-pointer
 %2d-state-ben-alloc-pointer
-#endif
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Start the allocation of other pelagic variables which can be outputted
@@ -148,7 +142,6 @@
 %2d-intvar-ice-alloc
 #endif
 
-#ifdef INCLUDE_BEN
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Start the allocation of other benthic vairables which can be outputted 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -159,7 +152,6 @@
 %2d-variable-ben-alloc
 
 %2d-intvar-ben-alloc
-#endif
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Start the allocation of Pelagic vars for calculation of combined fluxes for output
@@ -180,14 +172,12 @@
 %2d-flux-ice-fill
 #endif
 
-#ifdef INCLUDE_BEN
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Start the allocation of Benthic vars for calculation of combined fluxes for output
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 %2d-flux-ben-alloc
 %2d-flux-ben-fill
-#endif
 
 
   end subroutine AllocateMem
