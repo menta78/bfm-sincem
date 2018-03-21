@@ -224,15 +224,10 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
         CalcBenOrganisms(5) = .FALSE.
          CalcBenBacteria(1) = .FALSE.
          CalcBenBacteria(2) = .FALSE.
-                 p_InitSink = 100.0
                   p_d_tot_2 = 0.35
                   p_clD1D2m = 0.01
                     p_clDxm = 0.001
                   p_q10diff = 1.49
-    calc_init_bennut_states = 0
-                    p_qnQIc = 0.11155
-                    p_qpQIc = 0.010255
-                    p_qsQIc = 0.0221
         filename_nml_conf = 'BFM_General.nml',
 /
 

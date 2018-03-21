@@ -6,7 +6,7 @@
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 !BOP
 !
-! !ROUTINE: BenthicReturn1
+! !ROUTINE: BenthicReturn
 !
 ! DESCRIPTION
 !   This process is a very simple parameterisation of benthic 

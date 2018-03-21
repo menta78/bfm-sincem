@@ -32,7 +32,6 @@
    integer                            :: surface_flux_method=-1
    integer                            :: bottom_flux_method=-1
    integer                            :: n_surface_fluxes=-1
-   integer                            :: calc_init_bennut_states
    character(len=PATH_MAX)            :: out_dir,out_fname,out_title
    integer                            :: out_units
    integer                            :: out_delta,out_secs,save_delta

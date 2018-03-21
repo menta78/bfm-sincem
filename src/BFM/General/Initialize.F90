@@ -23,8 +23,7 @@
   use mem_Phyto
   use mem_PAR
   use mem_Settling
-  use mem_BenthicReturn
-#if defined BENTHIC_BIO || defined BENITHIC_FULL 
+#if defined BENTHIC_BIO || defined BENTHIC_FULL 
   use mem_BenBac
   use mem_BenOrganism
   use mem_FilterFeeder
@@ -32,7 +31,7 @@
   use mem_BenthicReturn2
   use mem_BenOxygen
   use mem_ControlBennutBuffers
-#if defined BENITHIC_FULL
+#if defined BENTHIC_FULL
   use mem_BenthicNutrient3
   use mem_BenAmmonium
   use mem_BenNitrate
@@ -42,6 +41,8 @@
   use mem_BenSilica
   use mem_BenQ1Transport
 #endif
+#else
+  use mem_BenthicReturn
 #endif
 #ifdef INCLUDE_PELCO2
   use mem_CO2
