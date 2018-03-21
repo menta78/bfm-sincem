@@ -23,9 +23,7 @@
   use mem_Phyto
   use mem_PAR
   use mem_Settling
-#ifdef BENTHIC_RETURN
-    use mem_BenthicReturn
-#endif
+  use mem_BenthicReturn
 #if defined BENTHIC_BIO || defined BENITHIC_FULL 
   use mem_BenBac
   use mem_BenOrganism
@@ -118,10 +116,8 @@
 
       ! Benthic initialization is done only if there is an active model
       ! When INCLUDE_BEN is defined, 
-#ifdef BENTHIC_RETURN
       ! Simple benthic return
       call InitBenthicReturn
-#endif
 #ifdef BENTHIC_BIO
       ! Intermediate benthic return
       call InitBenOrganism

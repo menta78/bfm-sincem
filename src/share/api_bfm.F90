@@ -71,9 +71,7 @@
 #if defined INCLUDE_SEAICE
    real(RLEN),allocatable,dimension(:,:)   :: D2ave_ice
 #endif
-#if defined INCLUDE_BEN
    real(RLEN),allocatable,dimension(:,:)   :: D2ave_ben
-#endif
    character(len=64), dimension(:), allocatable :: var_names
    character(len=64), dimension(:), allocatable :: var_units
    character(len=64), dimension(:), allocatable :: var_long
@@ -121,7 +119,6 @@
 
 #endif
 
-#if defined INCLUDE_BEN
    integer,public                            :: stBenStateS=0
    integer,public                            :: stBenDiag2dS=0
    integer,public                            :: stBenFlux2dS=0
@@ -133,7 +130,6 @@
    integer,public                            :: stBenStart=0
    integer,public                            :: stBenEnd=0    
 
-#endif
 
    !---------------------------------------------
    ! Additional output variables
@@ -186,9 +182,7 @@
 #ifdef INCLUDE_SEAICE
    real(RLEN),allocatable,dimension(:),public  :: D2STATE_ICE_tot
 #endif
-#ifdef INCLUDE_BEN
    real(RLEN),allocatable,dimension(:),public  :: D2STATE_BEN_tot
-#endif
 
 
 #ifdef BFM_NEMO
@@ -218,9 +212,7 @@
 #if defined INCLUDE_SEAICE
    real(RLEN),allocatable,dimension(:,:),public  :: D2STATEB_ICE
 #endif
-#if defined INCLUDE_BEN
    real(RLEN),allocatable,dimension(:,:),public  :: D2STATEB_BEN
-#endif
 
    !---------------------------------------------
    ! Additional allocatable temporary arrays
@@ -269,9 +261,7 @@
 #if defined INCLUDE_SEAICE
    real(RLEN),allocatable,dimension(:,:),public  :: D2STATEB_ICE
 #endif
-#if defined INCLUDE_BEN
    real(RLEN),allocatable,dimension(:,:),public  :: D2STATEB_BEN
-#endif
 
 
    !---------------------------------------------
@@ -326,12 +316,10 @@ contains
                   NO_D2_BOX_FLUX_ICE, &
                   NO_STATES_ICE, NO_BOXES_ICE, NO_BOXES_Z_ICE 
 #endif
-#if defined INCLUDE_BEN
    use mem, only: NO_D2_BOX_STATES_BEN,  &
                   NO_D2_BOX_DIAGNOSS_BEN, &
                   NO_D2_BOX_FLUX_BEN, &
                   NO_STATES_BEN, NO_BOXES_BEN, NO_BOXES_Z_BEN 
-#endif
 
    use global_mem, only: LOGUNIT
    use time, only: bfmtime, outdeltalab
@@ -471,7 +459,6 @@ contains
         LEVEL3 'pelagic variables =',NO_D3_BOX_STATES
         LEVEL3 'pelagic transported variables ='
         LEVEL3 'pelagic diagnostic variables =', NO_D3_BOX_DIAGNOSS
-#ifdef INCLUDE_BEN
       case (2) ! Benthic only
         LEVEL2 "Using only Benthic component (bio_setup=2)"
         LEVEL3 'benthic variables =',NO_D2_BOX_STATES_BEN
@@ -483,7 +470,6 @@ contains
         LEVEL3 'pelagic diagnostic variables =', NO_D3_BOX_DIAGNOSS
         LEVEL3 'benthic variables =',NO_D2_BOX_STATES_BEN
         LEVEL3 'benthic diagnostic variables=', NO_D2_BOX_DIAGNOSS_BEN
-#endif
 #ifdef INCLUDE_SEAICE
       case (4) ! SeaIce only
         LEVEL2 "Using only Seaice component (bio_setup=4)"
@@ -512,12 +498,10 @@ contains
    LEVEL3 'NO_BOXES_ICE   =',NO_BOXES_ICE
    LEVEL3 'NO_STATES_ICE  =',NO_STATES_ICE
 #endif
-#ifdef INCLUDE_BEN
    LEVEL2 'Dimensional benthic informations:'
    LEVEL3 'NO_BOXES_Z_BEN =',NO_BOXES_Z_BEN
    LEVEL3 'NO_BOXES_BEN   =',NO_BOXES_BEN
    LEVEL3 'NO_STATES_BEN  =',NO_STATES_BEN
-#endif
    LEVEL1 ' '
    LEVEL2 'EXPERIMENT INITIALIZATION :'
    select case (bfm_init)
@@ -597,9 +581,7 @@ contains
 #ifdef INCLUDE_SEAICE
    n = n + NO_D2_BOX_STATES_ICE + NO_D2_BOX_FLUX_ICE + NO_D2_BOX_DIAGNOSS_ICE
 #endif
-#ifdef INCLUDE_BEN
    n = n + NO_D2_BOX_STATES_BEN + NO_D2_BOX_FLUX_BEN + NO_D2_BOX_DIAGNOSS_BEN
-#endif
 
    allocate(var_ids(1:n),stat=rc)
    if (rc /= 0) stop 'init_bfm(): Error allocating var_ids'

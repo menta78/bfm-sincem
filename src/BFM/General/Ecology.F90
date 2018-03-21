@@ -76,23 +76,21 @@
   end if
 
   if ( CalcBenthicFlag ) then
-#ifdef BENTHIC_RETURN
-     ! Simple benthic return
-     call BenthicReturnDynamics
-#endif
-
-#ifdef BENTHIC_BIO
+#if defined BENTHIC_BIO
      ! Intermediate benthic return
      call PelForcingForBenDynamics
      call BenthicSystemDynamics
      call BenthicNutrient2Dynamics
-#endif
 
-#ifdef BENTHIC_FULL
+#elif defined BENTHIC_FULL
      ! Full benthic nutrients
      call PelForcingForBenDynamics
      call BenthicSystemDynamics
      call BenthicNutrient3Dynamics
+
+#else
+     ! Simple benthic return
+     call BenthicReturnDynamics
 #endif
   endif
   

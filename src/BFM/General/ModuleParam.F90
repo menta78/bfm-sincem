@@ -152,7 +152,6 @@
       p_poro0=0.4
   ! 1d-parameters
   real(RLEN),public,dimension(:),allocatable   ::  p_p_ae, p_poro      
-#ifdef INCLUDE_BEN
       integer   :: calc_init_bennut_states
   real(RLEN)   :: &
       p_InitSink=100.0_RLEN,  &  
@@ -163,8 +162,7 @@
       p_qnQIc, &
       p_qpQIc, &
       p_qsQIc
-#endif
-#ifdef BENTHIC_RETURN
+#if ! defined BENTHIC_BIO || ! defined BENTHIC_FULL 
       logical,public :: CalcBenOrganisms=.FALSE., CalcBenBacteria=.FALSE.
 #endif
 
