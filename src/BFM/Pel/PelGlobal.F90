@@ -89,7 +89,9 @@
 #endif
   do i = 1 , ( iiPhytoPlankton)
     sediPPY(i,:)  =   p_rPIm( i)
+#ifndef BFM_POM
     if(BOTindices(1) .NE.0) sediPPY(i,BOTindices)  =   p_burvel_PI
+#endif
   end do
 
   end subroutine PelGlobalDynamics
