@@ -299,6 +299,7 @@
         ! variables)
         ! !!!!!!! ALL DETRITUS FLUXES TO THE SEDIMENT ARE DIRECTED VIA R6 TO Q6 !!!!!!!!
         ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+#ifndef BFM_POM
         call flux(kbot, iiPel, ppR6c, ppR6c, ( jbotR6c(BoxNumberXY)/ &
           Depth(kbot)) )
         call flux(kbot, iiPel, ppR6n, ppR6n, ( jbotR6n(BoxNumberXY)/ &
@@ -318,6 +319,7 @@
           Depth(kbot)) )
         call flux(kbot, iiPel, ppR6f, ppR6f, ( jbotR6f(BoxNumberXY)/ &
           Depth(kbot)) )
+#endif
 #endif
       end do ! loop over NO_BOXES_XY
    end if ! AssignPelBenFluxesInBFMFlag
