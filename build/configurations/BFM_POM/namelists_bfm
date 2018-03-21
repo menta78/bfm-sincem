@@ -144,13 +144,13 @@ AssignAirPelFluxesInBFMFlag = .FALSE.
 !-------------------------------------------------------
 ! Benthic flags and parameters :
 &Param_parameters_ben
-        CalcBenOrganisms(1) = .FALSE.
-        CalcBenOrganisms(2) = .FALSE.
-        CalcBenOrganisms(3) = .FALSE.
-        CalcBenOrganisms(4) = .FALSE.
-        CalcBenOrganisms(5) = .FALSE.
-         CalcBenBacteria(1) = .FALSE.
-         CalcBenBacteria(2) = .FALSE.
+        CalcBenOrganisms(1) = .TRUE.
+        CalcBenOrganisms(2) = .TRUE.
+        CalcBenOrganisms(3) = .TRUE.
+        CalcBenOrganisms(4) = .TRUE.
+        CalcBenOrganisms(5) = .TRUE.
+         CalcBenBacteria(1) = .TRUE.
+         CalcBenBacteria(2) = .TRUE.
                     p_poro0 = 0.7
                     p_d_tot = 0.30
                  p_InitSink = 100.0
