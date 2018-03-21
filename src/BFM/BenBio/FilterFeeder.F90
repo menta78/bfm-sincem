@@ -38,6 +38,11 @@
 #endif
  use mem,  ONLY: Source_D2_vector_ben
 #endif
+#ifdef BFM_GOTM
+  use bio_var, ONLY: BOTindices
+#else
+  use api_bfm, ONLY: BOTindices
+#endif
   use mem_Param,  ONLY: p_d_tot,p_pe_R1c, p_pe_R1n, p_pe_R1p,p_small
   use mem_FilterFeeder
 
