@@ -27,12 +27,16 @@
   use mem,  ONLY: D1m, G2o, D2m
   use mem, ONLY: ppD1m, ppG2o, ppD2m, InitializeModel, LocalDelta, shiftD1m, &
     jbotO2o, ETW_Ben, irrenh, rrBTo, jG2K3o, jG2K7o, O2o_Ben, NO_BOXES_XY, iiBen, &
-    iiPel, flux_vector,KNO3,M3n, BoxNumberXY_ben
+    iiPel, flux_vector
+#if defined BENTHIC_FULL
+  use mem, ONLY: KNO3, M3n, BoxNumberXY_ben
+  use bennut_interface, ONLY: CalculateFromSet
 #endif
-  use constants,  ONLY: SEC_PER_DAY, ONE_PER_DAY, BENTHIC_BIO,STANDARD,EQUATION
+
+#endif
+  use constants,  ONLY: SEC_PER_DAY, ONE_PER_DAY, STANDARD,EQUATION
   use mem_Param,  ONLY: p_poro, p_small, p_d_tot, CalcBenthicFlag
   use mem_BenOxygen
-  use bennut_interface, ONLY: CalculateFromSet
   use mem_Param,  ONLY: p_d_tot, p_clD1D2m
 
 !  

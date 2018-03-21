@@ -12,7 +12,6 @@
   module mem_FilterFeeder
 !
 ! !USES:
-#ifdef INCLUDE_BEN
 
   use global_mem
 
@@ -151,7 +150,6 @@
 101 call error_msg_prn(NML_READ,"InitFilterFeeder.f90","FilterFeeder_parameters")
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   end  subroutine InitFilterFeeder
-#endif
   end module mem_FilterFeeder
 !EOC
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

@@ -37,13 +37,14 @@
 #else
    use mem, ONLY: D3STATE, PELBOTTOM, PhytoPlankton, NO_BOXES_XY, Depth,  &
            PhytoPlankton, ppPhytoPlankton, iiPhytoPlankton,               &
-           ppMicroZooPlankton, iiMicroZooPlankton,                        &
+           MicroZooPlankton, ppMicroZooPlankton, iiMicroZooPlankton,      &
            R1c, R2c, R6c, R1n, R6n, R1p, R6p, R6s,                        &
            ppR1c, ppR6c, ppR1n, ppR6n, ppR1p, ppR6p, ppR6s, ppR2c,        &
            ppO2o, ppN1p, ppN3n, ppN4n, ppN5s, ppN6r,                      &
            jbotR6c, jbotR6n, jbotR6p, jbotR6s, jbotR1c, jbotR1n, jbotR1p, &
            jbotO2o, jbotN1p, jbotN3n, jbotN4n, jbotN5s, jbotN6r,          &
-           sediPPY, sediR2, sediR6, qpcPPY, qncPPY, qscPPY, qlcPPY,       &
+           sediPPY, sediR2, sediR6,                                       &
+           qpcPPY, qncPPY, qscPPY, qlcPPY, qncMIZ, qpcMIZ,                &
            iiC, iiN, iiP, iiL, iiS, iiLastElement, iiBen, iiPel,          &
            flux, flux_vector
 #ifdef INCLUDE_PELFE
@@ -64,7 +65,7 @@
    use mem_PelBac, ONLY: p_suhR1, p_sulR1, p_suR2, p_suR6,        &
                          p_qncPBA, p_qpcPBA
 #if defined BENTHIC_BIO || defined BENTHIC_FULL
-   use mem, ONLY: jPIY3c, jZIY3c, ZI_Fc, jRIY3c, jRIY3n, jRIY3p, jRIY3s, 
+   use mem, ONLY: jPIY3c, jZIY3c, ZI_Fc, jRIY3c, jRIY3n, jRIY3p, jRIY3s,  &
                   D1m, D6m, D7m, D8m, D9m, ppD6m, ppD7m, ppD8m, ppD9m
 #endif
 #ifdef BFM_GOTM
@@ -105,11 +106,13 @@
    real(RLEN), dimension(:), pointer  ::lcl_PhytoPlankton, lcl_MicroZooPlankton
    real(RLEN), dimension(:), allocatable :: jbotR2R6, jbotR2R1
    real(RLEN), dimension(:,:), allocatable :: jbotR6PPY, jbotR1PPY
+   real(RLEN)            :: newDm(NO_BOXES_XY)
    !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    ! Local Variables
    !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    integer  :: i, j, kbot, Box 
-   real(RLEN) :: sedi, c, p, s, uptake, ruQc, ruQn, ruQp, ruQs, ruQf, ruQl
+   real(RLEN) :: sedi, c, p, s, uptake, ruQc, ruQn, ruQp, ruQs, ruQf, ruQl, Delta
+   real(RLEN), external  :: GetDelta
    !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    allocate(jbotR1PPY(iiLastElement,NO_BOXES_XY), jbotR2R1(NO_BOXES_XY),   &
             jbotR6PPY(iiLastElement,NO_BOXES_XY), jbotR2R6(NO_BOXES_XY) )
@@ -149,7 +152,6 @@
                j = ppPhytoPlankton(i,iiS)
                if ( j > 0) &
                   PELBOTTOM(j,Box) = PELBOTTOM(j,Box) - uptake*qscPPY(i,kbot)
-               end if
 #ifdef INCLUDE_PELFE
                j = ppPhytoPlankton(i,iiF)
                if ( j > 0) & 
@@ -179,6 +181,7 @@
          call flux(kbot, iiPel, ppR6n, ppR6n, -(jRIY3n(Box)/Depth(kbot)) )
          call flux(kbot, iiPel, ppR6p, ppR6p, -(jRIY3p(Box)/Depth(kbot)) )
          call flux(kbot, iiPel, ppR6s, ppR6s, -(jRIY3s(Box)/Depth(kbot)) )
+         !
       endif
 #endif
    !
@@ -406,7 +409,7 @@
          call flux_vector(iiBen, ppD6m,ppD6m,(newDM(:)- D6m(:))/Delta)
          call RecalcPenetrationDepth( D1m(:), D7m(:), &
               -jbotR6n(:)*Delta, Q6n(:),newDm(:) )
-e        call flux_vector(iiBen, ppD7m,ppD7m,(newDM(:)- D7m(:))/Delta)
+         call flux_vector(iiBen, ppD7m,ppD7m,(newDM(:)- D7m(:))/Delta)
          call RecalcPenetrationDepth( D1m(:), D8m(:), &
               -jbotR6p(:)*Delta, Q6p(:),newDm(:) )
          call flux_vector(iiBen, ppD8m,ppD8m,(newDM(:)- D8m(:))/Delta)
