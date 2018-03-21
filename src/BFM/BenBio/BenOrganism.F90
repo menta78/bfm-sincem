@@ -1,6 +1,5 @@
 #include "DEBUG.h"
 #include "INCLUDE.h"
-#ifdef INCLUDE_BEN
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model 
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -459,7 +458,6 @@
   call flux_vector(iiBen, ppD8m,ppD8m,( cmm- D8m(:))*( rqt6p- ruQ6p)/ Q6p(:))
 
   end subroutine BenOrganismDynamics
-#endif
 !EOC
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model 

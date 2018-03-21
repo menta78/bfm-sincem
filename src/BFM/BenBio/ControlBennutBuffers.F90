@@ -8,32 +8,27 @@
 ! !ROUTINE: ControlBennutBuffers
 !
 ! DESCRIPTION
-!   This process forces the system to calculate a flux from
-!       dissolved pelagic nutrient to the particualte nutreit pool
-!       in the sediment. The reason for this is that if one of the
-!       benthic pools become zero the partial differential equations 
-!       used to calclate the diagenict processes and vertical fluxes
-!       are not valid any more.
-!       Therfor this process maximize input to benthos in
-!       cases when nearly no particulate detritus enters the benthic system.
-!       This is done by transferring dissolved nutrients N3.n,N4.n,N5.s
-!       in the layer adjacent to the sediment into
-!       benthic particulate nutrients (Q6.n,Q6.p,Q6.s).
-!       A fixed fraction per day will be transferred to the benthos :
-!        a. Minimized to  a fixed maximum value
-!        b. Only when the settling rate is lower than the fixed maximum value
-!        c. Only when het particulate nutrient buffer is really low.
-!           This is determined to check if the quotient of the nutrient buffer
-!           and the  fixed fraction is below a parameter, standing for the
-!           specific refill rate.
-!       The values of fixed fraction and the maximum value for the 
-!       different nutrients are calculated according to Redfield
-!       The user decides which nutrients should be handled
+!  This process forces the system to calculate a flux from dissolved pelagic
+!  nutrients to the particulate nutrient pool in the sediment. 
+!  The reason for this is that if one of the benthic pools becomes zero 
+!  the partial differential equations used to calculate the diagenetic processes 
+!  and vertical fluxes are not valid any more. Therfore this process maximize 
+!  input to benthos in cases when nearly no particulate detritus enters the system. 
+!  This is done by transferring dissolved nutrients N3.n,N4.n,N5.s in the layer 
+!  adjacent to the sediment into benthic particulate nutrients (Q6.n,Q6.p,Q6.s).
+!  A fixed fraction per day will be transferred to the benthos :
+!    a. Minimized to  a fixed maximum value
+!    b. Only when the settling rate is lower than the fixed maximum value
+!    c. Only when het particulate nutrient buffer is really low.
+!       This is determined to check if the quotient of the nutrient buffer
+!       and the  fixed fraction is below a parameter, standing for the
+!       specific refill rate.
+!  The values of fixed fraction and the maximum value for the different nutrients 
+!  are calculated according to Redfield. User decides which nutrients to handle
 !          
 ! !INTERFACE
   subroutine ControlBennutBuffersDynamics
 !
-#ifdef INCLUDE_BEN
 ! !USES:
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -138,7 +133,6 @@
 
   end do
 
-#endif
   end subroutine ControlBennutBuffersDynamics
 !EOC
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

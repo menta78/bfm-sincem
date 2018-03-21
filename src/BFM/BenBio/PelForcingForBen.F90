@@ -13,7 +13,6 @@
 ! !INTERFACE
   subroutine PelForcingForBenDynamics
 !
-#ifdef INCLUDE_BEN
 ! !USES:
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -181,7 +180,6 @@
       ! depth of the level above the sediment
       Depth_Ben(:)  =   Depth(BOTindices)
 
-#endif
   end subroutine PelForcingForBenDynamics
 !EOC
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

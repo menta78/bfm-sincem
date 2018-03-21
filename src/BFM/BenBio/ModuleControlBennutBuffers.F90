@@ -22,7 +22,6 @@
 ! !INTERFACE
   module mem_ControlBennutBuffers
 !
-#ifdef INCLUDE_BEN
 ! !USES:
 
   use global_mem
@@ -112,7 +111,6 @@
 101 call error_msg_prn(NML_READ,"ModuleControlBennutBuffers.F90","ControlBennutBuffers_parameters")
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   end  subroutine InitControlBennutBuffers
-#endif
   end module mem_ControlBennutBuffers
 !EOC
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

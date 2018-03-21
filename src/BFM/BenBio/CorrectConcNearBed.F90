@@ -1,6 +1,5 @@
 #include "DEBUG.h"
 #include "INCLUDE.h"
-#ifdef INCLUDE_BEN
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model 
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -25,16 +24,17 @@
 #else
      use mem,         ONLY: ETAUB,NO_BOXES_XY
 #endif
-
-     IMPLICIT NONE
+!
+      IMPLICIT NONE
+ 
 ! !INPUT PARAMETERS:
-     real(RLEN), intent(IN),dimension(NO_BOXES_XY)   ::DepthLayer
-     real(RLEN), intent(IN),dimension(NO_BOXES_XY)   ::Sedi
-     real(RLEN), intent(IN)                              ::fto
-     real(RLEN), intent(IN)                              ::p_max
-     real(RLEN), intent(IN),dimension(NO_BOXES_XY)   ::wf          ! volumefiltered*Y3c (m/d)
+      real(RLEN), intent(IN),dimension(NO_BOXES_XY)   ::DepthLayer
+      real(RLEN), intent(IN),dimension(NO_BOXES_XY)   ::Sedi
+      real(RLEN), intent(IN)                          ::fto
+      real(RLEN), intent(IN)                          ::p_max
+      real(RLEN), intent(IN),dimension(NO_BOXES_XY)   ::wf          ! volumefiltered*Y3c (m/d)
 ! !OUTPUT PARAMETERS:
-     real(RLEN),dimension(NO_BOXES_XY),intent(OUT)   ::correction
+      real(RLEN),dimension(NO_BOXES_XY),intent(OUT)   ::correction
 
 !  
 !
@@ -85,7 +85,6 @@
       return
       end subroutine CorrectConcNearBed
 
-#endif
 !EOC
 !-----------------------------------------------------------------------
 
