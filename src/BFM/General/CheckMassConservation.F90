@@ -146,6 +146,10 @@
   if ( CalcBenthicFlag ) then
 
 #if defined BENTHIC_BIO
+     totbenc(:) = ( Y1c(:)+ Y2c(:)+ Y3c(:)+ &
+                    Y4c(:)+ Y5c(:)+ H1c(:)+ &
+                    H2c(:)+ Q1c(:)+ Q6c(:) )
+
      totbenp(:) = ( Y1p(:)+ Y2p(:)+ Y3p(:)+ &
                     Y4p(:)+ Y5p(:)+ H1p(:)+ &
                     H2p(:)+ Q1p(:)+ Q6p(:)+ &
@@ -157,16 +161,20 @@
      totbens(:)  =  Q6s(:)
 
 #elif defined BENTHIC_FULL
-      totbenp(:) = ( Y1p(:)+ Y2p(:)+ Y3p(:)+ &
-                     Y4p(:)+ Y5p(:)+ H1p(:)+ &
-                     H2p(:)+ Q1p(:)+ Q6p(:)+ &
-                     Q11p(:)+ K1p(:)+ K11p(:)+ K21p(:))
-      totbenn(:) = ( Y1n(:)+ Y2n(:)+ Y3n(:)+ &
-                     Y4n(:)+ Y5n(:)+ H1n(:)+ &
-                     H2n(:)+ Q1n(:)+ Q6n(:)+ &
-                     Q11n(:)+ G4n(:)+ K3n(:)+&
-                     K4n(:)+ K14n(:)+ K24n(:))
-      totbens(:) =   K5s(:)+ Q6s(:)
+     totbenc(:) = ( Y1c(:)+ Y2c(:)+ Y3c(:)+ &
+                    Y4c(:)+ Y5c(:)+ H1c(:)+ &
+                    H2c(:)+ Q1c(:)+ Q6c(:) )
+
+     totbenp(:) = ( Y1p(:)+ Y2p(:)+ Y3p(:)+ &
+                    Y4p(:)+ Y5p(:)+ H1p(:)+ &
+                    H2p(:)+ Q1p(:)+ Q6p(:)+ &
+                    Q11p(:)+ K1p(:)+ K11p(:)+ K21p(:))
+     totbenn(:) = ( Y1n(:)+ Y2n(:)+ Y3n(:)+ &
+                    Y4n(:)+ Y5n(:)+ H1n(:)+ &
+                    H2n(:)+ Q1n(:)+ Q6n(:)+ &
+                    Q11n(:)+ G4n(:)+ K3n(:)+&
+                    K4n(:)+ K14n(:)+ K24n(:))
+     totbens(:) =   K5s(:)+ Q6s(:)
 
 #else
       totbenc(:)  =  ( Q1c(:)+ Q6c(:))
