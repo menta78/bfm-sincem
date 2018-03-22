@@ -80,7 +80,8 @@
      ! Intermediate benthic return
      call PelForcingForBenDynamics
      call BenthicSystemDynamics
-     call BenthicNutrient2Dynamics
+     call BenthicReturn2Dynamics
+     call BenOxygenDynamics
 
 #elif defined BENTHIC_FULL
      ! Full benthic nutrients
