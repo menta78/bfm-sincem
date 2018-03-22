@@ -250,7 +250,7 @@ end
 end
 
 # BENTHIC_BIO system
-2d-state-ben -if-exist BENTHIC_BIO
+2d-state-ben -if-exist BENTHIC_BIO || BENTHIC_FULL
   #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   # Benthic Organisms
   #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -293,7 +293,7 @@ end
     D9m       : Penetration Depth organic Si  : m
 end
 
-2d-variable-ben -if-exist BENTHIC_BIO
+2d-variable-ben -if-exist BENTHIC_BIO || BENTHIC_FULL
 
   #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   #     These variables are used as input to the Benthic Nutrient Model:
@@ -389,6 +389,13 @@ end
 end
 
 2d-variable-ben -if-exist BENTHIC_FULL
+
+  #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  # Control of benthic organism on diagenetic processes
+  #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+  shiftD2m      : Rate of change of D2m: m/d
+
   #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   # Variables in the benthic nurient model which represent the concentration
   # of the macro nutr. in the porewater of the different layers.

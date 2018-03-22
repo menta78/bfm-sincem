@@ -141,17 +141,19 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
 !-------------------------------------------------------
 ! Benthic flags and parameters :
 &Param_parameters_ben
+        CalcBenOrganisms(1) = .FALSE.
+        CalcBenOrganisms(2) = .FALSE.
+        CalcBenOrganisms(3) = .FALSE.
+        CalcBenOrganisms(4) = .FALSE.
+        CalcBenOrganisms(5) = .FALSE.
+         CalcBenBacteria(1) = .FALSE.
+         CalcBenBacteria(2) = .FALSE.
                     p_poro0 = 0.7
                     p_d_tot = 0.30
-                 p_InitSink = 100.0
                   p_d_tot_2 = 0.35
                   p_clD1D2m = 0.01
                     p_clDxm = 0.001
                   p_q10diff = 1.49
-    calc_init_bennut_states = 0 
-                    p_qnQIc = 0.11155
-                    p_qpQIc = 0.010255
-                    p_qsQIc = 0.0221
 
 	filename_nml_conf = 'BFM_General.nml',
 /
@@ -222,11 +224,30 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
 !<variablename>0 = <realvalue>
 !-------------------------------------------------------------------------!
 &bfm_init_nml_ben
-   Q6c0  = 10265.19,
-   Q6n0  = 200.0,
-   Q6p0  = 25.0,
-   Q6s0  = 10.0,
-   Q1c0  = 10.4988,
+    G2o0  =  0.008879,
+    D1m0  =  0.002,
+    D2m0  =  0.025,
+    D6m0  =  0.25,
+    D7m0  =  0.25,
+    D8m0  =  0.25,
+    D9m0  =  0.25,
+    Q1c0  =  10.4988,
+    Q6c0  =  10265.19,
+    Q6n0  =  200.0,
+    Q6p0  =  25.,
+    Q6s0  =  10.0,
+    H1c0  =  165.0,
+    H2c0  =  45.0,
+    Y1c0  =  160.0,
+    Y2c0  =  470,
+    Y3c0  =  310.0,
+    Y4c0  =  220.0,
+    Y5c0  =  160.0,
+    K1p0  =  0.1,
+    K11p0 =  80.0,
+    K4n0  =  0.0277856,
+    K14n0 =  1.0838474,
+    K6r0  =  100.0,
 	filename_nml_conf = 'BFM_General.nml',
 /
 
@@ -262,6 +283,7 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
           'qpcPPY_iiP1', 'qncPPY_iiP1', 'qlcPPY_iiP1', 'qpcPPY_iiP2', 'qncPPY_iiP2', 'qlcPPY_iiP2',
           'qpcPPY_iiP3', 'qncPPY_iiP3', 'qlcPPY_iiP3', 'qpcPPY_iiP4', 'qncPPY_iiP4', 'qlcPPY_iiP4',
           'Q6c','Q6n','Q6p','Q6s','Q1c','Q1n','Q1p',
+          'Y1c','Y2c','Y3c','Y4c','Y5c','H1c','H2c'
 	filename_nml_conf = 'BFM_General.nml',
 /
 

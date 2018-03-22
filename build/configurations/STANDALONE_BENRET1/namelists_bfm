@@ -217,11 +217,11 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
 !<variablename>0 = <realvalue>
 !-------------------------------------------------------------------------!
 &bfm_init_nml_ben
+   Q1c0  = 10.4988,
    Q6c0  = 10265.19,
    Q6n0  = 200.0,
    Q6p0  = 25.0,
    Q6s0  = 10.0,
-   Q1c0  = 10.4988,
 	filename_nml_conf = 'BFM_General.nml',
 /
 

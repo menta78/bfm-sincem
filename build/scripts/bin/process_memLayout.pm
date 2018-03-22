@@ -90,17 +90,30 @@ sub check_directive{
 
     trim($include);
     my @includes = split(/\s+/, $include);
+    my $hasOR = 0 ; my $check = 0 ;
+    if ( "||" =~ @includes ) { $hasOR = 1 ; };
     #print join("<>",@includes) . "\n";
     foreach my $inc (@includes){
+        if ($inc eq "||") { next;};
         #print "\t$directives ----> $inc ----> return ";
         if ( !($directives =~ /${inc}(\s|$)/) ){
-            #print "0\n"; 
-            return 0; 
-        }
+            if ( ! $hasOR ) {
+              #print "0\n"; 
+              return 0; 
+            } ;
+         } else {
+              $check = 1 ;
+              $$blk_include = $inc ;
+              #print "Add ". $inc . " 1\n";
+         }
     }
+    if ( $check ) { 
+      #print "1\n"; 
+      return 1;
+    };
     #print "1\n"; 
-    $$blk_include = $include;
-    return 1;
+    #$$blk_include = $include;
+    #return 1;
 }
 
 sub insert_term{
