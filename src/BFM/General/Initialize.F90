@@ -115,7 +115,7 @@
       call InitSettling
       call InitPelGlobal
 
-#if defined BENTHIC_BIO || defined BENTHIC_FULL
+#if defined BENTHIC_BIO
       ! Intermediate benthic return
       call InitBenOrganism
       call InitFilterFeeder
@@ -124,14 +124,12 @@
       call InitBenthicReturn2
       call InitBenOxygen
       call InitControlBennutBuffers
-#ifdef BENTHIC_FULL
+#elif defined BENTHIC_FULL
       ! Full benthic nutrients
       call InitBenOrganism
       call InitFilterFeeder
       call InitBenBac
       call InitBioturbation
-      call InitBenthicReturn1
-      call InitBenthicReturn2
       call InitBenthicNutrient3
       call InitBenAmmonium
       call InitBenNitrate
@@ -142,21 +140,16 @@
       call InitBenSilica
       call InitBenQ1Transport
       call InitControlBennutBuffers
+#else
+      ! Simple benthic return
+      call InitBenthicReturn
 #endif
 #ifdef INCLUDE_BENCO2
       call InitBenCO2Transport
       call InitBenAlkalinity
 #endif
-#else
-      ! Simple benthic return
-      call InitBenthicReturn
-#endif
-
 #ifdef INCLUDE_PELCO2
       call InitCO2
-#endif
-#ifdef INCLUDE_SILT
-      call InitSilt
 #endif
 #ifdef INCLUDE_SEAICE
       call InitSeaiceAlgae
