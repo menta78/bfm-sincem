@@ -148,22 +148,24 @@
 #if defined BENTHIC_BIO
      totbenc(:) = ( Y1c(:)+ Y2c(:)+ Y3c(:)+ &
                     Y4c(:)+ Y5c(:)+ H1c(:)+ &
-                    H2c(:)+ Q1c(:)+ Q6c(:) )
+                    H2c(:)+ Q1c(:)+ Q6c(:)+ &
+                    Q11c(:) )
 
      totbenp(:) = ( Y1p(:)+ Y2p(:)+ Y3p(:)+ &
                     Y4p(:)+ Y5p(:)+ H1p(:)+ &
                     H2p(:)+ Q1p(:)+ Q6p(:)+ &
-                    K1p(:)+ K11p(:))
+                    Q11p(:)+ K1p(:)+ K11p(:))
      totbenn(:) = ( Y1n(:)+ Y2n(:)+ Y3n(:)+ &
                     Y4n(:)+ Y5n(:)+ H1n(:)+ &
                     H2n(:)+ Q1n(:)+ Q6n(:)+ &
-                    K4n(:)+ K14n(:))
+                    Q11n(:)+ K4n(:)+ K14n(:))
      totbens(:)  =  Q6s(:)
 
 #elif defined BENTHIC_FULL
      totbenc(:) = ( Y1c(:)+ Y2c(:)+ Y3c(:)+ &
                     Y4c(:)+ Y5c(:)+ H1c(:)+ &
-                    H2c(:)+ Q1c(:)+ Q6c(:) )
+                    H2c(:)+ Q1c(:)+ Q6c(:)+ &
+                    Q11c(:) )
 
      totbenp(:) = ( Y1p(:)+ Y2p(:)+ Y3p(:)+ &
                     Y4p(:)+ Y5p(:)+ H1p(:)+ &
@@ -177,9 +179,9 @@
      totbens(:) =   K5s(:)+ Q6s(:)
 
 #else
-      totbenc(:)  =  ( Q1c(:)+ Q6c(:))
-      totbenp(:)  =  ( Q1p(:)+ Q6p(:))
-      totbenn(:)  =  ( Q1n(:)+ Q6n(:))
+      totbenc(:)  =  ( Q1c(:)+ Q11c(:)+ Q6c(:))
+      totbenp(:)  =  ( Q1p(:)+ Q11n(:)+ Q6p(:))
+      totbenn(:)  =  ( Q1n(:)+ Q11p(:)+ Q6n(:))
       totbens(:)  =    Q6s(:)
 #endif
 
