@@ -94,7 +94,7 @@
   ! Phosphorus remineralization in the sediments
   !----------------------------------------------------------------------
   rate  =   p_reminN1* K1p(:)
-  ! jbotN1p is used in BenPelCoup to define the pelagic flux
+  ! jbotN1p is used in PelagicBenthicCoupling to define the pelagic flux
   call flux_vector( iiBen, ppK1p,ppK1p,-( rate) )
   jbotN1p(:)  =   rate
   rate  =   p_K11K1p* K11p(:)
@@ -108,8 +108,8 @@
   ! K3.n is not used in this model version
   jbotN3n(:)  =   rate* p_pQIN3
   jbotN4n(:)  =   rate*( ONE - p_pQIN3)
-  ! jbotN3n is used in BenPelCoup to define the pelagic flux
-  ! jbotN4n is used in BenPelCoup to define the pelagic flux
+  ! jbotN3n is used in PelagicBenthicCoupling to define the pelagic flux
+  ! jbotN4n is used in PelagicBenthicCoupling to define the pelagic flux
   call flux_vector( iiBen, ppK4n,ppK4n,-( jbotN3n(:)+ jbotN4n(:)) )
   rate  =   p_K14K4n* K14n(:)
   call flux_vector( iiBen, ppK14n,ppK4n, rate )

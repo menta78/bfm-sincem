@@ -116,17 +116,15 @@
      shiftD1m(:) = shiftD1m(:)* (D1m(:)/( D1m(:)+ &
       abs(shiftD1m(:))))**(p_xdampingD1m)*( p_chD1m/( p_chD1m+ D1m(:)))
 #if defined BENTHIC_FULL
-     if ( CalcBenthicFlag ) then
-        do BoxNumberXY_ben = 1,NO_BOXES_XY
-           r(1) = CalculateFromSet( KNO3(BoxNumberXY_ben), EQUATION, &
-                  STANDARD, D1m(BoxNumberXY_ben), dummy)/M3n(BoxNumberXY_ben)
-           if ( r(1) .lt.ZERO) then
-             write(LOGUNIT,*) "BFM Warning: BenOxygen proportion M3n(D1m)/M3n(0..D2m)=",r(1)
-           endif
-        end do
-     end if
-#endif
+     do BoxNumberXY_ben = 1,NO_BOXES_XY
+        r(1) = CalculateFromSet( KNO3(BoxNumberXY_ben), EQUATION, &
+               STANDARD, D1m(BoxNumberXY_ben), dummy)/M3n(BoxNumberXY_ben)
+        if ( r(1) .lt.ZERO) then
+          write(LOGUNIT,*) "BFM Warning: BenOxygen proportion M3n(D1m)/M3n(0..D2m)=",r(1)
+        endif
+     end do
      shiftD1m(:)= shiftD1m(:) * max(ZERO,min(ONE,r*2.0_RLEN));
+#endif
   end if
 
 
@@ -171,12 +169,10 @@
     call flux_vector( iiBen, ppG2o,ppG2o,-jG2O2o )
     jbotO2o(:)=jbotO2o(:)+jG2O2o
 #if defined BENTHIC_BIO
-    if ( CalcBenthicFlag ) then
-      ! Compute shifting of the denitrification layer here in case of running only
-      ! the benthic submodel and NOT the benthic nutrient model.
-      r  =   p_d_tot- D2m(:)
-      call flux_vector( iiBen, ppD2m,ppD2m, shiftD1m(:)* r/( r+ 0.01_RLEN) )
-    end if
+    ! Compute shifting of the denitrification layer here in case of running only
+    ! the benthic submodel and NOT the benthic nutrient model.
+    r  =   p_d_tot- D2m(:)
+    call flux_vector( iiBen, ppD2m,ppD2m, shiftD1m(:)* r/( r+ 0.01_RLEN) )
 #endif
   else
       G2o(:)=G2oNew
