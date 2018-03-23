@@ -230,6 +230,7 @@ end
   #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     group BenDetritus[cnps] (BOM) : mg C/m2: mmol N/m2 : mmol P/m2 : mmol Si/m2
                 Q1[-s]    : Labile organic Matter
+                Q11[-s]   : Labile organic Matter
                 Q6        : Particulate organic Matter
     end
 end
@@ -369,10 +370,6 @@ end
   #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   #     Additional Benthic states
   #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    group BenDetritus[cnps] (BOM) : mg C/m2: mmol N/m2 : mmol P/m2 : mmol Si/m2
-                Q11[-s]   : Labile organic Matter
-    end
-
     group BenthicPhosphate[p] (BNP) : mmol P/m2
                 K21             : Phosphate in anoxic layer
     end
