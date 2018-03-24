@@ -18,7 +18,7 @@
 !   remineralisation rates and nitrogen remineralisation is partitioned 
 !   into ammonium and nitrate flux with a constant value. 
 !   Fluxes are then used as boundary conditions for pelagic variables
-!   in BentoPelCoup.F90
+!   in PelagicBenthicCoupling.F90
 !
 !
 ! !INTERFACE

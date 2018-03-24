@@ -47,7 +47,7 @@
   use mem_FilterFeeder
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! The following vector functions are used: eTq, MM, PartQ
+  ! The following vector functions are used
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   use mem_globalfun,   ONLY: eTq, MM, MM_power, insw, PartQ
 
@@ -219,7 +219,7 @@
     ! This uptake procedure was developed for the one/two layer original ERSEM
     ! model where the layer above the sediment could have depths up to a few
     ! hundred meters. p_dwat is in this case the layer depth seen by the
-    ! filterfeeders. o_dwat is used as an important calibration parameter.
+    ! filterfeeders. p_dwat is used as an important calibration parameter.
 
     ! In the original model the sedimentation of detritus (R6) was equal to the
     ! the sinking rate. By doing this we implictly assumed that this rate was
@@ -259,7 +259,7 @@
    case(2)
      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
      !  Alternative food uptake as in zooplankton:
-     !  using the modifed Holling response equation which take in account
+     !  using the modifed Holling response equation which take into account
      !  the maximum growth rate and the volume filtered.
      !
      !  It is assumed that the detritus sedimentation is defined as a net process
@@ -285,19 +285,19 @@
    case(4)
      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
      !  Alternative food uptake as in zooplankton:
-     !  using the modifed Holling response equation which tkae in account
+     !  using the modifed Holling response equation which take into account
      !  the maximum growth rate and the volume filtered.
      !  Further is assumed that the filterfeeder (nearly) stop filtering as soon as  
-     !  the costs for filtering  are lower than the  profit
+     !  the costs for filtering are lower than the profit
      !  For this we solve the next equation in which r is the unknown:
      !    (left side == profit , right side=costs)
      !    r* p_su* MM(  p_vum* food,  r* p_su)* Y3c(:)*netto = p_sra *r 
      !  If r > ONE : there is enough food to grow
-     !  if r < ONE : there is balance between costs and profit if  r*p_puf*sgu is larger than
-     !  the rest respiration.
+     !  if r < ONE : there is balance between costs and profit if r*p_puf*sgu 
+     !  is larger than the rest respiration.
      !
-     !  It is assumed that the detritus sedimentation is defined as a netto ptocess
-     !  ( p_bursel << P_sediR6). Therefor it assumed that filterfeeders do noet eat Q6.  
+     !  It is assumed that the detritus sedimentation is defined as a netto process
+     !  (p_bursel<< P_sediR6). Therefore it is assumed that filterfeeders do not eat Q6.  
      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
      cmm = ZERO;
 
@@ -317,7 +317,7 @@
 
      ! filtering saturation ( high at low , low at hight food)
      fsat=su/(p_small+ et*eo*p_vum*food);
-     ! Calculate cost of enregy based on realized rate of uptake.
+     ! Calculate cost of energy based on realized rate of uptake.
      rrc = max(eo * p_su*puf*fsat, p_srr)* Y3c(:)* et
      
      foodpm2 =food*fdepth
@@ -394,7 +394,7 @@
   call flux_vector( iiBen, ppY3n,ppY3n, ruZIn )
   call flux_vector( iiBen, ppY3p,ppY3p, ruZIp )
 
-  ! flux definitions from Z -> Y3 are found in BentoPelCoup
+  ! flux definitions from Z -> Y3 are found in PelagicBenthicCoupling.F90
   jZIY3c(:)  =   ruZIc
 
   reZIc  =   ZI_Fc(:)* se_uZI* choice
@@ -492,10 +492,9 @@
   retQ6n  =   retQ6n+ reQ6n
   retQ6p  =   retQ6p+ reQ6p
 
-  ! in case of a negative value of one of the following values there is a &
-  ! situation
-  ! of startvation and very low biomass values. Check on quota in the food is &
-  ! out of order
+  ! In case of a negative value of one of the following values there is a 
+  ! situation of starvation and very low biomass values.
+  ! Check on quota in the food is out of order
 
   rtY3c  =   max(  ZERO,  rtY3c -retR6c-retQ6c-rrc)
   rtY3n  =   max(  ZERO,  rtY3n -retR6n-retQ6n)
@@ -569,8 +568,8 @@
   call flux_vector( iiBen, ppY3p,ppQ6p, retQ6p )
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  ! Calculation of changes due to uptake of Benthic detritus in distribution of
-  ! state variables (Dx.m is an undetermined source)
+  ! Calculation of changes due to uptake of Benthic detritus in distribution
+  ! of state variables (Dx.m is an undetermined source)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
   call flux_vector(iiBen, ppD6m,ppD6m,( cmm- D6m(:))*( retQ6c- ruQ6c)/ Q6c(:))
@@ -598,7 +597,7 @@
   jRIY3s(:)  =  ZERO      - ruPIs
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  ! excretion of food orginating from the Pelagic realm is also a
+  ! excretion of food originating from the Pelagic realm is also a
   ! sedimentation from from pelagic to benthic, and thus is 
   ! added to the total benthic boundary flux
   ! jbot< 0 : flux out of the system
@@ -610,12 +609,12 @@
 
   ! The silicate is directly transferred to Q6.s
   ! the ruPis which is put back in R6 is however sedimentating:
-  jbotR6s(:)  =   jbotR6s(:)- ruPIs- ruR6s -reR6s
+  jbotR6s(:)  =   jbotR6s(:)- ruPIs- ruR6s
 
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  ! pseudo faeces production
-  ! This production lead only to a flux to the sediment!
+  ! The pseudo faeces production lead only to a flux to sediments via R6x
+  ! (see PelagicBenthicCoupling)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
   if ( sw_uptake /= 1) then
@@ -632,6 +631,7 @@
     jbotR6c(:)  =   jbotR6c(:)- reR6c
     jbotR6n(:)  =   jbotR6n(:)- reR6n
     jbotR6p(:)  =   jbotR6p(:)- reR6p
+    jbotR6s(:)  =   jbotR6s(:)- reR6s
 
   endif
 
