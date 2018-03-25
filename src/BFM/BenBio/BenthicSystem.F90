@@ -8,9 +8,10 @@
 ! !ROUTINE: BenthicSystem
 !
 ! DESCRIPTION
-!   !   This is the top level of the benthic submodel.
-!       All the biological processes affecting the benthic dynamics are called
-!       in a specified sequence according to the calculation flags.
+!   This is the top level of the benthic system :
+!   1) initialise benthic system global variables
+!   2) solve biological processes affecting the benthic dynamics 
+!      in a specified sequence according to the calculation flags.
 !
 !
 ! !INTERFACE
@@ -21,13 +22,18 @@
   ! Modules (use of ONLY is strongly encouraged!)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-  use global_mem, ONLY:RLEN
+  use global_mem, ONLY:RLEN, ZERO
 #ifdef NOPOINTERS
   use mem
 #else
-  use mem, ONLY: ppY1c, ppY1n, ppY1p, ppY2c, ppY2n, ppY2p, ppY4c, ppY4n, &
-    ppY4p, ppY5c, ppY5n, ppY5p, ppH1c, ppH1n, ppH1p, ppH2c, ppH2n, ppH2p, iiY1, &
-    iiY2, iiY3, iiY4, iiY5, iiH1, iiH2, iiBen, iiPel, flux
+  use mem, ONLY:  ppY1c, ppY1n, ppY1p, ppY2c, ppY2n, ppY2p, ppY4c, ppY4n,  &
+    ppY4p, ppY5c, ppY5n, ppY5p, ppH1c, ppH1n, ppH1p, ppH2c, ppH2n, ppH2p,  &
+    iiY1, iiY2, iiY3, iiY4, iiY5, iiH1, iiH2, iiBen, iiPel, flux,          &
+    rrBTo, rrATo, reBTn, reBTp, reATn, reATp,                              &
+    jbotO2o, jbotN1p, jbotN3n, jbotN4n, jbotN5s, jbotN6r
+#ifdef INCLUDE_BENCO2
+   use mem, ONLY:  jbotO3h,jbotO3c
+#endif
 #endif
   use mem_Param, ONLY: CalcBenOrganisms, CalcBenBacteria
 
@@ -67,14 +73,42 @@
   ! Local Variables
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  ! Initialize benthic rates 
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+  rrBTo(:)  =   ZERO  ! mgO2/m2 # Total Benthic oxic respiration
+  reBTn(:)  =   ZERO  ! mmN/m2  # Total Benthic oxic N mineralization
+  reBTp(:)  =   ZERO  ! mmP/m2  # Total Benthic oxic P mineralization
+  rrATo(:)  =   ZERO  ! mgO2/m2 # Total Benthic anoxic respiration
+  reATn(:)  =   ZERO  ! mmN/m2  # Total Benthic anoxic N mineralization
+  reATp(:)  =   ZERO  ! mmP/m2  # Total Benthic anoxic P mineralization
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  ! Calculation of turenh and irrenh in Bioturbation...
+  ! Initialize here inorganic nutrient fluxes that are given back by
+  ! Filterfeeders and nutrient regeration model
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+#ifdef INCLUDE_BENCO2
+  jbotO3h(:)=ZERO
+  jbotO3c(:)=ZERO
+#endif
+  jbotO2o(:)=ZERO
+  jbotN1p(:)=ZERO
+  jbotN3n(:)=ZERO
+  jbotN4n(:)=ZERO
+  jbotN5s(:)=ZERO
+  jbotN6r(:)=ZERO
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  ! Calculation of bioturbation (turenh) and bioirrigation (irrenh)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
   call BioturbationDynamics
 
-  call BenGlobalDynamics
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  ! Calculation of biological dynamics 
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
   if ( CalcBenOrganisms(iiY1)) then
     call BenOrganismDynamics( iiY1, ppY1c, ppY1n, ppY1p)

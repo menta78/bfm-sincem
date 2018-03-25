@@ -327,7 +327,7 @@
 #if defined BENTHIC_BIO || defined BENTHIC_FULL
    ! ------------------------------------------------------------------
    ! Control effective flux of jbotR6x (bio+physical) to benthic system
-   ! and compensate with nutrients uptake to aboud Q6 pools become zero 
+   ! and compensate with nutrients uptake to avoid Q6 pools become zero 
    ! ------------------------------------------------------------------
       call ControlBennutBuffersDynamics
 #endif
