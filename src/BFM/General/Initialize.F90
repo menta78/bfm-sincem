@@ -28,7 +28,7 @@
   use mem_BenOrganism
   use mem_FilterFeeder
   use mem_Bioturbation
-  use mem_BenthicReturn2
+  use mem_BenthicRemin
   use mem_BenOxygen
   use mem_ControlBennutBuffers
 #if defined BENTHIC_FULL
@@ -121,7 +121,7 @@
       call InitFilterFeeder
       call InitBenBac
       call InitBioturbation
-      call InitBenthicReturn2
+      call InitBenthicRemin
       call InitBenOxygen
       call InitControlBennutBuffers
 #elif defined BENTHIC_FULL

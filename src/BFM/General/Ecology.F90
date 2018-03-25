@@ -80,7 +80,7 @@
      ! Intermediate benthic return
      call PelForcingForBenDynamics
      call BenthicSystemDynamics
-     call BenthicReturn2Dynamics
+     call BenthicReminDynamics
      call BenOxygenDynamics
 
 #elif defined BENTHIC_FULL

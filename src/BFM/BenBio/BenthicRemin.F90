@@ -5,7 +5,7 @@
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 !BOP
 !
-! !ROUTINE: BenthicReturn2
+! !ROUTINE: BenthicRemin
 !
 ! DESCRIPTION
 !   This process is an intermediate parameterisation of benthic 
@@ -22,7 +22,7 @@
 !   released to the water column as silicate.
 !
 ! !INTERFACE
-  subroutine BenthicReturn2Dynamics
+  subroutine BenthicReminDynamics
 !
 ! !USES:
 
@@ -40,7 +40,7 @@
     iiPel, flux_vector
 #endif
   use mem_Param,  ONLY: p_qro, p_d_tot
-  use mem_BenthicReturn2
+  use mem_BenthicRemin
 !  
 !
 ! !AUTHORS
@@ -122,7 +122,7 @@
   ! K5.s is not used in this model version
   jbotN5s(:)  =   rate
 
-  end subroutine BenthicReturn2Dynamics
+  end subroutine BenthicReminDynamics
 !EOC
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model 

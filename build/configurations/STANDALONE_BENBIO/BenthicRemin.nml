@@ -3,7 +3,7 @@
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 !BOP
 !
-! !ROUTINE: BenthicReturn2
+! !ROUTINE: BenthicRemin
 !
 ! DESCRIPTION
 !   List of parameters values
@@ -14,7 +14,7 @@
 !   structure of the code based on ideas of M. Vichi.
 !
 ! !INTERFACE
-! parameter values for mem_BenthicReturn2 filled by InitBenthicReturn2
+! parameter values for mem_BenthicRemin filled by InitBenthicRemin
 !
 
 !  
@@ -51,7 +51,7 @@
 !  p_K11K1p:  	 Spec. P flux at the denit. layer (d-1)
 !  p_K14K4n:  	 Spec. N flux at the denit. layer (d-1)
 
-&BenthicReturn2_parameters
+&BenthicRemin_parameters
 p_reminO2 = 0.1,
 p_reminN1 = 0.001,
 p_reminN4 = 0.1,
