@@ -405,7 +405,7 @@ if [ ${GEN} ]; then
 
         if [[ "$MODE" == "OGS" ]]; then
             cp ${BFMDIR}/include/BFM_module_list.proto.h ${blddir}/
-            sed ':a;N;$!ba;s/, \&\n/,  /g' ${blddir}/BFM_var_list.h | sed -e "s/,    /,\n     \& /g" > ${BFMDIR}/include/BFM_var_list.h
+            sed ':a;N;$!ba;s/, \&\n/,  /g' ${blddir}/BFM_var_list.h | sed -e "s/,    /\n     integer,parameter ::/g" > ${BFMDIR}/include/BFM_var_list.h 
             mv ${BFMDIR}/src/BFM/General/BFM0D_Output_Ecology.F90 ${BFMDIR}/src/ogstm/
         fi
 
