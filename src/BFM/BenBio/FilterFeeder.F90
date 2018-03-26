@@ -33,8 +33,11 @@
     iiPhytoPlankton, PI_Benc, PI_Benn, PI_Benp, PI_Bens, sediPPY_Ben, sediR6_Ben, & 
     ZI_Fc, RI_Fc, ZI_Fn, ZI_Fp, RI_Fn, RI_Fp, RI_Fs, &
     NO_BOXES_XY, Depth_ben, iiBen, iiPel, flux_vector, jbotO2o,jbotN1p,jbotN4n
+#ifdef INCLUDE_PELCO2
+  use mem, ONLY: jbotO3c
+#endif
 #ifdef INCLUDE_BENCO2
-  use mem, ONLY: jbotO3c, ppG3c
+  use mem, ONLY: ppG3c
 #endif
  use mem,  ONLY: Source_D2_vector_ben
 #endif
@@ -349,7 +352,6 @@
 
   eNC=(ONE-p_pe_R1n)/(ONE-p_pe_R1c)
   ePC=(ONE-p_pe_R1p)/(ONE-p_pe_R1c)
-
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Pelagic Phytoplankton:
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -520,7 +522,6 @@
 
   end where
 
-
   where ( rep< ZERO)
 
     reQ6c  =  - rep/ p_qp
@@ -534,7 +535,6 @@
  
   retQ6c= retQ6c +r * retQ6c/(p_small + retQ6c + retR6c);
   retR6c= retR6c +r * retR6c/(p_small + retQ6c + retR6c);
-
 
   ren = max( ZERO, ren+ Y3n(:) -p_qn* Y3c(:))
   rep = max( ZERO, rep+ Y3p(:) -p_qp* Y3c(:))
@@ -552,7 +552,7 @@
   reBTn(:)  =   reBTn(:)+ ren * ( ONE-p_pePel)
   reBTp(:)  =   reBTp(:)+ rep * ( ONE-p_pePel)
 
-#ifdef INCLUDE_BENCO2
+#ifdef INCLUDE_PELCO2
   jbotO3c(:)=jbotO3c(:)+rrc*p_pePel
 #endif
   jbotO2o(:)=jbotO2o(:)-rrc/MW_C *p_pePel
@@ -619,7 +619,7 @@
 
   if ( sw_uptake /= 1) then
     
-    r =  min( p_Rps * et * eo * p_vum * fsat* Y3c(:) *RTc,0.25*RI_Fc(:))
+    r =  min( p_Rps * et * eo * p_vum * fsat* Y3c(:) *RTc,0.25_RLEN*RI_Fc(:))
     r =  r/(p_small + RI_Fc(:))
  
 
