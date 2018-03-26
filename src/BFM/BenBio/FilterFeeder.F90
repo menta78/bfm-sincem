@@ -39,7 +39,7 @@
 #ifdef INCLUDE_BENCO2
   use mem, ONLY: ppG3c
 #endif
- use mem,  ONLY: Source_D2_vector_ben
+
 #endif
 #ifdef BFM_GOTM
   use bio_var, ONLY: BOTindices
@@ -201,6 +201,7 @@
 
   food_ZI  =   p_ZI * ZI_Fc(:) * MM( ZI_Fc(:),  clu)
   food  =   food+ food_ZI
+  print*, 'Zi food ', food, food_ZI
 
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -215,6 +216,7 @@
   food_RI=RTc*p_R6
   food  =   food+ food_RI
 
+  print*, 'R6 food ', food, food_ZI
   !
 
   select case (sw_uptake)
@@ -385,7 +387,6 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Pelagic MicroZooplankton:
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
   choice  =   p_ZI* MM(  ZI_Fc(:),  clu)* fdepth
 
   ruZIc  =   ZI_Fc(:)* sgu* choice
@@ -402,7 +403,6 @@
   reZIc  =   ZI_Fc(:)* se_uZI* choice
   reZIn  =   ZI_Fn(:)* se_uZI* choice* eNC
   reZIp  =   ZI_Fp(:)* se_uZI* choice* ePC
-
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Pelagic Detritus
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -471,14 +471,12 @@
   ! Calculation of respiration:
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-  rrc  =   rrc+ p_pur*( foodpm2* sgu- retR6c- retQ6c)
+  rrc  =   rrc+ p_pur*( rgu- retR6c- retQ6c)
   
-  !jnetY3c(:)=rtY3c(:)- p_pur*( foodpm2* sgu- retR6c- retQ6c)-retQ6c-retR6c
 #ifdef INCLUDE_BENCO2 
   call flux_vector( iiBen, ppY3c,ppG3c, rrc*(ONE-p_pePel) )
 #endif
   call flux_vector(iiBen, ppG2o,ppG2o,-( rrc/ MW_C)* ( ONE-p_pePel))
-  call flux_vector(iiBen, ppY3c,ppY3c, -rrc*p_pePel )
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Calculation of mortality
@@ -539,8 +537,6 @@
   ren = max( ZERO, ren+ Y3n(:) -p_qn* Y3c(:))
   rep = max( ZERO, rep+ Y3p(:) -p_qp* Y3c(:))
 
-  call flux_vector( iiBen, ppY3n,ppY3n, -ren * p_pePel)
-  call flux_vector( iiBen, ppY3p,ppY3p, -rep * p_pePel)
   call flux_vector( iiBen, ppY3n,ppK4n,  ren * (ONE-p_pePel))
   call flux_vector( iiBen, ppY3p,ppK1p,  rep * (ONE-p_pePel))
 
@@ -594,7 +590,7 @@
   jRIY3p(:)  =   ruR6p  - retR6p
   ! The ruR6s which is uptaken by filter feeders is directly relased back 
   ! to R6: net food flux  from Y3 to/from R6 is 0
-  jRIY3s(:)  =  ZERO      - ruPIs
+  jRIY3s(:)  =  ZERO
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! excretion of food originating from the Pelagic realm is also a
@@ -609,7 +605,7 @@
 
   ! The silicate is directly transferred to Q6.s
   ! the ruPis which is put back in R6 is however sedimentating:
-  jbotR6s(:)  =   jbotR6s(:)- ruPIs- ruR6s
+  jbotR6s(:)  =   jbotR6s(:) -ruPIs -ruR6s
 
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
