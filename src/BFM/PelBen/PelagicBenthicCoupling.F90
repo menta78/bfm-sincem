@@ -122,6 +122,7 @@
    !
    ! At this point, if BENTHIC_BIO or BENTHIC_FULL has active Filter-Feeders
    ! jbotR6x will include the fluxes due to excretion and/or pseudofaeces
+   ! adn Inorganic nutrients fluxes due to starvation compasation of uptake
 
    ! loop over the number of bottom boxes
    BOXES_XY_LOOP : do Box = 1,NO_BOXES_XY

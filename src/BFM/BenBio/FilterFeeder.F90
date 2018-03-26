@@ -186,7 +186,6 @@
   food  =   p_small
 
   ! For phytoplankton:
-
   food_PT=ZERO
   do i=1,iiPhytoPlankton
      r =  PI_Benc(i,:) * MM( PI_Benc(i,:),  clu)
@@ -198,7 +197,6 @@
   food  =   food  + food_PT(:)
 
   ! For microzooplankton:
-
   food_ZI  =   p_ZI * ZI_Fc(:) * MM( ZI_Fc(:),  clu)
   food  =   food+ food_ZI
 
@@ -420,7 +418,6 @@
   reR6n  =   RI_Fn(:)* se_uQ6* choice *eNC
   reR6p  =   RI_Fp(:)* se_uQ6* choice *ePC
 
-
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Benthic Detritus
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -508,25 +505,21 @@
   r=ZERO
 
   where ( ren< ZERO)
-
     reQ6c  =  - ren/ p_qn
     r      =   r + reQ6c
     rtY3c  =   rtY3c- reQ6c
 
     ren  =   rtY3n- rtY3c* p_qn
     rep  =   rtY3p- rtY3c* p_qp
-
   end where
 
   where ( rep< ZERO)
-
     reQ6c  =  - rep/ p_qp
     r      =   r   + reQ6c
     rtY3c  =   rtY3c- reQ6c
 
     ren  =   rtY3n- rtY3c* p_qn
     rep  =   rtY3p- rtY3c* p_qp
-
   end where
  
   retQ6c= retQ6c +r * retQ6c/(p_small + retQ6c + retR6c);
@@ -586,9 +579,9 @@
   jRIY3c(:)  =   ruR6c  - retR6c
   jRIY3n(:)  =   ruR6n  - retR6n
   jRIY3p(:)  =   ruR6p  - retR6p
-  ! The ruR6s which is uptaken by filter feeders is directly relased back 
-  ! to R6: net food flux  from Y3 to/from R6 is 0
-  jRIY3s(:)  =  ZERO -ruPIs
+  ! The silica uptaken from pythoplankton is directly released back to R6 
+  ! (and removed here below at bottom boundary layer)
+  jRIY3s(:)  =  ZERO - ruPIs
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! excretion of food originating from the Pelagic realm is also a
@@ -601,10 +594,8 @@
   jbotR6n(:)  =   jbotR6n(:)- retR6n* (ONE-p_pR6Pel)
   jbotR6p(:)  =   jbotR6p(:)- retR6p* (ONE-p_pR6Pel)
 
-  ! The silicate is directly transferred to Q6.s
-  ! the ruPis which is put back in R6 is however sedimentating:
+  ! ruPis is put back in R6 (and buried to Q6s in PelagicBenthicCoupling)
   jbotR6s(:)  =   jbotR6s(:) -ruPIs -ruR6s
-
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! The pseudo faeces production lead only to a flux to sediments via R6x
@@ -615,7 +606,6 @@
     
     r =  min( p_Rps * et * eo * p_vum * fsat* Y3c(:) *RTc,0.25_RLEN*RI_Fc(:))
     r =  r/(p_small + RI_Fc(:))
- 
 
     reR6c=  max(ZERO,r * RI_Fc(:) -ruR6c)
     reR6n=  max(ZERO,r * RI_Fn(:) -ruR6n)
