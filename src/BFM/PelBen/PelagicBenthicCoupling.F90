@@ -142,20 +142,20 @@
             if ( lcl_PhytoPlankton(kbot) > p_small) then
                uptake = jPIY3c(i,Box)
                j = ppPhytoPlankton(i,iiC)
-               PELBOTTOM(j,Box) = PELBOTTOM(j,Box) - uptake
+               PELBOTTOM(j,Box) = - uptake
                j = ppPhytoPlankton(i,iiN) 
-               PELBOTTOM(j,Box) = PELBOTTOM(j,Box) - uptake*qncPPY(i,kbot)
+               PELBOTTOM(j,Box) = - uptake*qncPPY(i,kbot)
                j = ppPhytoPlankton(i,iiP)
-               PELBOTTOM(j,Box) = PELBOTTOM(j,Box) - uptake*qpcPPY(i,kbot)
+               PELBOTTOM(j,Box) = - uptake*qpcPPY(i,kbot)
                j = ppPhytoPlankton(i,iiL)
-               PELBOTTOM(j,Box) = PELBOTTOM(j,Box) - uptake*qlcPPY(i,kbot)
+               PELBOTTOM(j,Box) = - uptake*qlcPPY(i,kbot)
                j = ppPhytoPlankton(i,iiS)
                if ( j > 0) &
-                  PELBOTTOM(j,Box) = PELBOTTOM(j,Box) - uptake*qscPPY(i,kbot)
+                  PELBOTTOM(j,Box) = - uptake*qscPPY(i,kbot)
 #ifdef INCLUDE_PELFE
                j = ppPhytoPlankton(i,iiF)
                if ( j > 0) & 
-                  PELBOTTOM(j,Box) = PELBOTTOM(j,Box) - uptake*qfcPPY(i,kbot)
+                  PELBOTTOM(j,Box) = - uptake*qfcPPY(i,kbot)
 #endif
             end if
          end do
@@ -197,38 +197,38 @@
             ! carbon
             j=ppPhytoPlankton(i,iiC)
             ruQc = sedi* lcl_PhytoPlankton(kbot)
-            PELBOTTOM(j,Box)   = - ruQc
+            PELBOTTOM(j,Box)   = PELBOTTOM(j,Box) - ruQc
             jbotR1PPY(iiC,Box) = jbotR1PPY(iiC,Box) - ruQc * p_pe_R1c
             jbotR6PPY(iiC,Box) = jbotR6PPY(iiC,Box) - ruQc * (ONE - p_pe_R1c)
             ! nitrogen
             j=ppPhytoPlankton(i,iiN)
             ruQn = ruQc * qncPPY(i,kbot)
-            PELBOTTOM(j,Box)   = - ruQn
+            PELBOTTOM(j,Box)   = PELBOTTOM(j,Box) - ruQn
             jbotR1PPY(iiN,Box) = jbotR1PPY(iiN,Box) - ruQn * p_pe_R1n
             jbotR6PPY(iiN,Box) = jbotR6PPY(iiN,Box) - ruQn * (ONE - p_pe_R1n)
             ! phosphorus
             j=ppPhytoPlankton(i,iiP)
             ruQp = ruQc * qpcPPY(i,kbot)
-            PELBOTTOM(j,Box)   = - ruQp
+            PELBOTTOM(j,Box)   = PELBOTTOM(j,Box) - ruQp
             jbotR1PPY(iiP,Box) = jbotR1PPY(iiP,Box) - ruQp * p_pe_R1p
             jbotR6PPY(iiP,Box) = jbotR6PPY(iiP,Box) - ruQp * (ONE - p_pe_R1p)
             ! chlorophyll (stored but not used)
             j=ppPhytoPlankton(i,iiL)
             ruQl = ruQc * qlcPPY(i,kbot)
             j=ppPhytoPlankton(i,iiL)
-            PELBOTTOM(j,Box)=  - ruQl
+            PELBOTTOM(j,Box)=  PELBOTTOM(j,Box) - ruQl
             ! silica
             j=ppPhytoPlankton(i,iiS)
             if ( j> 0) then
                ruQs = ruQc * qscPPY(i,kbot)
-               PELBOTTOM(j,Box)   = - ruQs
+               PELBOTTOM(j,Box)   = PELBOTTOM(j,Box) - ruQs
                jbotR6PPY(iiS,Box) = jbotR6PPY(iiS,Box) - ruQs
             end if
 #ifdef INCLUDE_PELFE
             j=ppPhytoPlankton(i,iiF)
             if ( j> 0) then
                ruQf = ruQc * qfcPPY(i,kbot)
-               PELBOTTOM(j,Box)   = - ruQf
+               PELBOTTOM(j,Box)   = PELBOTTOM(j,Box) - ruQf
                jbotR6PPY(iiF,Box) = jbotR6PPY(iiF,Box) - ruQf ! split also to R1 ?
             end if
 #endif

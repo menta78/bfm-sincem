@@ -588,7 +588,7 @@
   jRIY3p(:)  =   ruR6p  - retR6p
   ! The ruR6s which is uptaken by filter feeders is directly relased back 
   ! to R6: net food flux  from Y3 to/from R6 is 0
-  jRIY3s(:)  =  ZERO
+  jRIY3s(:)  =  ZERO -ruPIs
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! excretion of food originating from the Pelagic realm is also a
