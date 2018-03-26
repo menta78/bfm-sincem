@@ -25,7 +25,8 @@
 #else
   use mem, ONLY: R6c, R6n, R6p, R6s, N1p, N3n, N4n, N5s, N6r, O2o, &
     iiPhytoPlankton, ppPhytoPlankton, PhytoPlankton, D2STATE_BEN, &
-    iiMicroZooPlankton, ppMicroZooPlankton, MicroZooPlankton
+    iiMicroZooPlankton, ppMicroZooPlankton, MicroZooPlankton, &
+    qncMIZ, qpcMIZ
   use mem, ONLY: ppR6c, ppR6n, ppR6p, ppR6s, ppN1p, ppN3n, &
     ppN4n, ppN5s, ppN6r, ppO2o, &
     ETW, ESW, ERHO, ETW_Ben, ESW_Ben, ERHO_Ben, &
@@ -37,7 +38,6 @@
     use mem, ONLY: O3c_Ben,O3c,O3h_Ben,O3h
 #endif
 #endif
-  use mem_MicroZoo, ONLY:p_qncMIZ,p_qpcMIZ
   use mem_Param,  ONLY: p_small
 #ifdef BFM_GOTM
   use bio_var, ONLY: BOTindices
@@ -131,14 +131,14 @@
            lcl_MicroZooPlankton => MicroZooPlankton(i,iiN)
            ZI_Fn(:)  =   ZI_Fn(:)+ lcl_MicroZooPlankton(BOTindices)
         else
-           ZI_Fn(:)  =   ZI_Fn(:)+ lcl_MicroZooPlankton(BOTindices)*p_qncMIZ(i)
+           ZI_Fn(:)  =   ZI_Fn(:)+ lcl_MicroZooPlankton(BOTindices)*qncMIZ(i,:)
         endif
         j = ppMicroZooPlankton(i,iiP)
         if ( j> 0) then
           lcl_MicroZooPlankton => MicroZooPlankton(i,iiP)
           ZI_Fp(:)  =   ZI_Fp(:)+ lcl_MicroZooPlankton(BOTindices)
         else
-          ZI_Fp(:)  =   ZI_Fp(:)+ lcl_MicroZooPlankton(BOTindices)*p_qpcMIZ(i)
+          ZI_Fp(:)  =   ZI_Fp(:)+ lcl_MicroZooPlankton(BOTindices)*qpcMIZ(i,:)
         endif
       enddo
 

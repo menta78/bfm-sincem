@@ -201,7 +201,6 @@
 
   food_ZI  =   p_ZI * ZI_Fc(:) * MM( ZI_Fc(:),  clu)
   food  =   food+ food_ZI
-  print*, 'Zi food ', food, food_ZI
 
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -215,8 +214,6 @@
   RTc=r*corr
   food_RI=RTc*p_R6
   food  =   food+ food_RI
-
-  print*, 'R6 food ', food, food_ZI
   !
 
   select case (sw_uptake)
@@ -403,6 +400,7 @@
   reZIc  =   ZI_Fc(:)* se_uZI* choice
   reZIn  =   ZI_Fn(:)* se_uZI* choice* eNC
   reZIp  =   ZI_Fp(:)* se_uZI* choice* ePC
+
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Pelagic Detritus
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
