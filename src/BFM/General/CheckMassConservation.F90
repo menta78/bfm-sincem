@@ -23,6 +23,7 @@
   use constants,    ONLY: MW_C, MW_P, MW_N, MW_SI
   use mem
   use mem_Param,    ONLY: CalcBenthicFlag,p_d_tot
+  use time, only: bfmtime
 
 !
 !
@@ -213,26 +214,29 @@
      initials = totsyss(1)
   else
      prec = precision(prevsysc)
-     write(LOGUNIT,*) "---> CheckMassConservation"
-     write(LOGUNIT,*) "---> defined precision digits: sp=6 dp=12; operational: ",prec
-     write(LOGUNIT,"(A,2D22.15)") "---> C:",totsysc(1),prevsysc
-     write(LOGUNIT,"(A,2D22.15)") "---> N:",totsysn(1),prevsysn
+     write(LOGUNIT,*) ""
+     write(LOGUNIT,*) "Check Mass Conservation at step ", bfmtime%stepnow
+     write(LOGUNIT,"(a,i6,a,1D15.8)") "---> Using precision digits ",prec, ", specified precision threshold ", p_prec
+     write(LOGUNIT,"(15x,A,15x,A)")  "Current", "Previous" 
+     write(LOGUNIT,"(A,2D22.15)") "---> C :",totsysc(1),prevsysc
+     write(LOGUNIT,"(A,2D22.15)") "---> N :",totsysn(1),prevsysn
      if (abs(totsysn(1)/initialn-ONE)>p_prec) then
         flag = .TRUE.
-        write(LOGUNIT,*) "------> Change in N larger than specified precision:",p_prec,totsysn(1)/initialn-ONE
+        write(LOGUNIT,"(A,1D22.15)") "------> Change in N larger than specified precision : ",totsysn(1)/initialn-ONE
      end if
-     write(LOGUNIT,"(A,2D22.15)") "---> P:",totsysp(1),prevsysp
+     write(LOGUNIT,"(A,2D22.15)") "---> P :",totsysp(1),prevsysp
      if (abs(totsysp(1)/initialp-ONE)>p_prec) then
         flag = .TRUE.
-        write(LOGUNIT,*) "------> Change in P larger than specified precision:",p_prec,totsysp(1)/initialp-ONE
+        write(LOGUNIT,"(A,1D22.15)") "------> Change in P larger than specified precision : ",totsysp(1)/initialp-ONE
      end if
      write(LOGUNIT,"(A,2D22.15)") "---> Si:",totsyss(1),prevsyss
      if (abs(totsyss(1)/initials-ONE)>p_prec) then
         flag = .TRUE.
-        write(LOGUNIT,*) "------> Change in Si larger than specified precision:",p_prec,totsyss(1)/initials-ONE
+        write(LOGUNIT,"(A,1D22.15)") "------> Change in Si larger than specified precision : ",totsyss(1)/initials-ONE
      end if
      if (flag)  then
-        write(LOGUNIT,*) "Check also usage of AssignAirPelFluxesInBFMFlag and AssignPelBenFluxesInBFMFlag in BFM_General.nml"
+        write(LOGUNIT,*) ""
+        write(LOGUNIT,*) "Check also BFM_General.nml settings!"
         call flush(LOGUNIT)
         stop "Mass conservation violation in BFM! Check log file."
      end if
