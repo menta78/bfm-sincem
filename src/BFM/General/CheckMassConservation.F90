@@ -216,6 +216,7 @@
      prec = precision(prevsysc)
      write(LOGUNIT,*) ""
      write(LOGUNIT,*) "Check Mass Conservation at step ", bfmtime%stepnow
+     if (bfmtime%stepnow ==  bfmtime%step0) & 
      write(LOGUNIT,"(a,i6,a,1D15.8)") "---> Using precision digits ",prec, ", specified precision threshold ", p_prec
      write(LOGUNIT,"(15x,A,15x,A)")  "Current", "Previous" 
      write(LOGUNIT,"(A,2D22.15)") "---> C :",totsysc(1),prevsysc
