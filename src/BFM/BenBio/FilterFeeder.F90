@@ -162,7 +162,6 @@
   real(RLEN),dimension(NO_BOXES_XY)  :: ruQ6p
   real(RLEN),dimension(NO_BOXES_XY)  :: su
   real(RLEN),dimension(NO_BOXES_XY)  :: r
-  real(RLEN),dimension(NO_BOXES_XY)  :: puf
   real(RLEN),dimension(NO_BOXES_XY)  :: fsat ! filtering saturation : at high feed levels less filtering
                                              ! is necessairy
   real(RLEN),dimension(NO_BOXES_XY)  :: netto
@@ -253,7 +252,7 @@
      rgu  =max( p_su* eO* eF,p_srr)* Y3c(:)* et
 
      fsat=ONE;
-     rrc = max(eo * p_sra, p_srr)* Y3c(:)* et
+     rrc = max(eo * su * p_sra, p_srr)* Y3c(:)* et
 
    case(2)
      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -270,7 +269,7 @@
      su  =  et* eO*  p_su* MM(  p_vum* food,  p_su)
      fsat=MM(p_su,p_vum*food)
      rgu= su *Y3c(:)
-     rrc = max(eo * p_sra*fsat, p_srr)* Y3c(:)* et
+     rrc = max(eo * su * p_sra*fsat, p_srr)* Y3c(:)* et
      foodpm2 =food*fdepth
    case(3)
      fdepth=Depth_Ben(:)
@@ -280,7 +279,7 @@
      su=su * insw(netto * su / p_su - p_sra);
      fsat=MM(p_su,p_vum*food)
      rgu= et* eO*  su *Y3c(:)
-     rrc = max(eo * p_sra*fsat, p_srr)* Y3c(:)* et
+     rrc = max(eo * su * p_sra*fsat, p_srr)* Y3c(:)* et
      foodpm2 =food*fdepth
    case(4)
      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -302,11 +301,10 @@
      cmm = ZERO;
 
      fdepth=Depth_Ben(:)
-     puf = p_sra/p_su; ! fraction of activity cost for filtering
 
      netto= (ONE-(p_pueQ6*RI_Fc(:)*sfood_RI+p_puePI*food_PT + &
         p_pueZI*ZI_Fc(:)*sfood_ZI)/food ) * (ONE-p_pur)
-     r= netto /(p_sra*p_su) * MM(p_vum * food, p_su) - 1._RLEN ! ?????
+     r= netto / p_sra * MM(p_vum * food, p_su) - 1._RLEN
 
      r=min(ONE,max(1.0e-6_RLEN,r))
 
@@ -319,7 +317,7 @@
      ! filtering saturation ( high at low , low at hight food)
      fsat=su/(p_small+ et*eo*p_vum*food);
      ! Calculate cost of energy based on realized rate of uptake.
-     rrc = max(eo * p_su*puf*fsat, p_srr)* Y3c(:)* et
+     rrc = max(eo * su * p_sra, p_srr)* Y3c(:)* et
 
      foodpm2 =food*fdepth
   end select
