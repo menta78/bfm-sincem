@@ -252,7 +252,7 @@
      rgu  =max( p_su* eO* eF,p_srr)* Y3c(:)* et
 
      fsat=ONE;
-     rrc = max(eo * su * p_sra, p_srr)* Y3c(:)* et
+     rrc = max(eo * p_su * eF * p_sra, p_srr)* Y3c(:)* et
 
    case(2)
      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
