@@ -175,7 +175,7 @@
 
   et  =   eTq(  ETW_Ben(:),  p_q10)
 
-  eo  =   MM_power(  max(p_small,O2o_Ben(:)),  p_clO2o,3)
+  eo  =   MM_power(  O2o_Ben(:),  p_clO2o,3)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Calculate total food Cfluxes!
