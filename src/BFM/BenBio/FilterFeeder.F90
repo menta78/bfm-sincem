@@ -521,8 +521,10 @@
     rep  =   rtY3p- rtY3c* p_qp
   end where
 
-  retQ6c= retQ6c +r * retQ6c/(p_small + retQ6c + retR6c);
-  retR6c= retR6c +r * retR6c/(p_small + retQ6c + retR6c);
+  where ((retQ6c + retR6c) > p_small )
+     retQ6c= retQ6c +r * retQ6c/(retQ6c + retR6c);
+     retR6c= retR6c +r * retR6c/(retQ6c + retR6c);
+  end where
 
   ren = max( ZERO, ren+ Y3n(:) -p_qn* Y3c(:))
   rep = max( ZERO, rep+ Y3p(:) -p_qp* Y3c(:))
