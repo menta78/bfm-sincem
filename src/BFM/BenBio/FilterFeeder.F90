@@ -605,8 +605,8 @@
 
   if ( sw_uptake /= 1) then
 
-    r =  min( p_Rps * et * eo * p_vum * fsat* Y3c(:) *RTc*RI_Fc(:),0.25_RLEN*RI_Fc(:))
-    r =  r/(p_small + RI_Fc(:))
+    r =  min( p_Rps * et * eo * p_vum * fsat* Y3c(:) *RTc,0.25_RLEN)
+
 
     reR6c=  max(ZERO,r * RI_Fc(:) -ruR6c)
     reR6n=  max(ZERO,r * RI_Fn(:) -ruR6n)
