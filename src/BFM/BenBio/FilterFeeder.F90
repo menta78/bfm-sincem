@@ -1,7 +1,7 @@
 #include "DEBUG.h"
 #include "INCLUDE.h"
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-! MODEL  BFM - Biogeochemical Flux Model 
+! MODEL  BFM - Biogeochemical Flux Model
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 !BOP
 !
@@ -30,7 +30,7 @@
   use mem, ONLY: ppY3c, ppY3n, ppY3p, ppQ6c, ppQ6n, ppQ6p, ppQ6s, ppG2o, ppK4n,O2o_Ben, &
     ppK1p, ppD6m, ppD7m, ppD8m, ppD9m, ppD1m, rrBTo, reBTn, reBTp, jbotR6c, jbotR6n, &
     jbotR6p, jbotR6s, jPIY3c, jZIY3c, jRIY3c, jRIY3n, jRIY3p, jRIY3s, ETW_Ben, &
-    iiPhytoPlankton, PI_Benc, PI_Benn, PI_Benp, PI_Bens, sediPPY_Ben, sediR6_Ben, & 
+    iiPhytoPlankton, PI_Benc, PI_Benn, PI_Benp, PI_Bens, sediPPY_Ben, sediR6_Ben, &
     ZI_Fc, RI_Fc, ZI_Fn, ZI_Fp, RI_Fn, RI_Fp, RI_Fs, &
     NO_BOXES_XY, Depth_ben, iiBen, iiPel, flux_vector, jbotO2o,jbotN1p,jbotN4n
 #ifdef INCLUDE_PELCO2
@@ -56,14 +56,14 @@
 
 !
 ! !AUTHORS
-!   W. Ebenhoeh and C. Kohlmeier 
+!   W. Ebenhoeh and C. Kohlmeier
 !
 !
 ! !REVISION_HISTORY
 !   !
 !
 ! COPYING
-!   
+!
 !   Copyright (C) 2015 BFM System Team (bfm_st@lists.cmcc.it)
 !   Copyright (C) 2006 P. Ruardij, M. Vichi
 !   (rua@nioz.nl, vichi@bo.ingv.it)
@@ -101,11 +101,11 @@
   real(RLEN),dimension(NO_BOXES_XY)  :: ePC
   real(RLEN),dimension(NO_BOXES_XY)  :: foodpm2
   real(RLEN),dimension(NO_BOXES_XY)  :: food
-  real(RLEN),dimension(iiPhytoPlankton,NO_BOXES_XY)  :: food_PIc
+  real(RLEN),dimension(iiPhytoPlankton,NO_BOXES_XY)  :: sfood_PI
   real(RLEN),dimension(NO_BOXES_XY)  :: food_PT
-  real(RLEN),dimension(NO_BOXES_XY)  :: food_ZI
-  real(RLEN),dimension(NO_BOXES_XY)  :: food_RI
-  real(RLEN),dimension(NO_BOXES_XY)  :: food_Q6
+  real(RLEN),dimension(NO_BOXES_XY)  :: sfood_ZI
+  real(RLEN),dimension(NO_BOXES_XY)  :: sfood_RI
+  real(RLEN),dimension(NO_BOXES_XY)  :: sfood_Q6
   real(RLEN),dimension(NO_BOXES_XY)  :: availQ6_c
   real(RLEN),dimension(NO_BOXES_XY)  :: availQ6_n
   real(RLEN),dimension(NO_BOXES_XY)  :: availQ6_p
@@ -163,8 +163,8 @@
   real(RLEN),dimension(NO_BOXES_XY)  :: su
   real(RLEN),dimension(NO_BOXES_XY)  :: r
   real(RLEN),dimension(NO_BOXES_XY)  :: puf
-  real(RLEN),dimension(NO_BOXES_XY)  :: fsat ! filtering saturation : at high feed levels less filtering 
-                                             ! is necessairy 
+  real(RLEN),dimension(NO_BOXES_XY)  :: fsat ! filtering saturation : at high feed levels less filtering
+                                             ! is necessairy
   real(RLEN),dimension(NO_BOXES_XY)  :: netto
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
@@ -188,17 +188,17 @@
   ! For phytoplankton:
   food_PT=ZERO
   do i=1,iiPhytoPlankton
-     r =  PI_Benc(i,:) * MM( PI_Benc(i,:),  clu)
-     call CorrectConcNearBed(Depth_Ben(:), sediPPY_Ben(i,:), p_height, & 
-                                    p_max, p_vum*et*Y3c(:), corr)
-     food_PIc(i,:)=r*corr*p_PI
-     food_PT(:)  =   food_PT(:)+ food_PIc(i,:)
+     r =  MM( PI_Benc(i,:),  clu)
+     call CorrectConcNearBed(Depth_Ben(:), sediPPY_Ben(i,:), p_height, &
+                                  p_max, p_vum*et*Y3c(:), corr)
+     sfood_PI(i,:)=corr*p_PI
+     food_PT(:)  =   food_PT(:)+ PI_Benc(i,:) * sfood_PI(i,:)
   enddo
   food  =   food  + food_PT(:)
 
   ! For microzooplankton:
-  food_ZI  =   p_ZI * ZI_Fc(:) * MM( ZI_Fc(:),  clu)
-  food  =   food+ food_ZI
+  sfood_ZI  =   p_ZI * MM( ZI_Fc(:),  clu)
+  food  =   food+ ZI_Fc(:) * sfood_ZI
 
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -206,12 +206,12 @@
   ! and add it to the total amount of food
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-  r=   RI_Fc(:)* MM( RI_Fc(:),  clu)
-  call CorrectConcNearBed(Depth_Ben(:), sediR6_Ben(:), p_height, & 
+  r=   MM( RI_Fc(:),  clu)
+  call CorrectConcNearBed(Depth_Ben(:), sediR6_Ben(:), p_height, &
                                     p_max, p_vum*et*Y3c(:), corr)
   RTc=r*corr
-  food_RI=RTc*p_R6
-  food  =   food+ food_RI
+  sfood_RI=RTc*p_R6
+  food  =   food+ RI_Fc(:)* sfood_RI
   !
 
   select case (sw_uptake)
@@ -234,8 +234,8 @@
     availQ6_n  =   Q6n(:)* PartQ(  D7m(:),  clm,  cmm,  p_d_tot)
     availQ6_p  =   Q6p(:)* PartQ(  D8m(:),  clm,  cmm,  p_d_tot)
 
-    food_Q6  =   p_puQ6* availQ6_c* MM(  availQ6_c,  clu)
-    foodpm2  =   foodpm2+ food_Q6
+    sfood_Q6  =   p_puQ6 * MM(  availQ6_c,  clu)
+    foodpm2  =   foodpm2 + sfood_Q6
 
     cmm  =  ( p_clm+ p_cm)* 0.5D+00
 
@@ -252,7 +252,7 @@
      ! The minimal uptake rate is equal to rest respiration.
      ! With filtering the filterfeeder provide himself also with oxygen.
      rgu  =max( p_su* eO* eF,p_srr)* Y3c(:)* et
-    
+
      fsat=ONE;
      rrc = max(eo * p_sra, p_srr)* Y3c(:)* et
 
@@ -263,7 +263,7 @@
      !  the maximum growth rate and the volume filtered.
      !
      !  It is assumed that the detritus sedimentation is defined as a net process
-     !  ( p_bursel << P_sediR6). Therefore it assumed that filterfeeders do not eat Q6.  
+     !  ( p_bursel << P_sediR6). Therefore it assumed that filterfeeders do not eat Q6.
      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
      cmm = ZERO;
 
@@ -276,7 +276,8 @@
    case(3)
      fdepth=Depth_Ben(:)
      su  =  p_su* MM(  p_vum* food,  p_su)
-     netto= (ONE-(p_pueQ6*food_RI+p_puePI*food_PT +p_pueZI*food_ZI)/food ) * (ONE-p_pur);
+     netto= (ONE-(p_pueQ6*RI_Fc(:)*sfood_RI+p_puePI*food_PT + &
+        p_pueZI*ZI_Fc(:)*sfood_ZI)/food ) * (ONE-p_pur)
      su=su * insw(netto * su-p_sra);
      fsat=min(ONE,su/(p_vum*food));
      rgu= et* eO*  su *Y3c(:)
@@ -287,29 +288,30 @@
      !  Alternative food uptake as in zooplankton:
      !  using the modifed Holling response equation which take into account
      !  the maximum growth rate and the volume filtered.
-     !  Further is assumed that the filterfeeder (nearly) stop filtering as soon as  
+     !  Further is assumed that the filterfeeder (nearly) stop filtering as soon as
      !  the costs for filtering are lower than the profit
      !  For this we solve the next equation in which r is the unknown:
      !    (left side == profit , right side=costs)
-     !    r* p_su* MM(  p_vum* food,  r* p_su)* Y3c(:)*netto = p_sra *r 
+     !    r* p_su* MM(  p_vum* food,  r* p_su)* Y3c(:)*netto = p_sra *r
      !  If r > ONE : there is enough food to grow
-     !  if r < ONE : there is balance between costs and profit if r*p_puf*sgu 
+     !  if r < ONE : there is balance between costs and profit if r*p_puf*sgu
      !  is larger than the rest respiration.
      !
      !  It is assumed that the detritus sedimentation is defined as a netto process
-     !  (p_bursel<< P_sediR6). Therefore it is assumed that filterfeeders do not eat Q6.  
+     !  (p_bursel<< P_sediR6). Therefore it is assumed that filterfeeders do not eat Q6.
      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
      cmm = ZERO;
 
      fdepth=Depth_Ben(:)
-     puf = p_sra/p_su;
+     puf = p_sra/p_su; ! fraction of activity cost for filtering
 
-     netto= (ONE-(p_pueQ6*food_RI+p_puePI*food_PT +p_pueZI*food_ZI)/food ) * (ONE-p_pur);
-     r= netto /puf - p_su/(p_vum *food);
+     netto= (ONE-(p_pueQ6*RI_Fc(:)*sfood_RI+p_puePI*food_PT + &
+        p_pueZI*ZI_Fc(:)*sfood_ZI)/food ) * (ONE-p_pur);
+     r= netto /puf - p_su/(p_vum *food); ! ?????
 
      r=min(ONE,max(1.0e-6_RLEN,r));
 
-     ! Calculate relative uptake
+     ! Calculate relative uptake, harmonic mean of max metabolic capacity and availability
      su= ONE/( ONE/(p_small+ r* p_vum *food * et *eO ) + ONE/(p_small+ p_su *et *eO  ))  ;
      ! The minimal uptake rate is equal to rest respiration.
      ! With filtering the filterfeeder provide himself also with oxygen.
@@ -319,7 +321,7 @@
      fsat=su/(p_small+ et*eo*p_vum*food);
      ! Calculate cost of energy based on realized rate of uptake.
      rrc = max(eo * p_su*puf*fsat, p_srr)* Y3c(:)* et
-     
+
      foodpm2 =food*fdepth
   end select
 
@@ -363,7 +365,7 @@
   rePIp  =   ZERO
 
   do i=1,iiPhytoPlankton
-    choice=food_PIc(i,:)* fdepth/(p_small + PI_Benc(i,:))
+    choice=sfood_PI(i,:)* fdepth
     jPIY3c(i,:) =       PI_Benc(i,:)* sgu* choice
     ruPIc  = ruPIc  +   PI_Benc(i,:)* sgu* choice
     ruPIn  = ruPIn  +   PI_Benn(i,:)* sgu* choice
@@ -371,8 +373,8 @@
     ruPIs  = ruPIs  +   PI_Bens(i,:)* sgu* choice
 
     rePIc  = rePIc  +   PI_Benc(i,:)* se_uPI* choice
-    rePIn  = rePIn  +   PI_Benn(i,:)* se_uPI* choice*eNC 
-    rePIp  = rePIp  +   PI_Benp(i,:)* se_uPI* choice*ePC 
+    rePIn  = rePIn  +   PI_Benn(i,:)* se_uPI* choice*eNC
+    rePIp  = rePIp  +   PI_Benp(i,:)* se_uPI* choice*ePC
   enddo
 
   call flux_vector( iiBen, ppY3c,ppY3c, ruPIc )
@@ -382,7 +384,7 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Pelagic MicroZooplankton:
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  choice  =   p_ZI* MM(  ZI_Fc(:),  clu)* fdepth
+  choice  =   sfood_ZI * fdepth
 
   ruZIc  =   ZI_Fc(:)* sgu* choice
   ruZIn  =   ZI_Fn(:)* sgu* choice
@@ -403,7 +405,7 @@
   ! Pelagic Detritus
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-  choice  =   food_RI * fdepth/(p_small+RI_Fc(:))
+  choice  =   sfood_RI * fdepth
 
   ruR6c  =   RI_Fc(:)* sgu* choice
   ruR6n  =   RI_Fn(:)* sgu* choice
@@ -423,7 +425,7 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
   if ( sw_uptake == 1) then
-    choice  =   p_puQ6* MM(  availQ6_c,  clu)
+    choice  =   sfood_Q6
 
     ruQ6c  =   sgu* choice* availQ6_c
     ruQ6n  =   sgu* choice* availQ6_n
@@ -467,8 +469,8 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
   rrc  =   rrc+ p_pur*( rgu- retR6c- retQ6c)
-  
-#ifdef INCLUDE_BENCO2 
+
+#ifdef INCLUDE_BENCO2
   call flux_vector( iiBen, ppY3c,ppG3c, rrc*(ONE-p_pePel) )
 #endif
   call flux_vector(iiBen, ppG2o,ppG2o,-( rrc/ MW_C)* ( ONE-p_pePel))
@@ -487,7 +489,7 @@
   retQ6n  =   retQ6n+ reQ6n
   retQ6p  =   retQ6p+ reQ6p
 
-  ! In case of a negative value of one of the following values there is a 
+  ! In case of a negative value of one of the following values there is a
   ! situation of starvation and very low biomass values.
   ! Check on quota in the food is out of order
 
@@ -499,8 +501,8 @@
   ! Calculation of nutrient release and correction of C:N:P
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-  ren  =   rtY3n- rtY3c* p_qn 
-  rep  =   rtY3p- rtY3c* p_qp 
+  ren  =   rtY3n- rtY3c* p_qn
+  rep  =   rtY3p- rtY3c* p_qp
 
   r=ZERO
 
@@ -521,7 +523,7 @@
     ren  =   rtY3n- rtY3c* p_qn
     rep  =   rtY3p- rtY3c* p_qp
   end where
- 
+
   retQ6c= retQ6c +r * retQ6c/(p_small + retQ6c + retR6c);
   retR6c= retR6c +r * retR6c/(p_small + retQ6c + retR6c);
 
@@ -579,13 +581,13 @@
   jRIY3c(:)  =   ruR6c  - retR6c
   jRIY3n(:)  =   ruR6n  - retR6n
   jRIY3p(:)  =   ruR6p  - retR6p
-  ! The silica uptaken from pythoplankton is directly released back to R6 
+  ! The silica uptaken from pythoplankton is directly released back to R6
   ! (and removed here below at bottom boundary layer)
   jRIY3s(:)  =  ZERO
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! excretion of food originating from the Pelagic realm is also a
-  ! sedimentation from from pelagic to benthic, and thus is 
+  ! sedimentation from from pelagic to benthic, and thus is
   ! added to the total benthic boundary flux
   ! jbot< 0 : flux out of the system
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -603,8 +605,8 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
   if ( sw_uptake /= 1) then
-    
-    r =  min( p_Rps * et * eo * p_vum * fsat* Y3c(:) *RTc,0.25_RLEN*RI_Fc(:))
+
+    r =  min( p_Rps * et * eo * p_vum * fsat* Y3c(:) *RTc*RI_Fc(:),0.25_RLEN*RI_Fc(:))
     r =  r/(p_small + RI_Fc(:))
 
     reR6c=  max(ZERO,r * RI_Fc(:) -ruR6c)
@@ -622,5 +624,5 @@
   end subroutine FilterFeederDynamics
 !EOC
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-! MODEL  BFM - Biogeochemical Flux Model 
+! MODEL  BFM - Biogeochemical Flux Model
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
