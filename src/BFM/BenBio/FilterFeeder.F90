@@ -248,7 +248,7 @@
      ! Correction of growth rate for environmental factors:
      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-     ! The minimal uptake rate is equal to rest respiration.
+     ! The minimal uptake rate is equal to rest respiration. (i.e. not limited by food, bad!)
      ! With filtering the filterfeeder provide himself also with oxygen.
      rgu  =max( p_su* eO* eF,p_srr)* Y3c(:)* et
 
@@ -268,7 +268,7 @@
 
      fdepth=Depth_Ben(:)
      su  =  et* eO*  p_su* MM(  p_vum* food,  p_su)
-     fsat=min(ONE,su/(et*eo*p_vum*food))
+     fsat=MM(p_su,p_vum*food)
      rgu= su *Y3c(:)
      rrc = max(eo * p_sra*fsat, p_srr)* Y3c(:)* et
      foodpm2 =food*fdepth
@@ -278,7 +278,7 @@
      netto= (ONE-(p_pueQ6*RI_Fc(:)*sfood_RI+p_puePI*food_PT + &
         p_pueZI*ZI_Fc(:)*sfood_ZI)/food ) * (ONE-p_pur)
      su=su * insw(netto * su-p_sra);
-     fsat=min(ONE,su/(p_vum*food));
+     fsat=MM(p_su,p_vum*food)
      rgu= et* eO*  su *Y3c(:)
      rrc = max(eo * p_sra*fsat, p_srr)* Y3c(:)* et
      foodpm2 =food*fdepth
