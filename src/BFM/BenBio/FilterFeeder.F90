@@ -182,7 +182,6 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
   clu=p_clu+p_small;
-  if ( sw_uptake == 1 ) clu=p_clu/p_dwat;
   food  =   p_small
 
   ! For phytoplankton:
@@ -234,7 +233,7 @@
     availQ6_n  =   Q6n(:)* PartQ(  D7m(:),  clm,  cmm,  p_d_tot)
     availQ6_p  =   Q6p(:)* PartQ(  D8m(:),  clm,  cmm,  p_d_tot)
 
-    sfood_Q6  =   p_puQ6 * MM(  availQ6_c,  clu)
+    sfood_Q6  =   p_puQ6 * MM(  availQ6_c,  clu * fdepth)
     foodpm2  =   foodpm2 + sfood_Q6
 
     cmm  =  ( p_clm+ p_cm)* 0.5D+00
