@@ -95,8 +95,8 @@
   !----------------------------------------------------------------------
   rate  =   p_reminN1* K1p(:)
   ! jbotN1p is used in PelagicBenthicCoupling to define the pelagic flux
-  call flux_vector( iiBen, ppK1p,ppK1p,-( rate) )
-  jbotN1p(:)  =   rate
+  call flux_vector( iiBen, ppK1p,ppK1p,-( rate ) )
+  jbotN1p(:)  = jbotN1p(:) + rate
   rate  =   p_K11K1p* K11p(:)
   call flux_vector( iiBen, ppK11p,ppK1p, rate )
   ! K21.p is not used in this model version
@@ -106,11 +106,11 @@
   !----------------------------------------------------------------------
   rate  =   p_reminN4* K4n(:)
   ! K3.n is not used in this model version
-  jbotN3n(:)  =   rate* p_pQIN3
-  jbotN4n(:)  =   rate*( ONE - p_pQIN3)
+  jbotN3n(:)  = jbotN3n(:) + rate* p_pQIN3
+  jbotN4n(:)  = jbotN4n(:) + rate* ( ONE - p_pQIN3)
   ! jbotN3n is used in PelagicBenthicCoupling to define the pelagic flux
   ! jbotN4n is used in PelagicBenthicCoupling to define the pelagic flux
-  call flux_vector( iiBen, ppK4n,ppK4n,-( jbotN3n(:)+ jbotN4n(:)) )
+  call flux_vector( iiBen, ppK4n,ppK4n,-( rate ) )
   rate  =   p_K14K4n* K14n(:)
   call flux_vector( iiBen, ppK14n,ppK4n, rate )
 
@@ -120,7 +120,7 @@
   rate  =   p_reminQ6s* Q6s(:)
   call flux_vector( iiBen, ppQ6s,ppQ6s,-( rate) )
   ! K5.s is not used in this model version
-  jbotN5s(:)  =   rate
+  jbotN5s(:)  =   jbotN5s(:) + rate
 
   end subroutine BenthicReminDynamics
 !EOC
