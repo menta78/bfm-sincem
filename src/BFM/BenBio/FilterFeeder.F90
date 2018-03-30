@@ -314,7 +314,7 @@
      rgu= su *Y3c(:)
 
      ! filtering saturation ( high at low , low at hight food)
-     fsat=su/(p_small+ et*eo*p_vum*food);
+     fsat=ONE
      ! Calculate cost of energy based on realized rate of uptake.
      rrc = max(eo * su * p_sra, p_srr)* Y3c(:)* et
 
