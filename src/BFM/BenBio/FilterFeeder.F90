@@ -25,7 +25,7 @@
 #ifdef NOPOINTERS
   use mem
 #else
-  use mem, ONLY: Y3c, Y3n, Y3p, Q6c, Q6n, Q6p, Q6s, G2o, K4n, K1p, D6m, D7m, D8m, D9m, &
+  use mem, ONLY: iiY3, Y3c, Y3n, Y3p, Q6c, Q6n, Q6p, Q6s, G2o, K4n, K1p, D6m, D7m, D8m, D9m, &
     D1m
   use mem, ONLY: ppY3c, ppY3n, ppY3p, ppQ6c, ppQ6n, ppQ6p, ppQ6s, ppG2o, ppK4n,O2o_Ben, &
     ppK1p, ppD6m, ppD7m, ppD8m, ppD9m, ppD1m, rrBTo, reBTn, reBTp, jbotR6c, jbotR6n, &
@@ -48,6 +48,7 @@
 #endif
   use mem_Param,  ONLY: p_d_tot,p_pe_R1c, p_pe_R1n, p_pe_R1p,p_small
   use mem_FilterFeeder
+  use mem_BenOrganisms, ONLY: p_qncBOs, p_qpcBOS
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! The following vector functions are used
@@ -467,6 +468,7 @@
 
   rrc  =   rrc+ p_pur*( rgu- retR6c- retQ6c)
 
+  call flux_vector(iiBen, ppY3c,ppY3c, -rrc*p_pePel )
 #ifdef INCLUDE_BENCO2
   call flux_vector( iiBen, ppY3c,ppG3c, rrc*(ONE-p_pePel) )
 #endif
@@ -498,27 +500,27 @@
   ! Calculation of nutrient release and correction of C:N:P
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-  ren  =   rtY3n- rtY3c* p_qn
-  rep  =   rtY3p- rtY3c* p_qp
+  ren  =   rtY3n- rtY3c* p_qncBOS(iiY3)
+  rep  =   rtY3p- rtY3c* p_qpcBOS(iiY3)
 
   r=ZERO
 
   where ( ren< ZERO)
-    reQ6c  =  - ren/ p_qn
+    reQ6c  =  - ren/ p_qncBOS(iiY3)
     r      =   r + reQ6c
     rtY3c  =   rtY3c- reQ6c
 
-    ren  =   rtY3n- rtY3c* p_qn
-    rep  =   rtY3p- rtY3c* p_qp
+    ren  =   rtY3n- rtY3c* p_qncBOS(iiY3)
+    rep  =   rtY3p- rtY3c* p_qpcBOS(iiY3)
   end where
 
   where ( rep< ZERO)
-    reQ6c  =  - rep/ p_qp
+    reQ6c  =  - rep/ p_qpcBOS(iiY3)
     r      =   r   + reQ6c
     rtY3c  =   rtY3c- reQ6c
 
-    ren  =   rtY3n- rtY3c* p_qn
-    rep  =   rtY3p- rtY3c* p_qp
+    ren  =   rtY3n- rtY3c* p_qncBOS(iiY3)
+    rep  =   rtY3p- rtY3c* p_qpcBOS(iiY3)
   end where
 
   where ((retQ6c + retR6c) > p_small )
@@ -526,9 +528,13 @@
      retR6c= retR6c +r * retR6c/(retQ6c + retR6c);
   end where
 
-  ren = max( ZERO, ren+ Y3n(:) -p_qn* Y3c(:))
-  rep = max( ZERO, rep+ Y3p(:) -p_qp* Y3c(:))
+  ren = max( ZERO, ren+ Y3n(:) -p_qncBOS(iiY3)* Y3c(:))
+  rep = max( ZERO, rep+ Y3p(:) -p_qpcBOS(iiY3)* Y3c(:))
 
+  ! Flux from Y3 to Pelagic nutrients (removed here and added to jbotXX below)
+  call flux_vector( iiBen, ppY3n,ppY3n, -ren * p_pePel)
+  call flux_vector( iiBen, ppY3p,ppY3p, -rep * p_pePel)
+  ! Flux from Y3 to Benthic nutriets
   call flux_vector( iiBen, ppY3n,ppK4n,  ren * (ONE-p_pePel))
   call flux_vector( iiBen, ppY3p,ppK1p,  rep * (ONE-p_pePel))
 
