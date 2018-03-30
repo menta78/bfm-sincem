@@ -305,12 +305,10 @@
 
      netto= (ONE-(p_pueQ6*RI_Fc(:)*sfood_RI+p_puePI*food_PT + &
         p_pueZI*ZI_Fc(:)*sfood_ZI)/food ) * (ONE-p_pur)
-     r= netto / p_sra * MM(p_vum * food, p_su) - 1._RLEN
-
-     r=min(ONE,max(1.0e-6_RLEN,r))
+     r= max(p_small,netto * p_vum * food / p_su / p_sra - 1._RLEN)
 
      ! Calculate relative uptake, harmonic mean of max metabolic capacity and availability
-     su= ONE/( ONE/(p_small+ r* p_vum *food * et *eO ) + ONE/(p_small+ p_su *et *eO  ))
+     su= p_su*et*eO/( ONE/r + ONE)
      ! The minimal uptake rate is equal to rest respiration.
      ! With filtering the filterfeeder provide himself also with oxygen.
      rgu= su *Y3c(:)
