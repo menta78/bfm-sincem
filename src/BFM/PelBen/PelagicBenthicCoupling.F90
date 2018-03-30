@@ -233,17 +233,6 @@
                jbotR6PPY(iiF,Box) = jbotR6PPY(iiF,Box) - ruQf ! split also to R1 ?
             end if
 #endif
-         else
-             PELBOTTOM(ppPhytoPlankton(i,iiC),Box) = ZERO
-             PELBOTTOM(ppPhytoPlankton(i,iiN),Box) = ZERO
-             PELBOTTOM(ppPhytoPlankton(i,iiP),Box) = ZERO
-             PELBOTTOM(ppPhytoPlankton(i,iiL),Box) = ZERO
-             j=ppPhytoPlankton(i,iiS)
-             if ( j>0) PELBOTTOM(j,Box) = ZERO
-#ifdef INCLUDE_PELFE
-             j=ppPhytoPlankton(i,iiF)
-             if ( j>0) PELBOTTOM(j,Box) = ZERO
-#endif
          end if
       enddo
 
