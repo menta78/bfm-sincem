@@ -16,8 +16,8 @@
 ! !USES:
 
   use global_mem
-  use mem,  ONLY: iiBenOrganisms, iiY1, iiY2, iiY3, iiY4, iiY5
-
+  use mem,  ONLY: iiBenOrganisms, iiBenBacteria ,  &
+                  iiY1, iiY2, iiY3, iiY4, iiY5
 !  
 !
 ! !AUTHORS
@@ -68,8 +68,8 @@
   real(RLEN)  :: p_sr(iiBenOrganisms)  !
   real(RLEN)  :: p_sd(iiBenOrganisms)  !
   real(RLEN)  :: p_sdm(iiBenOrganisms)
-  real(RLEN)  :: p_Yn(iiBenOrganisms,5)  ! Y1 > YI
-  real(RLEN)  :: p_Hn(iiBenOrganisms,2)  ! H1 > YI
+  real(RLEN)  :: p_paBOS(iiBenOrganisms,iiBenOrganisms)  ! Y1 > YI
+  real(RLEN)  :: p_paBBA(iiBenOrganisms,iiBenBacteria)  ! H1 > YI
   real(RLEN)  :: p_puQ6(iiBenOrganisms)  ! H2 > YI
   real(RLEN)  :: p_pueQ6(iiBenOrganisms)
   real(RLEN)  :: p_cm(iiBenOrganisms)
@@ -87,8 +87,8 @@
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   namelist /BenOrganisms_parameters/ p_q10, p_su, p_chu, p_clu, p_pue, p_pur, &
-    p_pudil, p_sr, p_puQ6, p_pueQ6, p_cm, p_clm, p_sd, p_sdm, p_qncBOS, p_qpcBOS, p_Yn, &
-    p_Hn
+    p_pudil, p_sr, p_puQ6, p_pueQ6, p_cm, p_clm, p_sd, p_sdm, p_qncBOS, p_qpcBOS, &
+    p_paBOS, p_paBBA
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
   !BEGIN compute

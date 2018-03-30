@@ -174,7 +174,7 @@
   ! For other benthic organisms:
 
   do i = 1 , ( iiBenOrganisms)
-    food_src  =   BenOrganisms(i,iiC)* p_Yn(y,i)
+    food_src  =   BenOrganisms(i,iiC)* p_paBOS(y,i)
     food  =   food+ food_src* MM( food_src,  p_clu(y))
   end do
 
@@ -183,7 +183,7 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
   do i = 1 , ( iiBenBacteria)
-    food_src  =   max(ZERO,BenBacteria(i,iiC)* p_Hn(y,i))
+    food_src  =   max(ZERO,BenBacteria(i,iiC)* p_paBBA(y,i))
     food  =   food+ food_src* MM( food_src,  p_clu(y))
   end do
 
@@ -244,7 +244,7 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
   do i = 1 , ( iiBenOrganisms)
-    choice = p_Yn(y,i)* MM( p_Yn(y, i)* BenOrganisms(i, iiC), p_clu(y))
+    choice = p_paBOS(y,i)* MM( p_paBOS(y, i)* BenOrganisms(i, iiC), p_clu(y))
     ruYIc  =   BenOrganisms(i,iiC)* sgu* choice
     ruYIn  =   BenOrganisms(i,iiN)* sgu* choice
     ruYIp  =   BenOrganisms(i,iiP)* sgu* choice
@@ -278,7 +278,7 @@
 
   do i = 1 , ( iiBenBacteria)
 
-    choice = p_Hn(y,i)* MM( p_Hn(y, i)* BenBacteria(i, iiC), p_clu(y))
+    choice = p_paBBA(y,i)* MM( p_paBBA(y, i)* BenBacteria(i, iiC), p_clu(y))
     ruBIc  =   BenBacteria(i,iiC)* sgu* choice
     ruBIn  =   BenBacteria(i,iiN)* sgu* choice
     ruBIp  =   BenBacteria(i,iiP)* sgu* choice
