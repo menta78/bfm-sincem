@@ -25,7 +25,7 @@
   use mem_Settling
 #if defined BENTHIC_BIO || defined BENTHIC_FULL 
   use mem_BenBac
-  use mem_BenOrganism
+  use mem_BenOrganisms
   use mem_FilterFeeder
   use mem_Bioturbation
   use mem_BenthicRemin
@@ -117,7 +117,7 @@
 
 #if defined BENTHIC_BIO
       ! Intermediate benthic return
-      call InitBenOrganism
+      call InitBenOrganisms
       call InitFilterFeeder
       call InitBenBac
       call InitBioturbation
@@ -126,7 +126,7 @@
       call InitControlBennutBuffers
 #elif defined BENTHIC_FULL
       ! Full benthic nutrients
-      call InitBenOrganism
+      call InitBenOrganisms
       call InitFilterFeeder
       call InitBenBac
       call InitBioturbation

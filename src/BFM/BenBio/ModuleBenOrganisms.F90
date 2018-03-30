@@ -11,7 +11,7 @@
 !
 !
 ! !INTERFACE
-  module mem_BenOrganism
+  module mem_BenOrganisms
 !
 ! !USES:
 
@@ -79,11 +79,11 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! SHARED PUBLIC FUNCTIONS (must be explicited below "contains")
 
-  public InitBenOrganism
+  public InitBenOrganisms
   contains
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  subroutine InitBenOrganism()
+  subroutine InitBenOrganisms()
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   namelist /BenOrganisms_parameters/ p_q10, p_su, p_chu, p_clu, p_pue, p_pur, &
@@ -98,7 +98,7 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
     write(LOGUNIT,*) "#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
-    write(LOGUNIT,*) "#  Reading BenOrganism parameters.."
+    write(LOGUNIT,*) "#  Reading BenOrganisms parameters.."
     open(NMLUNIT,file='BenOrganisms.nml',status='old',action='read',err=100)
     read(NMLUNIT,nml=BenOrganisms_parameters,err=101)
     close(NMLUNIT)
@@ -112,12 +112,12 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Local Error Messages
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-100 call error_msg_prn(NML_OPEN,"InitBenOrganism.f90","BenOrganism.nml")
-101 call error_msg_prn(NML_READ,"InitBenOrganism.f90","BenOrganisms_parameters")
+100 call error_msg_prn(NML_OPEN,"InitBenOrganisms.f90","BenOrganisms.nml")
+101 call error_msg_prn(NML_READ,"InitBenOrganisms.f90","BenOrganisms_parameters")
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  end  subroutine InitBenOrganism
+  end  subroutine InitBenOrganisms
 
-  end module mem_BenOrganism
+  end module mem_BenOrganisms
 !EOC
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model 

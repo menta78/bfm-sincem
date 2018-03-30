@@ -111,19 +111,19 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
   if ( CalcBenOrganisms(iiY1)) then
-    call BenOrganismDynamics( iiY1, ppY1c, ppY1n, ppY1p)
+    call BenOrganismsDynamics( iiY1, ppY1c, ppY1n, ppY1p)
   end if
 
   if ( CalcBenOrganisms(iiY2)) then
-    call BenOrganismDynamics( iiY2, ppY2c, ppY2n, ppY2p)
+    call BenOrganismsDynamics( iiY2, ppY2c, ppY2n, ppY2p)
   end if
 
   if ( CalcBenOrganisms(iiY4)) then
-    call BenOrganismDynamics( iiY4, ppY4c, ppY4n, ppY4p)
+    call BenOrganismsDynamics( iiY4, ppY4c, ppY4n, ppY4p)
   end if
 
   if ( CalcBenOrganisms(iiY5)) then
-    call BenOrganismDynamics( iiY5, ppY5c, ppY5n, ppY5p)
+    call BenOrganismsDynamics( iiY5, ppY5c, ppY5n, ppY5p)
   end if
 
   if ( CalcBenOrganisms(iiY3)) then

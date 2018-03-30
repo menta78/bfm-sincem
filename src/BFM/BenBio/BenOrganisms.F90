@@ -13,7 +13,7 @@
 ! 
 !
 ! !INTERFACE
-  subroutine BenOrganismDynamics(y,  ppyc, ppyn, ppyp)
+  subroutine BenOrganismsDynamics(y,  ppyc, ppyn, ppyp)
 !
 ! !USES:
 
@@ -37,7 +37,7 @@
 #endif
 #endif
   use mem_Param,  ONLY: p_d_tot,p_small
-  use mem_BenOrganism
+  use mem_BenOrganisms
 
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -457,7 +457,7 @@
   call flux_vector(iiBen, ppD7m,ppD7m,( cmm- D7m(:))*( rqt6n- ruQ6n)/ Q6n(:))
   call flux_vector(iiBen, ppD8m,ppD8m,( cmm- D8m(:))*( rqt6p- ruQ6p)/ Q6p(:))
 
-  end subroutine BenOrganismDynamics
+  end subroutine BenOrganismsDynamics
 !EOC
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model 
