@@ -78,7 +78,7 @@
         r=ONE/(ONE-b)*(0.5*DepthLayer)**b
         correction=r*(f**(ONE-b) -p_small**(ONE-b))/(f-p_small)
       elsewhere
-        correction=ONE/p_small
+        correction=ONE
       endwhere
 
 
