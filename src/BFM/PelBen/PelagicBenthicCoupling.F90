@@ -171,10 +171,10 @@
             PELBOTTOM(j,Box) = - uptake
             j = ppMicroZooPlankton(i,iiN)
             if ( j > 0 ) &
-              PELBOTTOM(j,Box) = -uptake* (c*qncMIZ(i,kbot))/ZI_fc(Box)
+              PELBOTTOM(j,Box) = -uptake* qncMIZ(i,kbot)
             j = ppMicroZooPlankton(i,iiP)
             if ( j > 0 ) &
-              PELBOTTOM(j,Box) = -uptake* (c*qpcMIZ(i,kbot))/ZI_fc(Box)
+              PELBOTTOM(j,Box) = -uptake* qpcMIZ(i,kbot)
          end do
          !
          ! Detritus (net flux= uptake - excretion of food : flux may be negative!)
