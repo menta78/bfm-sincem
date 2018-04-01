@@ -586,7 +586,7 @@
   jRIY3p(:)  =   ruR6p  - retR6p
   ! The silica uptaken from pythoplankton is directly released back to R6
   ! (and removed here below at bottom boundary layer)
-  jRIY3s(:)  =  ZERO
+  jRIY3s(:)  =   ZERO   - ruPIs
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! excretion of food originating from the Pelagic realm is also a
