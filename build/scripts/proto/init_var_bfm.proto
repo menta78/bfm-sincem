@@ -224,7 +224,7 @@ END MODULE init_var_bfm_local
 !
 ! !LOCAL VARIABLES:
    integer              :: icontrol,i,j,n,Flun
-   integer,parameter    :: NSAVE=120  ! Maximum no variables which can be saved
+   integer,parameter    :: NSAVE=300  ! Maximum no variables which can be saved
    character(len=64),dimension(NSAVE):: var_save
    character(len=64),dimension(NSAVE):: ave_save
 
