@@ -15,14 +15,13 @@
 ! USES:
   use mem, only: InitializeModel
   use mem_Param
-  use mem_PelGlobal
   use mem_PelChem
   use mem_PelBac
   use mem_MesoZoo
   use mem_MicroZoo
   use mem_Phyto
   use mem_PAR
-  use mem_Settling
+  use mem_PelSinkSet
 #if defined BENTHIC_BIO || defined BENTHIC_FULL 
   use mem_BenBac
   use mem_BenOrganisms
@@ -112,8 +111,7 @@
       call InitMicroZoo
       call InitPhyto
       call InitPAR
-      call InitSettling
-      call InitPelGlobal
+      call InitPelSinkSet
 
 #if defined BENTHIC_BIO
       ! Intermediate benthic return

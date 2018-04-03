@@ -59,7 +59,7 @@
   use mem, ONLY: Q6c, Q6n, Q6p, Q6s, Q1c, Q1n, Q1p
   use mem, ONLY: ppQ6c, ppQ6n, ppQ6p, ppQ6s, ppQ1c, ppQ1n, ppQ1p
 #endif
-   use mem_Settling
+   use mem_PelSinkSet
    use mem_Param, ONLY: p_pe_R1c, p_pe_R1n, p_pe_R1p , p_small,   &
                  CalcBenthicFlag, AssignPelBenFluxesInBFMFlag
    use mem_PelBac, ONLY: p_suhR1, p_sulR1, p_suR2, p_suR6,        &

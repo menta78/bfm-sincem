@@ -11,7 +11,7 @@
 !   Define parameters and control for sinking of 3D pelagic variables
 !
 ! !INTERFACE
-  module mem_PelGlobal
+  module mem_PelSinkSet
 !
 ! !USES:
 
@@ -68,7 +68,7 @@
   type(SinkControl), dimension(NO_D3_BOX_STATES) :: SINKD3STATE
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! PelGlobal PARAMETERS (read from nml)
+  ! Pelagic sinking PARAMETERS (read from nml)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! NAME           UNIT      DESCRIPTION
   ! p_rR6m         [m/d]   detritus sinking rate
@@ -85,13 +85,29 @@
   logical       :: AggregateSink = .FALSE.
   real(RLEN)    :: depth_factor = 2000.0_RLEN
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  !
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Pelagic Settling PARAMETERS (read from nml)
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! BURIAL VELOCITIES into the sediment
+  ! NAME         [UNIT]/KIND            DESCRIPTION
+  ! p_burvel_R6     [m/d]              Bottom Burial Velocity for detritus
+  ! p_burvel_R2     [m/d]              Bottom Burial Velocity for dissolved
+  ! p_burvel_PI     [m/d]              Bottom Burial Velocity for plankton
+  ! p_burvel_O5     [m/d]              Bottom Burial Velocity for calcite
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  real(RLEN)  :: p_burvel_R6=0.0_RLEN
+  real(RLEN)  :: p_burvel_R2=0.0_RLEN
+  real(RLEN)  :: p_burvel_PI=0.0_RLEN
+  real(RLEN)  :: p_burvel_O5=0.0_RLEN
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! SHARED PUBLIC FUNCTIONS (must be explicited below "contains")
 
-  public InitPelGlobal
+  public InitPelSinkSet
   contains
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  subroutine InitPelGlobal()
+  subroutine InitPelSinkSet()
 
   implicit none 
 
@@ -104,18 +120,27 @@
   namelist /PelGlobal_parameters/ p_rR6m, p_rO5m, KSINK_rPPY, AggregateSink, &
                                   depth_factor
 #endif
+  namelist /Settling_parameters/ p_burvel_R6,p_burvel_R2,p_burvel_PI,p_burvel_O5
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
   !  Open the namelist file(s)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
   write(LOGUNIT,*) "#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
-  write(LOGUNIT,*) "#  Reading PelGlobal parameters.."
+  write(LOGUNIT,*) "#  Reading Pelagic Sinking parameters.."
   open(NMLUNIT,file='Pelagic_Environment.nml',status='old',action='read',err=100)
   read(NMLUNIT,nml=PelGlobal_parameters,err=101)
   close(NMLUNIT)
   write(LOGUNIT,*) "#  Namelist is:"
   write(LOGUNIT,nml=PelGlobal_parameters)
+
+  write(LOGUNIT,*) "#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+  write(LOGUNIT,*) "#  Reading Pelagic Settling parameters.."
+  open(NMLUNIT,file='Benthic_Environment.nml',status='old',action='read',err=100)
+  read(NMLUNIT,nml=Settling_parameters,err=101)
+  close(NMLUNIT)
+  write(LOGUNIT,*) "#  Namelist is:"
+  write(LOGUNIT,nml=Settling_parameters)
 
   ! Initialize Pelagic variables settling dynamics
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -176,9 +201,9 @@
 101 call error_msg_prn(NML_READ,"InitPelGlobal.f90","PelGlobal_parameters")
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-  end  subroutine InitPelGlobal
+  end  subroutine InitPelSinkSet
 
-  end module mem_PelGlobal
+  end module mem_PelSinkSet
 !BOP
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model 

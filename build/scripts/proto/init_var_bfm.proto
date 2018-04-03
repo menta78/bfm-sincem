@@ -29,7 +29,6 @@ MODULE init_var_bfm_local
 !
 ! !USES:
    use mem
-   use mem_PelGlobal
    use mem_PelChem
    use mem_PelBac
    use mem_MesoZoo
@@ -105,7 +104,6 @@ end subroutine ini_organic_quotas
 !
 ! !USES:
    use mem
-   use mem_PelGlobal
    use mem_PelChem
    use mem_PelBac
    use mem_MesoZoo
@@ -188,7 +186,6 @@ END MODULE init_var_bfm_local
    use global_mem, ONLY: RLEN,ZERO,ONE
 #endif
    use mem
-   use mem_PelGlobal
    use mem_PelChem
    use mem_PelBac
    use mem_MesoZoo

@@ -33,7 +33,6 @@
   use mem, ONLY: qncSAL, qpcSAL, qscSAL, qlcSAL, qpcSZO, qncSZO, &
                  qpcSBA, qncSBA, qpcSOM, qncSOM, qscSOM
   use mem_Param,  ONLY: p_small
-  use mem_PelGlobal
 
 !  
 !

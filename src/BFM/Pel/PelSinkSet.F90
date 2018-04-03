@@ -5,14 +5,13 @@
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 !BOP
 !
-! !ROUTINE: PelGlobal
+! !ROUTINE: PelSinkSet
 !
 ! DESCRIPTION
-!   Compute global pelagic diagnostic variables that are needed in other
-!   subroutines
+!   Compute global
 !
 ! !INTERFACE
-  subroutine PelGlobalDynamics
+  subroutine PelSinkSet
 !
 ! !USES:
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -20,9 +19,8 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   use global_mem, ONLY:RLEN,ZERO
   use mem_Param,  ONLY: p_small
-  use mem_PelGlobal
+  use mem_PelSinkSet
   use mem
-  use mem_Settling
   use mem_Phyto,  ONLY: p_rPIm
   use init_var_bfm_local
 #ifdef BFM_GOTM
@@ -41,15 +39,13 @@
   integer  :: i
 !
 ! !AUTHORS
-!   Piet Ruardij
+!   BFM team
 !
 ! !REVISION_HISTORY
 !
 ! COPYING
 !
 !   Copyright (C) 2015 BFM System Team (bfm_st@lists.cmcc.it)
-!   Copyright (C) 2006 P. Ruardij, M. Vichi
-!   (rua@nioz.nl, vichi@bo.ingv.it)
 !
 !   This program is free software; you can redistribute it and/or modify
 !   it under the terms of the GNU General Public License as published by
@@ -62,16 +58,6 @@
 !EOP
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 !BOC
-
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  ! Reset total flux variables
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  flPTN6r(:)  =   ZERO
-
-  !---------------------------------------------
-  ! Update quotas of non- and living organic components
-  !---------------------------------------------
-  call upd_organic_quotas()
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Prescribe background costant sedimentation velocities
@@ -92,7 +78,7 @@
     if(BOTindices(1) .NE.0) sediPPY(i,BOTindices)  =   p_burvel_PI
   end do
 
-  end subroutine PelGlobalDynamics
+  end subroutine PelSinkSet
 !EOC
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model
