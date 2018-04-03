@@ -68,11 +68,9 @@
 ! CalcPelagicFlag               logical Pelagic System
 ! CalcBenthicFlag               logical Benthic system
 !    Selected using fortran MACROS from compset configuration :
-!      BENTHIC_RETURN : Simple Benthic Return 
 !      BENTHIC_BIO    : Benthic organisms and intermediate complexity nutrient regeneration
 !      BENTHIC_FULL   : Benthic organisms and full nutrient regeneration (early diagenesis)
-! CalcTransportFlag             logical Compute Transport Term (when coupled
-!                                       with a OGCM)
+! CalcTransportFlag             logical Compute Transport Term (when coupled with a OGCM)
 ! CalcConservationFlag          logical Mass Conservation Check
 ! CalcPhytoPlankton             logical Pelagic Phytoplankton (vector)
 ! CalcPelBacteria               logical Pelagic Bacteria (vector)
@@ -224,31 +222,31 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
 !<variablename>0 = <realvalue>
 !-------------------------------------------------------------------------!
 &bfm_init_nml_ben
-    G2o0  =  0.008879,
-    D1m0  =  0.002,
-    D2m0  =  0.025,
-    D6m0  =  0.25,
-    D7m0  =  0.25,
-    D8m0  =  0.25,
-    D9m0  =  0.25,
-    Q1c0  =  10.4988,
-    Q11c0 =  10.4988,
-    Q6c0  =  10265.19,
-    Q6n0  =  200.0,
-    Q6p0  =  25.,
-    Q6s0  =  10.0,
-    H1c0  =  165.0,
-    H2c0  =  45.0,
-    Y1c0  =  160.0,
-    Y2c0  =  470,
-    Y3c0  =  310.0,
-    Y4c0  =  220.0,
-    Y5c0  =  160.0,
-    K1p0  =  0.1,
-    K11p0 =  80.0,
-    K4n0  =  0.0277856,
-    K14n0 =  1.0838474,
-    K6r0  =  100.0,
+   Q1c0  =  10.4988,
+   Q11c0 =  10.4988,
+   Q6c0  =  10265.19,
+   Q6n0  =  200.0,
+   Q6p0  =  25.0,
+   Q6s0  =  10.0,
+   G2o0  =  0.008879,
+   K1p0  =  0.1,
+   K11p0 =  80.0,
+   K4n0  =  0.0277856,
+   K14n0 =  1.0838474,
+   K6r0  =  100.0,
+   H1c0  =  165.0,
+   H2c0  =  45.0,
+   Y1c0  =  160.0,
+   Y2c0  =  470,
+   Y3c0  =  310.0,
+   Y4c0  =  220.0,
+   Y5c0  =  160.0,
+   D1m0  =  0.002,
+   D2m0  =  0.025,
+   D6m0  =  0.25,
+   D7m0  =  0.25,
+   D8m0  =  0.25,
+   D9m0  =  0.25,
 	filename_nml_conf = 'BFM_General.nml',
 /
 
@@ -819,7 +817,7 @@ p_paMEZ(2,:)=   0.0,    1.0
 /
 
 !-------------------------------------------------------------------------!
-! NAMELIST BenthicRemin_parameters
+! NAMELIST BenOxygen_parameters
 !-------------------------------------------------------------------------!
 ! NAME         [UNIT]/KIND            DESCRIPTION
 !  p_exsaf  	   [-]        sensitivity factor
@@ -1055,15 +1053,15 @@ p_paMEZ(2,:)=   0.0,    1.0
 !NAMELIST Bioturbation_parameters
 !-------------------------------------------------------------------------!
 ! NAME         [UNIT]/KIND            DESCRIPTION
-!  p_q10  	 [-]         Temperature dependency
-!  p_chtur  	 [mgC/m2]    MM-constant describing control of biomass YI on bioturbation
-!  p_chirr  	 [mgC/m2]    MM-constant describing control of biomass YI on bioirrigation
-!  p_turY1  	 [-]         Multiplication factor to correct influence of a group of YI on bioturbation
-!  p_irrY4  	 [-]         Multiplication factor to correct influence of a group of YI on bioirrigation
-!  p_Etur        [m2/d]      Potential turbation constant
-!  p_cturm  	 [m]         Average depth where the bioturbation activity is located
-!  p_cmtur  	 [-]         maximum enhancement of detritus penetration due to bioturbation
-!  p_cmirr  	 [-]         maximum enhancement of diffusion due to bioirrigation                          
+! p_q10  	 [-]         Temperature dependency
+! p_chtur      [mgC/m2]      MM-constant describing control of biomass YI on bioturbation
+! p_chirr      [mgC/m2]      MM-constant describing control of biomass YI on bioirrigation
+! p_turY1  	 [-]         Multiplication factor to correct influence of a group of YI on bioturbation
+! p_irrY4  	 [-]         Multiplication factor to correct influence of a group of YI on bioirrigation
+! p_Etur        [m2/d]       Potential turbation constant
+! p_cturm  	 [m]         Average depth where the bioturbation activity is located
+! p_cmtur  	 [-]         maximum enhancement of detritus penetration due to bioturbation
+! p_cmirr  	 [-]         maximum enhancement of diffusion due to bioirrigation                          
 !-------------------------------------------------------------------------!
 &Bioturbation_parameters
   p_q10   = 2.0,
