@@ -313,8 +313,6 @@
      ! With filtering the filterfeeder provide himself also with oxygen.
      rgu= su *Y3c(:)
 
-     ! filtering saturation ( high at low , low at hight food)
-     fsat=ONE
      ! Calculate cost of energy based on realized rate of uptake.
      rrc = max(su * p_sra, p_srr * et)* Y3c(:)
 
