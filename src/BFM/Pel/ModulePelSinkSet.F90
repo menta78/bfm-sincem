@@ -136,8 +136,8 @@
 
   write(LOGUNIT,*) "#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
   write(LOGUNIT,*) "#  Reading Pelagic Settling parameters.."
-  open(NMLUNIT,file='Benthic_Environment.nml',status='old',action='read',err=100)
-  read(NMLUNIT,nml=Settling_parameters,err=101)
+  open(NMLUNIT,file='Benthic_Environment.nml',status='old',action='read',err=102)
+  read(NMLUNIT,nml=Settling_parameters,err=103)
   close(NMLUNIT)
   write(LOGUNIT,*) "#  Namelist is:"
   write(LOGUNIT,nml=Settling_parameters)
@@ -199,6 +199,8 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 100 call error_msg_prn(NML_OPEN,"InitPelGlobal.f90","Pelagic_Environment.nml")
 101 call error_msg_prn(NML_READ,"InitPelGlobal.f90","PelGlobal_parameters")
+102 call error_msg_prn(NML_OPEN,"InitPelGlobal.f90","Benthic_Environment.nml")
+103 call error_msg_prn(NML_READ,"InitPelGlobal.f90","Settling_parameters")
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
   end  subroutine InitPelSinkSet

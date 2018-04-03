@@ -105,7 +105,7 @@
 
     write(LOGUNIT,*) "#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
     write(LOGUNIT,*) "#  Reading BenBac parameters.."
-    open(NMLUNIT,file='BenBac.nml',status='old',action='read',err=100)
+    open(NMLUNIT,file='Benthic_Ecology.nml',status='old',action='read',err=100)
     read(NMLUNIT,nml=BenBacteria_parameters,err=101)
     close(NMLUNIT)
     write(LOGUNIT,*) "#  Namelist is:"
@@ -118,7 +118,7 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Local Error Messages
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-100 call error_msg_prn(NML_OPEN,"InitBenBac.f90","BenBac.nml")
+100 call error_msg_prn(NML_OPEN,"InitBenBac.f90","Benthic_Ecology.nml")
 101 call error_msg_prn(NML_READ,"InitBenBac.f90","BenBacteria_parameters")
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   end  subroutine InitBenBac

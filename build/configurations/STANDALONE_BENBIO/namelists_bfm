@@ -815,7 +815,7 @@ p_paMEZ(2,:)=   0.0,    1.0
   p_reminQ6s = 0.05,
   p_K11K1p   = 0.005,
   p_K14K4n   = 0.005,
-        filename_nml_conf = 'BenthicRemin.nml',
+        filename_nml_conf = 'Benthic_Environment.nml',
 /
 
 !-------------------------------------------------------------------------!
@@ -833,7 +833,7 @@ p_paMEZ(2,:)=   0.0,    1.0
   p_xdampingD1m =  2.0,
   p_mD1m        =  0.0001,
   p_chD1m       =  0.05,
-        filename_nml_conf = 'BenOxygen.nml',
+        filename_nml_conf = 'Benthic_Environment.nml',
 /
 
 !-------------------------------------------------------------------------!
@@ -854,7 +854,7 @@ p_paMEZ(2,:)=   0.0,    1.0
   p_control_n   = .FALSE.,
   p_control_p   = .FALSE.,
   p_control_s   = .TRUE.
-        filename_nml_conf = 'ControlBennutBuffers.nml',
+        filename_nml_conf = 'Benthic_Environment.nml',
 /
 
 !-------------------------------------------------------------------------!
@@ -902,7 +902,7 @@ p_paMEZ(2,:)=   0.0,    1.0
   p_iK4    = 1,        2
   p_iK1    = 1,        2
   p_iQ1    = 1,        2
-        filename_nml_conf = 'BenBac.nml',
+        filename_nml_conf = 'Benthic_Ecology.nml',
 /
 
 !-------------------------------------------------------------------------!
@@ -975,7 +975,7 @@ p_paMEZ(2,:)=   0.0,    1.0
   p_paBBA(4,:)=    1.0,      1.0,
 ! Y5
   p_paBBA(5,:)=    0.0,      0.0,
-        filename_nml_conf = 'BenOrganisms.nml',
+        filename_nml_conf = 'Benthic_Ecology.nml',
 /
 
 !-------------------------------------------------------------------------!
@@ -1049,7 +1049,7 @@ p_paMEZ(2,:)=   0.0,    1.0
   p_height  =  0.02,
   p_max     =  0.10
   p_pePel   =  1.0
-        filename_nml_conf = 'FilterFeeder.nml',
+        filename_nml_conf = 'Benthic_Ecology.nml',
 /
 !-------------------------------------------------------------------------!
 !NAMELIST Bioturbation_parameters
@@ -1075,7 +1075,7 @@ p_paMEZ(2,:)=   0.0,    1.0
   p_cturm = 0.02,
   p_cmtur = 10.0,
   p_cmirr = 10.0,
-        filename_nml_conf = 'Bioturbation.nml',
+        filename_nml_conf = 'Benthic_Ecology.nml',
 /
 
 !-------------------------------------------------------------------------!
