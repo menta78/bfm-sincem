@@ -38,6 +38,7 @@
 #endif
   use mem, ONLY: ppQ6c, ppQ1c, ppQ6p, ppQ1p, ppQ6n, ppQ1n, ppQ6s,  &
     jbotO2o, jbotN1p, jbotN3n, jbotN4n, jbotN5s, jbotO3c, jbotO3h, &
+    ppO2o, ppN1p, ppN3n, ppN4n, ppN5s, ppO3c, ppO3h, &
     NO_BOXES_XY, iiBen, iiPel, flux_vector
   use mem_BenthicReturn
   use mem_Param, ONLY: CalcConservationFlag, AssignPelBenFluxesInBFMFlag
