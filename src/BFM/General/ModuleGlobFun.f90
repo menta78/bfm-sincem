@@ -1,5 +1,5 @@
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-! MODEL  BFM - Biogeochemical Flux Model 
+! MODEL  BFM - Biogeochemical Flux Model
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 !BOP
 !
@@ -8,7 +8,7 @@
 ! DESCRIPTION
 !   List of general model functions
 
-!   This file is generated directly from OpenSesame model code, using a code 
+!   This file is generated directly from OpenSesame model code, using a code
 !   generator which transposes from the sesame meta language into F90.
 !   F90 code generator written by P. Ruardij.
 !   structure of the code based on ideas of M. Vichi.
@@ -20,7 +20,7 @@
   USE global_mem, ONLY: RLEN, ZERO, ONE, BASETEMP
   USE mem_Param,  ONLY: p_small
 
-!  
+!
 !
 ! !AUTHORS
 !   mfstep/ERSEM team
@@ -29,9 +29,9 @@
 !   --------
 !
 ! COPYING
-!   
+!
 !   Copyright (C) 2015 BFM System Team (bfm_st@lists.cmcc.it)
-!   Copyright (C) 2006 P. Ruardij, the mfstep group, the ERSEM team 
+!   Copyright (C) 2006 P. Ruardij, the mfstep group, the ERSEM team
 !   (rua@nioz.nl, vichi@bo.ingv.it)
 !
 !   This program is free software; you can redistribute it and/or modify
@@ -61,9 +61,9 @@
         IMPLICIT NONE
         real(RLEN),intent(IN) :: x
         real(RLEN)            :: INSW
- 
+
         INSW = ZERO
-        if (x > ZERO ) INSW=ONE 
+        if (x > ZERO ) INSW=ONE
 
     end function INSW
 
@@ -98,7 +98,7 @@
         real(RLEN)            :: ERAMP
 
         ERAMP = ZERO
-        if ( x > ZERO ) ERAMP = ONE 
+        if ( x > ZERO ) ERAMP = ONE
         if ( x < m )    ERAMP = x / m
 
     end function
@@ -143,7 +143,7 @@
         IMPLICIT NONE
         real(RLEN),intent(IN)  :: alfa, x
         real(RLEN)             :: IntegralExp
-        
+
         IntegralExp=(exp(alfa * x) -ONE)/alfa
 
     end function IntegralExp
@@ -175,47 +175,39 @@
        integer                :: nutlim
        real(RLEN) :: pu_n, pu_p, pq_n, pq_p
        !
-       pu_n = fn / ( p_small + fc ) ; pq_n = pu_n / qnc
-       pu_p = fp / ( p_small + fc ) ; pq_p = pu_p / qpc
+       pu_n = abs(fn) ; pq_n = pu_n / qnc
+       pu_p = abs(fp) ; pq_p = pu_p / qpc
        !
        nutlim = c
        !
        ! CASE 1
-       if ( (fc <0) .AND. (fn <0) .AND. (fp <0) ) then
-          if ( pq_p>pq_n .OR. abs(pq_p-pq_n)<p_small ) then
-             if (abs(pu_p) > qpc) nutlim = p
+       if ( (fc <= 0) .AND. (fn <0) .AND. (fp <0) ) then
+          if ( pq_p>pq_n ) then
+             if (pu_p > qpc * abs(fc)) nutlim = p
           else
-             if (abs(pu_n) > qnc) nutlim = n
+             if (pu_n > qnc * abs(fc)) nutlim = n
           endif
-       endif
-       ! CASE 2
-       if ( (fc <0) .AND. (fn <0) .AND. (fp >0) ) then
-           if (abs(pu_n) > qnc) nutlim = n
-       endif
-       ! CASE 3
-       if ( (fc <0) .AND. (fn >0) .AND. (fp <0) ) then
-          if (abs(pu_p) > qpc) nutlim = p
-       endif
-       ! CASE 4
-       if ( (fc <0) .AND. (fn >0) .AND. (fp >0) ) nutlim = c
-       ! CASE 5
-       if ( (fc >0) .AND. (fn <0) .AND. (fp <0) ) then
-          if ( pq_p<pq_n .OR. abs(pq_p-pq_n)<p_small ) then
+       else if ( (fc <= 0) .AND. (fn <0) .AND. (fp >0) ) then
+           if (pu_n > qnc * abs(fc)) nutlim = n
+       else if ( (fc <=0) .AND. (fn >0) .AND. (fp <0) ) then
+          if (pu_p > qpc * abs(fc)) nutlim = p
+       else if ( (fc <= 0) .AND. (fn >0) .AND. (fp >0) ) then
+          nutlim = c
+       else if ( (fc >0) .AND. (fn <0) .AND. (fp <0) ) then
+          if ( pq_p<pq_n ) then
              nutlim = p
           else
              nutlim = n
           endif
-       endif
-       ! CASE 6
-       if ( (fc >0) .AND. (fn <0) .AND. (fp >0) ) nutlim = n
-       ! CASE 7
-       if ( (fc >0) .AND. (fn >0) .AND. (fp <0) ) nutlim = p
-       ! CASE 8
-       if ( (fc >0) .AND. (fn >0) .AND. (fp >0) ) then
-          if ( pq_p<pq_n .OR. abs(pq_p-pq_n)<p_small ) then
-             if ( pu_p < qpc ) nutlim = p
+       else if ( (fc >0) .AND. (fn <0) .AND. (fp >0) ) then
+          nutlim = n
+       else if ( (fc >0) .AND. (fn >0) .AND. (fp <0) ) then
+          nutlim = p
+       else if ( (fc >0) .AND. (fn >0) .AND. (fp >0) ) then
+          if ( pq_p<pq_n ) then
+             if ( pu_p < qpc * abs(fc) ) nutlim = p
           else
-             if ( pu_n < qnc ) nutlim = n
+             if ( pu_n < qnc * abs(fc) ) nutlim = n
           endif
        endif
 
@@ -224,5 +216,5 @@
   end module mem_globalfun
 !EOC
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-! MODEL  BFM - Biogeochemical Flux Model 
+! MODEL  BFM - Biogeochemical Flux Model
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
