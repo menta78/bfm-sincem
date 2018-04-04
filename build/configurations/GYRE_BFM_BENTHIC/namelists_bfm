@@ -68,14 +68,11 @@
 ! Global Switches : turn on/off or choose model components 
 ! NAME                          KIND    DESCRIPTION
 ! CalcPelagicFlag               logical Pelagic System
-! CalcBenthicFlag               numeric Benthic system
-!                                       0 = No Benthic System
-!                                       The following are Not Yet Activated
-!                                       1 = Simple Benthic Return
-!                                       2 = Benthic organisms and intermediate 
-!                                           complexity nutrient regeneration 
-!                                       3 = Benthic organisms and full nutrient 
-!                                           regeneration (early diagenesis)
+! CalcBenthicFlag               logical Benthic system
+!    Selected using fortran MACROS from compset configuration :
+!      BENTHIC_RETURN : Simple Benthic Return 
+!      BENTHIC_BIO    : Benthic organisms and intermediate complexity nutrient regeneration
+!      BENTHIC_FULL   : Benthic organisms and full nutrient regeneration (early diagenesis)
 ! CalcTransportFlag             logical Compute Transport Term (when coupled
 !                                       with a OGCM)
 ! CalcConservationFlag          logical Mass Conservation Check
@@ -113,7 +110,7 @@
 &Param_parameters
 ! Switches : 
             CalcPelagicFlag = .TRUE.
-            CalcBenthicFlag = 1
+            CalcBenthicFlag = .FALSE.
        CalcConservationFlag = .FALSE.
           CalcTransportFlag = .TRUE.
        CalcPhytoPlankton(1) = .TRUE.
@@ -126,7 +123,7 @@
      CalcMesoZooPlankton(1) = .FALSE.
      CalcMesoZooPlankton(2) = .TRUE.
            CalcPelChemistry = .TRUE.
-AssignPelBenFluxesInBFMFlag = .TRUE.
+AssignPelBenFluxesInBFMFlag = .FALSE.
 AssignAirPelFluxesInBFMFlag = .TRUE.
             ChlDynamicsFlag = 2
 ! Parameters : 
@@ -138,33 +135,6 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
                       p_qro = 0.5
                p_qon_dentri = 1.25
                 p_qon_nitri = 2.0
-	filename_nml_conf = 'BFM_General.nml',
-/
-
-!-------------------------------------------------------------------------!
-! NAMELIST Param_parameters_ben
-!-------------------------------------------------------
-! Benthic flags and parameters :
-&Param_parameters_ben
-        CalcBenOrganisms(1) = .FALSE.
-        CalcBenOrganisms(2) = .FALSE.
-        CalcBenOrganisms(3) = .FALSE.
-        CalcBenOrganisms(4) = .FALSE.
-        CalcBenOrganisms(5) = .FALSE.
-         CalcBenBacteria(1) = .FALSE.
-         CalcBenBacteria(2) = .FALSE.
-                    p_poro0 = 0.7
-                    p_d_tot = 0.30
-                 p_InitSink = 100.0
-                  p_d_tot_2 = 0.35
-                  p_clD1D2m = 0.01
-                    p_clDxm = 0.001
-                  p_q10diff = 1.49
-    calc_init_bennut_states = 0 
-                    p_qnQIc = 0.11155
-                    p_qpQIc = 0.010255
-                    p_qsQIc = 0.0221
-
 	filename_nml_conf = 'BFM_General.nml',
 /
 
@@ -245,6 +215,25 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
 /
 
 !-------------------------------------------------------------------------!
+! NAMELIST Param_parameters_ben
+!-------------------------------------------------------
+! Benthic flags and parameters :
+&Param_parameters_ben
+        CalcBenOrganisms(1) = .FALSE.
+        CalcBenOrganisms(2) = .FALSE.
+        CalcBenOrganisms(3) = .FALSE.
+        CalcBenOrganisms(4) = .FALSE.
+        CalcBenOrganisms(5) = .FALSE.
+         CalcBenBacteria(1) = .FALSE.
+         CalcBenBacteria(2) = .FALSE.
+                  p_d_tot_2 = 0.35
+                  p_clD1D2m = 0.01
+                    p_clDxm = 0.001
+                  p_q10diff = 1.49
+        filename_nml_conf = 'BFM_General.nml',
+/
+
+!-------------------------------------------------------------------------!
 ! NAMELIST bfm_init_nml_ben
 !-------------------------------------------------------------------------!
 !Benthic initialisation of standard variables
@@ -315,8 +304,7 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
           'EICE','ETW','EIR','EWIND','xEPS',
           'R6p','R6n','R6s','B1p','B1n','Z5p','Z6p','Z5n','Z6n',
           'Y1c','Y2c','Y3c','Y4c','Y5c','H1c','H2c',
-          'Q6c','Q6n','Q6p','Q6s','Q1c','Q1n','Q1p',
-          'K1p','K3n','K4n','K5s'
+          'ruBOSc','ruBBAc'
 	filename_nml_conf = 'BFM_General.nml',
 /
 

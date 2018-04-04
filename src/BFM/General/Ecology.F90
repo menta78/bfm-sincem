@@ -23,7 +23,6 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   use global_mem, ONLY:RLEN
   use mem,  ONLY: iiBen, iiPel, iiReset, flux
-  use constants,  ONLY: BENTHIC_RETURN, BENTHIC_BIO, BENTHIC_FULL
   use mem_Param,  ONLY: CalcPelagicFlag, CalcBenthicFlag, CalcConservationFlag
   use api_bfm, ONLY: LOGUNIT
 #ifdef INCLUDE_SEAICE
@@ -76,47 +75,27 @@
 
   end if
 
-#ifdef INCLUDE_BEN
-  if ( CalcBenthicFlag > 0 ) then
+  if ( CalcBenthicFlag ) then
+#if defined BENTHIC_BIO
+     ! Intermediate benthic return
+     call PelForcingForBenDynamics
+     call BenthicSystemDynamics
+     call BenthicReminDynamics
+     call BenOxygenDynamics
 
-         call SettlingDynamics
-  
-       select case ( CalcBenthicFlag)
+#elif defined BENTHIC_FULL
+     ! Full benthic nutrients
+     call PelForcingForBenDynamics
+     call BenthicSystemDynamics
+     call BenthicNutrient3Dynamics
 
-         case ( BENTHIC_RETURN )  ! Simple benthic return
-           call BenthicReturn1Dynamics
-
-         case ( BENTHIC_BIO )  ! Intermediate benthic return
-           call PelForcingForBenDynamics
-           call BenthicSystemDynamics
-           call BenthicNutrient2Dynamics
-
-         case ( BENTHIC_FULL )  ! Full benthic nutrients
-           call PelForcingForBenDynamics
-           call BenthicSystemDynamics
-           call BenthicNutrient3Dynamics
-
-       end select
-
-       call ControlBennutBuffersDynamics
-
-       call BentoPelCoupDynamics
-
-       call SedimentationDynamics
-
-  else 
-       ! This case considers an inactive benthic system 
-       ! (the benthic arrays are defined but not used)
-       ! only the net sink at the bottom is computed
-       call SettlingDynamics
-       call BentoPelCoupDynamics
-  endif
 #else
-  ! only the net sink at the bottom is computed
-  call SettlingDynamics
-  call BentoPelCoupDynamics
-
+     ! Simple benthic return
+     call BenthicReturnDynamics
 #endif
+  endif
+  
+  call PelagicBenthicCoupling
 
   if (CalcConservationFlag) &
      call CheckMassConservationDynamics

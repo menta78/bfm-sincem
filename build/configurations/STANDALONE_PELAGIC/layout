@@ -49,6 +49,7 @@ end
   SUNQ	       : Daylength in hours : h
   EWIND : Wind speed : m/s
   EICE  : Sea-ice fraction: -
+  ETAUB : Bottom Stress : N m/s
 end
 3d-variable-pel
   ETW   : temperature : C
@@ -149,6 +150,33 @@ end
     OArag      : Saturation state of Aragonite : -
 end
 
+#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+#       Benthic variables
+#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+2d-state-ben
+  #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  # Benthic State Vars
+  #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    group BenDetritus[cnps] (BOM) : mg C/m2: mmol N/m2 : mmol P/m2 : mmol Si/m2
+                Q1[-s]    : Labile organic Matter
+                Q6        : Particulate organic Matter
+    end
+end
+
+2d-variable-ben
+
+  #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  # Variables to check totmass of C N P Si in benthic
+  #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    totben[cnps]  : total mass present in benthos: g C: g N: g P: g Si
+
+  #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  # Variables holding quota of elements in species
+  #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    qpcBOM(BenDetritus)         : Quotum P/C in Benthic Organic Matter:mmol N/mg C
+    qncBOM(BenDetritus)         : Quotum N/C in Benthic Organic Matter:mmol P/mg C
+    qscBOM(BenDetritus)         : Quotum Si/C in Benthic Organic Matter:mmol Si/mg C
+end
 
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 #       GENERAL DIAGNOSTICS

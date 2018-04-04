@@ -25,12 +25,10 @@
 #endif
 #endif
 
-#if defined INCLUDE_BEN
    use mem, ONLY: NO_D2_BOX_STATES_BEN, D2SOURCE_BEN, &
         D2STATE_BEN, D2STATETYPE_BEN
 #ifdef EXPLICIT_SINK
    use mem, ONLY: D2SINK_BEN
-#endif
 #endif
    use standalone
    use api_bfm
@@ -67,11 +65,9 @@
    integer,dimension(2,2)  :: blccc_ice
    logical                 :: cut_ice
 #endif
-#if defined INCLUDE_BEN
    real(RLEN)              :: min2D_ben
    integer,dimension(2,2)  :: blccc_ben
    logical                 :: cut_ben
-#endif
 !
 ! !EOP
 !-----------------------------------------------------------------------
@@ -84,10 +80,8 @@
    min2D_ice =  ONE
    bbccc2D_ice=D2STATE_ICE
 #endif
-#if defined INCLUDE_BEN
    min2D_ben =  ONE
    bbccc2D_ben=D2STATE_BEN
-#endif
    TLOOP : DO
    ! Integration step:
 #ifndef EXPLICIT_SINK
@@ -106,14 +100,12 @@
       ccc_tmp2D_ice=D2STATE_ICE
 #endif
 
-#if defined INCLUDE_BEN
 #ifndef EXPLICIT_SINK
       bccc2D_ben=D2SOURCE_BEN
 #else
       bccc2D_ben=sum(D2SOURCE_BEN-D2SINK_BEN,2)
 #endif
       ccc_tmp2D_ben=D2STATE_BEN
-#endif
 
       DO j=1,NO_D3_BOX_STATES
          IF (D3STATETYPE(j).ge.0) THEN
@@ -137,7 +129,6 @@
       END DO
 #endif
 
-#if defined INCLUDE_BEN
       DO j=1,NO_D2_BOX_STATES_BEN
          IF (D2STATETYPE_BEN(j).ge.0) THEN
 #ifndef EXPLICIT_SINK
@@ -147,7 +138,6 @@
 #endif
          END IF
       END DO
-#endif
 
       nmin=nmin+nstep 
       ! Check for negative concentrations
@@ -159,11 +149,10 @@
       cut_ice = ( min2D_ice .lt. eps ) 
       cut = ( cut .OR. cut_ice )
 #endif
-#if defined INCLUDE_BEN
       min2D_ben=minval(D2STATE_BEN)
       cut_ben = ( min2D_ben .lt. eps )
       cut = ( cut .OR. cut_ben )
-#endif
+
       IF( cut ) THEN ! cut timestep
          IF (nstep.eq.1) THEN
             LEVEL1 'Necessary Time Step too small! Exiting from the following systems:'
@@ -185,7 +174,6 @@
             end if
 #endif
 
-#if defined INCLUDE_BEN
             if ( cut_ben) then
                blccc_ben(:,2)=minloc(D2STATE_BEN)
                LEVEL1 'Benthic Variable: ', var_names(stBenStateS+blccc_ben(1,2)-1)
@@ -193,7 +181,6 @@
                               'Rate=',bccc2D_ben(blccc_ben(1,2),blccc_ben(2,2))
                D2STATE_BEN=bbccc2D_ben
             end if
-#endif
 
             LEVEL1 'EXIT at time: ',timesec
             STOP 'integration-RK'
@@ -206,9 +193,7 @@
          D2STATE_ICE=bbccc2D_ice
 #endif
 
-#if defined INCLUDE_BEN
          D2STATE_BEN=bbccc2D_ben
-#endif
          dtm1=maxdelt
          delt=nstep*mindelt
          timesec=ntime*maxdelt
@@ -256,7 +241,6 @@
          END DO
 #endif
 
-#if defined INCLUDE_BEN
          DO j=1,NO_D2_BOX_STATES_BEN
             IF (D2STATETYPE_BEN(j).ge.0) THEN
 #ifndef EXPLICIT_SINK
@@ -268,7 +252,6 @@
 #endif
             END IF
          END DO
-#endif
 
 
          ! check for negative values
@@ -280,11 +263,10 @@
          cut_ice = ( min2D_ice .lt. eps ) 
          cut = ( cut .OR. cut_ice )
 #endif
-#if defined INCLUDE_BEN
          min2D_ben=minval(D2STATE_BEN)
          cut_ben = ( min2D_ben .lt. eps )
          cut = ( cut .OR. cut_ben )
-#endif
+
          IF( cut ) THEN ! cut timestep
             IF (nstep.eq.1) THEN
                LEVEL1 'Necessary Time Step too small! Exiting from the following systems:'
@@ -306,7 +288,6 @@
                end if
 #endif
 
-#if defined INCLUDE_BEN
                if ( cut_ben) then
                   blccc_ben(:,2)=minloc(D2STATE_BEN)
                   LEVEL1 'Benthic variable: ', var_names(stBenStateS+blccc_ben(1,2)-1)
@@ -314,7 +295,6 @@
                                  'rate=',bccc2D_ben(blccc_ben(1,2),blccc_ben(2,2))
                   D2STATE_BEN=bbccc2D_ben
                end if
-#endif
 
                LEVEL1 'EXIT at time: ',timesec
                STOP 'integration-RK'
@@ -328,9 +308,7 @@
             D2STATE_ICE=bbccc2D_ice
 #endif
 
-#if defined INCLUDE_BEN
             D2STATE_BEN=bbccc2D_ben
-#endif
 
             dtm1=delt
             delt=nstep*mindelt

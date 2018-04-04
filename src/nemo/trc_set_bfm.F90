@@ -21,11 +21,8 @@
    use global_mem, only:RLEN,ZERO,ONE
    use mem_param,  only: AssignAirPelFluxesInBFMFlag,        &
                          AssignPelBenFluxesInBFMFlag
-   use mem_PelGlobal, only: p_rR6m, KSINK_rPPY,              &
-                            AggregateSink, depth_factor,     &
-                            SINKD3STATE 
+   use mem_PelSinkSet
    use mem
-   use mem_Settling
    use constants,    only: SEC_PER_DAY
    use api_bfm
    use trcdiabfm,    only: bfm_iomput

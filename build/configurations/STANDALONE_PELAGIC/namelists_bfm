@@ -66,14 +66,11 @@
 ! Global Switches : turn on/off or choose model components 
 ! NAME                          KIND    DESCRIPTION
 ! CalcPelagicFlag               logical Pelagic System
-! CalcBenthicFlag               numeric Benthic system
-!                                       0 = No Benthic System
-!                                       The following are Not Yet Activated
-!                                       1 = Simple Benthic Return
-!                                       2 = Benthic organisms and intermediate 
-!                                           complexity nutrient regeneration 
-!                                       3 = Benthic organisms and full nutrient 
-!                                           regeneration (early diagenesis)
+! CalcBenthicFlag               logical Benthic system
+!    Selected using fortran MACROS from compset configuration :
+!      BENTHIC_RETURN : Simple Benthic Return 
+!      BENTHIC_BIO    : Benthic organisms and intermediate complexity nutrient regeneration
+!      BENTHIC_FULL   : Benthic organisms and full nutrient regeneration (early diagenesis)
 ! CalcTransportFlag             logical Compute Transport Term (when coupled
 !                                       with a OGCM)
 ! CalcConservationFlag          logical Mass Conservation Check
@@ -111,8 +108,8 @@
 &Param_parameters
 ! Switches : 
             CalcPelagicFlag = .TRUE.
-            CalcBenthicFlag = 0
-       CalcConservationFlag = .FALSE.
+            CalcBenthicFlag = .FALSE.
+       CalcConservationFlag = .TRUE.
           CalcTransportFlag = .FALSE.
        CalcPhytoPlankton(1) = .TRUE.
        CalcPhytoPlankton(2) = .TRUE.
@@ -136,6 +133,26 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
                       p_qro = 0.5
                p_qon_dentri = 1.25
                 p_qon_nitri = 2.0
+	filename_nml_conf = 'BFM_General.nml',
+/
+
+!-------------------------------------------------------------------------!
+! NAMELIST Param_parameters_ben
+!-------------------------------------------------------
+! Benthic flags and parameters :
+&Param_parameters_ben
+                    p_poro0 = 0.7
+                    p_d_tot = 0.30
+                 p_InitSink = 100.0
+                  p_d_tot_2 = 0.35
+                  p_clD1D2m = 0.01
+                    p_clDxm = 0.001
+                  p_q10diff = 1.49
+    calc_init_bennut_states = 0 
+                    p_qnQIc = 0.11155
+                    p_qpQIc = 0.010255
+                    p_qsQIc = 0.0221
+
 	filename_nml_conf = 'BFM_General.nml',
 /
 
@@ -199,6 +216,21 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
 /
 
 !-------------------------------------------------------------------------!
+! NAMELIST bfm_init_nml_ben
+!-------------------------------------------------------------------------!
+!Benthic initialisation of standard variables
+!<variablename>0 = <realvalue>
+!-------------------------------------------------------------------------!
+&bfm_init_nml_ben
+   Q6c0  = 10265.19,
+   Q6n0  = 200.0,
+   Q6p0  = 25.0,
+   Q6s0  = 10.0,
+   Q1c0  = 10.4988,
+	filename_nml_conf = 'BFM_General.nml',
+/
+
+!-------------------------------------------------------------------------!
 !NAMELIST bfm_save_nml
 !-------------------------------------------------------------------------!
 ! Stored variables
@@ -251,7 +283,30 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
 	filename_nml_conf = 'Benthic_Environment.nml',
 /
 
-
+!-------------------------------------------------------------------------!
+! NAMELIST BenthicReturn_parameters
+!-------------------------------------------------------------------------!
+! NAME         [UNIT]/KIND            DESCRIPTION
+! p_reminQ1c    [d-1]       Remineralization rate of DOC
+! p_reminQ1n    [d-1]       Remineralization rate of DON
+! p_reminQ1p    [d-1]       Remineralization rate of DOP
+! p_reminQ6c    [d-1]       Remineralization rate of C detritus
+! p_reminQ6n    [d-1]       Remineralization rate of N detritus
+! p_reminQ6p    [d-1]       Remineralization rate of P detritus
+! p_reminQ6s    [d-1]       Remineralization rate of Si detritus
+! p_pQIN3        [-]        Partitioning coeff. between NO3 and NH4
+!-------------------------------------------------------------------------!
+&BenthicReturn_parameters
+    p_reminQ1c = 0.1
+    p_reminQ1n = 0.1
+    p_reminQ1p = 0.1
+    p_reminQ6c = 0.05
+    p_reminQ6n = 0.05
+    p_reminQ6p = 0.05
+    p_reminQ6s = 0.05
+    p_pQIN3 = 0.1
+        filename_nml_conf = 'Benthic_Environment.nml',
+/
 
 !-------------------------------------------------------------------------!
 !NAMELIST CSYS_parameters 
@@ -792,6 +847,14 @@ p_paMEZ(2,:)=   0.0,    1.0
 !use_external_data logical Read external data (user defined)
 !data_file	   char	   Filename for external data
 !
+!Bottom boundary conditions for benthic-only simulations
+!(not used in pelagic simulations)
+!botdep_c       real    Organic carbon deposition rate (mg C m^-2 d^-1)
+!botdep_n       real    Organic nitrogen deposition rate (mmol m^-2 d^-1)
+!botdep_p       real    Organic phosphorus deposition rate (mmol m^-2 d^-1)
+!botdep_si      real    Organic silicate deposition rate (mmol m^-2 d^-1)
+!botox_o       real    Pelagic oxygen ventilation rate (mmol m^-2 d^-1)
+!
 !-------------------------------------------------------------------------!
 &forcings_nml
    forcing_method    = 1,
@@ -808,6 +871,11 @@ p_paMEZ(2,:)=   0.0,    1.0
    forcing_file      = '',
    use_external_data = .false.,
    data_file         = '',
+   botdep_c    = 0.0  !350.0,
+   botdep_n    = 0.0  !3.24,
+   botdep_p    = 0.0  !0.21,
+   botdep_si   = 0.0  !0.1151,
+   botox_o     = 0.0  !0.0,
 	filename_nml_conf = 'Standalone.nml',
 /
 

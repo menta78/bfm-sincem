@@ -78,10 +78,6 @@
   real(RLEN),   parameter :: SEC_PER_DAY=86400.0_RLEN  ! Seconds in day
   real(RLEN)              :: DAY_PER_SEC=ZERO  ! Inverse of Seconds in day
   real(RLEN),   parameter :: ONE_PER_DAY=1.0_RLEN  ! rate which is used in cases where implicitly assumed
-  integer,      parameter :: NO_BENTHOS=0
-  integer,      parameter :: BENTHIC_RETURN=1
-  integer,      parameter :: BENTHIC_BIO=2
-  integer,      parameter :: BENTHIC_FULL=3
   real(RLEN),   parameter :: HOURS_PER_DAY=24.0_RLEN  ! Hours in a day
   real(RLEN),   parameter :: SOLAR_RADIATION=1368.0_RLEN  ! Solar radiation constant
   integer,      parameter :: NODATA=0

@@ -19,11 +19,9 @@
                   NO_BOXES_X, NO_BOXES_Y, NO_BOXES_Z,    &
                   NO_BOXES_XY, NO_D3_BOX_DIAGNOSS, ERHO, &
                   NO_STATES,Depth,D3STATE,EPR,D3STATETYPE
-#ifdef INCLUDE_BEN
    use mem, only: NO_D2_BOX_STATES_BEN, D2STATE_BEN, &
                   NO_BOXES_Z_BEN, NO_BOXES_BEN, NO_STATES_BEN
    use api_bfm, only : D2STATE_BEN_tot, D2STATEB_BEN
-#endif
 #ifdef INCLUDE_SEAICE
    use mem, only: NO_D2_BOX_STATES_ICE, D2STATE_ICE, &
                   NO_BOXES_Z_ICE, NO_BOXES_ICE, NO_STATES_ICE
@@ -186,11 +184,9 @@
    NO_BOXES    = count(SEAmask)
    NO_BOXES_XY = count(SRFmask)
    NO_STATES   = NO_D3_BOX_STATES * NO_BOXES
-#ifdef INCLUDE_BEN
    NO_BOXES_Z_BEN  = 1
    NO_BOXES_BEN = NO_BOXES_XY * NO_BOXES_Z_BEN
    NO_STATES_BEN = NO_BOXES_BEN * NO_D2_BOX_STATES_BEN
-#endif
 #ifdef INCLUDE_SEAICE
    NO_BOXES_Z_ICE  = 1
    NO_BOXES_ICE = NO_BOXES_XY * NO_BOXES_Z_ICE
@@ -256,9 +252,7 @@
 #ifdef INCLUDE_SEAICE
    allocate(D2STATE_ICE_tot(NO_D2_BOX_STATES_ICE))
 #endif
-#ifdef INCLUDE_BEN
    allocate(D2STATE_BEN_tot(NO_D2_BOX_STATES_BEN))
-#endif
 
    !---------------------------------------------
    ! Assign the rank of the process
@@ -492,15 +486,12 @@
    D3STATEB = D3STATE
 
 #ifdef INCLUDE_SEAICE
-      allocate(D2STATEB_ICE(NO_D2_BOX_STATES_ICE,NO_BOXES_XY))
-      D2STATEB_ICE = D2STATE_ICE
+   allocate(D2STATEB_ICE(NO_D2_BOX_STATES_ICE,NO_BOXES_XY))
+   D2STATEB_ICE = D2STATE_ICE
 #endif
 
-
-#ifdef INCLUDE_BEN
-      allocate(D2STATEB_BEN(NO_D2_BOX_STATES_BEN,NO_BOXES_XY))
-      D2STATEB_BEN = D2STATE_BEN
-#endif
+   allocate(D2STATEB_BEN(NO_D2_BOX_STATES_BEN,NO_BOXES_XY))
+   D2STATEB_BEN = D2STATE_BEN
 
    ! Initialise the arrays containing external boundary data
    !-------------------------------------------------------
