@@ -42,7 +42,7 @@ end
 end
 
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-#       PHYSICAL VARIABLES
+#                          PHYSICAL VARIABLES
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 2d-variable-pel
   ThereIsLight : Switch for day/night cycle : -
@@ -61,7 +61,7 @@ end
 end
 
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-#       PELAGIC STATE VARIABLES (volume)
+#                            PELAGIC SYSTEM
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 3d-state-pel
   #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -151,36 +151,7 @@ end
 end
 
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-#       Benthic variables
-#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-2d-state-ben
-  #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  # Benthic State Vars
-  #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    group BenDetritus[cnps] (BOM) : mg C/m2: mmol N/m2 : mmol P/m2 : mmol Si/m2
-                Q1[-s]    : Labile organic Matter
-                Q11[-s]   : Labile organic Matter
-                Q6        : Particulate organic Matter
-    end
-end
-
-2d-variable-ben
-
-  #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  # Variables to check totmass of C N P Si in benthic
-  #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    totben[cnps]  : total mass present in benthos: g C: g N: g P: g Si
-
-  #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  # Variables holding quota of elements in species
-  #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    qpcBOM(BenDetritus)         : Quotum P/C in Benthic Organic Matter:mmol N/mg C
-    qncBOM(BenDetritus)         : Quotum N/C in Benthic Organic Matter:mmol P/mg C
-    qscBOM(BenDetritus)         : Quotum Si/C in Benthic Organic Matter:mmol Si/mg C
-end
-
-#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-#       GENERAL DIAGNOSTICS
+#   Support variables for Pelagic system
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 3d-variable-pel
 
@@ -249,10 +220,40 @@ end
     ABIO_eps              : Abiotic Extinction Coefficient : 1/m
 end
 
+#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+#                           BENTHIC SYSTEM
+#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+# RETURN model
+2d-state-ben
+  #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  # Benthic State Variables
+  #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    group BenDetritus[cnps] (BOM) : mg C/m2: mmol N/m2 : mmol P/m2 : mmol Si/m2
+                Q1[-s]    : Labile organic Matter
+                Q11[-s]   : Labile organic Matter
+                Q6        : Particulate organic Matter
+    end
+end
+
+2d-variable-ben
+
+  #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  # Variables to check totmass of C N P Si in benthic
+  #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    totben[cnps]  : total mass present in benthos: g C: g N: g P: g Si
+
+  #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  # Variables holding quota of elements in species
+  #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    qpcBOM(BenDetritus)         : Quotum P/C in Benthic Organic Matter:mmol N/mg C
+    qncBOM(BenDetritus)         : Quotum N/C in Benthic Organic Matter:mmol P/mg C
+    qscBOM(BenDetritus)         : Quotum Si/C in Benthic Organic Matter:mmol Si/mg C
+end
+
+#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+# TOTAL MASS CONSERVATION variables for C N P Si within BFM systems
+#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 2d-variable-pel
-  #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  # Variables to check total mass of C N P Si in the system
-  #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   totsysc  : total mass :  g C
   totsysn  : total mass :  g N
   totsysp  : total mass :  g P

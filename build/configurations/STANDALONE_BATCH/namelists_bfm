@@ -7,7 +7,7 @@
 #
 # COPYING
 #   
-#   Copyright (C) 2013 BFM System Team (bfm_st@lists.cmcc.it)
+#   Copyright (C) 2015 BFM System Team (bfm_st@lists.cmcc.it)
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 #-------------------------------------------------------------------------!
 
 
- 
+
 !-------------------------------------------------------------------------!
 !NAMELIST bfm_nml
 !-------------------------------------------------------------------------!
@@ -35,10 +35,13 @@
 !                        1. pelagic
 !                        2. benthic
 !                        3. pelagic and benthic
+!                        4. sea ice
+!                        5. pelagic and sea ice
 ! out_fname      string  Name of NetCDF output file
 ! out_dir        string  Path to the output file
 ! out_title      string  Name of the experiment in NetCDF file
 ! out_delta      integer Output is saved every out_delta timesteps
+!                        Use -1 to store with real monthly frequency
 ! parallel_log   logical Set true in parallel jobs for a single log file 
 !-------------------------------------------------------------------------!
 &bfm_nml
@@ -64,11 +67,9 @@
 ! CalcPelagicFlag               logical Pelagic System
 ! CalcBenthicFlag               logical Benthic system
 !    Selected using fortran MACROS from compset configuration :
-!      BENTHIC_RETURN : Simple Benthic Return 
 !      BENTHIC_BIO    : Benthic organisms and intermediate complexity nutrient regeneration
 !      BENTHIC_FULL   : Benthic organisms and full nutrient regeneration (early diagenesis)
-! CalcTransportFlag             logical Compute Transport Term (when coupled
-!                                       with a OGCM)
+! CalcTransportFlag             logical Compute Transport Term (when coupled with a OGCM)
 ! CalcConservationFlag          logical Mass Conservation Check
 ! CalcPhytoPlankton             logical Pelagic Phytoplankton (vector)
 ! CalcPelBacteria               logical Pelagic Bacteria (vector)
@@ -79,12 +80,12 @@
 !                                       time integration
 ! AssignAirPelFluxesInBFMFlag   logical Air-sea fluxes are added to the
 !                                       time integration
-! ChlDynamicsFlag               numeric Choose the dynamics of Chl-a
-!                                       1 = diagnostic, optimal light property
-!                                           in phytoplankton 
-!                                           (Ebenhoeh et al 1995, ERSEM-II) 
-!                                       2 = state variable, constituent of 
-!                                           phytoplankton
+! ChlDynamicsFlag    numeric Choose the dynamics of Chl-a
+!                            1 = diagnostic, optimal light property
+!                                in phytoplankton
+!                                (Ebenhoeh et al 1995, ERSEM-II)
+!                            2 = state variable, constituent of
+!                                phytoplankton
 !
 ! Global Parameters : used throughout the model and not related 
 !                     to a specific component
@@ -133,10 +134,51 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
 /
 
 !-------------------------------------------------------------------------!
+! NAMELIST Param_parameters_ben
+!-------------------------------------------------------
+! Benthic flags and parameters :
+&Param_parameters_ben
+                    p_poro0 = 0.7
+                    p_d_tot = 0.30
+                  p_d_tot_2 = 0.35
+                  p_clD1D2m = 0.01
+                    p_clDxm = 0.001
+                  p_q10diff = 1.49
+
+	filename_nml_conf = 'BFM_General.nml',
+/
+
+!-------------------------------------------------------------------------!
 ! NAMELIST bfm_init_nml
 !-------------------------------------------------------------------------!
 !Pelagic initialisation of standard variables
 !<variablename>0 = <realvalue>
+!
+! Initialization with InitVar structure 
+!----------------------------------------
+! NOTE:
+! This part is still experimental and will be improved in the future
+!----------------------------------------
+! BFM variable information for data input
+! available fields:
+! integer init: select the initialization
+!               0 = homogeneous
+!               1 = analytical (linear)
+!               2 = from file
+! options for init==1
+!   real anv1: value in the surface layer
+!   real anz1: thickness of the surface layer
+!   real anv2: value in the bottom layer
+!   real anz2: starting depth of the bottom layer
+! options for init==2 
+! * Options currently used when coupled with NEMO
+!   logical obc: variable has open boundary data
+!   logical sbc: variable has surface boundary data
+!   logical cbc: variable has coastal boundary data
+! * Options not used when coupled with NEMO because
+!   overridden by values in namelist_top_cfg
+!   char filename: name of the input file
+!   char  varname: name of the var in input file
 !-------------------------------------------------------------------------!
 &bfm_init_nml
    N1p0 = 100.0
@@ -153,6 +195,22 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
    R1c0 = 0.0
    R2c0 = 0.0
    R6c0 = 0.0
+	filename_nml_conf = 'BFM_General.nml',
+/
+
+!-------------------------------------------------------------------------!
+! NAMELIST bfm_init_nml_ben
+!-------------------------------------------------------------------------!
+!Benthic initialisation of standard variables
+!<variablename>0 = <realvalue>
+!-------------------------------------------------------------------------!
+&bfm_init_nml_ben
+   Q1c0  =  10.4988,
+   Q11c0 =  10.4988,
+   Q6c0  =  10265.19,
+   Q6n0  =  200.0,
+   Q6p0  =  25.0,
+   Q6s0  =  10.0,
 	filename_nml_conf = 'BFM_General.nml',
 /
 
@@ -180,26 +238,6 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
 
 	filename_nml_conf = 'BFM_General.nml',
 /
-
-!-------------------------------------------------------------------------!
-!NAMELIST Settling_parameters
-!-------------------------------------------------------------------------!
-! BURIAL VELOCITIES into the sediment
-! NAME         [UNIT]/KIND            DESCRIPTION
-! p_burvel_R6     [m/d]              Bottom Burial Velocity for detritus 
-! p_burvel_R2     [m/d]              Bottom Burial Velocity for dissolved
-! p_burvel_PI     [m/d]              Bottom Burial Velocity for plankton 
-! p_burvel_O5     [m/d]              Bottom Burial Velocity for calcite
-!-------------------------------------------------------------------------!
-&Settling_parameters
-  p_burvel_R6 = 1.5,
-  p_burvel_O5 = 30.0,
-  p_burvel_R2 = 0.0,
-  p_burvel_PI = 0.0
-	filename_nml_conf = 'Benthic_Environment.nml',
-/
-
-
 
 !-------------------------------------------------------------------------!
 !NAMELIST CSYS_parameters 
@@ -385,9 +423,9 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
 !  p_xqf       [-]            Multiplication factor for luxury storage
 !              --------- Light parameters ERSEM-II -----------
 !  p_iswLtyp   [0-6]          Shape of the productivity function
-!  p_chELiPPY    [W/m2]         Maximum Iopt
-!  p_clELiPPY    [W/m2]         Minimum Iopt
-!  p_ruELiPPY    [1/d]          Maximum daily shift in Iopt (1/d)
+!  p_chELiPPY  [W/m2]         Maximum Iopt
+!  p_clELiPPY  [W/m2]         Minimum Iopt
+!  p_ruELiPPY  [1/d]          Maximum daily shift in Iopt (1/d)
 !  p_addepth   [m]            Adaptation depth. Meaningless with high-res models
 !              --------- Sinking parameters -----------
 !  p_rPIm      [m/d]          Phytoplankton background sinking rate
@@ -647,14 +685,14 @@ p_paMEZ(2,:)=   0.0,    1.0
 !-------------------------------------------------------------------------!
 ! Sinking rates of Pelagic Variables
 !  : for mem_PelGlobal filled by InitPelGlobal
-! NAME           UNIT      DESCRIPTION
-! p_rR6m         [m/d]   detritus sinking rate
-! p_rO5m         [m/d]   calcite sinking rate
-! KSINK_rPPY      [m]    prescribe sinking rate for phytoplankton below this
-!                        depth threshold to p_rR6m value. Use 0.0 to disable.
-! AggregateSink  logic   use aggregation = true to enhance the sink rate
-!                        and bypass the prescribed sinking
-! depth_factor    [m]    depth factor for aggregation method
+! NAME         [UNIT]/KIND            DESCRIPTION
+! p_rR6m          [m/d]         detritus sinking rate
+! p_rO5m          [m/d]         calcite sinking rate
+! KSINK_rPPY       [m]          prescribe sinking rate for phytoplankton below this
+!                               depth threshold to p_rR6m value. Use 0.0 to disable.
+! AggregateSink   logic         use aggregation = true to enhance the sink rate
+!                               and bypass the prescribed sinking
+! depth_factor     [m]          depth factor for aggregation method
 !-------------------------------------------------------------------------!
 &PelGlobal_parameters
   p_rR6m         = 5.0
@@ -664,6 +702,50 @@ p_paMEZ(2,:)=   0.0,    1.0
   depth_factor   = 2000.0
 	filename_nml_conf = 'Pelagic_Environment.nml',
 /
+
+!-------------------------------------------------------------------------!
+!NAMELIST Settling_parameters
+!-------------------------------------------------------------------------!
+! BURIAL VELOCITIES into the sediment
+! NAME         [UNIT]/KIND            DESCRIPTION
+! p_burvel_R6     [m/d]          Bottom Burial Velocity for detritus 
+! p_burvel_R2     [m/d]          Bottom Burial Velocity for dissolved
+! p_burvel_PI     [m/d]          Bottom Burial Velocity for plankton 
+! p_burvel_O5     [m/d]          Bottom Burial Velocity for calcite
+!-------------------------------------------------------------------------!
+&Settling_parameters
+  p_burvel_R6 = 1.5,
+  p_burvel_O5 = 30.0,
+  p_burvel_R2 = 0.0,
+  p_burvel_PI = 0.01
+	filename_nml_conf = 'Benthic_Environment.nml',
+/
+
+!-------------------------------------------------------------------------!
+! NAMELIST BenthicReturn_parameters
+!-------------------------------------------------------------------------!
+! NAME         [UNIT]/KIND            DESCRIPTION
+! p_reminQ1c    [d-1]       Remineralization rate of DOC
+! p_reminQ1n    [d-1]       Remineralization rate of DON
+! p_reminQ1p    [d-1]       Remineralization rate of DOP
+! p_reminQ6c    [d-1]       Remineralization rate of C detritus
+! p_reminQ6n    [d-1]       Remineralization rate of N detritus
+! p_reminQ6p    [d-1]       Remineralization rate of P detritus
+! p_reminQ6s    [d-1]       Remineralization rate of Si detritus
+! p_pQIN3        [-]        Partitioning coeff. between NO3 and NH4
+!-------------------------------------------------------------------------!
+&BenthicReturn_parameters
+  p_reminQ1c = 0.1
+  p_reminQ1n = 0.1
+  p_reminQ1p = 0.1
+  p_reminQ6c = 0.05
+  p_reminQ6n = 0.05
+  p_reminQ6p = 0.05
+  p_reminQ6s = 0.05
+  p_pQIN3 = 0.1
+        filename_nml_conf = 'Benthic_Environment.nml',
+/
+
 
 !-------------------------------------------------------------------------!
 !NAMELIST standalone_nml
@@ -740,6 +822,14 @@ p_paMEZ(2,:)=   0.0,    1.0
 !use_external_data logical Read external data (user defined)
 !data_file	   char	   Filename for external data
 !
+!Bottom boundary conditions for benthic-only simulations
+!(not used in pelagic simulations)
+!botdep_c       real    Organic carbon deposition rate (mg C m^-2 d^-1)
+!botdep_n       real    Organic nitrogen deposition rate (mmol m^-2 d^-1)
+!botdep_p       real    Organic phosphorus deposition rate (mmol m^-2 d^-1)
+!botdep_si      real    Organic silicate deposition rate (mmol m^-2 d^-1)
+!botox_o       real    Pelagic oxygen ventilation rate (mmol m^-2 d^-1)
+!
 !-------------------------------------------------------------------------!
 &forcings_nml
    forcing_method    = 1,
@@ -756,6 +846,11 @@ p_paMEZ(2,:)=   0.0,    1.0
    forcing_file      = '',
    use_external_data = .false.,
    data_file         = '',
+   botdep_c          = 0.0,
+   botdep_n          = 0.0,
+   botdep_p          = 0.0,
+   botdep_si         = 0.0,
+   botox_o           = 0.0,
 	filename_nml_conf = 'Standalone.nml',
 /
 

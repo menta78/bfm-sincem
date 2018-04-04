@@ -21,14 +21,14 @@
 #  BFM_STANDALONE   : mandatory when using the STANDALONE model
 #  INCLUDE_PELFE    : add Iron component to the pelagic system
 #  INCLUDE_PELCO2   : activate Carbonate System and CO2 dynamics 
-#  INCLUDE_DIAG     : activate flux diagnostics defined in .mem file
+#  BENTHIC_BIO      : use Intermediate complexity Benthic system
 #  EXPLICIT_SINK    : use of D3SOURCE and D3SINK
 
 &BFM_conf
         MODE    = 'STANDALONE',
         CPPDEFS = 'BFM_STANDALONE INCLUDE_PELCO2 INCLUDE_DIAG',
         ARCH    = 'gfortran.inc',
-        PROC    = 1,
+        PROC    = 4,
         EXP     = 'standalone.batch',
 /
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
