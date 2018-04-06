@@ -300,6 +300,7 @@
      !  (p_bursel<< P_sediR6). Therefore it is assumed that filterfeeders do not eat Q6.
      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
      cmm = ZERO;
+     fsat=ONE
 
      fdepth=Depth_Ben(:)
 
