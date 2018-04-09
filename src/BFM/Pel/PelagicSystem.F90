@@ -21,19 +21,23 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
   use global_mem, ONLY:RLEN, ZERO
-  use mem, ONLY: iiPhytoPlankton,iiMesoZooPlankton,iiMicroZooPlankton,  &
-                 iiPelBacteria,flPTN6r
+  use mem, ONLY: iiPhytoPlankton, iiMesoZooPlankton, iiMicroZooPlankton,      &
+                 iiPelBacteria, flPTN6r, sediR2, sediR6, sediPPY 
 #ifdef INCLUDE_PELFE
   use mem, ONLY: iiF
 #endif
-  use mem_Param, ONLY: CalcPhytoPlankton,CalcMicroZooPlankton, &
-    CalcMesoZooPlankton, CalcPelBacteria, CalcPelChemistry,    &
-    ChlDynamicsFlag
+  use mem_Param, ONLY: CalcPhytoPlankton,CalcMicroZooPlankton,                &
+    CalcMesoZooPlankton, CalcPelBacteria, CalcPelChemistry, ChlDynamicsFlag
   use global_interface,   ONLY: CalcChlorophylla, CalcOxygenSaturation
   use global_interface, ONLY: PhotoAvailableRadiation, &
     PhytoDynamics, LightAdaptationDynamics, MesoZooDynamics, MicroZooDynamics
-  use api_bfm, ONLY: LOGUNIT
+  use api_bfm, ONLY: LOGUNIT, BOTindices
   use init_var_bfm_local, only: upd_organic_quotas
+  use mem_PelSinkSet, ONLY: p_rR6m, p_rPIm, p_burvel_R2, p_burvel_R6, p_burvel_PI
+#if defined INCLUDE_PELCO2
+  use mem,            ONLY: sediO5
+  use mem_PelSinkSet, ONLY: p_rO5m, p_burvel_O5
+#endif
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 !  
@@ -81,7 +85,14 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Set background sedimentation velocities
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  call PelSinkSet
+  sediR2(:) = ZERO
+  sediR6(:) = p_rR6m
+#if defined INCLUDE_PELCO2
+  sediO5(:) = p_rO5m
+#endif
+  do i = 1 , (iiPhytoPlankton)
+    sediPPY(i,:) = p_rPIm( i)
+  end do
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Dissovled oxygen saturation and air-sea flux
@@ -133,6 +144,20 @@
   do i =1,iiPelBacteria
      if ( CalcPelBacteria(i)) call PelBacDynamics( i )
   end do
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Prescribe burial velocities at sediment-water column interface
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  if ( BOTindices(1) .NE.0 )  then 
+      sediR2(BOTindices) = p_burvel_R2
+      sediR6(BOTindices) = p_burvel_R6
+#if defined INCLUDE_PELCO2
+      sediO5(BOTindices) = p_burvel_O5
+#endif
+      do i = 1 , ( iiPhytoPlankton)
+          sediPPY(i,BOTindices)  =   p_burvel_PI
+      end do
+  endif
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Compute HydroChemistry (including CO2 in seawater)
