@@ -129,7 +129,7 @@
    ! loop over the number of bottom boxes
    BOXES_XY_LOOP : do Box = 1,NO_BOXES_XY
       kbot = BOTindices(Box)
-  
+
 #if defined BENTHIC_BIO || defined BENTHIC_FULL
    ! 
    ! ------------------------------------------------------------------
@@ -335,11 +335,11 @@
       call flux(kbot, iiPel, ppN5s, ppN5s, jbotN5s(Box)/Depth(kbot) )
       call flux(kbot, iiPel, ppN6r, ppN6r, jbotN6r(Box)/Depth(kbot) )
 #if defined INCLUDE_PELCO2
-      call flux(kbot, iiPel, ppO5c, ppO5c, jbotO5c(Box)/Depth(kbot))
+      call flux(kbot, iiPel, ppO5c, ppO5c, jbotO5c(Box)/Depth(kbot) )
 #if defined INCLUDE_BENCO2 || ( ! defined BENTHIC_BIO && ! defined BENTHIC_FULL )
       call flux(kbot, iiPel, ppO3c, ppO3c, jbotO3c(Box)/Depth(kbot) )
       ! convert the units from mmol/m3/d to umol/kg/d
-      call flux(kbot, iiPel, ppO3h, ppO3h, jbotO3h(Box)/Depth(kbot))
+      call flux(kbot, iiPel, ppO3h, ppO3h, jbotO3h(Box)/Depth(kbot) )
 #endif
 #endif
       ! PhytoPlankton
@@ -374,45 +374,44 @@
            call flux(kbot, iiPel, j, j, PELBOTTOM(j,Box)/Depth(kbot) )
       enddo
       !
+   enddo FLUXES_XY_LOOP
    !
    ! ------------------------------------------------------------------
    ! FLUXES for Benthic-Pelagic Coupling
    ! ------------------------------------------------------------------
    !
-      if ( CalcBenthicFlag ) then
-         !
-         ! Sedimentation of Pelagic Organic Matter (Q6f still missing !!!)
+   if ( CalcBenthicFlag ) then
+      !
+      ! Sedimentation of Pelagic Organic Matter (Q6f still missing !!!)
 
-         call flux_vector( iiBen, ppQ6c,ppQ6c, -jbotR6c(:) )
-         call flux_vector( iiBen, ppQ6n,ppQ6n, -jbotR6n(:) )
-         call flux_vector( iiBen, ppQ6p,ppQ6p, -jbotR6p(:) )
-         call flux_vector( iiBen, ppQ6s,ppQ6s, -jbotR6s(:) )
-         call flux_vector( iiBen, ppQ1c,ppQ1c, -jbotR1c(:) )
-         call flux_vector( iiBen, ppQ1n,ppQ1n, -jbotR1n(:) )
-         call flux_vector( iiBen, ppQ1p,ppQ1p, -jbotR1p(:) )
+      call flux_vector( iiBen, ppQ6c,ppQ6c, -jbotR6c(:) )
+      call flux_vector( iiBen, ppQ6n,ppQ6n, -jbotR6n(:) )
+      call flux_vector( iiBen, ppQ6p,ppQ6p, -jbotR6p(:) )
+      call flux_vector( iiBen, ppQ6s,ppQ6s, -jbotR6s(:) )
+      call flux_vector( iiBen, ppQ1c,ppQ1c, -jbotR1c(:) )
+      call flux_vector( iiBen, ppQ1n,ppQ1n, -jbotR1n(:) )
+      call flux_vector( iiBen, ppQ1p,ppQ1p, -jbotR1p(:) )
 
 #if defined BENTHIC_BIO || defined BENTHIC_FULL
-         !
-         ! Changes in depth distribution of states due to OMT sedimentation
+      !
+      ! Changes in depth distribution of states due to OMT sedimentation
 
-         Delta=GetDelta( )
-         call RecalcPenetrationDepth( D1m(:), D6m(:), &
-              -jbotR6c(:)*Delta, Q6c(:),newDm(:) )
-         call flux_vector(iiBen, ppD6m,ppD6m,(newDM(:)- D6m(:))/Delta)
-         call RecalcPenetrationDepth( D1m(:), D7m(:), &
-              -jbotR6n(:)*Delta, Q6n(:),newDm(:) )
-         call flux_vector(iiBen, ppD7m,ppD7m,(newDM(:)- D7m(:))/Delta)
-         call RecalcPenetrationDepth( D1m(:), D8m(:), &
-              -jbotR6p(:)*Delta, Q6p(:),newDm(:) )
-         call flux_vector(iiBen, ppD8m,ppD8m,(newDM(:)- D8m(:))/Delta)
-         call RecalcPenetrationDepth(D1m(:), D9m(:), &
-              -jbotR6s(:)*Delta, Q6s(:),newDm(:) )
-         call flux_vector(iiBen, ppD9m,ppD9m,(newDM(:)- D9m(:))/Delta)
+      Delta=GetDelta( )
+      call RecalcPenetrationDepth( D1m(:), D6m(:), &
+           -jbotR6c(:)*Delta, Q6c(:),newDm(:) )
+      call flux_vector(iiBen, ppD6m,ppD6m,(newDM(:)- D6m(:))/Delta)
+      call RecalcPenetrationDepth( D1m(:), D7m(:), &
+           -jbotR6n(:)*Delta, Q6n(:),newDm(:) )
+      call flux_vector(iiBen, ppD7m,ppD7m,(newDM(:)- D7m(:))/Delta)
+      call RecalcPenetrationDepth( D1m(:), D8m(:), &
+           -jbotR6p(:)*Delta, Q6p(:),newDm(:) )
+      call flux_vector(iiBen, ppD8m,ppD8m,(newDM(:)- D8m(:))/Delta)
+      call RecalcPenetrationDepth(D1m(:), D9m(:), &
+           -jbotR6s(:)*Delta, Q6s(:),newDm(:) )
+      call flux_vector(iiBen, ppD9m,ppD9m,(newDM(:)- D9m(:))/Delta)
 #endif
 
-      endif 
-      !
-   enddo FLUXES_XY_LOOP
+   endif 
    !
    deallocate( jbotR1PPY, jbotR2R1, jbotR6PPY, jbotR2R6 )
    ! 
