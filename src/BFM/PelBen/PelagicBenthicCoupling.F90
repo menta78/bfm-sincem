@@ -338,7 +338,6 @@
       call flux(kbot, iiPel, ppO5c, ppO5c, jbotO5c(Box)/Depth(kbot) )
 #if defined INCLUDE_BENCO2 || ( ! defined BENTHIC_BIO && ! defined BENTHIC_FULL )
       call flux(kbot, iiPel, ppO3c, ppO3c, jbotO3c(Box)/Depth(kbot) )
-      ! convert the units from mmol/m3/d to umol/kg/d
       call flux(kbot, iiPel, ppO3h, ppO3h, jbotO3h(Box)/Depth(kbot) )
 #endif
 #endif

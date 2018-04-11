@@ -50,9 +50,6 @@
   use mem_BenCO2Transport
   use mem_BenAlkalinity
 #endif
-#ifdef INCLUDE_SILT
-  use mem_Silt
-#endif
 #ifdef INCLUDE_SEAICE
   use mem_SeaiceAlgae
   use mem_SeaiceBac
