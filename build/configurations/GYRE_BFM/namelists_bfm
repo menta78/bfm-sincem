@@ -49,7 +49,7 @@
    bio_calc     = .TRUE.
    bfm_init     = 0
    bfm_rstctl   = .FALSE.
-   bio_setup    = 1
+   bio_setup    = 3
    out_fname    = 'GYRE_BFM'
    out_dir      = '.'
    out_title    = 'GYRE_BFM'
