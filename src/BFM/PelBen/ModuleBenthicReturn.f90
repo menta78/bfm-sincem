@@ -20,6 +20,7 @@
 
   use global_mem
   use mem_Param, ONLY: CalcBenthicFlag
+  use mem,       ONLY: NO_BOXES_XY
 
 !  
 !
@@ -63,15 +64,13 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! BenthicReturn1 PARAMETERS (read from nml)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  real(RLEN)  :: p_reminQ1c  ! Spec. remin. rate of DOC (d-1)
-  real(RLEN)  :: p_reminQ1n  ! Spec. remin. rate of DON (d-1)
-  real(RLEN)  :: p_reminQ1p  ! Spec. remin. rate of DOP (d-1)
-  real(RLEN)  :: p_reminQ6c  ! Spec. remin. rate of C detritus (d-1)
-  real(RLEN)  :: p_reminQ6n  ! Spec. remin. rate of N detritus (d-1)
-  real(RLEN)  :: p_reminQ6p  ! Spec. remin. rate of P detritus (d-1)
-  real(RLEN)  :: p_reminQ6s  ! Spec. remin. rate of Si detritus (d-1)
-  real(RLEN)  :: p_pQIN3  ! Partitioning coeff. between NO3 and NH4
+  real(RLEN)  :: p_reminQ1  ! Spec. remin. rate of Dissolved OM (d-1)
+  real(RLEN)  :: p_reminQ6  ! Spec. remin. rate of Particulate OM (d-1)
+  real(RLEN)  :: p_pQIN3    ! Partitioning coeff. between NO3 and NH4
+  real(RLEN)  :: p_depscale ! Depth level to scale remineralization rates (m)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Scaling factor for remineralization rates
+  real(RLEN),ALLOCATABLE, DIMENSION(:) :: RETFAC
   ! SHARED PUBLIC FUNCTIONS (must be explicited below "contains")
 
   public InitBenthicReturn
@@ -81,13 +80,11 @@
   subroutine InitBenthicReturn()
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  namelist /BenthicReturn_parameters/ p_reminQ1c, p_reminQ1n, p_reminQ1p, &
-    p_reminQ6c, p_reminQ6n, p_reminQ6p, p_reminQ6s, p_pQIN3
+  namelist /BenthicReturn_parameters/ p_reminQ1, p_reminQ6, p_pQIN3, p_depscale
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
   !BEGIN compute
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-
   !  Open the namelist file(s)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   if ( CalcBenthicFlag ) then
@@ -99,6 +96,13 @@
      write(LOGUNIT,*) "#  Namelist is:"
      write(LOGUNIT,nml=BenthicReturn_parameters)
   endif
+  !
+  ! Scaling factor of remineralzation rates
+  allocate(RETFAC(NO_BOXES_XY))
+  RETFAC = ONE
+  ! 
+  if ( p_depscale > ZERO) &
+     write(LOGUNIT,'(a,f12.6)') "Set depth scaling factor for Benthic Return rates using ", p_depscale
   ! 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   return

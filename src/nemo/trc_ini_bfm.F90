@@ -37,7 +37,7 @@
                          error_msg_prn,ONE, bfm_lwp,NMLUNIT, SkipBFMCore
    use constants,  only: SEC_PER_DAY
    use api_bfm, only: ZEROS, SEAmask, BOTmask, SRFmask, &
-        btmp1D, rtmp3Da, rtmp3Db, &
+        btmp1D, rtmp1D, rtmp3Da, rtmp3Db, &
         var_names, bfm_init, &
         BOTindices,SRFindices, stPelStateS, &
         InitVar, bio_setup, in_rst_fname, out_rst_fname, save_delta, time_delta, &
@@ -51,6 +51,7 @@
    use init_var_bfm_local
    use trcdiabfm,  only: bfm_iomput
    use sw_tool,    only: gsw_p_from_z
+   use mem_BenthicReturn, ONLY: RETFAC, p_depscale
 
    ! NEMO modules
    USE trcnam_trp, only: ln_trczdf_exp,ln_trcadv_cen2,ln_trcadv_tvd
@@ -275,7 +276,7 @@
    ! Allocate memory and give homogeneous initial values
    !-------------------------------------------------------
    call init_var_bfm(bio_setup)
-
+   
    !---------------------------------------------
    ! Disable BFM coupling if no oceanpoints are
    ! available in the domain (only land!)
@@ -526,6 +527,22 @@
      stop
    endif
 #endif
+   ! Set Benthic conditions
+   !
+   ! Scaling factor for benthic return coefficients
+   ! Depth dependence from Middelburg et al. (1996) metamodel (see par. 3.4)
+   if ( p_depscale > ZERO ) then
+      allocate(rtmp1D(NO_BOXES))
+      rtmp1D = pack(gdept_0,SEAmask)
+      DO i = 1, NO_BOXES_XY
+         j = BOTindices(i)
+         zexp  = MIN( 8.,( rtmp1D(j) / p_depscale )**(-1.5) )
+         zdexp = -0.9543 + 0.7662 * LOG( zexp ) - 0.235 * LOG( zexp )**2
+         RETFAC(i) = MIN( 1., EXP( zdexp ) / 0.5 )
+         if (lwp) write(LOGUNIT,*) RETFAC(i),rtmp1D(j)
+      END DO 
+      deallocate(rtmp1D)
+   endif
  
 #ifdef INCLUDE_PELFE
    ALLOCATE (ironsed(jpi,jpj,jpk))
@@ -539,7 +556,7 @@
       CALL iom_open ( 'bottom_fraction.nc', m )
       CALL iom_get  ( m, 1, 'btmfrac' , ironsed(:,:,:), 1 )
       CALL iom_close( m )
-      ! iron release dpenedence on depth (metamodel of Middelburg et al.,1996)
+      ! iron release dependence on depth (metamodel of Middelburg et al.,1996)
       DO k = 1, jpk
          DO j = 1, jpj
             DO i = 1, jpi
@@ -558,6 +575,7 @@
       !
    endif
 #endif
+
    ! control consistency with NEMO EOS and BFM available conversions
    if ( nn_eos .eq. -1 ) then
       LEVEL1 'Conversions for NEMO TEOS-10 not available. Use directly CT and SA as state variables'
