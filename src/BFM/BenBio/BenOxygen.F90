@@ -25,7 +25,7 @@
   use mem
 #else
   use mem,  ONLY: D1m, G2o, D2m
-  use mem, ONLY: ppD1m, ppG2o, ppD2m, InitializeModel, LocalDelta, shiftD1m, &
+  use mem, ONLY: ppD1m, ppG2o, ppD2m, InitializeModel, shiftD1m, &
     jbotO2o, ETW_Ben, irrenh, rrBTo, jG2K3o, jG2K7o, O2o_Ben, NO_BOXES_XY, iiBen, &
     iiPel, flux_vector
 #if defined BENTHIC_FULL
@@ -34,10 +34,11 @@
 #endif
 
 #endif
-  use constants,  ONLY: SEC_PER_DAY, ONE_PER_DAY, STANDARD,EQUATION
+  use constants,  ONLY: SEC_PER_DAY, ONE_PER_DAY, STANDARD,EQUATION, ZERO_KELVIN
   use mem_Param,  ONLY: p_poro, p_small, p_d_tot, CalcBenthicFlag
   use mem_BenOxygen
   use mem_Param,  ONLY: p_d_tot, p_clD1D2m
+  use time,       ONLY: bfmtime
 
 !  
 !
@@ -79,15 +80,21 @@
   real(RLEN),dimension(NO_BOXES_XY)  :: G2oNew
   real(RLEN),dimension(NO_BOXES_XY)  :: jG2O2o
   real(RLEN),dimension(NO_BOXES_XY)  :: unc_shiftD1m
-  real(RLEN)                             :: dummy
+  real(RLEN)                         :: dummy, delta
 
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Current timestep for transient G2o computation
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  delta = bfmtime%timestep / SEC_PER_DAY
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  ! Emperical equation derived from Broecker and Peng (1973)
+  ! Oxygen diffusion from pelagic to benthic pore water [m2/d]
+  ! Empirical equation from Broecker and Peng (1974, Table 2 note a) +
+  ! bioirrigation diffusion enhancement and porosity correction
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-  diff = SEC_PER_DAY* 1.0e-9_RLEN* (10.0_RLEN)**((- 984.26_RLEN/( 273.0_RLEN+ &
-    ETW_Ben(:))+ 3.672_RLEN))* p_poro* irrenh(:)* p_exsaf
+  diff = SEC_PER_DAY* 1.0e-9_RLEN* (10.0_RLEN)**((- 984.26_RLEN/(ETW_Ben(:)- &
+    ZERO_KELVIN)+ 3.672_RLEN))* p_poro* irrenh(:)* p_exsaf
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Recalculate total consumption from /m2 to /m3 pw:
@@ -138,7 +145,7 @@
   ! recalculate the new D1mNew at the actual time step:
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-  D1mNew  =   D1m(:)+ r* LocalDelta
+  D1mNew  =   D1m(:)+ r* delta * 0._RLEN
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! calculate the consumption which belongs to the corrected D1mNew
@@ -152,13 +159,11 @@
 
   G2oNew = D1mNew*( O2o_Ben(:)- 0.66667_RLEN* zmG2o* D1mNew* D1mNew/( 2.0_RLEN* &
     diff))* p_poro
-
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! flux to pelagic: correct flux for rate of change of G2o
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-  jG2O2o = -( rrBTo(:)+ jG2K3o(:)+ jG2K7o(:))-( G2oNew- G2o(:))/ &
-    ONE_PER_DAY
+  jG2O2o = -( rrBTo(:)+ jG2K3o(:)+ jG2K7o(:))- (G2oNew- G2o(:))/ ONE_PER_DAY
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   !  Assign fluxes

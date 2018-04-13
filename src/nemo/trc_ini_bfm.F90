@@ -539,7 +539,6 @@
          zexp  = MIN( 8.,( rtmp1D(j) / p_depscale )**(-1.5) )
          zdexp = -0.9543 + 0.7662 * LOG( zexp ) - 0.235 * LOG( zexp )**2
          RETFAC(i) = MIN( 1., EXP( zdexp ) / 0.5 )
-         if (lwp) write(LOGUNIT,*) RETFAC(i),rtmp1D(j)
       END DO 
       deallocate(rtmp1D)
    endif
