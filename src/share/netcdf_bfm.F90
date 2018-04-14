@@ -721,7 +721,7 @@ end subroutine init_netcdf_rst_bfm
      call check_err(NF90_PUT_VAR( ncid_rst, d2state_long_rid_ice, tmp_d2long_ice, &
           start=(/ 1, 1 /), count=(/ LEN(tmp_d2long_ice), NO_D2_BOX_STATES_ICE /)), restfile)
 #if defined BFM_NEMO || defined BFM_POM
-     call check_err(NF90_PUT_VAR(ncid_rst,d2state_rid_ice,D2STATEB_ICE(:,:),start,edges), restfile)
+     call check_err(NF90_PUT_VAR(ncid_rst,d2stateb_rid_ice,D2STATEB_ICE(:,:),start,edges), restfile)
 #endif
 #endif
 
@@ -741,7 +741,7 @@ end subroutine init_netcdf_rst_bfm
      call check_err(NF90_PUT_VAR( ncid_rst, d2state_long_rid_ben, tmp_d2long_ben, &
           start=(/ 1, 1 /), count=(/ LEN(tmp_d2long_ben), NO_D2_BOX_STATES_BEN /)), restfile)
 #if defined BFM_NEMO || defined BFM_POM
-     call check_err(NF90_PUT_VAR(ncid_rst,d2state_rid_ben,D2STATEB_BEN(:,:),start,edges), restfile)
+     call check_err(NF90_PUT_VAR(ncid_rst,d2stateb_rid_ben,D2STATEB_BEN(:,:),start,edges), restfile)
 #endif
      LEVEL2 'save_rst_bfm: Restart data has been written'
 ! the file is closed in the main (in case of more restart files)
