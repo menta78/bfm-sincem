@@ -145,7 +145,7 @@
   ! recalculate the new D1mNew at the actual time step:
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-  D1mNew  =   D1m(:)+ r* delta * 0._RLEN
+  D1mNew  =   D1m(:)+ r* delta
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! calculate the consumption which belongs to the corrected D1mNew
