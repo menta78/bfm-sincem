@@ -83,13 +83,6 @@
   real(RLEN),dimension(NO_BOXES_XY)  :: rate
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-  ! Oxygen consumption in the sediments
-  rate = p_reminO2* max( ZERO, - G2o(:)/ D1m(:)+ K6r(:)/ p_qro/( &
-    p_d_tot- D1m(:)))* D1m(:)
-  call flux_vector( iiBen, ppG2o,ppG2o,-( rate) )
-  call flux_vector( iiBen, ppK6r,ppK6r,-( rate* p_qro) )
-  jG2K7o(:)  =   rate
-
   !----------------------------------------------------------------------
   ! Phosphorus remineralization in the sediments
   !----------------------------------------------------------------------

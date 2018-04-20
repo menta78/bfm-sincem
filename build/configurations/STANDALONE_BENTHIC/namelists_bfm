@@ -140,7 +140,7 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
 ! Benthic flags and parameters :
 &Param_parameters_ben
          CalcBenBacteria(1) = .TRUE.
-         CalcBenBacteria(2) = .TRUE.
+         CalcBenBacteria(2) = .FALSE.
         CalcBenOrganisms(1) = .TRUE.
         CalcBenOrganisms(2) = .TRUE.
         CalcBenOrganisms(3) = .TRUE.
@@ -225,10 +225,7 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
    Q1c0  =  10.4988,
    Q11c0 =  10.4988,
    Q6c0  =  10265.19,
-   Q6n0  =  200.0,
-   Q6p0  =  25.0,
-   Q6s0  =  10.0,
-   G2o0  =  0.008879,
+   G2o0  =  0.1,
    K1p0  =  0.1,
    K11p0 =  80.0,
    K4n0  =  0.0277856,
@@ -241,7 +238,7 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
    Y3c0  =  310.0,
    Y4c0  =  220.0,
    Y5c0  =  160.0,
-   D1m0  =  0.002,
+   D1m0  =  0.020,
    D2m0  =  0.025,
    D6m0  =  0.25,
    D7m0  =  0.25,
@@ -281,7 +278,7 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
           'qpcMIZ_iiZ5', 'qncMIZ_iiZ5', 'qpcMIZ_iiZ6', 'qncMIZ_iiZ6'
           'qpcPPY_iiP1', 'qncPPY_iiP1', 'qlcPPY_iiP1', 'qpcPPY_iiP2', 'qncPPY_iiP2', 'qlcPPY_iiP2',
           'qpcPPY_iiP3', 'qncPPY_iiP3', 'qlcPPY_iiP3', 'qpcPPY_iiP4', 'qncPPY_iiP4', 'qlcPPY_iiP4',
-          'Q6c','Q6n','Q6p','Q6s','Q1c','Q1n','Q1p',
+          'Q6c','Q6n','Q6p','Q6s','Q1c','Q1n','Q1p','Q11c',
           'Y1c','Y2c','Y3c','Y4c','Y5c','H1c','H2c', 
           'D1m','D2m','G2o','K1p','K11p','K4n','K14n','K6r'
 	filename_nml_conf = 'BFM_General.nml',
@@ -762,7 +759,7 @@ p_paMEZ(2,:)=   0.0,    1.0
 ! p_burvel_O5     [m/d]          Bottom Burial Velocity for calcite
 !-------------------------------------------------------------------------!
 &Settling_parameters
-  p_burvel_R6 = 1.5,
+  p_burvel_R6 = 0.5,
   p_burvel_O5 = 30.0,
   p_burvel_R2 = 0.0,
   p_burvel_PI = 0.01
@@ -790,7 +787,6 @@ p_paMEZ(2,:)=   0.0,    1.0
 ! NAMELIST BenthicRemin_parameters
 !-------------------------------------------------------------------------!
 ! NAME         [UNIT]/KIND            DESCRIPTION
-!  p_reminO2     [1/d]      Spec. oxygen consumption
 !  p_reminN1     [1/d]      Spec. P release in the water 
 !  p_reminN4  	 [1/d]      Spec. N release in the water 
 !  p_pQIN3  	            Partitioning coeff. between NO3 and NH4
@@ -799,7 +795,6 @@ p_paMEZ(2,:)=   0.0,    1.0
 !  p_K14K4n  	 [1/d]      Spec. N flux at the denit. layer
 !-------------------------------------------------------------------------!
 &BenthicRemin_parameters
-  p_reminO2  = 0.1,
   p_reminN1  = 0.001,
   p_reminN4  = 0.1,
   p_pQIN3    = 0.5,
