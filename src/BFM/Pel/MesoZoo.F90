@@ -48,9 +48,9 @@
   use mem_MesoZoo
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! The following vector functions are used: eTq, MM, MM_power, nutlim
+  ! The following vector functions are used
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  use mem_globalfun,   ONLY: eTq, MM, MM_power, nutlim
+  use mem_globalfun,   ONLY: eTq, MM, MM_power, fixratio
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Implicit typing is never allowed
@@ -359,50 +359,9 @@
   else
      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
      ! Eliminate the excess of the non-limiting constituent under fixed quota
-     ! Determine whether C, P or N is limiting (Total Fluxes Formulation)
+     ! Determine release due to either C, P, or N limitation
      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-     limit = nutlim(tfluxc,tfluxn,tfluxp,qncMEZ(zoo,:),qpcMEZ(zoo,:),iiC,iiN,iiP)
-   
-     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-     ! Compute the correction terms depending on the limiting constituent
-     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-     WHERE     ( limit == iiC )
-         pe_R6c = ZERO
-         pe_N1p = max(ZERO,tfluxp  - p_qpcMEZ(zoo)* tfluxc)
-         pe_N4n = max(ZERO,tfluxn  - p_qncMEZ(zoo)* tfluxc)
-     ELSEWHERE ( limit == iiP )
-         pe_N1p = ZERO
-         pe_R6c = max(ZERO, tfluxc  - tfluxp/p_qpcMEZ(zoo))
-         pe_N4n = max(ZERO, tfluxn  - tfluxp/p_qpcMEZ(zoo)*p_qncMEZ(zoo) )
-     ELSEWHERE ( limit == iiN )
-         pe_N4n = ZERO
-         pe_R6c = max(ZERO, tfluxc  - tfluxn/p_qncMEZ(zoo))
-         pe_N1p = max(ZERO, tfluxp  - tfluxn/p_qncMEZ(zoo)*p_qpcMEZ(zoo))
-     END WHERE
-
-#ifdef DEBUG
-     write(*,*) '+++++++++++++++'
-     if ( limit(1)==iiC ) then
-     write(*,*) 'tfluxp', tfluxp,'pe_N1p', tfluxp  - p_qpcMEZ(zoo)* tfluxc 
-     write(*,*) 'tfluxn', tfluxn,'pe_N4n', tfluxn  - p_qncMEZ(zoo)* tfluxc
-     write(*,*) 'tfluxc', tfluxc,'pe_R6c', ZERO 
-     write(*,*) 'ooooooooooooooo'
-     endif
-   
-     if ( limit(1)==iiP ) then
-     write(*,*) 'tfluxp', tfluxp,'pe_N1p', ZERO 
-     write(*,*) 'tfluxn', tfluxn,'pe_N4n', tfluxn - tfluxp/p_qpcMEZ(zoo)*p_qncMEZ(zoo)
-     write(*,*) 'tfluxc', tfluxc,'pe_R6c', tfluxc - tfluxp/p_qpcMEZ(zoo)
-     write(*,*) 'ooooooooooooooo'
-     endif
-   
-     if ( limit(1)==iiN ) then
-     write(*,*) 'tfluxp', tfluxp,'pe_N1p', tfluxp  - tfluxn/p_qncMEZ(zoo)*p_qpcMEZ(zoo)
-     write(*,*) 'tfluxn', tfluxn,'pe_N4n', ZERO
-     write(*,*) 'tfluxc', tfluxc,'pe_R6c', tfluxc  - tfluxn/p_qncMEZ(zoo) 
-     endif
-     write(*,*) '+++++++++++++++'
-#endif
+     call fixratio(tfluxC,tfluxN,tfluxP,qncMEZ(zoo,:),qpcMEZ(zoo,:),pe_R6c, pe_N4n, pe_N1p)
    
   endif
 

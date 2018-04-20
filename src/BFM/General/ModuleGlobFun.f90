@@ -148,70 +148,32 @@
 
     end function IntegralExp
 
-    elemental function nutlim(fc, fn, fp, qnc, qpc, c, n, p)
+    elemental subroutine fixratio(fc, fn, fp, qnc, qpc, rc, rn, rp)
     !==========================================================================
-    ! Determine whether C, N, or P is the limiting element for a PFT
+    ! Determine release fluxes due to either C, N, or P limitiation
     ! fc,fn,fp     : total fluxes of C,N,P                    [mol/kg]
     ! qnc          : N:C ratio                                [molN/molC]
     ! qpc          : P:C ratio                                [molP/molC]
-    ! c,n,p        : constituents indexes                     [-]
-    ! nutlim       : limiting consituent index                [-]
-    !
-    ! Configurations of fluxes for C, N, P
-    !          fc        fn         fp
-    !   1      <0        <0         <0
-    !   2      <0        <0         >0
-    !   3      <0        >0         <0
-    !   4      <0        >0         >0
-    !   5      >0        <0         <0
-    !   6      >0        <0         >0
-    !   7      >0        >0         <0
-    !   8      >0        >0         >0
+    ! rc,rn,rp     : release fluxes of C,N,P                  [mol/kg]
     !==========================================================================
        IMPLICIT NONE
        !
-       real(RLEN), intent(in) :: fc, fn, fp, qnc, qpc
-       integer,    intent(in) :: c, n, p
-       integer                :: nutlim
-       real(RLEN) :: pu_n, pu_p, pq_n, pq_p
+       real(RLEN), intent(in)  :: fc, fn, fp, qnc, qpc
+       real(RLEN), intent(out) :: rc, rn, rp
        !
-       pu_n = abs(fn) ; pq_n = pu_n / qnc
-       pu_p = abs(fp) ; pq_p = pu_p / qpc
+       rc = ZERO ; rn = ZERO ; rp = ZERO
        !
-       nutlim = c
+       ! carbon
+       rc = max( max(fc-fp/qpc,fc-fn/qnc) , ZERO )
+       ! 
+       ! nitrogen
+       rn = max( fn - (fc-rc)*qnc, ZERO )
+       ! 
+       ! phosphorous
+       rp = max( fp - (fc-rc)*qpc, ZERO )
        !
-       ! CASE 1
-       if ( (fc <= 0) .AND. (fn <0) .AND. (fp <0) ) then
-          if ( pq_p>pq_n ) then
-             if (pu_p > qpc * abs(fc)) nutlim = p
-          else
-             if (pu_n > qnc * abs(fc)) nutlim = n
-          endif
-       else if ( (fc <= 0) .AND. (fn <0) .AND. (fp >0) ) then
-           if (pu_n > qnc * abs(fc)) nutlim = n
-       else if ( (fc <=0) .AND. (fn >0) .AND. (fp <0) ) then
-          if (pu_p > qpc * abs(fc)) nutlim = p
-       else if ( (fc <= 0) .AND. (fn >0) .AND. (fp >0) ) then
-          nutlim = c
-       else if ( (fc >0) .AND. (fn <0) .AND. (fp <0) ) then
-          if ( pq_p<pq_n ) then
-             nutlim = p
-          else
-             nutlim = n
-          endif
-       else if ( (fc >0) .AND. (fn <0) .AND. (fp >0) ) then
-          nutlim = n
-       else if ( (fc >0) .AND. (fn >0) .AND. (fp <0) ) then
-          nutlim = p
-       else if ( (fc >0) .AND. (fn >0) .AND. (fp >0) ) then
-          if ( pq_p<pq_n ) then
-             if ( pu_p < qpc * abs(fc) ) nutlim = p
-          else
-             if ( pu_n < qnc * abs(fc) ) nutlim = n
-          endif
-       endif
-
-    end function nutlim
+       return
+    end subroutine fixratio
 
   end module mem_globalfun
 !EOC
