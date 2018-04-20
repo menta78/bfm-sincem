@@ -9,8 +9,19 @@
 ! !ROUTINE: BenOxygen
 !
 ! DESCRIPTION
-!   Description of first order oxic processes in the sediment
-!       and computation of oxygen penetration depth
+!   Description of first order oxic processes in the sediment and computation 
+!   of oxygen penetration depth (D1m). 
+!   This is based on the stationary state solution of the following: 
+!      dGO/dt = Do * d2GO/dz^2 - Mo(bt) - Mo(nit) - Mo(rox)
+!   where Do is oxygen molecular diffusion, Mo() are benthic respiration terms, 
+!   and GO is pore water oxygen concentration [mmolO2/m2].
+!   At equilibrium, the following boundary conditions are defined 
+!      Go(z=0)eq = O2o(z=-H)  ;  dGo(z=D1m)eq/dz = 0
+!   with O2o as pelagic oxygen and z sediment depth.      
+!   By imposing the above conditions to stationary state solution at equilibrium 
+!   (dGO/dt=0) the pore water oxygen at equilibrium is 
+!      GOeq = O2o - p * D1m *z + p/2 * z^2
+!   where p=( Mo(bt) + Mo(nit) + Mo(rox) ) / Do
 !
 ! !INTERFACE
   subroutine BenOxygenDynamics
@@ -73,13 +84,9 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Local Variables
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  real(RLEN),dimension(NO_BOXES_XY)  :: r
-  real(RLEN),dimension(NO_BOXES_XY)  :: diff
-  real(RLEN),dimension(NO_BOXES_XY)  :: zmG2o
-  real(RLEN),dimension(NO_BOXES_XY)  :: D1mNew
-  real(RLEN),dimension(NO_BOXES_XY)  :: G2oNew
-  real(RLEN),dimension(NO_BOXES_XY)  :: jG2O2o
-  real(RLEN),dimension(NO_BOXES_XY)  :: unc_shiftD1m
+  real(RLEN),dimension(NO_BOXES_XY)  :: Do, MG2o, p, r
+  real(RLEN),dimension(NO_BOXES_XY)  :: D1mNew, G2oNew
+  real(RLEN),dimension(NO_BOXES_XY)  :: GO2flux
   real(RLEN)                         :: dummy, delta
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -89,39 +96,36 @@
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Oxygen diffusion from pelagic to benthic pore water [m2/d]
-  ! Empirical equation from Broecker and Peng (1974, Table 2 note a) +
-  ! bioirrigation diffusion enhancement and porosity correction
+  ! Empirical equation from Broecker and Peng (1974, Table 2 note a)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-  diff = SEC_PER_DAY* 1.0e-9_RLEN* (10.0_RLEN)**((- 984.26_RLEN/(ETW_Ben(:)- &
-    ZERO_KELVIN)+ 3.672_RLEN))* p_poro* irrenh(:)* p_exsaf
+  Do = SEC_PER_DAY* 1.0e-9_RLEN* (10.0_RLEN)**((- 984.26_RLEN/(ETW_Ben(:)- &
+    ZERO_KELVIN)+ 3.672_RLEN)) * p_exsaf
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  ! Recalculate total consumption from /m2 to /m3 pw:
+  ! Calculate total respiration in pore water from /m2 to /m3:
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-  zmG2o  =  ( rrBTo(:)+ jG2K3o(:)+ jG2K7o(:))/( D1m(:)* p_poro)
+  MG2o = ( rrBTo(:)+ jG2K3o(:)+ jG2K7o(:) ) / ( D1m(:)* p_poro )
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  ! Determine new thickness:
+  ! Determine new thickness by imposing the following boundary condition
+  !    Go(z)eq = 0 for z > D1m
+  ! to pore water oxygen equilibrium equation
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-  D1mNew  =   sqrt(  2.0_RLEN* diff* O2o_Ben(:)/( p_small+ zmG2o))
-  D1mNew  = min(D1mnew ,p_d_tot-2.0_RLEN*p_clD1D2m);
+  D1mNew = sqrt( 2.0_RLEN* Do* O2o_Ben(:) / (p_small+ mG2o) )
+  D1mNew = min(D1mnew ,p_d_tot-2.0_RLEN*p_clD1D2m);
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Calculate rate of change of thickness of the aerobic layer:
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
   shiftD1m(:)  =  ( max(  p_mD1m,  D1mNew)- D1m(:))/ ONE_PER_DAY
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Damping the change of D1m in case of large changes
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
   if ( InitializeModel== 0) then
-     shiftD1m(:) = shiftD1m(:)* (D1m(:)/( D1m(:)+ &
-      abs(shiftD1m(:))))**(p_xdampingD1m)*( p_chD1m/( p_chD1m+ D1m(:)))
+
+     shiftD1m(:) = shiftD1m(:)* (( D1m(:)+ shiftD1m(:)) / D1m(:) )**(p_xdampingD1m) &
+                 *( p_chD1m/( p_chD1m+ D1m(:)))
 #if defined BENTHIC_FULL
      do BoxNumberXY_ben = 1,NO_BOXES_XY
         r(1) = CalculateFromSet( KNO3(BoxNumberXY_ben), EQUATION, &
@@ -134,45 +138,37 @@
 #endif
   end if
 
-
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Damping the change of D1m in case of too thick D1m
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-  r= min( shiftD1m(:),max(ZERO,p_d_tot-p_chD1m-D1m(:)))
+  r = min( shiftD1m(:),max(ZERO,p_d_tot-p_chD1m-D1m(:)))
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! recalculate the new D1mNew at the actual time step:
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-  D1mNew  =   D1m(:)+ r* delta
-
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  ! calculate the consumption which belongs to the corrected D1mNew
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-  zmG2o  =  ( 2.0_RLEN* diff* O2o_Ben(:))/( D1mNew* D1mNew)
+  D1mNew = D1m(:) + r * delta
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  ! New oxygen conc. in the sediment:
+  ! calculate the new pore water oxygen concentration at D1mNew
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  p = mG2o / Do
+  G2oNew = D1mNew * O2o_Ben(:) - p* D1m(:)* ( D1mNew**2 / 2.0_RLEN) &
+         + p/ 2.0_RLEN * ( D1mNew**3 / 3.0_RLEN)
 
-  G2oNew = D1mNew*( O2o_Ben(:)- 0.66667_RLEN* zmG2o* D1mNew* D1mNew/( 2.0_RLEN* &
-    diff))* p_poro
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! flux to pelagic: correct flux for rate of change of G2o
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  GO2flux = -( rrBTo(:)+ jG2K3o(:)+ jG2K7o(:))- (G2oNew- G2o(:))/ ONE_PER_DAY
 
-  jG2O2o = -( rrBTo(:)+ jG2K3o(:)+ jG2K7o(:))- (G2oNew- G2o(:))/ ONE_PER_DAY
-
+  write(*,*) 'GO2 c : ', G2o(:), G2oNew, mG2o, GO2flux, D1mNew
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   !  Assign fluxes
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   if ( InitializeModel== 0) then
-    shiftD1m(:)=r
+    shiftD1m(:) = r
     call flux_vector( iiBen, ppD1m,ppD1m, r )
-    call flux_vector( iiBen, ppG2o,ppG2o,-jG2O2o )
-    jbotO2o(:)=jbotO2o(:)+jG2O2o
+    call flux_vector( iiBen, ppG2o,ppG2o,-GO2flux )
+    jbotO2o(:) = jbotO2o(:) + GO2flux
 #if defined BENTHIC_BIO
     ! Compute shifting of the denitrification layer here in case of running only
     ! the benthic submodel and NOT the benthic nutrient model.

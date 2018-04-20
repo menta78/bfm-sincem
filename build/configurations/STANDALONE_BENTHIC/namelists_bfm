@@ -282,7 +282,8 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
           'qpcPPY_iiP1', 'qncPPY_iiP1', 'qlcPPY_iiP1', 'qpcPPY_iiP2', 'qncPPY_iiP2', 'qlcPPY_iiP2',
           'qpcPPY_iiP3', 'qncPPY_iiP3', 'qlcPPY_iiP3', 'qpcPPY_iiP4', 'qncPPY_iiP4', 'qlcPPY_iiP4',
           'Q6c','Q6n','Q6p','Q6s','Q1c','Q1n','Q1p',
-          'Y1c','Y2c','Y3c','Y4c','Y5c','H1c','H2c'
+          'Y1c','Y2c','Y3c','Y4c','Y5c','H1c','H2c', 
+          'D1m','D2m','G2o','K1p','K11p','K4n','K14n','K6r'
 	filename_nml_conf = 'BFM_General.nml',
 /
 
@@ -821,7 +822,7 @@ p_paMEZ(2,:)=   0.0,    1.0
 &BenOxygen_parameters
   p_exsaf       =  1.5,
   p_xdampingD1m =  2.0,
-  p_mD1m        =  0.0001,
+  p_mD1m        =  0.001,
   p_chD1m       =  0.05,
         filename_nml_conf = 'Benthic_Environment.nml',
 /
@@ -873,7 +874,7 @@ p_paMEZ(2,:)=   0.0,    1.0
 !-------------------------------------------------------------------------!
 &BenBacteria_parameters
 !              H1       H2
-  p_cdm    = 0.001,    0.01
+  p_cdm    = 0.005,    0.01
   p_qncBBA = 0.0167,   0.0167
   p_qpcBBA = 0.00125,  0.00125
   p_qlnc   = 0.0083,   0.0083

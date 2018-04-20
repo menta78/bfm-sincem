@@ -219,7 +219,7 @@
 
   ! Growth rate at actual amount:
 
-  sgu_y  =   p_su(y)* et* eO* eF
+  sgu_y  =   p_su(y)* et* eo* eF
 
   ! Relative growth rate corrected for actual amount of food:
 
