@@ -65,6 +65,7 @@
 !    Temperature [TB(k)-->ETW(k)]
 !    Salinity [SB(k)-->ESW(k)]
 !    Density [(RHO(k)*1000)+1000-->ERHO]
+!    Water Pressure rho(k)*grav*zz(k)*H*1.e-5 --> EPR(k)
 !    Inorganic suspended matter [ISM(k)-->ESS(k)]
 !    Surface short wave radiation Recomputed to W/m2)
 !    Wind velocity [EWIND, m/s, recomputed from wind stress WUSURF, WVSURF]
@@ -87,7 +88,8 @@
                      EIR,  &
                      ESS,  &
                      ERHO, &
-                     EWIND
+                     EWIND,&
+                     EPR
 !
 #endif
 !
@@ -102,7 +104,10 @@
                      WUBOT,  &
                      WVBOT,  &
                      RHO0,   &
-                     RHOSEA
+                     RHOSEA, &
+                     GRAV,   &
+                     H,      &
+                     ZZ
 !
       use Service, ONLY: ISM
 !
@@ -149,6 +154,10 @@
 !            --TRANSFER DENSITY--
 !
              ERHO(k)  = (rho(k)*RHO0)+RHO0
+!           
+!            --COMPUTE PRESSURE--
+!
+             EPR(k)=-ERHO(k)*GRAV*ZZ(k)*H*1.e-5_RLEN
 !
 !            ---TRANSFER INORGANIC SUSPENDED MATTER---
 !
