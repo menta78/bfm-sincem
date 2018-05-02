@@ -79,7 +79,7 @@
      use mem_Param, ONLY: AssignAirPelFluxesInBFMFlag,                    &
                           AssignPelBenFluxesInBFMFlag,p_small
 !
-     use mem_Settling
+     use mem_PelSinkSet
 !
      use Mem, ONLY:D3STATE,D3SOURCE,NO_D3_BOX_STATES,                     &
                    ppO2o,                                                 &

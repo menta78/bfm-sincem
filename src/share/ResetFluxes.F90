@@ -91,7 +91,6 @@
     jbotN3n(:) = ZERO
     jbotN4n(:) = ZERO
 #endif
-#endif
 
 #ifdef BFM_POM
     jsurO2o(:) = ZERO
