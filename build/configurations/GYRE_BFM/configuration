@@ -21,8 +21,8 @@
 #  BFM_STANDALONE   : mandatory when using the STANDALONE model
 #  BFM_PARALLEL     : activate parallel coupling with BFM
 #  INCLUDE_PELFE    : add Iron component to the pelagic system
-#  INCLUDE_PELCO2   : activate Carbonate System and CO2 dynamics
-#  INCLUDE_DIAG   : activate flux diagnostics defined in .mem file
+#  INCLUDE_PELCO2   : activate Pelagic Carbonate System and CO2 dynamics 
+#  BENTHIC_BIO      : use Intermediate complexity Benthic system
 #  EXPLICIT_SINK    : use of D3SOURCE and D3SINK
 
 &BFM_conf

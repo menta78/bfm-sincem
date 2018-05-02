@@ -84,14 +84,12 @@ subroutine set_var_info_bfm
 %2d-flux-ice-string
 #endif
 
-#ifdef INCLUDE_BEN
 !
 !2d Benthic variables description
 %2d-state-ben-string
 %2d-diagnos-ben-string
 %2d-diaggrp-ben-string
 %2d-flux-ben-string
-#endif
 
 
 !
@@ -120,7 +118,6 @@ subroutine set_var_info_bfm
 
 #endif
 
-#ifdef INCLUDE_BEN
 !
 !Index Benthic
 !
@@ -129,8 +126,6 @@ subroutine set_var_info_bfm
 %2d-state-ben-string-index
 %2d-diagnos-ben-string-index
 %2d-flux-ben-string-index
-
-#endif
 
 
 %startend-string-index

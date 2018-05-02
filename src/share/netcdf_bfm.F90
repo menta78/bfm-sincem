@@ -27,11 +27,9 @@
         stIceStateS, stIceDiag2dS, stIceFlux2dS, stIceStateE, &
         stIceDiag2dE, stIceFlux2dE, stIceStart, stIceEnd, &
 #endif
-#if defined INCLUDE_BEN
         D2ave_ben, &
         stBenStateS, stBenDiag2dS, stBenFlux2dS, stBenStateE, &
         stBenDiag2dE, stBenFlux2dE, stBenStart, stBenEnd,  &
-#endif
         stStart, stEnd, stPelStateS, stPelDiagS, stPelFluxS, &
         stPelDiag2dS, stPelSurS, stPelBotS, stPelRivS, &
         stPelStateE, stPelDiagE, stPelFluxE, stPelDiag2dE, &
@@ -43,9 +41,7 @@
 #if defined INCLUDE_SEAICE
    use mem,     only: D2FLUX_FUNC_ICE
 #endif
-#if defined INCLUDE_BEN
    use mem,     only: D2FLUX_FUNC_BEN
-#endif
 
    use global_mem, only: RLEN,ZERO,LOGUNIT,bfm_lwp
    use constants, ONLY: SEC_PER_DAY
@@ -99,10 +95,8 @@
    integer                       :: d2vars_rdim_ice,d2state_rid_ice,d2stateb_rid_ice,d2state_name_rid_ice, &
         d2state_units_rid_ice,d2state_long_rid_ice
 #endif
-#ifdef INCLUDE_BEN
    integer                       :: d2vars_rdim_ben,d2state_rid_ben,d2stateb_rid_ben,d2state_name_rid_ben, &
         d2state_units_rid_ben,d2state_long_rid_ben
-#endif
 #ifdef INCLUDE_PELCO2
    integer                       :: ph_rid
 #endif
@@ -383,9 +377,8 @@
 #if defined INCLUDE_SEAICE
    use mem, only: NO_D2_BOX_STATES_ICE
 #endif
-#if defined INCLUDE_BEN
    use mem, only: NO_D2_BOX_STATES_BEN
-#endif
+
    implicit none
 !
 ! !INPUT/OUTPUT PARAMETERS:
@@ -455,7 +448,7 @@
    call check_err(NF90_DEF_VAR(ncid_rst,'pH',NF90_DOUBLE,ocepoint_rdim,ph_rid), fname)
    if (nc_compres) call check_err(NF90_DEF_VAR_DEFLATE(ncid_rst,ph_rid,nc_shuffle,nc_deflate,nc_defllev))
 #endif
-#ifdef BFM_POM
+#if defined BFM_NEMO || defined BFM_POM
    call check_err(NF90_DEF_VAR(ncid_rst,'D3STATEB',NF90_DOUBLE,dims,d3stateb_rid), fname)
    if (nc_compres) call check_err(NF90_DEF_VAR_DEFLATE(ncid_rst,d3stateb_rid,nc_shuffle,nc_deflate,nc_defllev))
 #endif
@@ -493,14 +486,13 @@
    call check_err(NF90_DEF_VAR(ncid_rst,'D2STATE_ICE_NAME',NF90_CHAR,(/chars_rdim, d2vars_rdim_ice/),d2state_name_rid_ice), fname)
    call check_err(NF90_DEF_VAR(ncid_rst,'D2STATE_ICE_UNITS',NF90_CHAR,(/chars_rdim, d2vars_rdim_ice/),d2state_units_rid_ice), fname)
    call check_err(NF90_DEF_VAR(ncid_rst,'D2STATE_ICE_LONG',NF90_CHAR,(/chars_rdim, d2vars_rdim_ice/),d2state_long_rid_ice), fname)
-#ifdef BFM_POM
+#if defined BFM_NEMO || defined BFM_POM
    call check_err(NF90_DEF_VAR(ncid_rst,'D2STATEB_ICE',NF90_DOUBLE,dims,d2stateb_rid_ice), fname)
    if (nc_compres) call check_err(NF90_DEF_VAR_DEFLATE(ncid_rst,d2stateb_rid_ice,nc_shuffle,nc_deflate,nc_defllev))
 #endif
 #endif
 
 
-#if defined INCLUDE_BEN
    !---------------------------------------------
    ! define 2D Benthic dimensions and variables
    !---------------------------------------------
@@ -512,10 +504,9 @@
    call check_err(NF90_DEF_VAR(ncid_rst,'D2STATE_BEN_NAME',NF90_CHAR,(/chars_rdim, d2vars_rdim_ben/),d2state_name_rid_ben), fname)
    call check_err(NF90_DEF_VAR(ncid_rst,'D2STATE_BEN_UNITS',NF90_CHAR,(/chars_rdim, d2vars_rdim_ben/),d2state_units_rid_ben), fname)
    call check_err(NF90_DEF_VAR(ncid_rst,'D2STATE_BEN_LONG',NF90_CHAR,(/chars_rdim, d2vars_rdim_ben/),d2state_long_rid_ben), fname)
-#ifdef BFM_POM
+#if defined BFM_NEMO || defined BFM_POM
    call check_err(NF90_DEF_VAR(ncid_rst,'D2STATEB_BEN',NF90_DOUBLE,dims,d2stateb_rid_ben), fname)
    if (nc_compres) call check_err(NF90_DEF_VAR_DEFLATE(ncid_rst,d2stateb_rid_ben,nc_shuffle,nc_deflate,nc_defllev))
-#endif
 #endif
 
    DEALLOCATE(dims)
@@ -643,22 +634,20 @@ end subroutine init_netcdf_rst_bfm
 #ifdef INCLUDE_PELCO2
    use mem, only: D3DIAGNOS,pppH
 #endif
-#ifdef BFM_POM
+#if defined BFM_NEMO || defined BFM_POM
    use api_bfm, only: D3STATEB
 #endif
 
 #if defined INCLUDE_SEAICE
    use mem, only: D2STATE_ICE, NO_D2_BOX_STATES_ICE
-#ifdef BFM_POM
+#if defined BFM_NEMO || defined BFM_POM
    use api_bfm, only: D2STATEB_ICE
 #endif
 #endif
 
-#if defined INCLUDE_BEN
    use mem, only: D2STATE_BEN, NO_D2_BOX_STATES_BEN
-#ifdef BFM_POM
+#if defined BFM_NEMO || defined BFM_POM
    use api_bfm, only: D2STATEB_BEN
-#endif
 #endif
 
    implicit none
@@ -673,9 +662,7 @@ end subroutine init_netcdf_rst_bfm
 #ifdef INCLUDE_SEAICE
    character(len=LEN(var_names)), dimension(NO_D2_BOX_STATES_ICE) :: tmp_d2names_ice,tmp_d2units_ice,tmp_d2long_ice
 #endif
-#ifdef INCLUDE_BEN
    character(len=LEN(var_names)), dimension(NO_D2_BOX_STATES_BEN) :: tmp_d2names_ben,tmp_d2units_ben,tmp_d2long_ben
-#endif
 !
 ! !REVISION HISTORY:
 !  Original author(s): Marcello Vichi (INGV) 
@@ -717,7 +704,7 @@ end subroutine init_netcdf_rst_bfm
 #ifdef INCLUDE_PELCO2
      call check_err(NF90_PUT_VAR(ncid_rst,ph_rid,D3DIAGNOS(pppH,:),start=(/1/),count=(/NO_BOXES/)), restfile)
 #endif
-#ifdef BFM_POM
+#if defined BFM_NEMO || defined BFM_POM
      call check_err(NF90_PUT_VAR(ncid_rst,d3stateb_rid,D3STATEB(:,:),start,edges), restfile)
 #endif
 
@@ -737,12 +724,11 @@ end subroutine init_netcdf_rst_bfm
           start=(/ 1, 1 /), count=(/ LEN(tmp_d2units_ice), NO_D2_BOX_STATES_ICE /)), restfile)
      call check_err(NF90_PUT_VAR( ncid_rst, d2state_long_rid_ice, tmp_d2long_ice, &
           start=(/ 1, 1 /), count=(/ LEN(tmp_d2long_ice), NO_D2_BOX_STATES_ICE /)), restfile)
-#ifdef BFM_POM
-     call check_err(NF90_PUT_VAR(ncid_rst,d2state_rid_ice,D2STATEB_ICE(:,:),start,edges), restfile)
+#if defined BFM_NEMO || defined BFM_POM
+     call check_err(NF90_PUT_VAR(ncid_rst,d2stateb_rid_ice,D2STATEB_ICE(:,:),start,edges), restfile)
 #endif
 #endif
 
-#if defined INCLUDE_BEN
      start(1) = 1;   edges(1) = NO_D2_BOX_STATES_BEN
      start(2) = 1;   edges(2) = NO_BOXES_XY
      tmp_d2names_ben(:) = var_names(stBenStateS:stBenStateE)
@@ -758,9 +744,8 @@ end subroutine init_netcdf_rst_bfm
           start=(/ 1, 1 /), count=(/ LEN(tmp_d2units_ben), NO_D2_BOX_STATES_BEN /)), restfile)
      call check_err(NF90_PUT_VAR( ncid_rst, d2state_long_rid_ben, tmp_d2long_ben, &
           start=(/ 1, 1 /), count=(/ LEN(tmp_d2long_ben), NO_D2_BOX_STATES_BEN /)), restfile)
-#ifdef BFM_POM
-     call check_err(NF90_PUT_VAR(ncid_rst,d2state_rid_ben,D2STATEB_BEN(:,:),start,edges), restfile)
-#endif
+#if defined BFM_NEMO || defined BFM_POM
+     call check_err(NF90_PUT_VAR(ncid_rst,d2stateb_rid_ben,D2STATEB_BEN(:,:),start,edges), restfile)
 #endif
      LEVEL2 'save_rst_bfm: Restart data has been written'
 ! the file is closed in the main (in case of more restart files)
@@ -784,23 +769,22 @@ end subroutine init_netcdf_rst_bfm
 #ifdef INCLUDE_PELCO2
    use mem, only: D3DIAGNOS,pppH
 #endif
-#ifdef BFM_POM
+#if defined BFM_NEMO || defined BFM_POM
    use api_bfm, only: D3STATEB
 #endif
 
 #if defined INCLUDE_SEAICE
    use mem, only: D2STATE_ICE, NO_D2_BOX_STATES_ICE
-#ifdef BFM_POM
+#if defined BFM_NEMO || defined BFM_POM
    use api_bfm, only: D2STATEB_ICE
 #endif
 #endif
 
-#if defined INCLUDE_BEN
    use mem, only: D2STATE_BEN, NO_D2_BOX_STATES_BEN
-#ifdef BFM_POM
+#if defined BFM_NEMO || defined BFM_POM
    use api_bfm, only: D2STATEB_BEN
 #endif
-#endif
+
    implicit none
 !
 ! !INPUT PARAMETERS:
@@ -853,7 +837,7 @@ end subroutine init_netcdf_rst_bfm
    call check_err(NF90_INQ_VARID(ncid_rst_in,"pH",nstate_id), fname)
    call check_err(NF90_GET_VAR(ncid_rst_in,nstate_id,D3DIAGNOS(pppH,:)), fname)
 #endif 
-#ifdef BFM_POM
+#if defined BFM_NEMO || defined BFM_POM
    call check_err(NF90_INQ_VARID(ncid_rst_in,"D3STATEB",nstate_id), fname)
    call check_err(NF90_GET_VAR(ncid_rst_in,nstate_id,D3STATEB(:,:)), fname)
 #endif
@@ -880,14 +864,13 @@ end subroutine init_netcdf_rst_bfm
    !---------------------------------------------
    call check_err(NF90_INQ_VARID(ncid_rst_in,"D2STATE_ICE",nstate_id), fname)
    call check_err(NF90_GET_VAR(ncid_rst_in,nstate_id,D2STATE_ICE(:,:)), fname)
-#ifdef BFM_POM
+#if defined BFM_NEMO || defined BFM_POM
    call check_err(NF90_INQ_VARID(ncid_rst_in,"D2STATEB_ICE",nstate_id), fname)
    call check_err(NF90_GET_VAR(ncid_rst_in,nstate_id,D2STATEB_ICE(:,:)), fname)
 #endif
 #endif
 
 
-#if defined INCLUDE_BEN
    !---------------------------------------------
    ! Check Benthic 2D dimensions 
    !---------------------------------------------
@@ -909,10 +892,9 @@ end subroutine init_netcdf_rst_bfm
    !---------------------------------------------
    call check_err(NF90_INQ_VARID(ncid_rst_in,"D2STATE_BEN",nstate_id), fname)
    call check_err(NF90_GET_VAR(ncid_rst_in,nstate_id,D2STATE_BEN(:,:)), fname)
-#ifdef BFM_POM
+#if defined BFM_NEMO || defined BFM_POM
    call check_err(NF90_INQ_VARID(ncid_rst_in,"D2STATEB_BEN",nstate_id), fname)
    call check_err(NF90_GET_VAR(ncid_rst_in,nstate_id,D2STATEB_BEN(:,:)), fname)
-#endif
 #endif
 
    LEVEL2 'read_rst_bfm: READ multiple restart files ... DONE! '
@@ -1099,10 +1081,8 @@ end subroutine init_netcdf_rst_bfm
    !---------------------------------------------
    ! Initialize 2D Benthic variables
    !---------------------------------------------
-#if defined INCLUDE_BEN
       LEVEL2 "read_rst_bfm_glo: READ 2D benthic initial conditions"
       stop "STOP in read_rst_bfm_glo: read benthic initial conditions not yet implemented"
-#endif
 
    call check_err(nf90_close(ncid_rst_3d),fname)
 
@@ -1197,7 +1177,6 @@ end subroutine init_netcdf_rst_bfm
       end do
 #endif
 
-#if defined INCLUDE_BEN
       do n=stBenStart,stBenEnd
          dims(1) = botpoint_dim
 
@@ -1217,7 +1196,6 @@ end subroutine init_netcdf_rst_bfm
                  long_name=var_long(n)) 
          endif
       end do
-#endif
 
 
    DEALLOCATE(dims)
@@ -1255,9 +1233,8 @@ end subroutine init_netcdf_rst_bfm
 #if defined INCLUDE_SEAICE
    use mem, only: D2STATE_ICE,D2DIAGNOS_ICE,D2DIAGNOS_ICE,D2FLUX_FUNC_ICE
 #endif
-#if defined INCLUDE_BEN
    use mem, only: D2STATE_BEN,D2DIAGNOS_BEN,D2DIAGNOS_BEN,D2FLUX_FUNC_BEN
-#endif
+
    implicit none
 !
 ! !INPUT PARAMETERS:
@@ -1396,7 +1373,6 @@ end subroutine init_netcdf_rst_bfm
    end do
 #endif
 
-#if defined INCLUDE_BEN
    !---------------------------------------------
    ! 2D Benthic variables
    !---------------------------------------------
@@ -1429,8 +1405,6 @@ end subroutine init_netcdf_rst_bfm
          ENDIF
       end if
    end do
-#endif
-
 
    iret = NF90_SYNC(ncid_bfm)
    call check_err(iret, 'Save_bfm: writing output')
@@ -1820,7 +1794,7 @@ end subroutine init_netcdf_rst_bfm
    end function store_data
 !EOC
 
-#if defined INCLUDE_BEN && defined INCLUDE_BENPROFILES
+#if defined INCLUDE_BENPROFILES
 !-----------------------------------------------------------------------
 !BOP
 ! !ROUTINE: Definine extra dimension variables

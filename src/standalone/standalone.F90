@@ -64,9 +64,7 @@
 #if defined INCLUDE_SEAICE
    real(RLEN),public,dimension(:,:),allocatable :: bbccc2D_ice,bccc2D_ice,ccc_tmp2D_ice
 #endif
-#if defined INCLUDE_BEN
    real(RLEN),public,dimension(:,:),allocatable :: bbccc2D_ben,bccc2D_ben,ccc_tmp2D_ben
-#endif
 
    real(RLEN),public                            :: dtm1
    logical,public                               :: sspflag
@@ -129,11 +127,9 @@
                   NO_D2_BOX_DIAGNOSS_ICE, NO_BOXES_ICE, NO_BOXES_Z_ICE, &
                   NO_STATES_ICE
 #endif
-#ifdef INCLUDE_BEN
    use mem, only: D2STATE_BEN, NO_D2_BOX_STATES_BEN, &
                   NO_D2_BOX_DIAGNOSS_BEN, NO_BOXES_BEN, NO_BOXES_Z_BEN, &
                   NO_STATES_BEN
-#endif
 
    IMPLICIT NONE
 !
@@ -193,7 +189,6 @@
    NO_BOXES    = NO_BOXES_X * NO_BOXES_Y * NO_BOXES_Z
    NO_BOXES_XY = NO_BOXES_X * NO_BOXES_Y
    NO_STATES   = NO_D3_BOX_STATES * NO_BOXES + NO_BOXES_XY
-#ifdef INCLUDE_BEN
 #  ifdef INCLUDE_BENPROFILES
    ! Dirty method to cheat the standalone model
    NO_BOXES_Z_BEN  = nboxes
@@ -203,7 +198,6 @@
    NO_BOXES_BEN = NO_BOXES_XY * NO_BOXES_Z_BEN
 #  endif
    NO_STATES_BEN = NO_BOXES_BEN * NO_D2_BOX_STATES_BEN
-#endif
 #ifdef INCLUDE_SEAICE
    NO_BOXES_Z_ICE  = 1
    NO_BOXES_ICE = NO_BOXES_XY * NO_BOXES_Z_ICE
@@ -349,11 +343,9 @@
    allocate(bbccc2D_ice(NO_D2_BOX_STATES_ICE,NO_BOXES_ICE))
    allocate(ccc_tmp2D_ice(NO_D2_BOX_STATES_ICE,NO_BOXES_ICE))
 #endif
-#if defined INCLUDE_BEN
    allocate(bccc2D_ben(NO_D2_BOX_STATES_BEN,NO_BOXES_BEN))
    allocate(bbccc2D_ben(NO_D2_BOX_STATES_BEN,NO_BOXES_BEN))
    allocate(ccc_tmp2D_ben(NO_D2_BOX_STATES_BEN,NO_BOXES_BEN))
-#endif
 
    ! Initialize prior time step for leap-frog:
    if (method == 3) then
@@ -363,10 +355,8 @@
       bbccc2d_ice = D2STATE_ICE
       ccc_tmp2D_ice = D2STATE_ICE
 #endif
-#if defined INCLUDE_BEN
       bbccc2d_ben = D2STATE_BEN
       ccc_tmp2D_ben = D2STATE_BEN
-#endif
    end if
 
 #ifdef DEBUG
@@ -379,11 +369,9 @@
      LEVEL1 trim(var_names(stIceStateS+i-1)),D2STATE_ICE(i,1)
    end do
 #endif
-#if defined INCLUDE_BEN
    do i=1,NO_D2_BOX_STATES_BEN
      LEVEL1 trim(var_names(stBenStateS+i-1)),D2STATE_BEN(i,1)
    end do
-#endif
 #endif
 
    return

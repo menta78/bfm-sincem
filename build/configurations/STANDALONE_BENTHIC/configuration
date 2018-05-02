@@ -20,13 +20,17 @@
 #  Currently available macros (cppdefs) are:
 #  BFM_STANDALONE   : mandatory when using the STANDALONE model
 #  INCLUDE_PELFE    : add Iron component to the pelagic system
-#  INCLUDE_PELCO2   : activate Carbonate System and CO2 dynamics 
-#  INCLUDE_DIAG     : activate flux diagnostics defined in .mem file
+#  INCLUDE_PELCO2   : activate Pelagic Carbonate System and CO2 dynamics 
+#  INCLUDE_SEAICE   : activate sea ice 2D layer
+#  BENTHIC_BIO      : use Intermediate complexity Benthic system
+#  BENTHIC_FULL     : use High-level complexity Benthic system
+#  INCLUDE_BENCO2   : activate Benthic Carbonate System and CO2 dynamics 
 #  EXPLICIT_SINK    : use of D3SOURCE and D3SINK
+#  INCLUDE_BENPROFILES : Compute vertical proiles of benthic states
 
 &BFM_conf
         MODE    = 'STANDALONE',
-        CPPDEFS = 'BFM_STANDALONE INCLUDE_PELCO2 INCLUDE_DIAG INCLUDE_BEN INCLUDE_BENCO2',
+        CPPDEFS = 'BFM_STANDALONE INCLUDE_PELCO2 INCLUDE_DIAG BENTHIC_BIO',
         ARCH    = 'gfortran.inc',
         PROC    = 4,
         EXP     = 'standalone.benthic',

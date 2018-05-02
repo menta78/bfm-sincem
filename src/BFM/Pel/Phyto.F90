@@ -40,7 +40,7 @@
   use mem_Param,  ONLY: p_small, ChlDynamicsFlag
   use mem_PAR,    ONLY: LightPeriodFlag, LightLocationFlag
   use mem_Phyto
-  use mem_globalfun,   ONLY: eTq, MM, insw, nutlim
+  use mem_globalfun,   ONLY: eTq, MM, insw
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Implicit typing is never allowed

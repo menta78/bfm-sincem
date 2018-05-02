@@ -36,7 +36,7 @@
   use constants,  ONLY: MW_C, ONE_PER_DAY
   use mem_Param,  ONLY: p_pe_R1c, p_pe_R1n, p_pe_R1p, p_qro, p_small
   use mem_PelBac
-  use mem_globalfun,   ONLY: eTq, MM_power, insw, MM, nutlim
+  use mem_globalfun,   ONLY: eTq, MM_power, insw, MM, fixratio
   use bfm_error_msg, ONLY: bfm_error
 !  
 !
@@ -405,58 +405,20 @@
   end select
    
   if ( ppbacn == 0 .or. ppbacp == 0 ) then
+
      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
      ! Eliminate the excess of the non-limiting constituent under fixed quota
-     ! Determine whether C, P or N is limiting (Total Fluxes Formulation)
+     ! Determine release due to either C, P, or N limitation
      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-     limit = nutlim(tfluxC,tfluxN,tfluxP,qncPBA(bac,:),qpcPBA(bac,:),iiC,iiN,iiP)
+     call fixratio(tfluxC,tfluxN,tfluxP,qncPBA(bac,:),qpcPBA(bac,:),pe_R6c, pe_N4n, pe_N1p)
 
      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-     ! Compute the correction terms depending on the limiting constituent
+     ! Apply the correction terms depending on the limiting constituent
      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-     WHERE     ( limit == iiC )
-         pe_N1p = max(ZERO,tfluxp  - p_qpcPBA(bac)* tfluxc)
-         pe_N4n = max(ZERO,tfluxn  - p_qncPBA(bac)* tfluxc)
-         pe_R6c = ZERO
-     ELSEWHERE ( limit == iiP )
-         pe_N1p = ZERO
-         pe_N4n = max(ZERO, tfluxn  - tfluxp/p_qpcPBA(bac)*p_qncPBA(bac) )
-         pe_R6c = max(ZERO, tfluxc  - tfluxp/p_qpcPBA(bac))
-     ELSEWHERE ( limit == iiN )
-         pe_N1p = max(ZERO, tfluxp  - tfluxn/p_qncPBA(bac)*p_qpcPBA(bac))
-         pe_N4n = ZERO
-         pe_R6c = max(ZERO, tfluxc  - tfluxn/p_qncPBA(bac))
-     END WHERE
-
      call flux_vector(iiPel, ppbacc, ppR6c, pe_R6c*(ONE-p_pe_R1c))
      call flux_vector(iiPel, ppbacc, ppR1c, pe_R6c*(p_pe_R1c)    )
      call flux_vector(iiPel, ppbacp, ppN1p, pe_N1p)
      call flux_vector(iiPel, ppbacn, ppN4n, pe_N4n)
-
-#ifdef DEBUG
-     write(*,*) '++++++  BAC  +++++'
-        write(*,*) 'limit', limit
-        if ( limit(1)==iiC ) then
-        write(*,*) 'tfluxc', tfluxc,'pe_R6c', ZERO
-        write(*,*) 'tfluxn', tfluxn,'pe_N4n', tfluxn  - p_qncPBA(bac)* tfluxc
-        write(*,*) 'tfluxp', tfluxp,'pe_N1p', tfluxp  - p_qpcPBA(bac)* tfluxc
-        write(*,*) 'ooooooooooooooo'
-        endif
-   
-        if ( limit(1)==iiP ) then
-        write(*,*) 'tfluxc', tfluxc,'pe_R6c', tfluxc - tfluxp/p_qpcPBA(bac)
-        write(*,*) 'tfluxn', tfluxn,'pe_N4n', tfluxn - tfluxp/p_qpcPBA(bac)*p_qncPBA(bac)
-        write(*,*) 'tfluxp', tfluxp,'pe_N1p', ZERO
-        write(*,*) 'ooooooooooooooo'
-        endif
-   
-        if ( limit(1)==iiN ) then
-        write(*,*) 'tfluxc', tfluxc,'pe_R6c', tfluxc  - tfluxn/p_qncPBA(bac)
-        write(*,*) 'tfluxn', tfluxn,'pe_N4n', ZERO
-        write(*,*) 'tfluxp', tfluxp,'pe_N1p', tfluxp  - tfluxn/p_qncPBA(bac)*p_qpcPBA(bac)
-        endif
-     write(*,*) '++++++  BAC  +++++'
-#endif
 
   endif
 

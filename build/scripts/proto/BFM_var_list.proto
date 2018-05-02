@@ -5,15 +5,15 @@
        
       INTEGER, parameter :: jptra_dia_2d = %2d-diagnos-pel-nrs
  
-C State variables
+! State variables
 
         integer,parameter :: %3d-state-pel-pp
 
-C       diagnostic indexes
+!       diagnostic indexes
         integer,parameter :: %3d-total-diagnos-pel-pp
 
-c       flux indexes
+!       flux indexes
         integer, parameter:: %3d-flux-pel-pp
 
-c       variables 2d
+!       variables 2d
         integer, parameter:: %2d-diagnos-pel-pp       

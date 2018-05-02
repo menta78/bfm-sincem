@@ -26,12 +26,10 @@
 #endif
 #endif
 
-#if defined INCLUDE_BEN
    use mem, ONLY: NO_D2_BOX_STATES_BEN, D2SOURCE_BEN, &
         NO_BOXES_XY, D2STATE_BEN, D2STATETYPE_BEN
 #ifdef EXPLICIT_SINK
    use mem, ONLY: D2SINK_BEN
-#endif
 #endif
    use standalone
    use api_bfm
@@ -70,11 +68,9 @@
    integer,dimension(2,2)                                     :: blccc_ice
    real(RLEN),dimension(NO_D2_BOX_STATES_ICE,NO_BOXES_XY) :: bc2D_ice
 #endif
-#if defined INCLUDE_BEN
    real(RLEN)                                                 :: min2D_ben
    integer,dimension(2,2)                                     :: blccc_ben
    real(RLEN),dimension(NO_D2_BOX_STATES_BEN,NO_BOXES_XY) :: bc2D_ben
-#endif
 !EOP
 !-----------------------------------------------------------------------
 !BOC
@@ -90,10 +86,8 @@
    bc2D_ice=bbccc2D_ice
 #endif
 
-#if defined INCLUDE_BEN
    bccc2D_ben=D2STATE_BEN
    bc2D_ben=bbccc2D_ben
-#endif
 
    TLOOP : DO
       ! Integration step:
@@ -119,7 +113,6 @@
       END DO
 #endif
 
-#if defined INCLUDE_BEN
       DO j=1,NO_D2_BOX_STATES_BEN
          IF(D2STATETYPE_BEN(j).ge.0) THEN
 #ifndef EXPLICIT_SINK
@@ -129,7 +122,6 @@
 #endif
          END IF
       END DO
-#endif
 
       nmin=nmin+nstep 
       ! Check for negative concentrations
@@ -138,10 +130,10 @@
 #if defined INCLUDE_SEAICE
       min2D_ice=minval(ccc_tmp2D_ice)
       min = ( min .OR. ( min2D_ice .lt. eps ) )
-#elif defined INCLUDE_BEN
+#endif
       min2D_ben=minval(ccc_tmp2D_ben)
       min = ( min .OR. ( min2D_ben .lt. eps ) )
-#endif
+
       IF ( min ) THEN ! cut timestep
          IF (nstep.eq.1) THEN
             LEVEL1 'Necessary Time Step too small! Exiting...'
@@ -153,11 +145,10 @@
                LEVEL2 ccc_tmp2D_ice(blccc_ice(2,1),blccc_ice(2,2)), &
                            bbccc2D_ice(blccc_ice(2,1),blccc_ice(2,2))
 #endif
-#if defined INCLUDE_BEN
                blccc_ben(2,:)=minloc(ccc_tmp2D_ben)
                LEVEL2 ccc_tmp2D_ben(blccc_ben(2,1),blccc_ben(2,2)), &
                            bbccc2D_ben(blccc_ben(2,1),blccc_ben(2,2))
-#endif
+
                LEVEL2 'EXIT at time: ',timesec
             STOP
          END IF
@@ -167,9 +158,7 @@
 #if defined INCLUDE_SEAICE
          D2STATE_ICE=bccc2D_ice
 #endif
-#if defined INCLUDE_BEN
          D2STATE_BEN=bccc2D_ben
-#endif
          dtm1=.5_RLEN*delt
          delt=2._RLEN*nstep*mindelt
          timesec=maxdelt*ntime
@@ -193,7 +182,6 @@
          END DO
          D2STATE_ICE=ccc_tmp2D_ice
 #endif
-#if defined INCLUDE_BEN
          DO j=1,NO_D2_BOX_STATES_BEN
             IF (D2STATETYPE_BEN(j).ge.0) THEN
                bbccc2D_ben(j,:) = D2STATE_BEN(j,:) + &
@@ -201,7 +189,7 @@
             END IF
          END DO
          D2STATE_BEN=ccc_tmp2D_ben
-#endif
+
          call ResetFluxes
          call envforcing_bfm
          call EcologyDynamics
@@ -219,14 +207,12 @@
 #endif
 #endif
 
-#if defined INCLUDE_BEN
 #ifndef EXPLICIT_SINK
          bbccc2D_ben=bc2D_ben/n**2+D2STATE_BEN*(ONE-ONE/n**2) + &
             D2SOURCE_BEN*.5_RLEN*delt*(ONE/n**2 - ONE/n)
 #else
          bbccc2D_ben=bc2D_ben/n**2+D2STATE_BEN*(ONE-ONE/n**2)+ &
             sum((D2SOURCE_BEN-D2SINK_BEN),2)*.5_RLEN*delt*(ONE/n**2 - ONE/n)
-#endif
 #endif
 
 #ifdef DEBUG
@@ -266,7 +252,6 @@
       END DO
 #endif
 
-#if defined INCLUDE_BEN
       bbccc2D_ben=bccc2D_ben
       DO j=1,NO_D2_BOX_STATES_BEN
          IF (D2STATETYPE_BEN(j).ge.0) THEN
@@ -274,7 +259,6 @@
                ass*(bc2D_ben(j,:)-2._RLEN*bccc2d_ben(j,:)+D2STATE_BEN(j,:))
          END IF
       END DO
-#endif
 
    ENDIF
    nstep=nmaxdelt
