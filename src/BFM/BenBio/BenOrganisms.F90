@@ -355,12 +355,15 @@
   call flux_vector(iiBen, ppG2o,ppG2o,-( rrc/ MW_C))
   rtyc  =   rtyc- rrc
 
+
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Calculation of mortality
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
+#ifdef BFM_POM
   sm  =   p_sd(y)* et + (1.0-eO) * p_sdo(y)
-
+#else
+  sm  =   p_sd(y)* et !+ (1.0-eO) * 0.1
+#endif
   rq6c  =   yc* sm
   rq6n  =   yn* sm
   rq6p  =   yp* sm
@@ -402,6 +405,7 @@
     rep  =   rtyp- rtyc* p_qpcBOS(y)
   end where
 
+
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Correction for cases where initial conditions deviate strongly from
   ! Redfield C:N:P. In this way the C:N:P does not become too extreme
@@ -430,6 +434,7 @@
   rrBTo(:)  =   rrBTo(:)+ rrc/ MW_C
   reBTn(:)  =   reBTn(:)+ ren
   reBTp(:)  =   reBTp(:)+ rep
+
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Assign organism-dependent parameters

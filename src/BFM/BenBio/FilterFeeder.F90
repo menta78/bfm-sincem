@@ -313,7 +313,6 @@
      fsat=ONE
 
      fdepth=Depth_Ben(:)
-     puf = p_sra/p_su;
 
      netto= (ONE-(p_pueQ6*RI_Fc(:)*sfood_RI+p_puePI*food_PT + &
         p_pueZI*ZI_Fc(:)*sfood_ZI)/food ) * (ONE-p_pur)
@@ -655,8 +654,6 @@
      call flux(kbot, iiPel, ppR6s, ppR6s, ( -jRIY3s(BoxNumberXY)/ Depth(kbot)) )
     
   end do
-#endif
-
 #endif
 
   end subroutine FilterFeederDynamics

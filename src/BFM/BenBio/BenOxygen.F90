@@ -43,12 +43,11 @@
   use mem, ONLY: KNO3, M3n, BoxNumberXY_ben
   use bennut_interface, ONLY: CalculateFromSet
 #endif
-
 #endif
+
   use constants,  ONLY: SEC_PER_DAY, ONE_PER_DAY, STANDARD,EQUATION, ZERO_KELVIN
   use mem_Param,  ONLY: p_poro, p_small, p_d_tot, CalcBenthicFlag
   use mem_BenOxygen
-  use bennut_interface, ONLY: CalculateFromSet
   use mem_Param,  ONLY: p_d_tot, p_clD1D2m
   use time,       ONLY: bfmtime
 

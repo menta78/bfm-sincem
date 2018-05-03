@@ -76,6 +76,10 @@
   real(RLEN)  :: p_clm(iiBenOrganisms)
   real(RLEN)  :: p_qncBOS(iiBenOrganisms)
   real(RLEN)  :: p_qpcBOS(iiBenOrganisms)
+#ifdef BFM_POM
+  real(RLEN)  :: p_clO2o(iiBenOrganisms)
+  real(RLEN)  :: p_sdo(iiBenOrganisms)
+#endif
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! SHARED PUBLIC FUNCTIONS (must be explicited below "contains")
 
@@ -88,6 +92,9 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   namelist /BenOrganisms_parameters/ p_q10, p_su, p_chu, p_clu, p_pue, p_pur, &
     p_pudil, p_sr, p_puQ6, p_pueQ6, p_cm, p_clm, p_sd, p_sdm, p_qncBOS, p_qpcBOS, &
+#ifdef BFM_POM
+    p_clO2o, p_sdo, &
+#endif
     p_paBOS, p_paBBA
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
