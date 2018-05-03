@@ -118,11 +118,9 @@
 !
 !      -----INTEGRATION OF SCALAR (BENTHIC) BFM STATE VAR'S WITH LEAPFROG SCHEME----
 !
-#ifdef INCLUDE_BEN
 !
       call lf1d
 !
-#endif
 !
 !      -----DEFINE AND UPDATE TIME FOR OUTPUT WRITING-----
 !

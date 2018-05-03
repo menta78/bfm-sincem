@@ -148,7 +148,6 @@
 !
 !  -----TOTAL NUMBER OF VARIABLES TO BE COMPUTED-----
 !
-#ifdef INCLUDE_BEN
 !
 !  -----PELAGIC+BENTHIC SETUP-----
 !
@@ -157,14 +156,6 @@
    NO_BOXES_Z_BEN  = 1
    NO_BOXES_BEN = NO_BOXES_XY * NO_BOXES_Z_BEN
    NO_STATES_BEN = NO_BOXES_BEN * NO_D2_BOX_STATES_BEN
-!
-#else
-!
-!  -----PELAGIC SETUP ONLY-----
-!
-   NO_STATES   = NO_D3_BOX_STATES * NO_BOXES
-!
-#endif
 !
 !  -----COMPRESSED COORDINATES FOR NETCDF OUTPUT-----
 !
@@ -239,7 +230,7 @@
 !  ****************************************************************************
 !  ****************************************************************************
 !!
-   call init_var_bfm(namlst,'bfm.nml',unit,bio_setup)
+   call init_var_bfm(bio_setup)
 !
 !   ******************************************************************
 !   ******************************************************************
@@ -298,19 +289,15 @@
 !
    D3STATEB = ZERO
 !
-#ifdef INCLUDE_BEN
-!
    allocate(D2STATEB_BEN(NO_D2_BOX_STATES_BEN,NO_BOXES_XY)) ! BENTHIC
 !
 !  -----ZEROING-----
 !
    D2STATEB_BEN = ZERO
 !
-#endif   
-
 !  -----DEFINE BETTER INITIAL CONDITIONS-----
 !
-   call set_initial_conditions
+   !call set_initial_conditions
 !
 !  -----SAVE INITIAL CONDITIONS IN OUTPUT FILE-----
 !
@@ -321,11 +308,8 @@
 !
      D3STATEB = D3STATE !PELAGIC
 !
-#ifdef INCLUDE_BEN
-!
      D2STATEB_BEN = D2STATE_BEN ! BENTHIC
 !
-#endif
 !
 !  -----IF "HOT" START (Bfm_init = 1) READ BFM RESTART FILE -----
 !
