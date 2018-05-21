@@ -78,6 +78,8 @@
 !
    use api_bfm
 !
+   use init_var_bfm_local
+!
    use Service, ONLY: savef
 !
    use netcdf_bfm, ONLY: init_netcdf_bfm,     &
@@ -231,6 +233,9 @@
 !  ****************************************************************************
 !!
    call init_var_bfm(bio_setup)
+
+! Initialize internal constitutents quota of functional groups
+   call ini_organic_quotas()
 !
 !   ******************************************************************
 !   ******************************************************************
