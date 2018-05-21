@@ -32,17 +32,23 @@
 
   use global_mem, ONLY:RLEN, ONE, bfm_lwp
 #ifdef NOPOINTERS
-  use mem,  ONLY: D2STATE_BEN, D2DIAGNOS
+  use mem,  ONLY: D2STATE_BEN, D2DIAGNOS, D3STATE, D3DIAGNOS
 #else
   use mem,  ONLY: Q6c, Q1c, Q6p, Q1p, Q6n, Q1n, Q6s
 #endif
   use mem, ONLY: ppQ6c, ppQ1c, ppQ6p, ppQ1p, ppQ6n, ppQ1n, ppQ6s,  &
     jbotO2o, jbotN1p, jbotN3n, jbotN4n, jbotN5s, jbotO3c, jbotO3h, &
-    ppO2o, ppN1p, ppN3n, ppN4n, ppN5s, ppO3c, ppO3h, &
-    NO_BOXES_XY, iiBen, iiPel, flux_vector
+    ppO2o, ppN1p, ppN3n, ppN4n, ppN5s, ppO3c, ppO3h, ppETW, &
+    NO_BOXES_XY, iiBen, iiPel, flux_vector, ETW, O2o
   use mem_BenthicReturn
   use mem_Param, ONLY: CalcConservationFlag, AssignPelBenFluxesInBFMFlag
   use constants, ONLY: MW_C
+  use mem_globalfun, ONLY: MM_POWER
+#ifdef BFM_GOTM
+ use bio_var, ONLY: BOTindices
+#else
+ use api_bfm, ONLY: BOTindices
+#endif
 !  
 !
 ! !AUTHORS
@@ -82,39 +88,52 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Local Variables
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  real(RLEN),dimension(NO_BOXES_XY)  :: rate
+  integer   :: box, kbot
+  real(RLEN),dimension(NO_BOXES_XY)  :: rate, et, eo, fact
 
   if ( .NOT. AssignPelBenFluxesInBFMFlag ) return
 
-  rate  =   p_reminQ6* retfac* Q6c(:)
+  et = ONE ; eo = ONE
+  ! temperature & oxygen dependence
+  do Box = 1,NO_BOXES_XY
+     kbot = BOTindices(Box)
+     if ( p_q10  .gt. ZERO ) et(box) = min (ONE, p_q10 ** (( ETW(kbot) - p_qBT) / 10.0_RLEN) )
+     if ( p_chdo .gt. ZERO ) eo(box) = MM_POWER(O2o(kbot), p_chdo, 2)
+  enddo
+
+  ! Aggregate control factors
+  fact = retfac* et* eo
+
+  ! remineralization fluxes
+  rate  =   p_reminQ6* fact* Q6c(:)
   call flux_vector( iiBen, ppQ6c,ppQ6c,-( rate) )
   jbotO2o(:)  = - rate / MW_C
   jbotO3c(:)  = rate
 
-  rate  =   p_reminQ1* retfac* Q1c(:)
+  rate  =   p_reminQ1* fact* Q1c(:)
   call flux_vector( iiBen, ppQ1c,ppQ1c,-( rate) )
   jbotO2o(:)  = jbotO2o(:) - rate / MW_C
   jbotO3c(:)  = jbotO3c(:) + rate
 
-  rate  =   p_reminQ6* retfac* Q6p(:)
+  rate  =   p_reminQ6* fact* Q6p(:)
   call flux_vector( iiBen, ppQ6p,ppQ6p,-( rate) )
   jbotN1p(:)  = rate
 
-  rate  =   p_reminQ1* retfac* Q1p(:)
+  rate  =   p_reminQ1* fact* Q1p(:)
   call flux_vector( iiBen, ppQ1p,ppQ1p,-( rate) )
   jbotN1p(:)  = jbotN1p(:)+ rate
 
-  rate  =   p_reminQ6* retfac* Q6n(:)
+  rate  =   p_reminQ6* fact* Q6n(:)
   call flux_vector( iiBen, ppQ6n,ppQ6n,-( rate) )
   jbotN3n(:)  = rate* p_pQIN3
   jbotN4n(:)  = rate*( ONE - p_pQIN3)
 
-  rate  =   p_reminQ1* retfac* Q1n(:)
+  rate  =   p_reminQ1* fact* Q1n(:)
   call flux_vector( iiBen, ppQ1n,ppQ1n,-( rate) )
   jbotN3n(:)  = jbotN3n(:)+ rate* p_pQIN3
   jbotN4n(:)  = jbotN4n(:)+ rate*( ONE - p_pQIN3)
 
-  rate  =   p_reminQ6* retfac* Q6s(:)
+  rate  =   p_reminQ6* fact* Q6s(:)
   call flux_vector( iiBen, ppQ6s,ppQ6s,-( rate) )
   jbotN5s(:)  = rate
 

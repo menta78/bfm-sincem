@@ -100,6 +100,7 @@
   real(RLEN)  :: p_burvel_R2=0.0_RLEN
   real(RLEN)  :: p_burvel_PI=0.0_RLEN
   real(RLEN)  :: p_burvel_O5=0.0_RLEN
+  logical     :: R6DeepBurial = .FALSE.
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! SHARED PUBLIC FUNCTIONS (must be explicited below "contains")
 
@@ -120,7 +121,8 @@
   namelist /PelGlobal_parameters/ p_rR6m, p_rO5m, KSINK_rPPY, AggregateSink, &
                                   depth_factor
 #endif
-  namelist /Settling_parameters/ p_burvel_R6,p_burvel_R2,p_burvel_PI,p_burvel_O5
+  namelist /Settling_parameters/ p_burvel_R6, p_burvel_R2, p_burvel_PI, &
+                                 p_burvel_O5, R6DeepBurial
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
   !  Open the namelist file(s)
