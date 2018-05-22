@@ -175,6 +175,38 @@
        return
     end subroutine fixratio
 
+    elemental function analytical_ic(z, z1, v1, z2, v2)
+    !==========================================================================
+    ! Create analytical field depth profile using 2 layer input data
+    ! NOTE: if z2,v2 are zeros create only uniform value in the upper layer
+    ! z            : Target depth                             [m]
+    ! z1, z2       : Depth of upper and lower reference layer [m]
+    ! v1, v2       : Field value at upper and lower layers    [field unit]
+    !==========================================================================
+        IMPLICIT NONE
+        !
+        real(RLEN),intent(IN) :: z, z1, v1, z2, v2
+        real(RLEN)            :: analytical_ic
+        real(RLEN)            :: alpha, fout
+        !
+        fout = ZERO
+        !
+        ! below lower layer (do it first to solve case z2 = 0)
+        if ( z .gt. z2 ) fout = v2
+        !
+        ! above upper layer
+        if ( z .le. z1 ) fout = v1
+        !
+        ! within upper and lower layer (linear interpolation)
+        alpha = (v2-v1) / (z2-z1 +2.E-15)
+        if ( (alpha .le. 1.E15) .AND. ( z .gt. z1 .and. z .le. z2 ) )  &
+            fout = v1 + alpha * (z-z1)
+        !
+        analytical_ic = max( fout , p_small ) 
+        !
+        return
+    end function analytical_ic
+
   end module mem_globalfun
 !EOC
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
