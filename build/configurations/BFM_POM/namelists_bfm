@@ -219,8 +219,8 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
     Q6p0           =  1.4,
     Q6s0           =  150.0,
     Q1c0           =  10.4988,
-    Q16c           = 0.0,
-    Q11c           = 0.0,
+    Q16c0           = 0.0,
+    Q11c0           = 0.0,
 	filename_nml_conf = 'BFM_General.nml',
 /
 
