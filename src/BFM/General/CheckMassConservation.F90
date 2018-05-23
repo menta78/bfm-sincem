@@ -150,17 +150,17 @@
      totbenc(:) = ( Y1c(:)+ Y2c(:)+ Y3c(:)+ &
                     Y4c(:)+ Y5c(:)+ H1c(:)+ &
                     H2c(:)+ Q1c(:)+ Q6c(:)+ &
-                    Q11c(:) )
+                    Q16c(:)+ Q11c(:) )
 
      totbenp(:) = ( Y1p(:)+ Y2p(:)+ Y3p(:)+ &
                     Y4p(:)+ Y5p(:)+ H1p(:)+ &
                     H2p(:)+ Q1p(:)+ Q6p(:)+ &
-                    Q11p(:)+ K1p(:)+ K11p(:))
+                    Q16p(:)+ Q11p(:)+ K1p(:)+ K11p(:))
      totbenn(:) = ( Y1n(:)+ Y2n(:)+ Y3n(:)+ &
                     Y4n(:)+ Y5n(:)+ H1n(:)+ &
                     H2n(:)+ Q1n(:)+ Q6n(:)+ &
-                    Q11n(:)+ K4n(:)+ K14n(:))
-     totbens(:)  =  Q6s(:)
+                    Q16n(:)+ Q11n(:)+ K4n(:)+ K14n(:))
+     totbens(:)  =  Q6s(:)+ Q16s(:)
 
 #elif defined BENTHIC_FULL
      totbenc(:) = ( Y1c(:)+ Y2c(:)+ Y3c(:)+ &
@@ -180,10 +180,10 @@
      totbens(:) =   K5s(:)+ Q6s(:)
 
 #else
-      totbenc(:)  =  ( Q1c(:)+ Q11c(:)+ Q6c(:))
-      totbenp(:)  =  ( Q1p(:)+ Q11n(:)+ Q6p(:))
-      totbenn(:)  =  ( Q1n(:)+ Q11p(:)+ Q6n(:))
-      totbens(:)  =    Q6s(:)
+      totbenc(:)  =  ( Q1c(:)+ Q11c(:)+ Q6c(:)+ Q16c(:))
+      totbenp(:)  =  ( Q1p(:)+ Q11n(:)+ Q6p(:)+ Q16p(:))
+      totbenn(:)  =  ( Q1n(:)+ Q11p(:)+ Q6n(:)+ Q16n(:))
+      totbens(:)  =    Q6s(:)+ Q16s(:)
 #endif
 
 #ifdef INCLUDE_BENCO2

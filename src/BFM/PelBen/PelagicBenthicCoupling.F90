@@ -44,7 +44,7 @@
            jbotR6c, jbotR6n, jbotR6p, jbotR6s, jbotR1c, jbotR1n, jbotR1p, &
            jbotO2o, jbotN1p, jbotN3n, jbotN4n, jbotN5s, jbotN6r,          &
            sediPPY, sediR2, sediR6,                                       &
-           qpcPPY, qncPPY, qscPPY, qlcPPY, qncMIZ, qpcMIZ,                &
+           qpcPPY, qncPPY, qscPPY, qlcPPY, qncMIZ, qpcMIZ,qccPPY,                &
            iiC, iiN, iiP, iiL, iiS, iiLastElement, iiBen, iiPel,          &
            flux, flux_vector
 #ifdef INCLUDE_PELFE
@@ -57,9 +57,11 @@
 #endif
 #endif
   use mem, ONLY: Q6c, Q6n, Q6p, Q6s, Q1c, Q1n, Q1p
-  use mem, ONLY: ppQ6c, ppQ6n, ppQ6p, ppQ6s, ppQ1c, ppQ1n, ppQ1p
+  use mem, ONLY: ppQ6c, ppQ6n, ppQ6p, ppQ6s, ppQ1c, ppQ1n, ppQ1p, &
+                 ppQ16c, ppQ16n, ppQ16p, ppQ16s
 #endif
    use mem_PelSinkSet
+   use constants, ONLY: MW_C
    use mem_Param, ONLY: p_pe_R1c, p_pe_R1n, p_pe_R1p , p_small,   &
                  CalcBenthicFlag, AssignPelBenFluxesInBFMFlag
    use mem_PelBac, ONLY: p_suhR1, p_sulR1, p_suR2, p_suR6,        &
@@ -106,7 +108,7 @@
    real(RLEN), dimension(:), pointer  ::lcl_PhytoPlankton, lcl_MicroZooPlankton
    real(RLEN), dimension(:), allocatable :: jbotR2R6, jbotR2R1
    real(RLEN), dimension(:,:), allocatable :: jbotR6PPY, jbotR1PPY
-   real(RLEN)            :: newDm(NO_BOXES_XY)
+   real(RLEN)            :: newDm(NO_BOXES_XY), burfrac(NO_BOXES_XY)
    !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    ! Local Variables
    !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -119,6 +121,7 @@
    !
    jbotR2R1  = ZERO ; jbotR2R6  = ZERO
    jbotR1PPY = ZERO ; jbotR6PPY = ZERO
+   burfrac = ZERO
    !
    ! At this point the Pelagic bottom arrays already contain :
    ! - Inorganic nutrients fluxes from benthic return/remin/nutrients schemes
@@ -380,13 +383,28 @@
    ! ------------------------------------------------------------------
    !
    if ( CalcBenthicFlag ) then
+
+      if ( R6DeepBurial ) then
+         !
+         ! Buried fraction of POC into deep sediment (Dunne et al,2007-GBC)
+         burfrac = (0.013_RLEN + 0.53_RLEN * abs(p_small + jbotR6c(:)/MW_C)**2) /  &
+                        ( 7.0_RLEN + abs(p_small + jbotR6c(:)/MW_C))**2
+         !
+         ! Burial od Pelagic Organic Matter
+         call flux_vector( iiBen, ppQ16c,ppQ16c, -jbotR6c(:) * burfrac)
+         call flux_vector( iiBen, ppQ16n,ppQ16n, -jbotR6n(:) * burfrac)
+         call flux_vector( iiBen, ppQ16p,ppQ16p, -jbotR6p(:) * burfrac)
+         call flux_vector( iiBen, ppQ16s,ppQ16s, -jbotR6s(:) * burfrac)
+
+      endif
+
       !
       ! Sedimentation of Pelagic Organic Matter (Q6f still missing !!!)
 
-      call flux_vector( iiBen, ppQ6c,ppQ6c, -jbotR6c(:) )
-      call flux_vector( iiBen, ppQ6n,ppQ6n, -jbotR6n(:) )
-      call flux_vector( iiBen, ppQ6p,ppQ6p, -jbotR6p(:) )
-      call flux_vector( iiBen, ppQ6s,ppQ6s, -jbotR6s(:) )
+      call flux_vector( iiBen, ppQ6c,ppQ6c, -jbotR6c(:) * (ONE - burfrac) )
+      call flux_vector( iiBen, ppQ6n,ppQ6n, -jbotR6n(:) * (ONE - burfrac) )
+      call flux_vector( iiBen, ppQ6p,ppQ6p, -jbotR6p(:) * (ONE - burfrac) )
+      call flux_vector( iiBen, ppQ6s,ppQ6s, -jbotR6s(:) * (ONE - burfrac) )
       call flux_vector( iiBen, ppQ1c,ppQ1c, -jbotR1c(:) )
       call flux_vector( iiBen, ppQ1n,ppQ1n, -jbotR1n(:) )
       call flux_vector( iiBen, ppQ1p,ppQ1p, -jbotR1p(:) )

@@ -42,13 +42,14 @@ end
 end
 
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-#       PHYSICAL VARIABLES
+#                          PHYSICAL VARIABLES
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 2d-variable-pel
   ThereIsLight : Switch for day/night cycle : -
   SUNQ	       : Daylength in hours : h
   EWIND : Wind speed : m/s
   EICE  : Sea-ice fraction: -
+  ETAUB : Bottom Stress : N m/s
 end
 3d-variable-pel
   ETW   : temperature : C
@@ -60,7 +61,7 @@ end
 end
 
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-#       PELAGIC STATE VARIABLES (volume)
+#                            PELAGIC SYSTEM
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 3d-state-pel
   #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -149,9 +150,8 @@ end
     OArag      : Saturation state of Aragonite : -
 end
 
-
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-#       GENERAL DIAGNOSTICS
+#   Support variables for Pelagic system
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 3d-variable-pel
 
@@ -211,7 +211,7 @@ end
     sediO5                    : Calcite sedimentation rate         :m/d
 
    #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-   # Sinking rates of phytoplankton and detritus
+   # Light diagnostics
    #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     sunPPY(PhytoPlankton) : Specific Net Production of PhytoPlankton : 1/d
     eiPPY(PhytoPlankton)  : Regulating Factor for Light in PhytoPlankton : -

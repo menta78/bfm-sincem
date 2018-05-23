@@ -317,9 +317,10 @@ end
   # Benthic State Variables
   #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     group BenDetritus[cnps] (BOM) : mg C/m2: mmol N/m2 : mmol P/m2 : mmol Si/m2
-                Q1[-s]    : Labile organic Matter
-                Q11[-s]   : Labile organic Matter
-                Q6        : Particulate organic Matter
+                Q1[-s]    : Sediment Labile organic Matter
+                Q11[-s]   : Sediment Labile organic Matter
+                Q6        : Sediment Particulate organic Matter
+                Q16       : Deep Sediment organic Matter
     end
 end
 

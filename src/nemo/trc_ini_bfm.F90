@@ -52,6 +52,7 @@
    use trcdiabfm,  only: bfm_iomput
    use sw_tool,    only: gsw_p_from_z
    use mem_BenthicReturn, ONLY: RETFAC, p_depscale
+   use mem_globalfun, only: analytical_ic
 
    ! NEMO modules
    USE trcnam_trp, only: ln_trczdf_exp,ln_trcadv_cen2,ln_trcadv_tvd
@@ -338,19 +339,25 @@
       endif
       do m = 1,NO_D3_BOX_STATES
          select case (InitVar(m) % init)
-         case (0) 
+         case (0) ! Homogeneous IC
             InitVar(m)%unif = minval( D3STATE(m,:) )
-         case (1) ! Analytical profile
+         case (1) ! Analytical IC
             rtmp3Da = ZERO
+            ! Check consistency of input z1 and z2
+            if ( InitVar(m)%anz2 .ne. ZERO .AND. InitVar(m)%anz2 .lt. InitVar(m)%anz1 ) then
+               STDERR 'ERROR: z2 < z1 in analytical profile creation for tracer ', TRIM(var_names(m))
+               STDERR '     Check settings in bfm_init_nml.'
+               stop
+            endif
             ! fsdept contains the model depth
             do j = 1,jpj
                do i = 1,jpi
-                  call analytical_profile(jpk,fsdept(i,j,:),InitVar(m) % anz1, &
-                    InitVar(m) % anv1,InitVar(m) % anz2,InitVar(m) % anv2,rtmp3Da(i,j,:))
+                  rtmp3Da(i,j,:) = analytical_ic( fsdept(i,j,:), InitVar(m)%anz1, &
+                    InitVar(m)%anv1, InitVar(m)%anz2, InitVar(m)%anv2 )
                end do
             end do
             D3STATE(m,:)  = pack(rtmp3Da,SEAmask)
-         case (2) ! from file
+         case (2) ! IC from file
             ! mapping index
             ll = n_trc_index(m)
             call trc_dta(nit000,sf_trcdta(ll),rf_trfac(ll))

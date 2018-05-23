@@ -150,7 +150,6 @@
   hxn = D2STATE_BEN(pphxn,:)
   hxp = D2STATE_BEN(pphxp,:)
 
-
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Assign functional group-dependent parameters:
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -194,8 +193,8 @@
   availQ6_n  =   Q6n(:)* PartQ(  D7m(:),  clm,  chm,  p_d_tot)
   availQ6_p  =   Q6p(:)* PartQ(  D8m(:),  clm,  chm,  p_d_tot)
 
-  qnQ6c  =   availQ6_n/( availQ6_c+ 1.0D-30)
-  qpQ6c  =   availQ6_p/( availQ6_c+ 1.0D-30)
+  qnQ6c  =   availQ6_n/( availQ6_c+ p_small)
+  qpQ6c  =   availQ6_p/( availQ6_c+ p_small)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Growth is controlled by quality of detritus (N and P content):

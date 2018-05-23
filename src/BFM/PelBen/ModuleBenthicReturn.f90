@@ -68,6 +68,9 @@
   real(RLEN)  :: p_reminQ6  ! Spec. remin. rate of Particulate OM (d-1)
   real(RLEN)  :: p_pQIN3    ! Partitioning coeff. between NO3 and NH4
   real(RLEN)  :: p_depscale ! Depth level to scale remineralization rates (m)
+  real(RLEN)  :: p_q10      ! Q10 value for remineralization rate
+  real(RLEN)  :: p_qBT      ! Base Temperature for Q10 remin
+  real(RLEN)  :: p_chdo     ! Half-saturation Oxygen concentration for MM^2
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Scaling factor for remineralization rates
   real(RLEN),ALLOCATABLE, DIMENSION(:) :: RETFAC
@@ -80,7 +83,8 @@
   subroutine InitBenthicReturn()
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  namelist /BenthicReturn_parameters/ p_reminQ1, p_reminQ6, p_pQIN3, p_depscale
+  namelist /BenthicReturn_parameters/ p_reminQ1, p_reminQ6, p_pQIN3, p_depscale, & 
+                                      p_q10, p_qBT, p_chdo
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
   !BEGIN compute

@@ -219,6 +219,8 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
     Q6p0           =  1.4,
     Q6s0           =  150.0,
     Q1c0           =  10.4988,
+    Q16c           = 0.0,
+    Q11c           = 0.0,
 	filename_nml_conf = 'BFM_General.nml',
 /
 
@@ -253,7 +255,7 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
           'qpcMIZ_iiZ5', 'qncMIZ_iiZ5', 'qpcMIZ_iiZ6', 'qncMIZ_iiZ6'
           'qpcPPY_iiP1', 'qncPPY_iiP1', 'qlcPPY_iiP1', 'qpcPPY_iiP2', 'qncPPY_iiP2', 'qlcPPY_iiP2',
           'qpcPPY_iiP3', 'qncPPY_iiP3', 'qlcPPY_iiP3', 'qpcPPY_iiP4', 'qncPPY_iiP4', 'qlcPPY_iiP4',
-          'Q6c','Q6n','Q6p','Q6s','Q1c','Q1n','Q1p','Q11c','Q11n','Q11p',
+          'Q6c','Q6n','Q6p','Q6s','Q1c','Q1n','Q1p','Q11c','Q11n','Q11p','Q16c','Q16n','Q16p','Q16s',
           'ETW','ESW','EIR','EWIND','xEPS',
           'sediR2','sediR6','sediPPY_iiP1','sediPPY_iiP2','sediPPY_iiP3','sediPPY_iiP4',
           'totpelc','totpeln','totpelp','totpels',
@@ -271,12 +273,14 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
 ! p_burvel_R2     [m/d]              Bottom Burial Velocity for dissolved
 ! p_burvel_PI     [m/d]              Bottom Burial Velocity for plankton
 ! p_burvel_O5     [m/d]              Bottom Burial Velocity for calcite
+! R6DeepBurial    logic          R6 Burial to Deep Sediment (Dunne et al., 2007)
 !-------------------------------------------------------------------------!
 &Settling_parameters
   p_burvel_R6 = 0.5,
   p_burvel_O5 = 30.,
   p_burvel_R2 = 0.0,
-  p_burvel_PI = 5.0
+  p_burvel_PI = 5.0,
+  R6DeepBurial = .FALSE.,
 	filename_nml_conf = 'Benthic_Environment.nml',
 /
 
@@ -752,12 +756,18 @@ p_paMEZ(2,:)=   0.0,    1.0
 ! p_reminQ6       [d-1]       Remineralization rate of Particulate OM
 ! p_pQIN3        [-]        Partitioning coeff. between NO3 and NH4
 ! p_depscale       [m]        Depth level to scale remin. rates (for BFM-NEMO)
+! p_q10            [-]        Q10 value for remineralization rate (=0 disable) 
+! p_qBT           [degC]      Base Temperature for Q10 remin
+! p_chdo        [mmol/m3]     Half-saturation Oxygen conc. for MM^2 (=0 disable)
 !-------------------------------------------------------------------------!
 &BenthicReturn_parameters
   p_reminQ1 = 0.01
   p_reminQ6 = 0.005
   p_pQIN3 = 0.1
   p_depscale = 0.0
+  p_q10      = 0.,
+  p_qBT      = 20.0,
+  p_chdo     = 0.,
         filename_nml_conf = 'Benthic_Environment.nml',
 /
 !-------------------------------------------------------------------------!
@@ -794,7 +804,7 @@ p_paMEZ(2,:)=   0.0,    1.0
 !               	1- MaxN only - fake start time used.
 !               	2- start and stop - MaxN calculated.
 !               	3- start and MaxN - stop calculated.
-!               	4- simdays - fake start time used 
+!               	4- simdays - fake start time used
 !			   and MaxN calculated.
 !MaxN		integer	do loop from n=1,MaxN
 !start		string	Initial time: YYYY/MM/DD HH:MM:SS

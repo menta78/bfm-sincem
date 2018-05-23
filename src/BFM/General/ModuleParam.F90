@@ -156,7 +156,7 @@
       p_clDxm=0.001_RLEN, &  
       p_clD1D2m=0.01_RLEN,    &  
       p_d_tot_2=0.35_RLEN
-#if ! defined BENTHIC_BIO && ! defined BENTHIC_FULL 
+#if ! defined BENTHIC_BIO || ! defined BENTHIC_FULL 
       logical,public :: CalcBenOrganisms=.FALSE., CalcBenBacteria=.FALSE.
 #endif
 
