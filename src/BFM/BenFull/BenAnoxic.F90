@@ -38,7 +38,7 @@
     INPUT_TERM, PARAMETER, SET_LAYER_INTEGRAL_UNTIL, LAYER2, ADD, DERIVATIVE, &
     RFLUX, INTEGRAL, ONE_PER_DAY, START_ADD_TERM, INPUT_ADD_TERM, LAYER3, SHIFT
   use mem_Param,  ONLY: p_poro, p_d_tot,p_d_tot_2, p_clDxm, p_qro, p_q10diff, p_qon_dentri
-  use mem_BenthicNutrient3, ONLY:p_max_state_change, p_max_shift_change
+  use mem_BenthicNutrient, ONLY:p_max_state_change, p_max_shift_change
   use mem_BenAnoxic
   use bennut_interface, ONLY: GetInfoFromSet, InitializeSet, DefineSet, &
     CompleteSet, CalculateSet, CalculateTau, CalculateFromSet

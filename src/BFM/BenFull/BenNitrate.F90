@@ -47,7 +47,7 @@
     INTEGRAL, MIN_VAL_EXPFUN,LAYER3
   use mem_Param,  ONLY: p_poro, p_d_tot, p_q10diff, p_qro, p_qon_dentri,p_small
   use mem_BenNitrate
-  use mem_BenthicNutrient3, ONLY:p_max_state_change
+  use mem_BenthicNutrient, ONLY:p_max_state_change
 
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=

@@ -35,7 +35,7 @@
     SHIFT, RFLUX, ONE_PER_DAY
   use mem_Param,  ONLY: p_poro, p_q10diff, p_clDxm, p_d_tot,p_small
   use mem_BenQ1Transport
-  use mem_BenthicNutrient3, ONLY:p_max_shift_change
+  use mem_BenthicNutrient, ONLY:p_max_shift_change
   use bennut_interface, ONLY: InitializeSet, DefineSet, CompleteSet, &
     CalculateSet, CalculateTau, CalculateFromSet
   use mem_globalfun,   ONLY: IntegralExp, insw, eTq

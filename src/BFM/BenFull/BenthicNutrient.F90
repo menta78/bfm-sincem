@@ -5,7 +5,7 @@
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 !BOP
 !
-! !ROUTINE: BenthicNutrient3
+! !ROUTINE: BenthicNutrient
 !
 ! DESCRIPTION
 !  Description of the diagenetic processes in the sediment
@@ -16,7 +16,7 @@
 !   structure of the code based on ideas of M. Vichi.
 !
 ! !INTERFACE
-  subroutine BenthicNutrient3Dynamics
+  subroutine BenthicNutrientDynamics
 !
 ! !USES:
   ! The following global scalar vars got a value: LocalDelta
@@ -111,7 +111,7 @@
   call BenCO2Profiles
 #endif
 
-  end subroutine BenthicNutrient3Dynamics
+  end subroutine BenthicNutrientDynamics
 !EOC
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model 

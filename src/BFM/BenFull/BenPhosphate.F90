@@ -40,7 +40,7 @@
     STANDARD, ADD, DERIVATIVE, RFLUX, SHIFT, ONE_PER_DAY,INTEGRAL
   use mem_Param,  ONLY: p_poro, p_p_ae, p_d_tot,p_d_tot_2, p_clDxm, p_q10diff,p_small
   use mem_BenPhosphate
-  use mem_BenthicNutrient3, ONLY:p_max_shift_change,p_InitCondition,p_max_state_change
+  use mem_BenthicNutrient, ONLY:p_max_shift_change,p_InitCondition,p_max_state_change
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! The following bennut functions are used:InitializeSet, &
