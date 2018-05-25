@@ -254,7 +254,7 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
   p_burvel_R6 = 1.5,
   p_burvel_O5 = 30.0,
   p_burvel_R2 = 0.0,
-  p_burvel_PI = 0.0
+  p_burvel_PI = 1.5
 	filename_nml_conf = 'Benthic_Environment.nml',
 /
 
@@ -703,7 +703,7 @@ p_paMEZ(1,:)=   0.5
   p_scavOrg = 1.58E-05
   p_scavIng = 0.01
 p_N7fLigand = 0.6
-    p_rDust = 2.0
+    p_rDust = 4.0
   p_rN7fsed = 1.0
 	filename_nml_conf = 'Pelagic_Environment.nml',
 /
@@ -936,16 +936,16 @@ p_N7fLigand = 0.6
    sn_trcsbc(N7f)  =  'IRON_DEPOSITION'  , -1     ,  'dust'  ,  .false. , .true.  , 'yearly'   , ''           , '', ''
    rn_trsfac(N3n)  =  6171428571.42857                          
    rn_trsfac(N4n)  =  6171428571.42857 
-   rn_trsfac(N7f)  =  12.53357207        != Solub(0.02) X FeinDust(0.035) X g->ug (1e6) / Fe g->mol (55.85)
-   sn_trccbc(N1p)  =  'RIVER_LOADS'  -12  'RIVERDIP'  .false.  .true.  'yearly'  ''  ''  ''
-   sn_trccbc(N3n)  =  'RIVER_LOADS'  -12  'RIVERDIN'  .false.  .true.  'yearly'  ''  ''  ''
-   sn_trccbc(N5s)  =  'RIVER_LOADS'  -12  'RIVERDSI'  .false.  .true.  'yearly'  ''  ''  ''
-   sn_trccbc(N7f)  =  'RIVER_LOADS'  -12  'RIVERDFE'  .false.  .true.  'yearly'  ''  ''  ''
-   sn_trccbc(R1c)  =  'RIVER_LOADS'  -12  'RIVERDOC'  .false.  .true.  'yearly'  ''  ''  ''
-   sn_trccbc(R1n)  =  'RIVER_LOADS'  -12  'RIVERDON'  .false.  .true.  'yearly'  ''  ''  ''
-   sn_trccbc(R1p)  =  'RIVER_LOADS'  -12  'RIVERDOP'  .false.  .true.  'yearly'  ''  ''  ''
-   sn_trccbc(O3c)  =  'RIVER_LOADS'  -12  'RIVERDIC'  .false.  .true.  'yearly'  ''  ''  ''
-   sn_trccbc(O3h)  =  'RIVER_LOADS'  -12  'RIVERDIC'  .false.  .true.  'yearly'  ''  ''  ''
+   rn_trsfac(N7f)  =  6.26678603        != Solub(0.01) X FeinDust(0.035) X g->ug (1e6) / Fe g->mol (55.85)
+   sn_trccbc(N1p)  =  'RIVER_LOADS'   -12  'RIVERDIP'  .false.  .true.  'yearly'  ''  ''  ''
+   sn_trccbc(N3n)  =  'RIVER_LOADS'   -12  'RIVERDIN'  .false.  .true.  'yearly'  ''  ''  ''
+   sn_trccbc(N5s)  =  'RIVER_LOADS'   -12  'RIVERDSI'  .false.  .true.  'yearly'  ''  ''  ''
+   sn_trccbc(N7f)  =  'RIVER_LOADS'   -12  'RIVERDFE'  .false.  .true.  'yearly'  ''  ''  ''
+   sn_trccbc(R1c)  =  'RIVER_LOADS'   -12  'RIVERDOC'  .false.  .true.  'yearly'  ''  ''  ''
+   sn_trccbc(R1n)  =  'RIVER_LOADS'   -12  'RIVERDON'  .false.  .true.  'yearly'  ''  ''  ''
+   sn_trccbc(R1p)  =  'RIVER_LOADS'   -12  'RIVERDOP'  .false.  .true.  'yearly'  ''  ''  ''
+   sn_trccbc(O3c)  =  'RIVER_LOADS'   -12  'RIVERDIC'  .false.  .true.  'yearly'  ''  ''  ''
+   sn_trccbc(O3h)  =  'RIVER_LOADS'   -12  'RIVERDIC'  .false.  .true.  'yearly'  ''  ''  ''
    rn_trcfac(N1p)  =  8.8464e+10    ! 1 mol P = 30.97 g; 1.e12*1.e3/30.97/365 conversion factor from Tg/y to mmol/d
    rn_trcfac(N3n)  =  1.9556e+11    ! 1 mol N = 14.01 g; 1.e12*1.e3/14.01/365 conversion factor from Tg/y to mmol/d
    rn_trcfac(N5s)  =  9.7534e+10    ! 1 mol Si = 28.09 g; 1.e12*1.e3/28.09/365 conversion factor from Tg/y to mmol/d
