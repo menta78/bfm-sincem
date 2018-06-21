@@ -42,13 +42,14 @@ end
 end
 
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-#       PHYSICAL VARIABLES
+#                          PHYSICAL VARIABLES
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 2d-variable-pel
   ThereIsLight : Switch for day/night cycle : -
   SUNQ	       : Daylength in hours : h
   EWIND : Wind speed : m/s
   EICE  : Sea-ice fraction: -
+  ETAUB : Bottom Stress : N m/s
 end
 3d-variable-pel
   ETW   : temperature : C
@@ -58,6 +59,7 @@ end
   ESS   : Suspended Sediments : g/m3
   EPR   : Water Pressure : dbar
 end
+
 2d-variable-ice -if-exist INCLUDE_SEAICE
   #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   #       Sea-ice physical variables
@@ -75,7 +77,7 @@ end
 end
 
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-#       PELAGIC STATE VARIABLES (volume)
+#                            PELAGIC SYSTEM
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 3d-state-pel
   #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -138,7 +140,104 @@ end
 end
 
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-# Sea-Ice State Vars
+#       CO2 and Carbonate system variables
+#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+3d-state-pel -if-exist INCLUDE_PELCO2
+  group Inorganic[ch] (CAR): mg C/m3 : mmol eq/m3
+     O3     : Dissolved Inorganic Carbon: Alkalinity
+     O5[-h] : Calcite
+  end
+end
+
+2d-variable-pel -if-exist INCLUDE_PELCO2
+  EPCO2air   : Atmospheric CO2 Partial Pressure : uatm
+  CO2airflux : Sea-air CO2 Flux : mmol/m2/d
+end
+
+3d-variable-pel -if-exist INCLUDE_PELCO2
+    DIC        : Dissolved Inorganic Carbon : umol/kg
+    CO2        : CO2(aq) : umol/kg
+    pCO2       : Oceanic pCO2 : uatm
+    HCO3       : Bicarbonate :  umol/kg
+    CO3        : Carbonate : umol/kg
+    ALK        : Alkalinity : umol eq/kg
+    pH         : pH : -
+    OCalc      : Saturation state of Calcite : -
+    OArag      : Saturation state of Aragonite : -
+end
+
+#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+#   Support variables for Pelagic system
+#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+3d-variable-pel
+
+    #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    # Variables to check total mass in pelagic
+    #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    totpel[cnps]  : Total Mass in Pelagic: g C: g N: g P: g Si
+
+    #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    # Variables for oxygen diagnostics
+    #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    cxoO2  : Oxygen Saturation : mmol O2/m3
+    eO2mO2 : Relative Oxygen saturation: - 
+
+    #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    # Diagnostic collective variables 
+    #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    Chla : Chlorophyll-a : mg Chl/m3
+    sunPPY(PhytoPlankton) : Specific Net Production of PhytoPlankton : 1/d
+
+    #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    # Water column diagnostic rates
+    #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    flPTN6r : Pelagic Anaerobic Mineralization Rate : mmol O2/m3/d
+    flN3O4n : Pelagic Denitrification Rate : mmol N/m3/d
+    flN4N3n : Pelagic Nitrification Rate   : mmol N/m3/d
+
+    #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    # Variables holding quota of elements in species
+    #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    qpcPPY(PhytoPlankton)	: Quotum P/C in Phytoplankton : mmol P/mg C 
+    qncPPY(PhytoPlankton)	: Quotum N/C in Phytoplankton : mmol N/mg C 
+    qscPPY(PhytoPlankton)	: Quotum Si/C in Phytoplankton : mmol Si/mg C 
+    qlcPPY(PhytoPlankton)	: Quotum Chl/C in Phytoplankton : mg Chl /mg C
+    qccPPY(PhytoPlankton)   : Quotum PIC/POC in Phytoplankton : mg C/mg C
+
+    qpcMEZ(MesoZooPlankton)	: Quotum P/C in Mesozooplankton :mmol P/mg C 
+    qncMEZ(MesoZooPlankton)	: Quotum N/C in Mesozooplankton :mmol N/mg C 
+
+    qpcMIZ(MicroZooPlankton)	: Quotum P/C in MicroZooPlankton :mmol P/mg C  
+    qncMIZ(MicroZooPlankton)	: Quotum N/C in MicroZooPlankton :mmol N/mg C 
+
+    qpcOMT(PelDetritus)		: Quotum P/C in Organic Matter:mmol N/mg C 
+    qncOMT(PelDetritus)		: Quotum N/C in Organic Matter:mmol P/mg C  
+    qscOMT(PelDetritus)		: Quotum Si/C in Organic Matter:mmol Si/mg C
+ 
+    qpcPBA(PelBacteria)		: Quotum P/C in Pelagic Bacteria :mmol P/mg C  
+    qncPBA(PelBacteria)		: Quotum N/C in Pelagic Bacteria :mmol N/mg C  
+
+   #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+   # Sinking rates of phytoplankton and detritus
+   #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    sediPPY(PhytoPlankton)    : PhytoPlankton sedimentation rate   :m/d
+    sediMIZ(MicroZooPlankton) : MicroZooPlankton sedimentation rate:m/d
+    sediMEZ(MesoZooPlankton)  : MesoZooPlankton sedimentation rate :m/d
+    sediR2                    : Colloidal OMT sedimentation rate   :m/d
+    sediR6                    : Detritus sedimentation rate        :m/d
+    sediO5                    : Calcite sedimentation rate         :m/d
+
+   #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+   # Light diagnostics
+   #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    eiPPY(PhytoPlankton)  : Regulating Factor for Light in PhytoPlankton : -
+    xEPS                  : Total Extinction Coefficient : 1/m
+    ELiPPY(PhytoPlankton) : Optimal light in PhytoPlankton : W/m2
+    ABIO_eps              : Abiotic Extinction Coefficient : 1/m
+end
+
+#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+#                            SEAICE SYSTEM
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 2d-state-ice -if-exist INCLUDE_SEAICE
   #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -209,110 +308,41 @@ end
     qncSBA(SeaiceBacteria)   : Quotum N/C in Sea ice Bacteria :mmol P/mg C  
 end
 
-
-
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-#       CO2 and Carbonate system variables
+#                           BENTHIC SYSTEM
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-3d-state-pel -if-exist INCLUDE_PELCO2
-  group Inorganic[ch] (CAR): mg C/m3 : mmol eq/m3
-     O3     : Dissolved Inorganic Carbon: Alkalinity
-     O5[-h] : Calcite
-  end
+# RETURN model
+2d-state-ben
+  #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  # Benthic State Variables
+  #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    group BenDetritus[cnps] (BOM) : mg C/m2: mmol N/m2 : mmol P/m2 : mmol Si/m2
+                Q1[-s]    : Surface Sediment Labile organic Matter
+                Q11[-s]   : Deep Sediment Labile organic Matter
+                Q6        : Surface Sediment Particulate organic Matter
+                Q16       : Deep Sediment Particulate organic Matter
+    end
 end
 
-2d-variable-pel -if-exist INCLUDE_PELCO2
-  EPCO2air   : Atmospheric CO2 Partial Pressure : uatm
-  CO2airflux : Sea-air CO2 Flux : mmol/m2/d
+2d-variable-ben
+
+  #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  # Variables to check totmass of C N P Si in benthic
+  #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    totben[cnps]  : total mass present in benthos: g C: g N: g P: g Si
+
+  #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  # Variables holding quota of elements in species
+  #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    qpcBOM(BenDetritus)         : Quotum P/C in Benthic Organic Matter:mmol N/mg C
+    qncBOM(BenDetritus)         : Quotum N/C in Benthic Organic Matter:mmol P/mg C
+    qscBOM(BenDetritus)         : Quotum Si/C in Benthic Organic Matter:mmol Si/mg C
 end
 
-3d-variable-pel -if-exist INCLUDE_PELCO2
-    DIC        : Dissolved Inorganic Carbon : umol/kg
-    CO2        : CO2(aq) : umol/kg
-    pCO2       : Oceanic pCO2 : uatm
-    HCO3       : Bicarbonate :  umol/kg
-    CO3        : Carbonate : umol/kg
-    ALK        : Alkalinity : umol eq/kg
-    pH         : pH : -
-    OCalc      : Saturation state of Calcite : -
-    OArag      : Saturation state of Aragonite : -
-end
-
-
-#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-#       GENERAL DIAGNOSTICS
-#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-3d-variable-pel
-
-    #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    # Variables to check total mass in pelagic
-    #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    totpel[cnps]  : Total Mass in Pelagic: g C: g N: g P: g Si
-
-    #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    # Variables for oxygen diagnostics
-    #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    cxoO2  : Oxygen Saturation : mmol O2/m3
-    eO2mO2 : Relative Oxygen saturation: - 
-
-    #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    # Diagnostic collective variables 
-    #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    Chla : Chlorophyll-a : mg Chl/m3
-    sunPPY(PhytoPlankton) : Specific Net Production of PhytoPlankton : 1/d
-
-    #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    # Water column diagnostic rates
-    #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    flPTN6r : Pelagic Anaerobic Mineralization Rate : mmol O2/m3/d
-    flN3O4n : Pelagic Denitrification Rate : mmol N/m3/d
-    flN4N3n : Pelagic Nitrification Rate   : mmol N/m3/d
-
-    #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    # Variables holding quota of elements in species
-    #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    qpcPPY(PhytoPlankton)	: Quotum P/C in Phytoplankton : mmol P/mg C 
-    qncPPY(PhytoPlankton)	: Quotum N/C in Phytoplankton : mmol N/mg C 
-    qscPPY(PhytoPlankton)	: Quotum Si/C in Phytoplankton : mmol Si/mg C 
-    qlcPPY(PhytoPlankton)	: Quotum Chl/C in Phytoplankton : mg Chl /mg C
-    qccPPY(PhytoPlankton)   : Quotum PIC/POC in Phytoplankton : mg C/mg C
-
-    qpcMEZ(MesoZooPlankton)	: Quotum P/C in Mesozooplankton :mmol P/mg C 
-    qncMEZ(MesoZooPlankton)	: Quotum N/C in Mesozooplankton :mmol N/mg C 
-
-    qpcMIZ(MicroZooPlankton)	: Quotum P/C in MicroZooPlankton :mmol P/mg C  
-    qncMIZ(MicroZooPlankton)	: Quotum N/C in MicroZooPlankton :mmol N/mg C 
-
-    qpcOMT(PelDetritus)		: Quotum P/C in Organic Matter:mmol N/mg C 
-    qncOMT(PelDetritus)		: Quotum N/C in Organic Matter:mmol P/mg C  
-    qscOMT(PelDetritus)		: Quotum Si/C in Organic Matter:mmol Si/mg C
- 
-    qpcPBA(PelBacteria)		: Quotum P/C in Pelagic Bacteria :mmol P/mg C  
-    qncPBA(PelBacteria)		: Quotum N/C in Pelagic Bacteria :mmol N/mg C  
-
-   #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-   # Sinking rates of phytoplankton and detritus
-   #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    sediPPY(PhytoPlankton)    : PhytoPlankton sedimentation rate   :m/d
-    sediMIZ(MicroZooPlankton) : MicroZooPlankton sedimentation rate:m/d
-    sediMEZ(MesoZooPlankton)  : MesoZooPlankton sedimentation rate :m/d
-    sediR2                    : Colloidal OMT sedimentation rate   :m/d
-    sediR6                    : Detritus sedimentation rate        :m/d
-    sediO5                    : Calcite sedimentation rate         :m/d
-
-   #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-   # Light diagnostics
-   #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    eiPPY(PhytoPlankton)  : Regulating Factor for Light in PhytoPlankton : -
-    xEPS                  : Total Extinction Coefficient : 1/m
-    ELiPPY(PhytoPlankton) : Optimal light in PhytoPlankton : W/m2
-    ABIO_eps              : Abiotic Extinction Coefficient : 1/m
-end
-
+#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+# TOTAL MASS CONSERVATION variables for C N P Si within BFM systems
+#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 2d-variable-pel
-  #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  # Variables to check total mass of C N P Si in the system
-  #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   totsysc  : total mass :  g C
   totsysn  : total mass :  g N
   totsysp  : total mass :  g P

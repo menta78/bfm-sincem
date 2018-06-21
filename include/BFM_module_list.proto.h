@@ -1,6 +1,6 @@
        USE api_bfm
        USE bfm_error_msg
-       USE co2system
+       USE mem_CSYS
        USE constants
        USE envforcing
        USE global_interface
@@ -29,7 +29,7 @@
        USE time
 #if defined INCLUDE_PELCO2 || defined INCLUDE_BENCO2
        USE mem_co2
-       USE co2system
+       USE mem_CSYS
        USE mem_benco2transport
 #endif
 #if defined INCLUDE_BEN

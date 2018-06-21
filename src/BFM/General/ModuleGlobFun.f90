@@ -1,5 +1,5 @@
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-! MODEL  BFM - Biogeochemical Flux Model 
+! MODEL  BFM - Biogeochemical Flux Model
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 !BOP
 !
@@ -8,7 +8,7 @@
 ! DESCRIPTION
 !   List of general model functions
 
-!   This file is generated directly from OpenSesame model code, using a code 
+!   This file is generated directly from OpenSesame model code, using a code
 !   generator which transposes from the sesame meta language into F90.
 !   F90 code generator written by P. Ruardij.
 !   structure of the code based on ideas of M. Vichi.
@@ -20,7 +20,7 @@
   USE global_mem, ONLY: RLEN, ZERO, ONE, BASETEMP
   USE mem_Param,  ONLY: p_small
 
-!  
+!
 !
 ! !AUTHORS
 !   mfstep/ERSEM team
@@ -29,9 +29,9 @@
 !   --------
 !
 ! COPYING
-!   
+!
 !   Copyright (C) 2015 BFM System Team (bfm_st@lists.cmcc.it)
-!   Copyright (C) 2006 P. Ruardij, the mfstep group, the ERSEM team 
+!   Copyright (C) 2006 P. Ruardij, the mfstep group, the ERSEM team
 !   (rua@nioz.nl, vichi@bo.ingv.it)
 !
 !   This program is free software; you can redistribute it and/or modify
@@ -61,9 +61,9 @@
         IMPLICIT NONE
         real(RLEN),intent(IN) :: x
         real(RLEN)            :: INSW
- 
+
         INSW = ZERO
-        if (x > ZERO ) INSW=ONE 
+        if (x > ZERO ) INSW=ONE
 
     end function INSW
 
@@ -98,7 +98,7 @@
         real(RLEN)            :: ERAMP
 
         ERAMP = ZERO
-        if ( x > ZERO ) ERAMP = ONE 
+        if ( x > ZERO ) ERAMP = ONE
         if ( x < m )    ERAMP = x / m
 
     end function
@@ -143,86 +143,72 @@
         IMPLICIT NONE
         real(RLEN),intent(IN)  :: alfa, x
         real(RLEN)             :: IntegralExp
-        
+
         IntegralExp=(exp(alfa * x) -ONE)/alfa
 
     end function IntegralExp
 
-    elemental function nutlim(fc, fn, fp, qnc, qpc, c, n, p)
+    elemental subroutine fixratio(fc, fn, fp, qnc, qpc, rc, rn, rp)
     !==========================================================================
-    ! Determine whether C, N, or P is the limiting element for a PFT
+    ! Determine release fluxes due to either C, N, or P limitiation
     ! fc,fn,fp     : total fluxes of C,N,P                    [mol/kg]
     ! qnc          : N:C ratio                                [molN/molC]
     ! qpc          : P:C ratio                                [molP/molC]
-    ! c,n,p        : constituents indexes                     [-]
-    ! nutlim       : limiting consituent index                [-]
-    !
-    ! Configurations of fluxes for C, N, P
-    !          fc        fn         fp
-    !   1      <0        <0         <0
-    !   2      <0        <0         >0
-    !   3      <0        >0         <0
-    !   4      <0        >0         >0
-    !   5      >0        <0         <0
-    !   6      >0        <0         >0
-    !   7      >0        >0         <0
-    !   8      >0        >0         >0
+    ! rc,rn,rp     : release fluxes of C,N,P                  [mol/kg]
     !==========================================================================
        IMPLICIT NONE
        !
-       real(RLEN), intent(in) :: fc, fn, fp, qnc, qpc
-       integer,    intent(in) :: c, n, p
-       integer                :: nutlim
-       real(RLEN) :: pu_n, pu_p, pq_n, pq_p
+       real(RLEN), intent(in)  :: fc, fn, fp, qnc, qpc
+       real(RLEN), intent(out) :: rc, rn, rp
        !
-       pu_n = fn / ( p_small + fc ) ; pq_n = pu_n / qnc
-       pu_p = fp / ( p_small + fc ) ; pq_p = pu_p / qpc
+       rc = ZERO ; rn = ZERO ; rp = ZERO
        !
-       nutlim = c
+       ! carbon
+       rc = max( max(fc-fp/qpc,fc-fn/qnc) , ZERO )
+       ! 
+       ! nitrogen
+       rn = max( fn - (fc-rc)*qnc, ZERO )
+       ! 
+       ! phosphorous
+       rp = max( fp - (fc-rc)*qpc, ZERO )
        !
-       ! CASE 1
-       if ( (fc <0) .AND. (fn <0) .AND. (fp <0) ) then
-          if ( pq_p>pq_n .OR. abs(pq_p-pq_n)<p_small ) then
-             if (abs(pu_p) > qpc) nutlim = p
-          else
-             if (abs(pu_n) > qnc) nutlim = n
-          endif
-       endif
-       ! CASE 2
-       if ( (fc <0) .AND. (fn <0) .AND. (fp >0) ) then
-           if (abs(pu_n) > qnc) nutlim = n
-       endif
-       ! CASE 3
-       if ( (fc <0) .AND. (fn >0) .AND. (fp <0) ) then
-          if (abs(pu_p) > qpc) nutlim = p
-       endif
-       ! CASE 4
-       if ( (fc <0) .AND. (fn >0) .AND. (fp >0) ) nutlim = c
-       ! CASE 5
-       if ( (fc >0) .AND. (fn <0) .AND. (fp <0) ) then
-          if ( pq_p<pq_n .OR. abs(pq_p-pq_n)<p_small ) then
-             nutlim = p
-          else
-             nutlim = n
-          endif
-       endif
-       ! CASE 6
-       if ( (fc >0) .AND. (fn <0) .AND. (fp >0) ) nutlim = n
-       ! CASE 7
-       if ( (fc >0) .AND. (fn >0) .AND. (fp <0) ) nutlim = p
-       ! CASE 8
-       if ( (fc >0) .AND. (fn >0) .AND. (fp >0) ) then
-          if ( pq_p<pq_n .OR. abs(pq_p-pq_n)<p_small ) then
-             if ( pu_p < qpc ) nutlim = p
-          else
-             if ( pu_n < qnc ) nutlim = n
-          endif
-       endif
+       return
+    end subroutine fixratio
 
-    end function nutlim
+    elemental function analytical_ic(z, z1, v1, z2, v2)
+    !==========================================================================
+    ! Create analytical field depth profile using 2 layer input data
+    ! NOTE: if z2,v2 are zeros create only uniform value in the upper layer
+    ! z            : Target depth                             [m]
+    ! z1, z2       : Depth of upper and lower reference layer [m]
+    ! v1, v2       : Field value at upper and lower layers    [field unit]
+    !==========================================================================
+        IMPLICIT NONE
+        !
+        real(RLEN),intent(IN) :: z, z1, v1, z2, v2
+        real(RLEN)            :: analytical_ic
+        real(RLEN)            :: alpha, fout
+        !
+        fout = ZERO
+        !
+        ! below lower layer (do it first to solve case z2 = 0)
+        if ( z .gt. z2 ) fout = v2
+        !
+        ! above upper layer
+        if ( z .le. z1 ) fout = v1
+        !
+        ! within upper and lower layer (linear interpolation)
+        alpha = (v2-v1) / (z2-z1 +2.E-15)
+        if ( (alpha .le. 1.E15) .AND. ( z .gt. z1 .and. z .le. z2 ) )  &
+            fout = v1 + alpha * (z-z1)
+        !
+        analytical_ic = max( fout , p_small ) 
+        !
+        return
+    end function analytical_ic
 
   end module mem_globalfun
 !EOC
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-! MODEL  BFM - Biogeochemical Flux Model 
+! MODEL  BFM - Biogeochemical Flux Model
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

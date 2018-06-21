@@ -22,9 +22,7 @@
 #if defined INCLUDE_SEAICE
    use mem, only: D2STATE_ICE,D2DIAGNOS_ICE,D2FLUX_FUNC_ICE
 #endif
-#if defined INCLUDE_BEN
    use mem, only: D2STATE_BEN,D2DIAGNOS_BEN,D2FLUX_FUNC_BEN
-#endif
 
    implicit none
 
@@ -44,9 +42,7 @@
 #ifdef INCLUDE_SEAICE
     logical,save                ::do_2ave_ice
 #endif
-#ifdef INCLUDE_BEN
     logical,save                ::do_2ave_ben
-#endif
 
 !EOP
 !-----------------------------------------------------------------------
@@ -86,7 +82,6 @@
             do_2ave_ice = .false.
          end if
 #endif
-#if defined INCLUDE_BEN
          i=count(var_ave(stBenStart:stBenEnd))
          if ( i > 0 ) then
             allocate(D2ave_ben(1:i,1:NO_BOXES_XY),stat=rc)
@@ -96,7 +91,6 @@
          else
             do_2ave_ben = .false.
          end if
-#endif
          ave_count=0.0
 
       case(RESET)
@@ -108,9 +102,7 @@
 #ifdef INCLUDE_SEAICE
          if (do_2ave_ice) D2ave_ice=D2ave_ice/ave_count
 #endif
-#ifdef INCLUDE_BEN
          if (do_2ave_ben) D2ave_ben=D2ave_ben/ave_count
-#endif
          ave_count=0.0
 
       case(ACCUMULATE)   ! Start of new time-step
@@ -226,7 +218,6 @@
             end do
          end if
 #endif
-#if defined INCLUDE_BEN
          if (stBenEnd /= 0 .and. do_2ave_ben) then
             !---------------------------------------------
             ! Compute Benthic 2D means
@@ -272,7 +263,6 @@
                end if
             end do
          end if
-#endif
    end select
 
 end subroutine calcmean_bfm

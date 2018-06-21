@@ -21,13 +21,11 @@
 #ifdef EXPLICIT_SINK
    use mem, only: D3SINK
 #endif 
-#ifdef INCLUDE_BEN
    use mem, only: D2STATE_BEN,D2SOURCE_BEN,NO_D2_BOX_STATES_BEN, &
                   D2STATETYPE_BEN
 #ifdef EXPLICIT_SINK
    use mem, only: D2SINK_BEN
 #endif 
-#endif
    use mem_param, only: CalcTransportFlag, CalcBenthicFlag, &
                         CalcPelagicFlag
    use time,      only: bfmtime
@@ -104,8 +102,7 @@
          end if
       end do
    end if
-#ifdef INCLUDE_BEN
-   if (CalcBenthicFlag /= 0) then
+   if (CalcBenthicFlag ) then
       do j=1,NO_D2_BOX_STATES_BEN
          if (D2STATETYPE_BEN(j) .ge. 0) then
 #ifndef EXPLICIT_SINK
@@ -116,7 +113,6 @@
          end if
       end do
    end if
-#endif
 
    return
    end subroutine trc_bfm

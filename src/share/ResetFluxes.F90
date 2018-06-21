@@ -32,12 +32,10 @@
 #endif
 
 
-#if defined INCLUDE_BEN
     use mem, ONLY: NO_D2_BOX_STATES_BEN, D2SOURCE_BEN, &
          D2FLUX_FUNC_BEN
 #ifdef EXPLICIT_SINK
     use mem, ONLY: D2SINK_BEN
-#endif
 #endif
 
 #endif
@@ -64,9 +62,7 @@
 #if defined INCLUDE_SEAICE
     D2SOURCE_ICE(:,:) = ZERO
 #endif
-#if defined INCLUDE_BEN
     D2SOURCE_BEN(:,:) = ZERO
-#endif
 
 #else
 
@@ -77,10 +73,8 @@
     D2SOURCE_ICE(:,:,:) = ZERO
     D2SINK_ICE(:,:,:) = ZERO
 #endif
-#if defined INCLUDE_BEN
     D2SOURCE_BEN(:,:,:) = ZERO
     D2SINK_BEN(:,:,:) = ZERO
-#endif
 
 #endif
 
@@ -88,9 +82,7 @@
 #if defined INCLUDE_SEAICE
     if (allocated(D2FLUX_FUNC_ICE)) D2FLUX_FUNC_ICE(:,:) = ZERO
 #endif
-#if defined INCLUDE_BEN
     if (allocated(D2FLUX_FUNC_BEN)) D2FLUX_FUNC_BEN(:,:) = ZERO
-#endif
 
     ! reset surface and bottom fluxes
     do i=1,NO_D3_BOX_STATES

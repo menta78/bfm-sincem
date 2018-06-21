@@ -16,17 +16,16 @@
    ! NEMO
    use oce_trc          ! ocean dynamics and active tracers variables
    use trc              ! ocean passive tracers variables
+   use iom, only: iom_put
    ! BFM
    use global_mem, only:RLEN,ZERO,ONE
    use mem_param,  only: AssignAirPelFluxesInBFMFlag,        &
                          AssignPelBenFluxesInBFMFlag
-   use mem_PelGlobal, only: p_rR6m, KSINK_rPPY,              &
-                            AggregateSink, depth_factor,     &
-                            SINKD3STATE 
+   use mem_PelSinkSet
    use mem
-   use mem_Settling
    use constants,    only: SEC_PER_DAY
    use api_bfm
+   use trcdiabfm,    only: bfm_iomput
 !
 !
 ! !AUTHORS
@@ -65,7 +64,7 @@
    ! 3D sinking velocity field
    integer               :: ji, jj, jk, n, iistate
    real(RLEN)            :: zfact,timestep,wsmax
-   real(RLEN)            :: wbio(jpi,jpj,jpk)   
+   real(RLEN)            :: wbio(jpi,jpj,jpk), tflux(jpi,jpj,jpk) 
    !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
    !  Biological timestep (in days)
    !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -114,7 +113,13 @@
 
       ! Compute vertical sinking with upwind scheme
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-      CALL trc_sink_bfm(wbio,m)
+      CALL trc_sink_bfm(wbio, m, tflux)
+
+      ! Output of fluxes as mmol / m2 / day
+      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+      if (bfm_iomput) & 
+         call iom_put ("sink"//TRIM(var_names(m)) , tflux * SEC_PER_DAY)
+
    
    endif
 

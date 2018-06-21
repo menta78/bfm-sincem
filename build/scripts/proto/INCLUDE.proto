@@ -21,23 +21,19 @@
 
 #endif
 
-#ifdef INCLUDE_BEN
-
 %2d-state-ben-header
 %2d-group-ben-header
 %2d-diagnos-ben-header
 %2d-diaggrp-ben-header
 
-#endif
-
 
 #endif
 
 
 
-#if defined INCLUDE_BENCO2 && !defined INCLUDE_BEN
+#if defined INCLUDE_BENCO2 && (!defined BENTHIC_BIO || !defined BENTHIC_FULL)
 #undef INCLUDE_BENCO2
 #endif
-#if defined INCLUDE_BENPROFILES && !defined INCLUDE_BEN
+#if defined INCLUDE_BENPROFILES && !defined BENTHIC_FULL
 #undef INCLUDE_BENPROFILES
 #endif

@@ -88,8 +88,8 @@
   !                                           phytoplankton
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   logical   :: CalcPelagicFlag=.TRUE.  
-  integer   :: CalcBenthicFlag=0      ! Switch for Benthic system
-  logical   :: CalcSeaiceFlag=.TRUE.  ! Switch for Seaice system
+  logical   :: CalcBenthicFlag=.TRUE.   ! Switch for Benthic system
+  logical   :: CalcSeaiceFlag=.TRUE.    ! Switch for Seaice system
 
   logical   :: CalcTransportFlag=.FALSE.  
   logical   :: CalcConservationFlag=.TRUE.  
@@ -134,7 +134,6 @@
   ! NAME          UNIT          DESCRIPTION
   ! p_sedlevels   [-]           Number of sigma levels for benthic nutrient
   ! p_poro0       [-]           Constant porosity for 0D and 1D runs
-  ! p_InitSink    Logical       parameter to Initialize BenthicSInk var.
   ! p_q10diff     [-]           Temperature-dependency porewater diffusion
   ! p_clDxm       [m]           minimal value of D?.m for calculation of the alpha
   ! p_d_tot       [m]           Thickness of modelled benthic sediment layers
@@ -152,17 +151,13 @@
       p_poro0=0.4
   ! 1d-parameters
   real(RLEN),public,dimension(:),allocatable   ::  p_p_ae, p_poro      
-#ifdef INCLUDE_BEN
-      integer   :: calc_init_bennut_states
   real(RLEN)   :: &
-      p_InitSink=100.0_RLEN,  &  
       p_q10diff=1.49_RLEN,  &  
       p_clDxm=0.001_RLEN, &  
       p_clD1D2m=0.01_RLEN,    &  
-      p_d_tot_2=0.35_RLEN,  &
-      p_qnQIc, &
-      p_qpQIc, &
-      p_qsQIc
+      p_d_tot_2=0.35_RLEN
+#if ! defined BENTHIC_BIO && ! defined BENTHIC_FULL 
+      logical,public :: CalcBenOrganisms=.FALSE., CalcBenBacteria=.FALSE.
 #endif
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -191,16 +186,13 @@
     CalcConservationFlag,CalcPhytoPlankton,CalcMicroZooPlankton,              &
     CalcPelChemistry,CalcMesoZooPlankton, CalcPelBacteria,                    &
     AssignPelBenFluxesInBFMFlag, AssignAirPelFluxesInBFMFlag,                 &
-    p_atm0,                                                                     &
+    p_atm0,                                                                   &
     p_pe_R1c, p_pe_R1n, p_pe_R1p, p_pe_R1s,                                   &
     ChlDynamicsFlag
-#ifdef INCLUDE_BEN
   namelist /Param_parameters_ben/                                             &
     p_sedlevels, p_sedsigma,p_d_tot, p_poro0,                                 &
     CalcBenOrganisms,CalcBenBacteria,                                         &
-    calc_init_bennut_states, p_qnQIc, p_qpQIc, p_qsQIc,                       &
-    p_InitSink, p_d_tot_2, p_clD1D2m, p_clDxm, p_q10diff
-#endif
+    p_d_tot_2, p_clD1D2m, p_clDxm, p_q10diff
 #ifdef INCLUDE_SEAICE
   namelist /Param_parameters_ice/                                             &
     CalcSeaiceAlgae,CalcSeaiceZoo,CalcSeaiceBacteria
@@ -216,10 +208,8 @@
    LEVEL1 "#  Reading BFM parameters .."
    open(NMLUNIT,file='BFM_General.nml',status='old',action='read',err=100)
    read(NMLUNIT,nml=Param_parameters,err=101)
-#ifdef INCLUDE_BEN
    rewind(NMLUNIT)
    read(NMLUNIT,nml=Param_parameters_ben,err=102)
-#endif
 #ifdef INCLUDE_SEAICE
    rewind(NMLUNIT)
    read(NMLUNIT,nml=Param_parameters_ice,err=103)
@@ -230,9 +220,7 @@
     write(LOGUNIT,*) "#  Reading Param parameters.. "
     write(LOGUNIT,*) "#  Namelist is:"
     write(LOGUNIT,nml=Param_parameters)
-#ifdef INCLUDE_BEN
     write(LOGUNIT,nml=Param_parameters_ben)
-#endif
 #ifdef INCLUDE_SEAICE
     write(LOGUNIT,nml=Param_parameters_ice)
 #endif

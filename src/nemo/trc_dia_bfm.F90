@@ -222,12 +222,10 @@ CONTAINS
 ! USES only 
    use iom, only: iom_put
 
-   use mem, only: NO_BOXES,D3STATE,D3DIAGNOS,D3FLUX_FUNC,D2DIAGNOS
+   use mem, only: NO_BOXES,D3STATE,D3DIAGNOS,D3FLUX_FUNC,D2DIAGNOS,  &
+            D2STATE_BEN,D2DIAGNOS_BEN,D2DIAGNOS_BEN,D2FLUX_FUNC_BEN
 #if defined INCLUDE_SEAICE
    use mem, only: D2STATE_ICE,D2DIAGNOS_ICE,D2DIAGNOS_ICE,D2FLUX_FUNC_ICE
-#endif
-#if defined INCLUDE_BEN
-   use mem, only: D2STATE_BEN,D2DIAGNOS_BEN,D2DIAGNOS_BEN,D2FLUX_FUNC_BEN
 #endif
    use global_mem, only: RLEN, LOGUNIT, bfm_lwp
    use api_bfm, only: var_names, var_ids
@@ -237,10 +235,8 @@ CONTAINS
            & stIceStart, stIceEnd, stIceStateS, stIceStateE,         &
            & stIceDiag2dS, stIceDiag2dE, stIceFlux2dS, stIceFlux2dE, &
 #endif
-#if defined INCLUDE_BEN
            & stBenStart, stBenEnd, stBenStateS, stBenStateE,         &
            & stBenDiag2dS, stBenDiag2dE, stBenFlux2dS, stBenFlux2dE, &
-#endif
            &  stPelStart, stPelFluxE, stPelStateS, stPelStateE,      &
            & stPelDiagS, stPelDiagE, stPelFluxS, stPelFluxE,         &
            & stPelDiag2dS, stPelDiag2dE, stPelSurS, stPelSurE,       &
@@ -325,7 +321,6 @@ CONTAINS
    end do
 #endif
 
-#if defined INCLUDE_BEN
    !---------------------------------------------
    ! 2D Benthic variables
    !---------------------------------------------
@@ -348,7 +343,6 @@ CONTAINS
          end if
       end if
    end do
-#endif
 
   return
   end subroutine bfm_iom

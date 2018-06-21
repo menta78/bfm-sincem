@@ -72,15 +72,12 @@
   real(RLEN),   parameter :: MW_P=31.0_RLEN  ! Molecular weight Phosphorus
   real(RLEN),   parameter :: MW_SI=28.0_RLEN  ! Molecular weight Silica
   real(RLEN),   parameter :: MW_Ca=40.078_RLEN  ! Molecular weight Calcium
+  real(RLEN),   parameter :: MW_Fe=55.845_RLEN  ! Molecular weight Iron
   real(RLEN),   parameter :: C2ALK=2.0_RLEN/MW_C ! Conversion factor between inorganic carbon and alkalinity
   real(RLEN),   parameter :: E2W=0.217_RLEN  ! Conversion factor Einstein->W
   real(RLEN),   parameter :: SEC_PER_DAY=86400.0_RLEN  ! Seconds in day
   real(RLEN)              :: DAY_PER_SEC=ZERO  ! Inverse of Seconds in day
   real(RLEN),   parameter :: ONE_PER_DAY=1.0_RLEN  ! rate which is used in cases where implicitly assumed
-  integer,      parameter :: NO_BENTHOS=0
-  integer,      parameter :: BENTHIC_RETURN=1
-  integer,      parameter :: BENTHIC_BIO=2
-  integer,      parameter :: BENTHIC_FULL=3
   real(RLEN),   parameter :: HOURS_PER_DAY=24.0_RLEN  ! Hours in a day
   real(RLEN),   parameter :: SOLAR_RADIATION=1368.0_RLEN  ! Solar radiation constant
   integer,      parameter :: NODATA=0

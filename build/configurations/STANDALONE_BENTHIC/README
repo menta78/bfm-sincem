@@ -1,0 +1,26 @@
+This configuration is a demonstrator for the higher level of complexity of the benthic component 
+
+BENTHIC_BIO : uses Benthic Organisms and explicit Dissolved Inorganic compounds
+
+BENTHIC_FULL : extension of BENTHI_BIO with explicit oxic/anoxic layers and Dissolved Inorganic compounds physical-chemistry reactions
+
+In order to use the BENTHIC_FULL system the following changes to the present configuration are required:
+
+1) In configuration file add the following line to generate additional namelists for BENTHIC_FULL
+           NMLLIST = 'namelists_BenFull.nml' 
+
+2) Add the following fields to bfm_init_nml_ben to provide reasonable initial conditions:
+   K21p0 = 0.856171,
+   K24n0 = 128.9876695,
+   K3n0  = 0.0448,
+   K5s0  = 8.463525,
+
+   If INCLUDE_BENCO2 macro is used, it is necessary to add also the following 
+
+   G2o0  = 0.67,
+   G3c0  = 120.15,
+   G13c0 = 440.8475,
+   G23c0 = 11920.0,
+   G3h0  = 10.35,
+   G13h0 = 50.0,
+   G23h0 = 1192.0,

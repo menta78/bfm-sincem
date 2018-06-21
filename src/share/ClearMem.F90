@@ -59,7 +59,6 @@ subroutine ClearMem
     deallocate(D2FLUX_FUNC_ICE)
     end if
 #endif
-#if defined INCLUDE_BEN
     if (allocated(D2FLUX_MATRIX_BEN)) then
     origin=0
     do i=stBenStateS,stBenStateE
@@ -73,7 +72,6 @@ subroutine ClearMem
     deallocate(D2FLUX_MATRIX_BEN)
     deallocate(D2FLUX_FUNC_BEN)
     end if
-#endif
 
     ! from api_bfm 
     deallocate(var_ids)
@@ -93,9 +91,7 @@ subroutine ClearMem
 #if defined INCLUDE_SEAICE
      deallocate(D2SINK_ICE)
 #endif
-#if defined INCLUDE_BEN
      deallocate(D2SINK_BEN)
-#endif
 #endif
 
      deallocate(D3STATETYPE)
@@ -116,7 +112,6 @@ subroutine ClearMem
 #endif
 #endif
 
-#if defined INCLUDE_BEN
      if ( allocated(D2ave_ben) ) deallocate(D2ave_ben)
      deallocate(D2DIAGNOS_BEN)
      deallocate(D2STATE_BEN)
@@ -124,7 +119,6 @@ subroutine ClearMem
      deallocate(D2STATETYPE_BEN)
 #ifdef BFM_NEMO
      deallocate(D2STATEOBC_BEN)
-#endif
 #endif
 
 #endif

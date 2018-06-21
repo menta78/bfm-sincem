@@ -20,12 +20,10 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
   use global_mem,   ONLY: RLEN,ZERO,ONE,LOGUNIT
-  use constants,    ONLY: MW_P, MW_N, MW_SI
+  use constants,    ONLY: MW_C, MW_P, MW_N, MW_SI
   use mem
   use mem_Param,    ONLY: CalcBenthicFlag,p_d_tot
-#ifdef INCLUDE_BEN
-  use constants,    ONLY: BENTHIC_RETURN, BENTHIC_BIO, BENTHIC_FULL
-#endif
+  use time, only: bfmtime
 
 !
 !
@@ -140,6 +138,71 @@
   totsysp(:) = sum(totpelp(:))
   totsyss(:) = sum(totpels(:))
 
+  ! Mass conservation variables
+  totbenc(:)  =  ZERO
+  totbenp(:)  =  ZERO
+  totbenn(:)  =  ZERO
+  totbens(:)  =  ZERO
+  
+  if ( CalcBenthicFlag ) then
+
+#if defined BENTHIC_BIO
+     totbenc(:) = ( Y1c(:)+ Y2c(:)+ Y3c(:)+ &
+                    Y4c(:)+ Y5c(:)+ H1c(:)+ &
+                    H2c(:)+ Q1c(:)+ Q6c(:)+ &
+                    Q16c(:)+ Q11c(:) )
+
+     totbenp(:) = ( Y1p(:)+ Y2p(:)+ Y3p(:)+ &
+                    Y4p(:)+ Y5p(:)+ H1p(:)+ &
+                    H2p(:)+ Q1p(:)+ Q6p(:)+ &
+                    Q16p(:)+ Q11p(:)+ K1p(:)+ K11p(:))
+     totbenn(:) = ( Y1n(:)+ Y2n(:)+ Y3n(:)+ &
+                    Y4n(:)+ Y5n(:)+ H1n(:)+ &
+                    H2n(:)+ Q1n(:)+ Q6n(:)+ &
+                    Q16n(:)+ Q11n(:)+ K4n(:)+ K14n(:))
+     totbens(:)  =  Q6s(:)+ Q16s(:)
+
+#elif defined BENTHIC_FULL
+     totbenc(:) = ( Y1c(:)+ Y2c(:)+ Y3c(:)+ &
+                    Y4c(:)+ Y5c(:)+ H1c(:)+ &
+                    H2c(:)+ Q1c(:)+ Q6c(:)+ &
+                    Q11c(:) )
+
+     totbenp(:) = ( Y1p(:)+ Y2p(:)+ Y3p(:)+ &
+                    Y4p(:)+ Y5p(:)+ H1p(:)+ &
+                    H2p(:)+ Q1p(:)+ Q6p(:)+ &
+                    Q11p(:)+ K1p(:)+ K11p(:)+ K21p(:))
+     totbenn(:) = ( Y1n(:)+ Y2n(:)+ Y3n(:)+ &
+                    Y4n(:)+ Y5n(:)+ H1n(:)+ &
+                    H2n(:)+ Q1n(:)+ Q6n(:)+ &
+                    Q11n(:)+ G4n(:)+ K3n(:)+&
+                    K4n(:)+ K14n(:)+ K24n(:))
+     totbens(:) =   K5s(:)+ Q6s(:)
+
+#else
+      totbenc(:)  =  ( Q1c(:)+ Q11c(:)+ Q6c(:)+ Q16c(:))
+      totbenp(:)  =  ( Q1p(:)+ Q11n(:)+ Q6p(:)+ Q16p(:))
+      totbenn(:)  =  ( Q1n(:)+ Q11p(:)+ Q6n(:)+ Q16n(:))
+      totbens(:)  =    Q6s(:)+ Q16s(:)
+#endif
+
+#ifdef INCLUDE_BENCO2
+     totbenc(:) = totbenc(:)+G3c(:)
+#endif
+     ! Convert from default units to g and multiply for the sediment volume
+     totbenc(:) = totbenc(:)/1000.0_RLEN*Area2d(:)
+     totbenn(:) = totbenn(:)*MW_N/1000.0_RLEN*Area2d(:)
+     totbenp(:) = totbenp(:)*MW_P/1000.0_RLEN*Area2d(:)
+     totbens(:) = totbens(:)*MW_Si/1000.0_RLEN*Area2d(:)
+
+  endif
+
+  ! Add benthic mass to the total
+  totsysc(:) = totsysc(:)+sum(totbenc(:))
+  totsysn(:) = totsysn(:)+sum(totbenn(:))
+  totsysp(:) = totsysp(:)+sum(totbenp(:))
+  totsyss(:) = totsyss(:)+sum(totbens(:))
+
   ! Store and check previous value
   if (first) then
      write(LOGUNIT,*) "Initializing Mass Conservation"
@@ -151,25 +214,30 @@
      initials = totsyss(1)
   else
      prec = precision(prevsysc)
-     write(LOGUNIT,*) "---> CheckMassConservation"
-     write(LOGUNIT,*) "---> defined precision digits: sp=6 dp=12; operational: ",prec
-     write(LOGUNIT,"(A,2D22.15)") "---> C:",totsysc(1),prevsysc
-     write(LOGUNIT,"(A,2D22.15)") "---> N:",totsysn(1),prevsysn
+     write(LOGUNIT,*) ""
+     write(LOGUNIT,*) "Check Mass Conservation at step ", bfmtime%stepnow
+     if (bfmtime%stepnow ==  bfmtime%step0) & 
+     write(LOGUNIT,"(a,i6,a,1D15.8)") "---> Using precision digits ",prec, ", specified precision threshold ", p_prec
+     write(LOGUNIT,"(15x,A,15x,A)")  "Current", "Previous" 
+     write(LOGUNIT,"(A,2D22.15)") "---> C :",totsysc(1),prevsysc
+     write(LOGUNIT,"(A,2D22.15)") "---> N :",totsysn(1),prevsysn
      if (abs(totsysn(1)/initialn-ONE)>p_prec) then
         flag = .TRUE.
-        write(LOGUNIT,*) "------> Change in N larger than specified precision:",p_prec,totsysn(1)/initialn-ONE
+        write(LOGUNIT,"(A,1D22.15)") "------> Change in N larger than specified precision : ",totsysn(1)/initialn-ONE
      end if
-     write(LOGUNIT,"(A,2D22.15)") "---> P:",totsysp(1),prevsysp
+     write(LOGUNIT,"(A,2D22.15)") "---> P :",totsysp(1),prevsysp
      if (abs(totsysp(1)/initialp-ONE)>p_prec) then
         flag = .TRUE.
-        write(LOGUNIT,*) "------> Change in P larger than specified precision:",p_prec,totsysp(1)/initialp-ONE
+        write(LOGUNIT,"(A,1D22.15)") "------> Change in P larger than specified precision : ",totsysp(1)/initialp-ONE
      end if
      write(LOGUNIT,"(A,2D22.15)") "---> Si:",totsyss(1),prevsyss
      if (abs(totsyss(1)/initials-ONE)>p_prec) then
         flag = .TRUE.
-        write(LOGUNIT,*) "------> Change in Si larger than specified precision:",p_prec,totsyss(1)/initials-ONE
+        write(LOGUNIT,"(A,1D22.15)") "------> Change in Si larger than specified precision : ",totsyss(1)/initials-ONE
      end if
      if (flag)  then
+        write(LOGUNIT,*) ""
+        write(LOGUNIT,*) "Check also BFM_General.nml settings!"
         call flush(LOGUNIT)
         stop "Mass conservation violation in BFM! Check log file."
      end if
@@ -178,65 +246,6 @@
   prevsysn = totsysn(1)
   prevsysp = totsysp(1)
   prevsyss = totsyss(1)
-
-#ifdef INCLUDE_BEN
-  ! Mass conservation variables
-  totbenc(:)  =  ( Q1c(:)+ Q6c(:))
-  totbenp(:)  =  ( Q1p(:)+ Q6p(:))
-  totbenn(:)  =  ( Q1n(:)+ Q6n(:))
-  totbens(:)  =  ( Q6s(:))
-  select case ( CalcBenthicFlag)
-
-    case ( 0 )
-      totbenc(:)  =  ZERO
-      totbenp(:)  =  ZERO
-      totbenn(:)  =  ZERO
-      totbens(:)  =  ZERO
-
-    case ( BENTHIC_RETURN )  ! Simple benthic return
-    continue
-
-    case ( BENTHIC_BIO )  ! Intermediate benthic return
-      ! Mass conservation variables
-      totbenp(:) = ( Y1p(:)+ Y2p(:)+ Y3p(:)+ &
-        Y4p(:)+ Y5p(:)+ H1p(:)+ &
-        H2p(:)+ Q1p(:)+ Q6p(:)+ &
-        Q11p(:)+ K1p(:)+ K11p(:))
-      totbenn(:) = ( Y1n(:)+ Y2n(:)+ Y3n(:)+ &
-        Y4n(:)+ Y5n(:)+ H1n(:)+ &
-        H2n(:)+ Q1n(:)+ Q6n(:)+ &
-        Q11n(:)+ K4n(:)+ K14n(:))
-      totbens(:)  =  ( Q6s(:))
-
-    case ( BENTHIC_FULL )  ! Full benthic nutrients
-      totbenp(:) = ( Y1p(:)+ Y2p(:)+ Y3p(:)+ &
-        Y4p(:)+ Y5p(:)+ H1p(:)+ &
-        H2p(:)+ Q1p(:)+ Q6p(:)+ &
-        Q11p(:)+ K1p(:)+ K11p(:)+ K21p(:))
-      totbenn(:) = ( Y1n(:)+ Y2n(:)+ Y3n(:)+ &
-        Y4n(:)+ Y5n(:)+ H1n(:)+ &
-        H2n(:)+ Q1n(:)+ Q6n(:)+ &
-        Q11n(:)+ G4n(:)+ K3n(:)+&
-         K4n(:)+ K14n(:)+ K24n(:))
-      totbens(:)  =   K5s(:)+ Q6s(:)
-
-  end select
-
-#ifdef INCLUDE_BENCO2
-  totbenc(:) = totbenc(:)+G3c(:)
-#endif
-  ! Convert from default units to g and multiply for the sediment volume
-  totbenc(:) = totbenc(:)/1000.0_RLEN*Area2d(:)*p_d_tot
-  totbenn(:) = totbenn(:)*MW_N/1000.0_RLEN*Area2d(:)*p_d_tot
-  totbenp(:) = totbenp(:)*MW_P/1000.0_RLEN*Area2d(:)*p_d_tot
-  totbens(:) = totbens(:)*MW_Si/1000.0_RLEN*Area2d(:)*p_d_tot
-
-  ! Add benthic mass to the total
-  totsysc(:) = totsysc(:)+sum(totbenc(:))
-  totsysn(:) = totsysn(:)+sum(totbenn(:))
-  totsysp(:) = totsysp(:)+sum(totbenp(:))
-  totsyss(:) = totsyss(:)+sum(totbens(:))
-#endif
 
   end subroutine CheckMassConservationDynamics
 !EOC
