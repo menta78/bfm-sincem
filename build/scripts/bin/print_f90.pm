@@ -2119,7 +2119,7 @@ sub func_FLUX_COUPLED{
 
     foreach my $name ( sort { $$LST_PARAM{$a}->getIndex() cmp $$LST_PARAM{$b}->getIndex() } keys %$LST_PARAM ){
         my $param   = $$LST_PARAM{$name};
-        if ( $dim == 2 ) { $localvarname = '  local_BFM1D_dia2d' ; }
+        if ( $dim == 2 ) { $localvarname = '  local_BFM0D_dia2d' ; }
         if ( $dim == 3 ) { $localvarname = '  local_BFM1D_dia' ;  }
         if( $dim == $param->getDim() 
             && $type eq $param->getType() 
@@ -2129,20 +2129,23 @@ sub func_FLUX_COUPLED{
                 foreach my $const ( sort { $$LST_CONST{$a} cmp $$LST_CONST{$b} } keys %$LST_CONST ){
                     if( exists ${$param->getComponents()}{$const} ){
                         my $nameC = $name . $const;
-                        $line .= ${localvarname} .  "(" . $index_group++ . ",:) = D". $dim . "DIAGNOS(pp${nameC},:)\n";
+                        if ( $dim == 2 ) {  $line .= ${localvarname} .  "(" . $index_group++ . ") = D". $dim . "DIAGNOS(pp${nameC},1)\n"; }
+                        if ( $dim == 3 ) { $line .= ${localvarname} .  "(" . $index_group++ . ",:) = D". $dim . "DIAGNOS(pp${nameC},:)\n"; }
                     }
                 }
                 if( $param->getComponentsEx() && keys(%{$param->getComponentsEx()}) != 0 ){
                     foreach my $const ( sort { $$LST_CONST{$a} cmp $$LST_CONST{$b} } keys %$LST_CONST ){
                         if( exists ${$param->getComponentsEx()}{$const} ){
                             my $nameC = $name . $const;
-                            $line .= ${localvarname} .  "(" . $index_group++ . ",:) = D". $dim . "DIAGNOS(pp${nameC},:)\n";
+                            if ( $dim == 2 ) { $line .= ${localvarname} .  "(" . $index_group++ . ") = D". $dim . "DIAGNOS(pp${nameC},1)\n"; }
+                            if ( $dim == 3 ) { $line .= ${localvarname} .  "(" . $index_group++ . ",:) = D". $dim . "DIAGNOS(pp${nameC},:)\n"; }
                         }
                     }
                 }
             }else{
                 my $nameC = $name; #. $const;
-                $line .= ${localvarname} .  "(" . $index_group++ . ",:) = D". $dim . "DIAGNOS(pp${nameC},:)\n";
+                if ( $dim == 2 ) {$line .= ${localvarname} .  "(" . $index_group++ . ") = D". $dim . "DIAGNOS(pp${nameC},1)\n";    }
+                if ( $dim == 3 ) { $line .= ${localvarname} .  "(" . $index_group++ . ",:) = D". $dim . "DIAGNOS(pp${nameC},:)\n"; }
             }
         }
     }

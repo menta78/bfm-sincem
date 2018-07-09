@@ -44,7 +44,7 @@
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 !
 !
-subroutine BFM1D_Output_EcologyDynamics(BFM1D_tra, BFM1D_sed, local_BFM1D_dia)
+subroutine BFM1D_Output_EcologyDynamics(BFM1D_tra, BFM1D_sed, local_BFM1D_dia,local_BFM0D_dia2D)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! The following global constants are used: RLEN
@@ -65,7 +65,9 @@ subroutine BFM1D_Output_EcologyDynamics(BFM1D_tra, BFM1D_sed, local_BFM1D_dia)
   INTEGER, parameter :: jptra_flux = %3d-flux-pel-nr
       
   INTEGER, parameter :: jptra_dia = jptra_var + jptra_flux
-  real(RLEN), intent(out) :: local_BFM1D_dia(jptra_dia, NO_BOXES) 
+  INTEGER, parameter :: jptra_dia_2d =  %2d-diagnos-pel-nrs
+  real(RLEN), intent(out) :: local_BFM1D_dia(jptra_dia, NO_BOXES)
+  real(RLEN), intent(out) :: local_BFM0D_dia2D(jptra_dia_2d) 
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Local Variables
@@ -89,6 +91,9 @@ subroutine BFM1D_Output_EcologyDynamics(BFM1D_tra, BFM1D_sed, local_BFM1D_dia)
   local_BFM1D_dia = 0;
 
   %3d-flux-coupled
+  local_BFM0D_dia2d = 0;
+
+  %2d-flux-coupled
 
 
 end subroutine BFM1D_Output_EcologyDynamics
