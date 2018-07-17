@@ -395,6 +395,11 @@
          call flux_vector( iiBen, ppQ16n,ppQ16n, -jbotR6n(:) * burfrac)
          call flux_vector( iiBen, ppQ16p,ppQ16p, -jbotR6p(:) * burfrac)
          call flux_vector( iiBen, ppQ16s,ppQ16s, -jbotR6s(:) * burfrac)
+         call flux_vector( iiBen, ppQ16c,ppQ16c, -jbotO5c(:) )
+      else
+         ! Here Divert O5c flux to surface Benthic OM for mass conservation 
+         ! TL: it has to be included in benthic CSYS 
+         call flux_vector( iiBen, ppQ6c,ppQ6c, -jbotO5c(:) )
 
       endif
 
