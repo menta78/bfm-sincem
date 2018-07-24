@@ -48,7 +48,7 @@
            iiC, iiN, iiP, iiL, iiS, iiLastElement, iiBen, iiPel,          &
            flux, flux_vector
 #ifdef INCLUDE_PELFE
-   use mem, ONLY: iiF, R6f, ppR6f, jbotR6f, qfcPPY
+   use mem, ONLY: iiF, R6f, ppR6f, jbotR6f, ppR1f, jbotR1f, qfcPPY
 #endif
 #ifdef INCLUDE_PELCO2
    use mem, ONLY: sediO5, O5c, jbotO5c, ppO5c
@@ -316,6 +316,9 @@
       jbotR1c(Box) = jbotR1c(Box) + jbotR1PPY(iiC,Box) + jbotR2R1(Box)
       jbotR1n(Box) = jbotR1n(Box) + jbotR1PPY(iiN,Box)
       jbotR1p(Box) = jbotR1p(Box) + jbotR1PPY(iiP,Box)
+#ifdef INCLUDE_PELFE
+      jbotR1f(Box) = jbotR1f(Box) + jbotR1PPY(iiF,Box)
+#endif
       !
    enddo OMT_XY_LOOP
 
