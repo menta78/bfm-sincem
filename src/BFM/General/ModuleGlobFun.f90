@@ -128,13 +128,19 @@
     end function
 
     ! temperature dependency for Q10 function
-    elemental function eTq(t, q10)
+    ! (with optional argument for base temperature)
+    elemental function eTq(t, q10, base)
 
         IMPLICIT NONE
-        real(RLEN),intent(IN) :: t, q10
-        real(RLEN)            :: eTq
+        real(RLEN),intent(IN)          :: t, q10
+        real(RLEN),intent(IN),optional :: base
+        real(RLEN)                     :: eTq
+        real(RLEN)                     :: tref
 
-        eTq = exp( log(q10) * (t-BASETEMP) / BASETEMP)
+        tref = BASETEMP
+        if ( present(base) ) tref = base
+
+        eTq = exp( log(q10) * (t-tref) / tref)
 
     end function eTq
 
