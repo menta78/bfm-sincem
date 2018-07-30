@@ -90,7 +90,7 @@
         & srt,slc,run,pe_R6,rupp,rump,misp,rupn,rumn3,rumn4,rumn,netgrowth,     &
         & misn,cqun3,sra,srs,rums,rups,miss,tN,fpplim,iN,iN1p,rr1n,rr1p,rr6c,   &
         & rr6n,rr6p,rr6s,runn,runn3,runn4,runp,runs,Irr,rho_Chl,rate_Chl,seo,   &
-        & flPIR2c,iNIn,eN5s,rrc,rr1c,iN5s,chl_opt
+        & flPIR2c,iNIn,eN5s,rrc,rr1c,iN5s,chl_opt,loss
 
   real(RLEN),allocatable,save,dimension(:) :: tfluxC, tfluxN, tfluxP, pe_R1n, pe_R1p, pe_R1c
 #ifndef INCLUDE_PELCO2
@@ -122,7 +122,7 @@
         &       rr1c(NO_BOXES), rr1n(NO_BOXES), rr1p(NO_BOXES),                 &
         &       rr6c(NO_BOXES), rr6n(NO_BOXES), rr6p(NO_BOXES), rr6s(NO_BOXES), &
         &       runn(NO_BOXES), runn3(NO_BOXES), runn4(NO_BOXES),               &
-        &       runp(NO_BOXES), runs(NO_BOXES), Irr(NO_BOXES),                  &
+        &       runp(NO_BOXES), runs(NO_BOXES), Irr(NO_BOXES), loss(NO_BOXES),  &
         &       flPIR2c(NO_BOXES), seo(NO_BOXES), sea(NO_BOXES),                &
         &       rate_Chl(NO_BOXES), rho_Chl(NO_BOXES), chl_opt(NO_BOXES),       & 
         &       tfluxC(NO_BOXES), tfluxN(NO_BOXES), tfluxP(NO_BOXES),           &
@@ -445,7 +445,9 @@
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
       ! Gross uptake of silicate excluding respiratory costs
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-      runs = max(ZERO, p_qscPPY(phyto) * (sum-srs) * phytoc)
+      miss = max(ZERO, phytos - p_qscPPY(phyto)*phytoc) ! intracellular missing Si
+      runs = p_qscPPY(phyto) * (sum-sra-sea-seo) * phytoc
+      loss = (srs+sdo) * phytos + miss
     case (2)
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
       !  Silicate uptake based on intracellular needs (note, no luxury)
@@ -456,13 +458,14 @@
       miss  =   max(ZERO, p_qscPPY(phyto)*phytoc - phytos) ! intracellular missing Si
       rups  =   run* p_qscPPY(phyto)* phytos  ! Si uptake based on net C uptake
       runs  =   min(  rums,  rups+ miss)  ! actual uptake
+      loss  =   sdo*phytos
     end select
               
     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     ! Uptake and Losses of Si (only lysis)
     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    call flux_vector( iiPel, ppN5s,ppphytos, runs)
-    call flux_vector( iiPel, ppphytos, ppR6s, sdo*phytos )
+    call flux_vector( iiPel, ppN5s, ppphytos, runs)
+    call flux_vector( iiPel, ppphytos, ppR6s, loss)
   endif
 
 #ifdef INCLUDE_PELFE
@@ -476,7 +479,7 @@
      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
      rumf  =   p_quf(phyto)* N7f(:)* phytoc  ! max potential uptake
      ! intracellular missing amount of Fe
-     misf  =   sadap*max(ZERO,p_xqf(phyto)*p_qfcPPY(phyto)*phytoc - phytof)  
+     misf  =   sadap*(p_xqf(phyto)*p_qfcPPY(phyto)*phytoc - phytof)  
      rupf  =   p_xqf(phyto)* run* p_qfcPPY(phyto)  ! Fe uptake based on C uptake
      runf  =   min(  rumf,  rupf+ misf)  ! actual uptake
      r  =   insw(runf)
@@ -488,7 +491,7 @@
      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
      ! Losses of Fe
      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-     rr6f  =   rr6c* p_qflc(phyto)
+     rr6f  =   rr6c* qfcPPY(phyto,:)
      rr1f  =   sdo* phytof- rr6f
      call flux_vector( iiPel, ppphytof,ppR1f, rr1f )
      call flux_vector( iiPel, ppphytof,ppR6f, rr6f )
