@@ -185,7 +185,7 @@ end
     qncPPY(PhytoPlankton)	: Quotum N/C in Phytoplankton : mmol N/mg C 
     qscPPY(PhytoPlankton)	: Quotum Si/C in Phytoplankton : mmol Si/mg C 
     qlcPPY(PhytoPlankton)	: Quotum Chl/C in Phytoplankton : mg Chl /mg C
-    qccPPY(PhytoPlankton)   : Quotum PIC/POC in Phytoplankton : mg C/mg C
+    qccPPY(PhytoPlankton)       : Quotum PIC/POC in Phytoplankton : mg C/mg C
 
     qpcMEZ(MesoZooPlankton)	: Quotum P/C in Mesozooplankton :mmol P/mg C 
     qncMEZ(MesoZooPlankton)	: Quotum N/C in Mesozooplankton :mmol N/mg C 
@@ -196,7 +196,7 @@ end
     qpcOMT(PelDetritus)		: Quotum P/C in Organic Matter:mmol N/mg C 
     qncOMT(PelDetritus)		: Quotum N/C in Organic Matter:mmol P/mg C  
     qscOMT(PelDetritus)		: Quotum Si/C in Organic Matter:mmol Si/mg C
- 
+
     qpcPBA(PelBacteria)		: Quotum P/C in Pelagic Bacteria :mmol P/mg C  
     qncPBA(PelBacteria)		: Quotum N/C in Pelagic Bacteria :mmol N/mg C  
 
@@ -209,7 +209,6 @@ end
     sediR2                    : Colloidal OMT sedimentation rate   :m/d
     sediR6                    : Detritus sedimentation rate        :m/d
     sediO5                    : Calcite sedimentation rate         :m/d
-
    #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
    # Sinking rates of phytoplankton and detritus
    #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -218,6 +217,7 @@ end
     xEPS                  : Total Extinction Coefficient : 1/m
     ELiPPY(PhytoPlankton) : Optimal light in PhytoPlankton : W/m2
     ABIO_eps              : Abiotic Extinction Coefficient : 1/m
+
 end
 
 2d-variable-pel
@@ -234,36 +234,6 @@ end
   #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   # OGS 1d variables
   #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  SiPToutr  : Sinks variables
-  SiPToutc  : Sinks variable
-  SiPTouto  : Sinks variable
-  SiPToutn  : Sinks variable
-  SiPToutp  : Sinks variable
-  SiPTouti  : Sinks variable
-  SiQIc     : Sinks variable
-  SiQIn     : Sinks variable
-  SiQIp     : Sinks variable
-  SiQIs     : Sinks variable
-  SiBTsinkc : Sinks variable
-  SiBTsinkn : Sinks variable
-  SiBTsinko : Sinks variable
-  SiBTsinkr : Sinks variable
-  SiBTsinkp : Sinks variable
-  SiBTsinks : Sinks variable
-  SiATsinkr : Sinks variable
-  SiATsinks : Sinks variable
-  SiG3c     : Sinks variable
-  SoO2Airo  : Sinks variable
-  SoPTinr   : Sinks variable
-  SoPTinc   : Sinks variable
-  SoPTino   : Sinks variable
-  SoPTinn   : Sinks variable
-  SoPTinp   : Sinks variable
-  SoPTini   : Sinks variable
-  SoRIc     : Sinks variable
-  SoRIn     : Sinks variable
-  SoRIp     : Sinks variable
-  SoRIs     : Sinks variable
 end
 
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -272,6 +242,7 @@ end
 3d-flux-pel -if-exist INCLUDE_DIAG INCLUDE_PELCO2
   ruPPYc=P.c  <- O3c : Gross Primary Production    : mg C/m3/d
   resPPYc=P.c -> O3c : Phytoplankton Respiration   : mg C/m3/d
+  netPPYc=(P.c <- O3c) - (P.c -> O3c)  :  net primary production  : mg C/m3/d
   resPBAc=B.c -> O3c : Bacterial Respiration       : mg C/m3/d
   resZOOc=Z.c -> O3c : Zooplankton Respiration     : mg C/m3/d
   rcalCARc=O5c <- O3c: Calcification rate          : mg C/m3/d
@@ -282,10 +253,12 @@ end
   ruPPYp=P.p <- N1p : Net Phosphate Uptake : mmol P/m3/d
   ruPPYs=P.s <- N5s : Net Silicate Uptake : mmol Si/m3/d
   exPPYc=(P.c->R1c+R2c+R3c+R6c): C excretion from phytoplankton :mg C/m3/d
+  exPPYcR1=(P.c->R1c): C flux from phytoplankton to R1C :mg C/m3/d
+  exPPYcR2=(P.c->R2c): C flux from phytoplankton to R2C :mg C/m3/d
+  exPPYcR3=(P.c->R3c): C flux from phytoplankton to R3C :mg C/m3/d
+  exPPYcR6=(P.c->R6c): C flux from phytoplankton to R6C :mg C/m3/d
   ruZOOc=(Z.c<-P.c+B.c+Z.c): Gross/Net Secondary Production:mg C/m3/d
   resPELo=(O2o->*): Pelagic Oxygen Demand : mmol O2/m3/d
-  remZOOn=(N4n<-B.n+Z.n): Zooplankton N Remineralization : mmol N/m3/d
-  remZOOp=(N1p<-B.p+Z.p): Zooplankton P Remineralization : mmol P/m3/d
   remPBAn=(N4n<-B.n): Bacterial N Uptake/Remineralization : mmol N/m3/d
   remPBAp=(N1p<-B.p): bacterial P Uptake/Remineralization : mmol P/m3/d
 end
@@ -304,4 +277,8 @@ end
   resMEZ2c=Z4c -> O3c : Omnivorous Zoo Respiration                : mg C/m3/d
   resMIZ1c=Z5c -> O3c : Microzooplankton Respiration              : mg C/m3/d
   resMIZ2c=Z6c -> O3c : Heterotrophic Nanoflagellates Respiration : mg C/m3/d
+  O3c_concdilu_flux
+  O3h_concdilu_flux
 end
+
+  

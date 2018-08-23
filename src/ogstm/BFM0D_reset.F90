@@ -19,24 +19,6 @@ subroutine BFM0D_reset
 
   call ResetFluxes()
 
-  SiPToutr = ZERO
-  SiPToutc = ZERO
-  SiPTouto = ZERO
-  SiPToutn = ZERO
-  SiPToutp = ZERO
-  SiPTouti = ZERO
-  SoO2Airo = ZERO
-  SoPTinr  = ZERO
-  SoPTinc  = ZERO
-  SoPTino  = ZERO
-  SoPTinn  = ZERO
-  SoPTinp  = ZERO
-  SoPTini  = ZERO
-  SoRIc    = ZERO
-  SoRIn    = ZERO
-  SoRIp    = ZERO
-  SoRIs    = ZERO
-
 #ifdef INCLUDE_PELCO2
   jsurO3c=0
 #endif
