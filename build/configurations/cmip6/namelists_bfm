@@ -36,6 +36,8 @@
 !                        1. pelagic
 !                        2. benthic
 !                        3. pelagic and benthic
+!                        4. sea ice
+!                        5. pelagic and sea ice
 ! out_fname      string  Name of NetCDF output file
 ! out_dir        string  Path to the output file
 ! out_title      string  Name of the experiment in NetCDF file
@@ -47,7 +49,7 @@
    bio_calc     = .TRUE.
    bfm_init     = 0
    bfm_rstctl   = .FALSE.
-   bio_setup    = 1
+   bio_setup    = 3
    out_fname    = 'PELAGOS1_OFF'
    out_dir      = '.'
    out_title    = 'PELAGOS1_OFF'
@@ -66,16 +68,11 @@
 ! Global Switches : turn on/off or choose model components 
 ! NAME                          KIND    DESCRIPTION
 ! CalcPelagicFlag               logical Pelagic System
-! CalcBenthicFlag               numeric Benthic system
-!                                       0 = No Benthic System
-!                                       The following are Not Yet Activated
-!                                       1 = Simple Benthic Return
-!                                       2 = Benthic organisms and intermediate 
-!                                           complexity nutrient regeneration 
-!                                       3 = Benthic organisms and full nutrient 
-!                                           regeneration (early diagenesis)
-! CalcTransportFlag             logical Compute Transport Term (when coupled
-!                                       with a OGCM)
+! CalcBenthicFlag               logical Benthic system
+!    Selected using fortran MACROS from compset configuration :
+!      BENTHIC_BIO    : Benthic organisms and intermediate complexity nutrient regeneration
+!      BENTHIC_FULL   : Benthic organisms and full nutrient regeneration (early diagenesis)
+! CalcTransportFlag             logical Compute Transport Term (when coupled with a OGCM)
 ! CalcConservationFlag          logical Mass Conservation Check
 ! CalcPhytoPlankton             logical Pelagic Phytoplankton (vector)
 ! CalcPelBacteria               logical Pelagic Bacteria (vector)
@@ -111,7 +108,7 @@
 &Param_parameters
 ! Switches : 
             CalcPelagicFlag = .TRUE.
-            CalcBenthicFlag = 0
+            CalcBenthicFlag = .TRUE.
        CalcConservationFlag = .FALSE.
           CalcTransportFlag = .TRUE.
        CalcPhytoPlankton(1) = .TRUE.
@@ -132,6 +129,21 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
                       p_qro = 0.5
                p_qon_dentri = 1.25
                 p_qon_nitri = 2.0
+	filename_nml_conf = 'BFM_General.nml',
+/
+
+!-------------------------------------------------------------------------!
+! NAMELIST Param_parameters_ben
+!-------------------------------------------------------
+! Benthic flags and parameters :
+&Param_parameters_ben
+                    p_poro0 = 0.7
+                    p_d_tot = 0.30
+                  p_d_tot_2 = 0.35
+                  p_clD1D2m = 0.01
+                    p_clDxm = 0.001
+                  p_q10diff = 1.49
+
 	filename_nml_conf = 'BFM_General.nml',
 /
 
@@ -188,7 +200,7 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
    R2c0 = 0.0,
    R3c0 = 0.0,
    R6c0 = 1.0,
-
+   ! 3D fields and BC
    InitVar(O2o)%init = 2,
    InitVar(N1p)%init = 2,
    InitVar(N1p)%cbc  = .true.,
@@ -207,7 +219,43 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
    InitVar(O3c)%cbc  = .true.,
    InitVar(O3h)%init = 2,
    InitVar(O3h)%cbc  = .true.,
+   ! BIO Analytical 0-100m
+   InitVar(B1c)%init = 1
+   InitVar(B1c)%anv1 = 1.0
+   InitVar(B1c)%anz1 = 100.0
+   InitVar(P1c)%init = 1
+   InitVar(P1c)%anv1 = 0.1
+   InitVar(P1c)%anz1 = 100.0
+   InitVar(P2c)%init = 1
+   InitVar(P2c)%anv1 = 0.1
+   InitVar(P2c)%anz1 = 100.0
+   InitVar(Z4c)%init = 1
+   InitVar(Z4c)%anv1 = 0.1
+   InitVar(Z4c)%anz1 = 100.0
+   InitVar(Z5c)%init = 1
+   InitVar(Z5c)%anv1 = 0.1
+   InitVar(Z5c)%anz1 = 100.0
+   InitVar(R1c)%init = 1
+   InitVar(R1c)%anv1 = 10.0
+   InitVar(R1c)%anz1 = 100.0
+   InitVar(R6c)%init = 1
+   InitVar(R6c)%anv1 = 10.0
+   InitVar(R6c)%anz1 = 100.0
    filename_nml_conf = 'BFM_General.nml',
+/
+
+!-------------------------------------------------------------------------!
+! NAMELIST bfm_init_nml_ben
+!-------------------------------------------------------------------------!
+!Benthic initialisation of standard variables
+!<variablename>0 = <realvalue>
+!-------------------------------------------------------------------------!
+&bfm_init_nml_ben
+   Q1c0  =  0.0 ! 10.4988,
+   Q11c0 =  0.0 ! 10.4988,
+   Q6c0  =  0.0 ! 10265.19,
+   Q16c0 =  0.0
+	filename_nml_conf = 'BFM_General.nml',
 /
 
 !-------------------------------------------------------------------------!
@@ -224,41 +272,18 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
           'N1p','N3n','N4n','N5s','N7f','N6r',
           'P1c','P1l','P1f','P2c','P2l','P2f',
           'Z4c','Z5c','B1c',
-          'R1c','R1n','R1p',
-          'R6c','R6p','R6n','R6s','R6f',
-          'Chla',
+          'R1c','R2c','R6c','R6f','Chla','R1n','R1p',
           'P1n','P2n',
           'P1p','P2p',
           'jbotR6c','jsurO2o','jsurO3c',
-          'ruPPYc','resPBAc','resZOOc',
-          'ruPPYn','ruPPYp','ruPPYs','ruPPYf','exPPYc',
+          'ruPPYc','ruPPYn','ruPPYp','ruPPYs','ruPPYf','exPPYc',
+          'resPPYc','resPBAc','resZOOc',
           'ruZOOc','qncOMT_iiR6','qpcOMT_iiR6',
-          'fscavN7f','remN7f','remN5s',
           'EICE','ETW','EIR','EWIND','xEPS',
-          'IRONDEPO',
-          'qncOMT_iiR6','qpcOMT_iiR6'
+          'R6p','R6n','R6s',
+          'sinkP1c','sinkR6c','Q6c','Q6n','Q6p','Q6s','Q1c','Q1n','Q1p','Q16c'
 	filename_nml_conf = 'BFM_General.nml',
 /
-
-!-------------------------------------------------------------------------!
-!NAMELIST Settling_parameters
-!-------------------------------------------------------------------------!
-! BURIAL VELOCITIES into the sediment
-! NAME         [UNIT]/KIND            DESCRIPTION
-! p_burvel_R6     [m/d]              Bottom Burial Velocity for detritus 
-! p_burvel_R2     [m/d]              Bottom Burial Velocity for dissolved
-! p_burvel_PI     [m/d]              Bottom Burial Velocity for plankton 
-! p_burvel_O5     [m/d]              Bottom Burial Velocity for calcite
-!-------------------------------------------------------------------------!
-&Settling_parameters
-  p_burvel_R6 = 1.5,
-  p_burvel_O5 = 30.0,
-  p_burvel_R2 = 0.0,
-  p_burvel_PI = 1.5
-	filename_nml_conf = 'Benthic_Environment.nml',
-/
-
-
 
 !-------------------------------------------------------------------------!
 !NAMELIST CSYS_parameters 
@@ -293,11 +318,11 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
     AtmCO20          =  367.0E0  
     MaxIterPHsolver  =  50       
     CalcBioAlk       =  .FALSE. 
+    AtmCO2_N         =  1        'CMIP5_scenarios_RCP_CO2_mixing_ratio.nc'  .TRUE.  'RCP85'   '1765-01-01 00:00:00'  'yearly'  .TRUE.  
+    AtmSLP_N         =  3        'AtmSLP.nc'                           .TRUE.   'AtmSLP'  '1764-07-01 00:00'  'dummy'   .TRUE.  
     p_kdca           =  10.9     
     p_nomega         =  1        
     Co2fluxfac       =  1.0 
-    AtmCO2_N         =  1        'CMIP5_scenarios_RCP_CO2_mixing_ratio.nc'  .TRUE.  'RCP85'   '1765-01-01 00:00:00'  'yearly'  .TRUE.  
-    AtmSLP_N         =  3        'AtmSLP.nc'                           .TRUE.   'AtmSLP'  '1764-07-01 00:00'  'dummy'   .TRUE.  
 	filename_nml_conf = 'Carbonate_Dynamics.nml',
 /
 
@@ -342,14 +367,14 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
 !                B1
      p_version = 1
          p_q10 = 2.95
-        p_chdo = 30.0
-          p_sd = 0.05
+        p_chdo = 45.0
+          p_sd = 0.1
          p_sd2 = 0.0
        p_suhR1 = 0.3
        p_sulR1 = 0.0
         p_suR2 = 0.0
         p_suR3 = 0.0
-        p_suR6 = 0.01
+        p_suR6 = 0.0075
          p_sum = 8.38
        p_pu_ra = 0.6
      p_pu_ra_o = 0.2
@@ -470,11 +495,11 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
         p_lN4 = 1.0,    1.0
        p_qnlc = 4.193e-3,4.193e-3
      p_qncPPY = 1.26e-2,1.26e-2
-        p_xqn = 1.25,    1.25
+        p_xqn = 1.5,    1.5
         p_qup = 0.025,  0.025
        p_qplc = 1.80e-4,1.80e-4
      p_qpcPPY = 7.86e-4,7.86e-4
-        p_xqp = 1.25,    1.25
+        p_xqp = 1.5,    1.5
    p_switchSi = 1,      0
        p_chPs = 1.0,    0.0
     p_Contois = 0.0,    0.0
@@ -483,11 +508,11 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
      p_qscPPY = 0.01,   0.0
        p_esNI = 0.1,    0.0
        p_res  = 5.0,    0.0
-     p_caco3r = 0.0,    0.3
+     p_caco3r = 0.0,    0.05
   p_switchChl = 1,      1
       p_sdchl = 0.2,    0.2
   p_alpha_chl = 1.38e-5, 0.46e-5
-     p_qlcPPY = 0.03,   0.015
+     p_qlcPPY = 0.025,   0.015
     p_epsChla = 0.03,   0.03
     p_EpEk_or = 0.0,    0.0
  p_tochl_relt = 0.0,    0.0
@@ -507,44 +532,6 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
         p_xqf = 1.5,     1.0
         p_quf = 2.0e-4,  2.0e-4
 	filename_nml_conf = 'Pelagic_Ecology.nml',
-/
-
-!-------------------------------------------------------------------------!
-!NAMELIST PAR_parameters
-!-------------------------------------------------------------------------!
-! LightPeriodFlag    numeric Choose the light averaging period
-!                            1 = Instantanous irradiance
-!                            2 = Daily average
-!                            3 = Daylight average with explicit
-!                                photoperiod
-! LightLocationFlag  numeric Choose the parameterization of light
-!                            location in the discrete grid
-!                            1 = Light at the top of the cell
-!                            2 = Light in the middle of the cell
-!                            3 = Average Light in the cell
-! ChlAttenFlag	     numeric Choose the PAR attenuation due to Chl
-!                            1 = broadband linear attenuation 
-!                            2 = 3-band tabulated attenuation coefficients
-!                                (Morel, 1988; Lengaigne et al, 2007)
-! p_PAR        [-]           Fraction of Photosynthetically Available Radiation
-! p_eps0       [1/m]         Background extinction coefficient
-! p_epsIR      [1/m]         Infrared extinction coefficient
-!                            (to use with ChlAttenFlag=2)
-! p_epsESS     [m2/g]        Specific attenuation coefficient of
-!                            suspended sediments
-! p_epsR6      [m2/mgC]      Specific attenuation coefficient of particulate
-!                            detritus
-!-------------------------------------------------------------------------!
-&PAR_parameters
-  LightPeriodFlag    =  1
-  LightLocationFlag  =  3
-  ChlAttenFlag       =  2
-  p_PAR        =  0.40
-  p_eps0       =  0.0435
-  p_epsIR      =  2.857
-  p_epsESS     =  0.04d-3
-  p_epsR6      =  0.1d-3
-	filename_nml_conf = 'Pelagic_Environment.nml',
 /
 
 !-------------------------------------------------------------------------!
@@ -651,8 +638,46 @@ p_paPPY(1,:) =  1.0,    0.0
 p_paMIZ(1,:)=   0.5
 !               Z4
 !       Z4
-p_paMEZ(1,:)=   0.5
+p_paMEZ(1,:)=   1.0
 	filename_nml_conf = 'Pelagic_Ecology.nml',
+/
+
+!-------------------------------------------------------------------------!
+!NAMELIST PAR_parameters
+!-------------------------------------------------------------------------!
+! LightPeriodFlag    numeric Choose the light averaging period
+!                            1 = Instantanous irradiance
+!                            2 = Daily average
+!                            3 = Daylight average with explicit
+!                                photoperiod
+! LightLocationFlag  numeric Choose the parameterization of light
+!                            location in the discrete grid
+!                            1 = Light at the top of the cell
+!                            2 = Light in the middle of the cell
+!                            3 = Average Light in the cell
+! ChlAttenFlag	     numeric Choose the PAR attenuation due to Chl
+!                            1 = broadband linear attenuation 
+!                            2 = 3-band tabulated attenuation coefficients
+!                                (Morel, 1988; Lengaigne et al, 2007)
+! p_PAR        [-]           Fraction of Photosynthetically Available Radiation
+! p_eps0       [1/m]         Background extinction coefficient
+! p_epsIR      [1/m]         Infrared extinction coefficient
+!                            (to use with ChlAttenFlag=2)
+! p_epsESS     [m2/g]        Specific attenuation coefficient of
+!                            suspended sediments
+! p_epsR6      [m2/mgC]      Specific attenuation coefficient of particulate
+!                            detritus
+!-------------------------------------------------------------------------!
+&PAR_parameters
+  LightPeriodFlag    =  1
+  LightLocationFlag  =  3
+  ChlAttenFlag       =  1
+  p_PAR        =  0.40
+  p_eps0       =  0.0435
+  p_epsIR      =  2.857
+  p_epsESS     =  0.04d-3
+  p_epsR6      =  0.1d-3
+	filename_nml_conf = 'Pelagic_Environment.nml',
 /
 
 !-------------------------------------------------------------------------!
@@ -692,7 +717,7 @@ p_paMEZ(1,:)=   0.5
     p_clN6r = 1.0
      p_rPAo = 1.0
   p_q10R6N5 = 1.49
-    p_sR6N5 = 0.01
+    p_sR6N5 = 0.005
 	filename_nml_conf = 'Pelagic_Environment.nml',
 /
 
@@ -713,22 +738,65 @@ p_N7fLigand = 0.6
 !-------------------------------------------------------------------------!
 ! Sinking rates of Pelagic Variables
 !  : for mem_PelGlobal filled by InitPelGlobal
-! NAME           UNIT      DESCRIPTION
-! p_rR6m         [m/d]   detritus sinking rate
-! p_rO5m         [m/d]   calcite sinking rate
-! KSINK_rPPY      [m]    prescribe sinking rate for phytoplankton below this
-!                        depth threshold to p_rR6m value. Use 0.0 to disable.
-! AggregateSink  logic   use aggregation = true to enhance the sink rate
-!                        and bypass the prescribed sinking
-! depth_factor    [m]    depth factor for aggregation method
+! NAME         [UNIT]/KIND            DESCRIPTION
+! p_rR6m          [m/d]         detritus sinking rate
+! p_rO5m          [m/d]         calcite sinking rate
+! KSINK_rPPY       [m]          prescribe sinking rate for phytoplankton below this
+!                               depth threshold to p_rR6m value. Use 0.0 to disable.
+! AggregateSink   logic         use aggregation = true to enhance the sink rate
+!                               and bypass the prescribed sinking
+! depth_factor     [m]          depth factor for aggregation method
 !-------------------------------------------------------------------------!
 &PelGlobal_parameters
-  p_rR6m         = 5.0
+  p_rR6m         = 1.0
   p_rO5m         = 3.0
   KSINK_rPPY     = 150.0
   AggregateSink  = .FALSE.
   depth_factor   = 2000.0
 	filename_nml_conf = 'Pelagic_Environment.nml',
+/
+
+!-------------------------------------------------------------------------!
+!NAMELIST Settling_parameters
+!-------------------------------------------------------------------------!
+! BURIAL VELOCITIES into the sediment
+! NAME         [UNIT]/KIND            DESCRIPTION
+! p_burvel_R6     [m/d]          Bottom Burial Velocity for detritus 
+! p_burvel_R2     [m/d]          Bottom Burial Velocity for dissolved
+! p_burvel_PI     [m/d]          Bottom Burial Velocity for plankton 
+! p_burvel_O5     [m/d]          Bottom Burial Velocity for calcite
+! R6DeepBurial    logic          R6 Burial to Deep Sediment (Dunne et al., 2007)
+!-------------------------------------------------------------------------!
+&Settling_parameters
+  p_burvel_R6 = 0.5,
+  p_burvel_O5 = 30.0,
+  p_burvel_R2 = 0.0,
+  p_burvel_PI = 0.1,
+  R6DeepBurial = .TRUE.,
+	filename_nml_conf = 'Benthic_Environment.nml',
+/
+
+!-------------------------------------------------------------------------!
+! NAMELIST BenthicReturn_parameters
+!-------------------------------------------------------------------------!
+! NAME         [UNIT]/KIND            DESCRIPTION
+! p_reminQ1       [d-1]       Remineralization rate of Dissolved OM
+! p_reminQ6       [d-1]       Remineralization rate of Particulate OM
+! p_pQIN3          [-]        Partitioning coeff. between NO3 and NH4
+! p_depscale       [m]        Depth level to scale remin. rates (for BFM-NEMO)
+! p_q10            [-]        Q10 value for remineralization rate (=0 disable) 
+! p_qBT           [degC]      Base Temperature for Q10 remin
+! p_chdo        [mmol/m3]     Half-saturation Oxygen conc. for MM^2 (=0 disable)
+!-------------------------------------------------------------------------!
+&BenthicReturn_parameters
+  p_reminQ1  =  0.05   
+  p_reminQ6  =  0.05  
+  p_pQIN3    =  0.1   
+  p_depscale =  50.0
+  p_q10      = 3.0,
+  p_qBT      = 20.0,
+  p_chdo     = 50.0,
+        filename_nml_conf = 'Benthic_Environment.nml',
 /
 
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
