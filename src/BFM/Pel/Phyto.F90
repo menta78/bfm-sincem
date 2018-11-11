@@ -445,7 +445,9 @@
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
       ! Gross uptake of silicate excluding respiratory costs
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-      runs = max(ZERO, p_qscPPY(phyto) * (sum-srs) * phytoc)
+      miss = max(ZERO, phytos - p_qscPPY(phyto)*phytoc) ! intracellular missing Si
+      runs = p_qscPPY(phyto) * (sum-sra-sea-seo) * phytoc
+      rr6s = (srs+sdo) * phytos + miss
     case (2)
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
       !  Silicate uptake based on intracellular needs (note, no luxury)
@@ -456,13 +458,14 @@
       miss  =   max(ZERO, p_qscPPY(phyto)*phytoc - phytos) ! intracellular missing Si
       rups  =   run* p_qscPPY(phyto)* phytos  ! Si uptake based on net C uptake
       runs  =   min(  rums,  rups+ miss)  ! actual uptake
+      rr6s  =   sdo*phytos
     end select
               
     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     ! Uptake and Losses of Si (only lysis)
     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    call flux_vector( iiPel, ppN5s,ppphytos, runs)
-    call flux_vector( iiPel, ppphytos, ppR6s, sdo*phytos )
+    call flux_vector( iiPel, ppN5s, ppphytos, runs)
+    call flux_vector( iiPel, ppphytos, ppR6s, rr6s)
   endif
 
 #ifdef INCLUDE_PELFE
@@ -476,7 +479,7 @@
      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
      rumf  =   p_quf(phyto)* N7f(:)* phytoc  ! max potential uptake
      ! intracellular missing amount of Fe
-     misf  =   sadap*max(ZERO,p_xqf(phyto)*p_qfcPPY(phyto)*phytoc - phytof)  
+     misf  =   sadap*(p_xqf(phyto)*p_qfcPPY(phyto)*phytoc - phytof)  
      rupf  =   p_xqf(phyto)* run* p_qfcPPY(phyto)  ! Fe uptake based on C uptake
      runf  =   min(  rumf,  rupf+ misf)  ! actual uptake
      r  =   insw(runf)
@@ -488,7 +491,7 @@
      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
      ! Losses of Fe
      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-     rr6f  =   rr6c* p_qflc(phyto)
+     rr6f  =   rr6c* qfcPPY(phyto,:)
      rr1f  =   sdo* phytof- rr6f
      call flux_vector( iiPel, ppphytof,ppR1f, rr1f )
      call flux_vector( iiPel, ppphytof,ppR6f, rr6f )

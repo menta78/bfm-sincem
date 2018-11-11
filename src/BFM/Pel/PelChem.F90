@@ -34,7 +34,7 @@
   use mem,  ONLY: ppN4n, ppN3n, ppO2o, ppO4n, ppN6r, ppR6s, ppN5s, &
     flN3O4n, ETW, flPTN6r, NO_BOXES, iiBen, iiPel, flN4N3n, flux_vector
 #ifdef INCLUDE_PELFE
-  use mem,  ONLY: N7f, R6f, R1f, ppN7f, ppR6f, ppR1f, fscavN7f
+  use mem,  ONLY: N7f, R6f, R1f, ppN7f, ppR6f, ppR1f, fscavN7f, R6c
 #endif
 #endif
   use mem_Param,  ONLY: p_qon_nitri, p_qro, p_qon_dentri, p_small

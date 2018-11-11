@@ -320,7 +320,8 @@
      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
      call flux_vector(iiPel, ppzooc, ppR6c, pe_R6c*(ONE-p_pe_R1c) )
      call flux_vector(iiPel, ppzooc, ppR1c, pe_R6c*(p_pe_R1c))
-     call flux_vector(iiPel, ppzoop, ppN1p, pe_N1p)
+     call flux_vector(iiPel, ppzoop, ppR6p, pe_N1p*(ONE-p_pe_R1p))
+     call flux_vector(iiPel, ppzoop, ppR1p, pe_N1p*(p_pe_R1p)    )
      call flux_vector(iiPel, ppzoon, ppN4n, pe_N4n)
 
   endif

@@ -370,7 +370,7 @@
   ! release (POC) and nutrient remineralization (PO4 and NH)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   call flux_vector(iiPel, ppzooc, ppR6c, pe_R6c)
-  call flux_vector(iiPel, ppzoop, ppN1p, pe_N1p)
+  call flux_vector(iiPel, ppzoop, ppR6p, pe_N1p)
   call flux_vector(iiPel, ppzoon, ppN4n, pe_N4n)
 
   end subroutine MesoZooDynamics

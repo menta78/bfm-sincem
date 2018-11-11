@@ -286,3 +286,7 @@ end
   remPBAp=(N1p<-B.p): bacterial P Uptake/Remineralization : mmol P/m3/d
   remN5s=(N5s<-R6s): Si Remineralization : mmol Si/m3/d
 end
+
+2d-flux-ben -if-exist INCLUDE_DIAG
+  burC=Q6c->Q16c : Burial of POC in deep sediments : mgC/m2/d 
+end

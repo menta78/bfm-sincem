@@ -301,7 +301,7 @@ echo ""
 #
 addproto=""
 if [ "$MODE" == "OGS" ]; then
-   addproto="BFM_var_list.h BFM0D_Output_Ecology.F90 namelist.passivetrc"
+   addproto="BFM_var_list.h BFM1D_Output_Ecology.F90 namelist.passivetrc"
 fi
 if [[ "$MODE" == "NEMO" || "$MODE" == "NEMO_CESM" ]]; then
    addproto="field_def_bfm.xml file_def_bfm.xml"
@@ -417,7 +417,7 @@ if [ ${GEN} ]; then
         if [[ "$MODE" == "OGS" ]]; then
             cp ${BFMDIR}/include/BFM_module_list.proto.h ${blddir}/
             sed ':a;N;$!ba;s/, \&\n/,  /g' ${blddir}/BFM_var_list.h | sed -e "s/,    /\n     integer,parameter ::/g" > ${BFMDIR}/include/BFM_var_list.h 
-            mv ${BFMDIR}/src/BFM/General/BFM0D_Output_Ecology.F90 ${BFMDIR}/src/ogstm/
+            mv ${BFMDIR}/src/BFM/General/BFM1D_Output_Ecology.F90 ${BFMDIR}/src/ogstm/
         fi
 
     elif [[ "$MODE" == "NEMO" || "$MODE" == "NEMO_3DVAR" ]]; then 

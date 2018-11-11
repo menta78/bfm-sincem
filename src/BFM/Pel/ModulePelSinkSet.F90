@@ -189,7 +189,9 @@
   if (bfm_lwp) write(LOGUNIT,*) '  ID   Variable   Group'
   do n = 1 , NO_D3_BOX_STATES
      if ( bfm_lwp .and. SINKD3STATE(n)%dosink ) then
+     if (allocated(var_names)) then
        write(LOGUNIT,'(i8,a8,i9)') n,trim(var_names(n)),SINKD3STATE(n)%group
+     endif
      endif
   enddo
   LEVEL1 ''
