@@ -54,19 +54,19 @@ subroutine BFM1D_Input_EcologyDynamics(bot,BFM1D_trn,dim_BFM1D_trn,BFM1D_er)
 ! LEVEL1 'BFM1D_Input_EcologyDynamics:ESW', ESW
   ERHO(:)   = BFM1D_er(:,3)
 ! LEVEL1 'BFM1D_Input_EcologyDynamics:ERHO', ERHO
-  EICE(:)   = BFM1D_er(:,4)
+  EICE(:)   = BFM1D_er(1,4)
 ! LEVEL1 'BFM1D_Input_EcologyDynamics:EICE', EICE
 #ifdef INCLUDE_PELCO2
-  AtmCO2%fnow(:) = BFM1D_er(:,5)
+  AtmCO2%fnow(:) = BFM1D_er(1,5)
 ! LEVEL1 'BFM1D_Input_EcologyDynamics:EPCO2air', EPCO2air
 #endif
   EIR(:)    = BFM1D_er(:,6)
 ! LEVEL1 'BFM1D_Input_EcologyDynamics:EIR', EIR
-  SUNQ(:)   = BFM1D_er(:,7)
+  SUNQ(:)   = BFM1D_er(1,7)
 ! LEVEL1 'BFM1D_Input_EcologyDynamics:DL', SUNQ
   DEPTH(:)  = BFM1D_er(:,8)
 ! LEVEL1 'BFM1D_Input_EcologyDynamics:DEPTH', DEPTH
-  EWIND(:)  = BFM1D_er(:,9)
+  EWIND(:)  = BFM1D_er(1,9)
 ! LEVEL1 'BFM1D_Input_EcologyDynamics:EWIND,', EWIND
   ph(:)     = BFM1D_er(:,10)
 ! LEVEL1 'BFM1D_Input_EcologyDynamics:PH,', ph
