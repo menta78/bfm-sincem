@@ -25,6 +25,7 @@ subroutine BFM1D_Input_EcologyDynamics(bot,BFM1D_trn,dim_BFM1D_trn,BFM1D_er)
   ! Local Variables
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   integer i,ib
+  real(RLEN) bottom
 
 
  !      BOTindices(:) = 0
@@ -71,4 +72,9 @@ subroutine BFM1D_Input_EcologyDynamics(bot,BFM1D_trn,dim_BFM1D_trn,BFM1D_er)
   ph(:)     = BFM1D_er(:,10)
 ! LEVEL1 'BFM1D_Input_EcologyDynamics:PH,', ph
 
+  bottom=0
+  DO ib=1,NO_BOXES
+     bottom = bottom + DEPTH(ib)
+     EPR(ib) = bottom - DEPTH(ib)/2
+  ENDDO
 end subroutine BFM1D_Input_EcologyDynamics
