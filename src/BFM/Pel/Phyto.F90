@@ -351,7 +351,7 @@
   else
      sadap  =   et*p_sum(phyto)
   end if
-  run  =   max(  ZERO, ( sum- slc)* phytoc)  ! net production
+  run  =   max(  ZERO, ( sum- (sea + seo + srt))* phytoc)  ! net production
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Nutrient Uptake: calculate maximum uptake of N, P
@@ -455,8 +455,8 @@
       !  however this generates fake remineralization and it is not implemented
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
       rums  =   p_qus(phyto)* N5s(:)* phytoc  ! max pot uptake based on affinity
-      miss  =   max(ZERO, p_qscPPY(phyto)*phytoc - phytos) ! intracellular missing Si
-      rups  =   run* p_qscPPY(phyto)* phytos  ! Si uptake based on net C uptake
+      miss  =   sadap*(p_qscPPY(phyto)*phytoc - phytos) ! intracellular missing Si
+      rups  =   run* p_qscPPY(phyto)  ! Si uptake based on net C uptake
       runs  =   min(  rums,  rups+ miss)  ! actual uptake
       rr6s  =   sdo*phytos
     end select
@@ -464,8 +464,9 @@
     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     ! Uptake and Losses of Si (only lysis)
     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    call flux_vector( iiPel, ppN5s, ppphytos, runs)
-    call flux_vector( iiPel, ppphytos, ppR6s, rr6s)
+    r  =   insw(runs)
+    call flux_vector( iiPel, ppN5s, ppphytos, runs*r)
+    call flux_vector( iiPel, ppphytos, ppR6s, rr6s - runs*(ONE-r))
   endif
 
 #ifdef INCLUDE_PELFE
