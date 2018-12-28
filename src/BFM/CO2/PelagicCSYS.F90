@@ -144,7 +144,7 @@
   ! Inorganic carbon and alkalinity flux due to PIC changes
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   call flux_vector( iiPel, ppO5c, ppO3c, rdiss(:) )
-  call flux_vector( iiPel, ppO3h, ppO3h, -C2ALK*rdiss(:) )
+  call flux_vector( iiPel, ppO3h, ppO3h, C2ALK*rdiss(:) )
 
   if (SRFindices(1) .eq. 0 ) return
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
