@@ -44,8 +44,8 @@
           <field field_ref="B1c"      name="bacc"       long_name="Bacterial Carbon Concentration"                     unit="mol m-3" > @B1c * (1e-03 / $mwC) </field>
           <field field_ref="R1c"      name="dissoc"     long_name="Dissolved Organic Carbon Concentration"             unit="mol m-3" > @R1c * (1e-03 / $mwC) </field>
           <field field_ref="R6c"      name="detoc"      long_name="Detrital Organic Carbon Concentration"              unit="mol m-3" > @R6c * (1e-03 / $mwC) </field>
-          <field field_ref="jsurO2o"  name="fgo2"       long_name="Surface Downward O2 Flux"                           unit="mol m-2 s-1" > @jsurO2o * ( 1e-03 / 86400.0) </field> 
-          <field field_ref="jsurO3c"  name="fgco2"      long_name="Surface Downward CO2 Flux"                          unit="kg m-2 s-1"  > @jsurO3c * ( 1e-06 / 86400.0) </field>
+          <field field_ref="jsurO2o"  name="fgo2"       long_name="Surface Downward O2 Flux"                           unit="mol m-2 s-1" > @jsurO2o * ( -1e-03 / 86400.0) </field> 
+          <field field_ref="jsurO3c"  name="fgco2"      long_name="Surface Downward CO2 Flux"                          unit="kg m-2 s-1"  > @jsurO3c * ( -1e-06 / 86400.0) </field>
           <field field_ref="sinkR6c"  name="expc"       long_name="Downward Flux of Particulate Organic Carbon"        unit="mol m-2 s-1" > @sinkR6c * (1e-03 / $mwC / 86400.0) </field>
           <field field_ref="sinkR6s"  name="expsi"      long_name="Sinking Particulate Silica Flux"                    unit="mol m-2 s-1" > @sinkR6s * (1e-03 / 86400.0) </field>
           <field field_ref="sinkR6f"  name="expfe"      long_name="Sinking Particulate Iron Flux"                      unit="mol m-2 s-1" > @sinkR6f * (1e-06 / 86400.0) </field>
@@ -70,7 +70,6 @@
           <field field_ref="Q16s"     />
         </file>
 
-
       </file_group>
 
       <file_group id="2m" output_freq="2mo" output_level="10" enabled=".TRUE."/> <!-- real 2m files -->
@@ -79,8 +78,9 @@
       <file_group id="6m" output_freq="6mo" output_level="10" enabled=".TRUE."/> <!-- real 6m files -->
 
       <file_group id="1y"  output_freq="1y" output_level="10" enabled=".TRUE."> <!-- real yearly files -->
+
         <file id="file210" name_suffix="_grid_bfm" description="BFM variables" >
-          <field field_ref="jsurO3c"  name="fgco2"    long_name="Surface Downward CO2 Flux"                          unit="kg m-2 s-1"  > @jsurO3c * ( 1e-06 / 86400.0) </field>
+          <field field_ref="jsurO3c"  name="fgco2"    long_name="Surface Downward CO2 Flux"                          unit="kg m-2 s-1"  > @jsurO3c * ( -1e-06 / 86400.0) </field>
           <field field_ref="O2o"      name="o2"       long_name="Dissolved Oxygen Concentration"                     unit="mol m-3" > @O2o * 1e-03 </field>
           <field field_ref="O3c"      name="dissic"   long_name="Dissolved Inorganic Carbon Concentration"           unit="mol m-3" > @O3c * (1e-03 / $mwC) </field>
           <field field_ref="O3h"      name="talk"     long_name="Total Alkalinity"                                   unit="mol m-3" > @O3h * 1e-03 </field>
