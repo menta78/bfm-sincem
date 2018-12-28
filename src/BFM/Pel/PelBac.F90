@@ -260,22 +260,23 @@
   call quota_flux(iiPel, ppbacp, ppR6p, ppbacp, ruR6p, tfluxP)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  ! Aerobic and anaerobic respiration 
-  ! Pelagic bacteria are a wide functional group comprising both aerobic and
-  ! anaerobic bacteria. At (very) low Oxygen concentrations bacteria use
-  ! N6r as electron acceptor in the respiration process. 
-  ! However, the carbon cost is higher and an additional term is used.
+  ! Aerobic and anaerobic respiration
+  ! Anaerobic bacteria use N6r as electron acceptor, with additional carbon cost
   ! If nitrate is present, the rate of consumption of N6r is converted to N3n
   ! consumption (eq 19 Vichi et al., 2004 and PelChem.F90)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  rrc = (p_pu_ra(bac)+ p_pu_ra_o(bac)*(ONE-eO2) )*rug + p_srs(bac)* bacc* et
-  call quota_flux( iiPel, ppbacc, ppbacc, ppO3c, rrc, tfluxC) 
+  ! Activity + Basal respiration
+  rrc = (p_pu_ra(bac) * rug) + p_srs(bac)* bacc* et
+  ! Aerobic consumption of Oxygen
   call flux_vector( iiPel, ppO2o, ppO2o, -eO2*rrc/MW_C )
-  flN6rPBA = (ONE- eO2)*rrc/ MW_C* p_qro
+  ! Anaerobic consumption of N6r
+  flN6rPBA =( ((ONE-eO2)*rrc) + (p_pu_ra_o(bac)*(ONE-eO2)*rug) )/ MW_C* p_qro
   call flux_vector( iiPel, ppN6r, ppN6r, flN6rPBA )
-
-  ! Update the total rate of formation of reduction equivalent
+  ! Bookkeeping of reduction equivalent formation rate
   flPTN6r(:) = flPTN6r(:) + flN6rPBA
+  ! Total Respiration
+  rrc = rrc + (p_pu_ra_o(bac)*(ONE-eO2)*rug)
+  call quota_flux( iiPel, ppbacc, ppbacc, ppO3c, rrc, tfluxC)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Net Production
@@ -300,7 +301,8 @@
       ! Fix-ratio: actual quota comes from detritus uptake vs. realized growth
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
       ren  =  (qncPBA(bac,:) - p_qncPBA(bac))*bacc*p_ruen(bac)
-      if ( ppbacn == 0 ) ren = min(ZERO, ((ruR1n+ruR6n)/run) - p_qncPBA(bac))
+      if ( ppbacn == 0 ) & 
+         ren = min( ZERO, (ruR1n+ruR6n) - p_qncPBA(bac)*run )
       call quota_flux(iiPel, ppbacn, ppbacn, ppN4n,       ren*insw( ren), tfluxN)
       call quota_flux(iiPel, ppbacn, ppN4n, ppbacn, -eN4n*ren*insw(-ren), tfluxN)
 
@@ -312,7 +314,8 @@
       ! Fix-ratio: actual quota comes from detritus uptake vs. realized growth
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
       rep  =  (qpcPBA(bac,:) - p_qpcPBA(bac))*bacc*p_ruep(bac)
-      if ( ppbacp == 0 ) rep = min(ZERO, ((ruR1p+ruR6p)/run) - p_qpcPBA(bac))
+      if ( ppbacp == 0 ) &
+         rep = min(ZERO, (ruR1p+ruR6p) - p_qpcPBA(bac)*run )
       call quota_flux(iiPel, ppbacp, ppbacp, ppN1p,       rep*insw( rep), tfluxP)
       call quota_flux(iiPel, ppbacp, ppN1p, ppbacp, -eN1p*rep*insw(-rep), tfluxP)
 
