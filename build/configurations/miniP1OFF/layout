@@ -76,7 +76,6 @@ end
    N3n	:	Nitrate  : mmol N/m3
    N4n	:	Ammonium : mmol N/m3
    N5s	:	Silicate     : mmol Si/m3
-   N6r	:	Reduction Equivalents : mmol S--/m3
    N7f  :   Bioavailable Iron : umol Fe/m3
 
   #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -132,6 +131,7 @@ end
     end
 
   #	State Variable(s) for Nitrogen Mass Balance
+   N6r  :       Reduction Equivalents : mmol S--/m3
    O4n  :       NitrogenSink : mmol N/m3
 end
 
@@ -278,6 +278,10 @@ end
   resPPYc=P.c -> O3c : Phytoplankton Respiration   : mg C/m3/d
   resPBAc=B.c -> O3c : Bacterial Respiration       : mg C/m3/d
   resZOOc=Z.c -> O3c : Zooplankton Respiration     : mg C/m3/d
+  ruPPYc1=P1c  <- O3c : Diatoms GPP           : mg C/m3/d
+  resPPYc1=P1c -> O3c : Diatoms Respiration   : mg C/m3/d
+  ruPPYc2=P2c  <- O3c : Flagellates GPP           : mg C/m3/d
+  resPPYc2=P2c -> O3c : Flagellates Respiration   : mg C/m3/d
 end
 
 3d-flux-pel -if-exist INCLUDE_DIAG
@@ -288,6 +292,8 @@ end
   exPBAc=(B.c -> R1c+R2c+R3c+R6c) : C excretion from Bacterioplankton : mg C/m3/d
   exPPYc=(P.c -> R1c+R2c+R3c+R6c) : C excretion from Phytoplankton : mg C/m3/d
   exZOOc=(Z.c -> R1c+R2c+R3c+R6c) : C excretion from Zooplankton  : mg C/m3/d
+  exPPYp=(P.p -> R1p+R6p) : P excretion from Phytoplankton : mmolP/m3/d
+  exPPYs=(P1s ->R6s) : Si excretion from Phytoplankton : mmolSi/m3/d
   ruPPYn=P.n <- N3n+N4n: Net Nitrogen Uptake:mmol N/m3/d
   ruPPYp=P.p <- N1p : Net Phosphate Uptake : mmol P/m3/d
   ruPPYs=P.s <- N5s : Net Silicate Uptake : mmol Si/m3/d
