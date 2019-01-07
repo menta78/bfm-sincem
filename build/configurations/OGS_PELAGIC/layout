@@ -187,6 +187,8 @@ end
     qlcPPY(PhytoPlankton)	: Quotum Chl/C in Phytoplankton : mg Chl /mg C
     qccPPY(PhytoPlankton)       : Quotum PIC/POC in Phytoplankton : mg C/mg C
 
+    BFM1D_exR2ac(PhytoPlankton) : activity exudation to R2 : mg C/ m3/d
+
     qpcMEZ(MesoZooPlankton)	: Quotum P/C in Mesozooplankton :mmol P/mg C 
     qncMEZ(MesoZooPlankton)	: Quotum N/C in Mesozooplankton :mmol N/mg C 
 

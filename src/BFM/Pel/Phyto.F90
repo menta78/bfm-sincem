@@ -27,7 +27,7 @@
   use mem, ONLY: ppR1c, ppR6c, ppO2o, ppR2c, ppN3n, ppN4n, ppN1p, ppR1n, &
     ppR6n, ppR1p, ppR6p, ppN5s, ppR6s, SUNQ, ThereIsLight, ETW, EIR, &
     xEPS, Depth, eiPPY, sediPPY, sunPPY, qpcPPY, qncPPY, qscPPY, qlcPPY, NO_BOXES, &
-    iiBen, iiPel, flux_vector, quota_flux
+    iiBen, iiPel, flux_vector, quota_flux, BFM1D_exR2ac
   use mem, ONLY: ppPhytoPlankton
 #ifdef INCLUDE_PELCO2
   use mem, ONLY: ppO3c, ppO5c, ppO3h, qccPPY
@@ -331,6 +331,7 @@
     case (2)
        ! Activity excretion is only assigned to R2
        flPIR2c = sea* phytoc
+       BFM1D_exR2ac(phyto,:) = sea* phytoc
     case (3)
        ! Activity and Nutrient-stress excretions are assigned to R2
        flPIR2c  =  seo*phytoc + sea*phytoc
