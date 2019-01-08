@@ -170,7 +170,7 @@ end
     # Diagnostic collective variables 
     #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     Chla : Chlorophyll-a : mg Chl/m3
-
+    ffCO2 : CO2 fugacity   : uatm 
     #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     # Water column diagnostic rates
     #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -188,7 +188,7 @@ end
     qccPPY(PhytoPlankton)       : Quotum PIC/POC in Phytoplankton : mg C/mg C
 
     BFM1D_exR2ac(PhytoPlankton) : activity exudation to R2 : mg C/ m3/d
-
+ 
     qpcMEZ(MesoZooPlankton)	: Quotum P/C in Mesozooplankton :mmol P/mg C 
     qncMEZ(MesoZooPlankton)	: Quotum N/C in Mesozooplankton :mmol N/mg C 
 
@@ -244,43 +244,44 @@ end
 3d-flux-pel -if-exist INCLUDE_DIAG INCLUDE_PELCO2
   ruPPYc=P.c  <- O3c : Gross Primary Production    : mg C/m3/d
   resPPYc=P.c -> O3c : Phytoplankton Respiration   : mg C/m3/d
-  netPPYc=(P.c <- O3c) - (P.c -> O3c)  :  net primary production  : mg C/m3/d
-  resPBAc=B.c -> O3c : Bacterial Respiration       : mg C/m3/d
-  resZOOc=Z.c -> O3c : Zooplankton Respiration     : mg C/m3/d
-  rcalCARc=O5c <- O3c: Calcification rate          : mg C/m3/d
+  #netPPYc=(P.c <- O3c) - (P.c -> O3c)  :  net primary production  : mg C/m3/d
+  #resPBAc=B.c -> O3c : Bacterial Respiration       : mg C/m3/d
+  #resZOOc=Z.c -> O3c : Zooplankton Respiration     : mg C/m3/d
+  #rcalCARc=O5c <- O3c: Calcification rate          : mg C/m3/d
 end
 
 3d-flux-pel -if-exist INCLUDE_DIAG
-  ruPPYn=P.n <- N3n+N4n: Net Nitrogen Uptake:mmol N/m3/d
-  ruPPYp=P.p <- N1p : Net Phosphate Uptake : mmol P/m3/d
-  ruPPYs=P.s <- N5s : Net Silicate Uptake : mmol Si/m3/d
-  exPPYc=(P.c->R1c+R2c+R3c+R6c): C excretion from phytoplankton :mg C/m3/d
-  exPPYcR1=(P.c->R1c): C flux from phytoplankton to R1C :mg C/m3/d
-  exPPYcR2=(P.c->R2c): C flux from phytoplankton to R2C :mg C/m3/d
-  exPPYcR3=(P.c->R3c): C flux from phytoplankton to R3C :mg C/m3/d
-  exPPYcR6=(P.c->R6c): C flux from phytoplankton to R6C :mg C/m3/d
-  ruZOOc=(Z.c<-P.c+B.c+Z.c): Gross/Net Secondary Production:mg C/m3/d
-  resPELo=(O2o->*): Pelagic Oxygen Demand : mmol O2/m3/d
-  remPBAn=(N4n<-B.n): Bacterial N Uptake/Remineralization : mmol N/m3/d
-  remPBAp=(N1p<-B.p): bacterial P Uptake/Remineralization : mmol P/m3/d
+#  ruPPYn=P.n <- N3n+N4n: Net Nitrogen Uptake:mmol N/m3/d
+#  ruPPYp=P.p <- N1p : Net Phosphate Uptake : mmol P/m3/d
+#  ruPPYs=P.s <- N5s : Net Silicate Uptake : mmol Si/m3/d
+#  exPPYc=(P.c->R1c+R2c+R3c+R6c): C excretion from phytoplankton :mg C/m3/d
+#  exPPYcR1=(P.c->R1c): C flux from phytoplankton to R1C :mg C/m3/d
+#  exPPYcR2=(P.c->R2c): C flux from phytoplankton to R2C :mg C/m3/d
+#  exPPYcR3=(P.c->R3c): C flux from phytoplankton to R3C :mg C/m3/d
+#  exPPYcR6=(P.c->R6c): C flux from phytoplankton to R6C :mg C/m3/d
+#  ruZOOc=(Z.c<-P.c+B.c+Z.c): Gross/Net Secondary Production:mg C/m3/d
+#  resPELo=(O2o->*): Pelagic Oxygen Demand : mmol O2/m3/d
+#  remPBAn=(N4n<-B.n): Bacterial N Uptake/Remineralization : mmol N/m3/d
+#  remPBAp=(N1p<-B.p): bacterial P Uptake/Remineralization : mmol P/m3/d
 end
 
 3d-flux-pel -if-exist INCLUDE_DIAG INCLUDE_PELCO2 BFM_OGS
   #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   # OGS diagnostic rates
   #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  resPPY1c=P1c -> O3c : Respiration Diatoms         : mg C/m3/d
-  resPPY2c=P2c -> O3c : Respiration Flagellates     : mg C/m3/d
-  resPPY3c=P3c -> O3c : Respiration Pico            : mg C/m3/d
-  resPPY4c=P4c -> O3c : Respiration Dinaflagellates : mg C/m3/d
-  ruPBAc=B.c <- O3c : Bacterial Production : mg C/m3/d
-  resPBA1c=B1c -> O3c : Aerobic and Anaerobic Bacteria Respiration : mg C/m3/d
-  resMEZ1c=Z3c -> O3c : Carnivorous Zoo Respiration               : mg C/m3/d
-  resMEZ2c=Z4c -> O3c : Omnivorous Zoo Respiration                : mg C/m3/d
-  resMIZ1c=Z5c -> O3c : Microzooplankton Respiration              : mg C/m3/d
-  resMIZ2c=Z6c -> O3c : Heterotrophic Nanoflagellates Respiration : mg C/m3/d
-  O3c_concdilu_flux
-  O3h_concdilu_flux
+#  resPPY1c=P1c -> O3c : Respiration Diatoms         : mg C/m3/d
+#  resPPY2c=P2c -> O3c : Respiration Flagellates     : mg C/m3/d
+#  resPPY3c=P3c -> O3c : Respiration Pico            : mg C/m3/d
+#  resPPY4c=P4c -> O3c : Respiration Dinaflagellates : mg C/m3/d
+#  ruPBAc=B.c <- O3c : Bacterial Production : mg C/m3/d
+#  resPBA1c=B1c -> O3c : Aerobic and Anaerobic Bacteria Respiration : mg C/m3/d
+#  resMEZ1c=Z3c -> O3c : Carnivorous Zoo Respiration               : mg C/m3/d
+#  resMEZ2c=Z4c -> O3c : Omnivorous Zoo Respiration                : mg C/m3/d
+#  resMIZ1c=Z5c -> O3c : Microzooplankton Respiration              : mg C/m3/d
+#  resMIZ2c=Z6c -> O3c : Heterotrophic Nanoflagellates Respiration : mg C/m3/d
+#  O3c_concdilu_flux
+#  O3h_concdilu_flux
+
 end
 
   
