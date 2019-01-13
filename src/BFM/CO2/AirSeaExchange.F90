@@ -49,7 +49,7 @@ Module AirSeaExchange
     real(RLEN)                       :: AirSeaCO2 
     !     
     real(RLEN),intent(IN)            :: xco2   ! Atmospheric mixing ratio of Gas [ppmv]
-    real(RLEN),intent(IN)            :: patm   ! Atmospheric pressure [mbar]
+    real(RLEN),intent(IN)            :: patm   ! Atmospheric pressure [mbar=hPa]
     real(RLEN),intent(IN)            :: temp   ! in-situ temperature at surface
     real(RLEN),intent(IN)            :: salt   ! practical salinity at surface
     real(RLEN),intent(IN)            :: rho    ! in-situ density 
