@@ -83,8 +83,12 @@ SUBROUTINE trc_bc_bfm ( kt, m )
    ! there is no dilution associated with the river runoff (the freshwater has the same concentration of the sea)
    zsfx(:,:) = emp(:,:)                                    ! - standard case: on/offline coupling with const vol
    IF( .NOT. lk_offline .AND. lk_vvl )  zsfx(:,:) = 0._wp  ! - online coupling with variable volume
+   IF( .NOT. lk_offline ) THEN
    IF( ln_rnf .AND. .NOT. ln_trc_cbc(m) )  &               ! - remove river dilution effect in the absence
       zsfx(:,:) = zsfx(:,:) + rnf(:,:)                     ! of a river load
+   ELSE 
+      zsfx(:,:) = zsfx(:,:) + rnf(:,:)                     ! use only emp (still not very clear to me why)
+   ENDIF
 
    ! Concentration and dilution effect on tra 
    DO jj = 2, jpj
