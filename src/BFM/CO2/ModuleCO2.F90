@@ -123,16 +123,16 @@
   !  Open the namelist file(s)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-    LEVEL1 '-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'
-    LEVEL1 ' '
+    !LEVEL1 '-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'
+    !LEVEL1 ' '
     LEVEL1 '     INITIALIZE PELAGIC CARBONATE SYSTEM       ' 
-    LEVEL1 ' '
+    !LEVEL1 ' '
     LEVEL2 'Namelist content:'
     open(NMLUNIT,file='Carbonate_Dynamics.nml',status='old',action='read',err=100)
     read(NMLUNIT,nml=CSYS_parameters,err=101)
     close(NMLUNIT)
     write(LOGUNIT,nml=CSYS_parameters)
-    LEVEL1 ' '
+    !LEVEL1 ' '
  
   ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Set initial conditions
@@ -188,8 +188,8 @@
     ! If cold start, CarbonateSystem computes initial pH
     if (bfm_init == 0 ) pH(:) = -ONE
 
-    LEVEL1 '-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'
-    LEVEL1 ' '
+    !LEVEL1 '-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'
+    !LEVEL1 ' '
 
     FLUSH(LOGUNIT)
     return
