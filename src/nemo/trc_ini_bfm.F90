@@ -574,7 +574,7 @@
       END DO
       ! 
       ztraf = SUM(ironsed * spread(e1e2t,3,jpk) * p_rN7fsed * 365. * 1.e-15 * tmask )
-      CALL mpp_sum (ztraf)
+      IF (lk_mpp) CALL mpp_sum (ztraf)
       LEVEL1 '  Total iron load from Sediment [Gmol/y] : ', ztraf
       ! 
       ironsed = ironsed * p_rN7fsed / ( SEC_PER_DAY * fse3t(:,:,:) )
