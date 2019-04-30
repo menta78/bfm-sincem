@@ -159,7 +159,6 @@
   tfluxN = ZERO
   tfluxP = ZERO
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Nutrient limitations (intracellular and extracellular)
@@ -279,16 +278,18 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Lysis and excretion
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  sdo  =  ( p_thdo(phyto)/( iN+ p_thdo(phyto)))* p_sdmo(phyto)  ! nutr. -stress lysis
+  ! Nutrient Stress Lysis
+  sdo = ( p_thdo(phyto)/( iN+ p_thdo(phyto)))* p_sdmo(phyto)
   ! extra lysis for high-density
-  sdo  =   sdo+ p_seo(phyto)* MM(phytoc, p_sheo(phyto))
-
-  sea  =   sum* p_pu_ea(phyto)  ! activity excretion
-
+  sdo = sdo+ p_seo(phyto)* MM(phytoc, p_sheo(phyto))
+  !
+  ! Activity Excretion
+  sea = sum* p_pu_ea(phyto)
+  !
+  ! Nutrient Stress Excretion
   if (p_netgrowth(phyto)) then
      seo = ZERO
   else 
-     ! nutrient stress excretion
      seo = sum*(ONE-p_pu_ea(phyto))*(ONE- iN) 
   end if
 
@@ -316,25 +317,30 @@
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Production, productivity and C flows
-  ! The release of DOC is controlled by a specific switch.
-  ! Beware that this switch must be consistent with the utilization of DOC 
-  ! by Bacteria. If DOC is released in a form that is not used by 
-  ! Bacteria, it will accumulate infinitely removing carbon from the system
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  rugc  =   sum* phytoc  ! gross production
-  slc  =   sea + seo + srt+ sdo  ! specific loss terms
+  ! Gross Production
+  rugc = sum* phytoc
+
+  ! Specific loss terms
+  slc = sea + seo + srt + sdo
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  ! Exudation of carbohydrate toward DOC
+  ! 1 - to R1 (Vichi2007b)
+  ! 2 - to R2 (Vichi2004). If p_netgrowth then seo = ZERO
+  ! 3 - Activity to R1 and Nut-Stress to R2 (BFM Manual)
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   select case (p_switchDOC(phyto))
     case (1)
-       ! All activity excretions are assigned to R1
        rr1c = rr1c + sea*phytoc + seo*phytoc
        flPIR2c = ZERO
     case (2)
-       ! Activity excretion is only assigned to R2
-       flPIR2c = sea* phytoc
+       flPIR2c = seo*phytoc + sea*phytoc
     case (3)
-       ! Activity and Nutrient-stress excretions are assigned to R2
-       flPIR2c  =  seo*phytoc + sea*phytoc
+       rr1c = rr1c + sea*phytoc
+       flPIR2c = seo*phytoc
   end select
+
   call quota_flux( iiPel, ppphytoc ,ppO3c,ppphytoc, rugc, tfluxC )  
   call quota_flux( iiPel, ppphytoc, ppphytoc,ppR1c, rr1c, tfluxC )
   call quota_flux( iiPel, ppphytoc, ppphytoc,ppR6c, rr6c, tfluxC )
