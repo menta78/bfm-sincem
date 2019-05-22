@@ -79,7 +79,7 @@ for line in DIAGNOSTIC_LINES:
         VARS[ivar]["ind"]=right_side
         ivar=ivar+1
 
-xmldoc = minidom.parse(INPUTDIR + 'BFMtab.xml')
+xmldoc = minidom.parse(args.xmlfile)
 NODES=xmldoc.getElementsByTagName("Diagnostics")[0].getElementsByTagName("var")
 XML_MODELVARS={}
 for node in NODES:
@@ -140,7 +140,7 @@ for ivar, var in enumerate(VARS_TO_DUMP['var']):
         if line.find(str_to_find)>-1:
             left_side,right_side=line.rsplit("local_BFM1D_dia(")
             pos_sep = right_side.find(",:")
-            new_line = "local_BFM1D_dia(%d%s" %(ivar, right_side[pos_sep:])
+            new_line = "local_BFM1D_dia(%d%s" %(ivar+1, right_side[pos_sep:])
             DIAGNOSTIC_LINES_RED.append(new_line)
 
 #BFM1D_Output_Ecology.F90 reconstruction
