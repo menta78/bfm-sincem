@@ -24,7 +24,7 @@
   use mem
 #else
   use mem, ONLY:  R6c, R6n, R6p, R1c, R1n, R1p, R2c, O2o, N6r, &
-    N4n, N1p, N3n, R3c, iiR1, iiR6, D3STATE, BRUM, BRUT
+    N4n, N1p, N3n, R3c, iiR1, iiR6, D3STATE, BRUM
   use mem, ONLY: iiPelBacteria, ppPelBacteria, iiC, iiN, iiP, ppR6c, &
     ppR6n, ppR6p, ppR1c, ppR1n, ppR1p, &
     ppR2c, ppO2o, ppN6r, ppN4n, ppN1p, ppN3n, ppR3c, flPTN6r, Depth, ETW, &
@@ -110,7 +110,6 @@
   tfluxN = ZERO
   tfluxP = ZERO
   BRUM = ZERO 
-  BRUT = ZERO
   
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Temperature effect on pelagic bacteria:
