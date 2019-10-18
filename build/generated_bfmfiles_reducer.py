@@ -75,7 +75,11 @@ def vars_table_to_lines_Output_Ecology(string_list, VARS_TABLE,ndims=3):
     LINES_RED=[]
     for ivar, var in enumerate(VARS_TABLE['var']):
         orig_index= VARS_TABLE[ivar]['ind']
-        str_to_find="%s%d%s" % (string, orig_index,suffix)
+        str_to_find="pp" + var
+        pos=str_to_find.find("_iiP")
+        if pos >-1 :
+            str_to_find = str_to_find[:pos] + "("  + str_to_find[pos+1:] + ")"
+
         for line in string_list:
             if line.find(str_to_find)>-1:
                 left_side,right_side=line.rsplit(string)
@@ -128,7 +132,13 @@ for iline, line in enumerate(LINES):
     if line.find("INTEGER, parameter :: jptra_var")>-1:
         i_jptra_line=iline
         left_side,right_side = line.rsplit("INTEGER, parameter :: jptra_var =")
-        jptra_dia = int(right_side.replace(" ",""))
+        jptra_var = int(right_side.replace(" ",""))
+
+    if line.find("INTEGER, parameter :: jptra_flux")>-1:
+        i_jptra_flux_line=iline
+        left_side,right_side = line.rsplit("INTEGER, parameter :: jptra_flux =")
+        jptra_flux = int(right_side.replace(" ",""))
+
     if line.find("INTEGER, parameter :: jptra_dia_2d")>-1:
         i_jptra_line_2d=iline
         left_side,right_side = line.rsplit("INTEGER, parameter :: jptra_dia_2d =")
@@ -137,11 +147,11 @@ for iline, line in enumerate(LINES):
     if line.find("diagnostic indexes")>-1:
         line_start=iline+1
     if line.find("flux indexes")>-1:
-        line_end=iline-1
+        line_end=iline+2 # in order to read following line
     if line.find("variables 2d")>-1:
         line_var2d=iline
 
-
+jptra_dia = jptra_var + jptra_flux
 DIAGNOSTIC_LINES_3D  =LINES[line_start:line_end]
 DIAGNOSTIC_LINES_2D  =LINES[line_var2d:]
 
@@ -186,6 +196,7 @@ for line in DIAGNOSTIC_LINES_RED_2D: LINES_RED.append(line)
 
 
 dumpfile(LINES_RED, OUTDIR + "BFM_var_list.h")
+
 
 inputfile=INPUTDIR + "BFM1D_Output_Ecology.F90"
 LINES=file2stringlist(inputfile)
