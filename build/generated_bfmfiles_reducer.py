@@ -183,7 +183,7 @@ LINES_RED=[]
 
 LINES_RED.append(LINES[i_jptra_line])
 LINES_RED.append("")
-LINES_RED.append(("      INTEGER, parameter :: jptra_var = %d" % (jptra_dia_red_3d)))
+LINES_RED.append(("      INTEGER, parameter :: jptra_dia = %d" % (jptra_dia_red_3d)))
 LINES_RED.append("")
 LINES_RED.append(("      INTEGER, parameter :: jptra_dia_2d = %d" % (jptra_dia_red_2d)))
 
