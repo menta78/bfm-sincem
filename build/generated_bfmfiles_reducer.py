@@ -129,13 +129,14 @@ XML_MODELVARS = xml_read(args.xmlfile)
 nLINES=len(LINES)
 
 for iline, line in enumerate(LINES):
-    if line.find("INTEGER, parameter :: jptra_var")>-1:
+    if line.find("INTEGER, parameter :: jptra = ")>-1:
         i_jptra_line=iline
+
+    if line.find("INTEGER, parameter :: jptra_var")>-1:
         left_side,right_side = line.rsplit("INTEGER, parameter :: jptra_var =")
         jptra_var = int(right_side.replace(" ",""))
 
     if line.find("INTEGER, parameter :: jptra_flux")>-1:
-        i_jptra_flux_line=iline
         left_side,right_side = line.rsplit("INTEGER, parameter :: jptra_flux =")
         jptra_flux = int(right_side.replace(" ",""))
 
@@ -180,14 +181,11 @@ DIAGNOSTIC_LINES_RED_2D= varstable_to_lines(VARS2D_TO_DUMP)
 #BFM_var_list.h reconstruction
 LINES_RED=[]
 
-for i in range(i_jptra_line_2d+1):
-    if i==i_jptra_line:
-        LINES_RED.append(("      INTEGER, parameter :: jptra_var = %d" % (jptra_dia_red_3d)))
-    else:
-        if i==i_jptra_line_2d:
-            LINES_RED.append(("      INTEGER, parameter :: jptra_dia_2d = %d" % (jptra_dia_red_2d)))
-        else:
-            LINES_RED.append(LINES[i])
+LINES_RED.append(LINES[i_jptra_line])
+LINES_RED.append("")
+LINES_RED.append(("      INTEGER, parameter :: jptra_var = %d" % (jptra_dia_red_3d)))
+LINES_RED.append("")
+LINES_RED.append(("      INTEGER, parameter :: jptra_dia_2d = %d" % (jptra_dia_red_2d)))
 
 for i in range(i_jptra_line_2d+1,line_start): LINES_RED.append(LINES[i]) # state
 for line in DIAGNOSTIC_LINES_RED_3D: LINES_RED.append(line)              # dia3D
