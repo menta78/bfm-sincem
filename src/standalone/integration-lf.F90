@@ -203,7 +203,7 @@
          D2STATE_BEN=ccc_tmp2D_ben
 #endif
          call ResetFluxes
-         call envforcing_bfm
+         call envforcing_bfm(j)
          call EcologyDynamics
       END IF
       IF(nmin.eq.nmaxdelt) EXIT TLOOP

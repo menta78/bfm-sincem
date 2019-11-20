@@ -208,7 +208,7 @@
       END IF
       ! Recalculate Sources:
       call ResetFluxes
-      call envforcing_bfm
+      call envforcing_bfm(1)
       call EcologyDynamics
    END DO TLOOP
    nstep=nmaxdelt

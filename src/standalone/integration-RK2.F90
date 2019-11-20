@@ -217,7 +217,7 @@
 #endif
          ! Recalculate Sources:
          call ResetFluxes
-         call envforcing_bfm
+         call envforcing_bfm(1)
          call EcologyDynamics
       ELSE
 #ifdef DEBUG
@@ -229,7 +229,7 @@
 #endif   
          ! Recalculate sources:
          call ResetFluxes
-         call envforcing_bfm
+         call envforcing_bfm(1)
          call EcologyDynamics
          DO j=1,NO_D3_BOX_STATES
             IF (D3STATETYPE(j).ge.0) THEN
@@ -341,7 +341,7 @@
          ENDIF
          ! Recalculate Sources:
          call ResetFluxes
-         call envforcing_bfm
+         call envforcing_bfm(1)
          call EcologyDynamics
       END IF
    END DO TLOOP
