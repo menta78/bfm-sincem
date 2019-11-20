@@ -276,6 +276,14 @@
   sum  =   p_sum(phyto)*et*eiPPY(phyto,:)*fpplim
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  ! Respiration rate
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  sra  =   p_pu_ra(phyto)* sum ! activity
+  srs  =   et* p_srs(phyto)                   ! basal
+  srt  =   sra+ srs                           ! total
+  rrc  =   srt* phytoc                        ! total actual respiration
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Lysis and excretion
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Nutrient Stress Lysis
@@ -284,13 +292,13 @@
   sdo = sdo+ p_seo(phyto)* MM(phytoc, p_sheo(phyto))
   !
   ! Activity Excretion
-  sea = sum* p_pu_ea(phyto)
+  sea = sum * p_pu_ea(phyto)
   !
   ! Nutrient Stress Excretion
   if (p_netgrowth(phyto)) then
      seo = ZERO
   else 
-     seo = sum*(ONE-p_pu_ea(phyto))*(ONE- iN) 
+     seo = sum*(ONE-p_pu_ea(phyto)-p_pu_ra(phyto))*(ONE- iN) 
   end if
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -306,14 +314,6 @@
   pe_R6 = min(  ONE,  pe_R6)
   rr6c  =     pe_R6     * sdo * phytoc
   rr1c  = (ONE - pe_R6) * sdo * phytoc
-
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  ! Respiration rate
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  sra  =   p_pu_ra(phyto)*( sum - sea - seo)  ! activity
-  srs  =   et* p_srs(phyto)                   ! basal
-  srt  =   sra+ srs                           ! total
-  rrc  =   srt* phytoc                        ! total actual respiration
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Production, productivity and C flows
