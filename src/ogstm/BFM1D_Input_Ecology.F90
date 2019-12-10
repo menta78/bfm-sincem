@@ -19,7 +19,7 @@ subroutine BFM1D_Input_EcologyDynamics(bot,BFM1D_trn,dim_BFM1D_trn,BFM1D_er)
   integer   , intent(in) :: bot
   integer dim_BFM1D_trn
 !  real(RLEN), intent(in) :: BFM1D_trn(dim_BFM1D_trn,NO_BOXES),BFM1D_er(NO_BOXES,10)
-  real(RLEN), intent(in) :: BFM1D_trn(NO_BOXES,dim_BFM1D_trn),BFM1D_er(NO_BOXES,10)
+  real(RLEN), intent(in) :: BFM1D_trn(NO_BOXES,dim_BFM1D_trn),BFM1D_er(NO_BOXES,11)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Local Variables
@@ -71,6 +71,8 @@ subroutine BFM1D_Input_EcologyDynamics(bot,BFM1D_trn,dim_BFM1D_trn,BFM1D_er)
 ! LEVEL1 'BFM1D_Input_EcologyDynamics:EWIND,', EWIND
   ph(:)     = BFM1D_er(:,10)
 ! LEVEL1 'BFM1D_Input_EcologyDynamics:PH,', ph
+  BAC_ACT_FACT(:) = BFM1D_er(:,11)
+! LEVEL1 'BFM1D_Input_EcologyDynamics:BAC_ACT_FACT',BAC_ACT_FACT
 
   bottom=0
   DO ib=1,NO_BOXES
