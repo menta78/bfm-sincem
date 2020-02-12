@@ -23,8 +23,8 @@
 #ifdef NOPOINTERS
   use mem
 #else
-  use mem, ONLY:  R6c, R6n, R6p, R1c, R1n, R1p, R2c, O2o, N6r, &
-    N4n, N1p, N3n, R3c, iiR1, iiR6, D3STATE, BRUM, BRUT
+  use mem, ONLY:  R6c, R6n, R6p, R1c, R1n, R1p, R2c, O2o, N6r, BGE, &
+    N4n, N1p, N3n, R3c, iiR1, iiR6, D3STATE, BRUM, BRUT, TEMP1, TEMP2, TEMP3, TEMP4
   use mem, ONLY: iiPelBacteria, ppPelBacteria, iiC, iiN, iiP, ppR6c, &
     ppR6n, ppR6p, ppR1c, ppR1n, ppR1p, &
     ppR2c, ppO2o, ppN6r, ppN4n, ppN1p, ppN3n, ppR3c, flPTN6r, Depth, ETW, &
@@ -59,13 +59,14 @@
   integer, save :: first =0
   integer       :: AllocStatus
   integer,dimension(NO_BOXES)  :: limit
-  real(RLEN),allocatable,save,dimension(:) :: et,eO2,r,flN6rPBA,rrc,  &
+  real(RLEN)    :: p_dnc = 0.86_RLEN  ! N/C ratio of denitrification (Paulmier et al., 2009)
+  real(RLEN),allocatable,save,dimension(:) :: et,eO2,r,flN6rPBA,rrc,rro,  &
                                           rd,ruR1c,ruR1n,ruR1p,ruR2c,ruR3c,  &
                                           ruR6c,ruR6p,ruR6n,rump, rtot,rnorm,  &
                                           rumn,rumn3,rumn4,ren,rep,reR2c, &
                                           reR3c,rut,rum,run,sun,rug, &
                                           suR2,cuR6,cuR1,iN1p,iNIn,iN, &
-                                          eN1p,eN4n,huln, hulp, bacc, &
+                                          eN1p,eN4n,huln, hulp, bacc, sut, &
                                           tfluxC, tfluxN, tfluxP, pe_N4n, pe_N1p, pe_R6c
 #ifndef INCLUDE_PELCO2
   integer,parameter :: ppO3c = 0
@@ -80,7 +81,7 @@
         &       flN6rPBA(NO_BOXES), rrc(NO_BOXES), rd(NO_BOXES),      &
         &       ruR1c(NO_BOXES), ruR1n(NO_BOXES), ruR1p(NO_BOXES),    &
         &       ruR6c(NO_BOXES), ruR6p(NO_BOXES), ruR6n(NO_BOXES),    &
-        &       ruR2c(NO_BOXES), ruR3c(NO_BOXES),                     &
+        &       ruR2c(NO_BOXES), ruR3c(NO_BOXES), rro(NO_BOXES),      &
         &       rump(NO_BOXES), rumn(NO_BOXES), rtot(NO_BOXES),       &
         &       rumn3(NO_BOXES), rumn4(NO_BOXES), ren(NO_BOXES),      &
         &       rep(NO_BOXES), reR2c(NO_BOXES), reR3c(NO_BOXES),      &
@@ -89,7 +90,7 @@
         &       cuR6(NO_BOXES), cuR1(NO_BOXES), rnorm(NO_BOXES),      &
         &       iN1p(NO_BOXES), iNIn(NO_BOXES), iN(NO_BOXES),         &
         &       eN1p(NO_BOXES), eN4n(NO_BOXES), huln(NO_BOXES),       &
-        &       hulp(NO_BOXES), bacc(NO_BOXES),                       &
+        &       hulp(NO_BOXES), bacc(NO_BOXES), sut(NO_BOXES),        &
         &       tfluxC(NO_BOXES), tfluxN(NO_BOXES), tfluxP(NO_BOXES), &
         &       pe_N4n(NO_BOXES), pe_N1p(NO_BOXES), pe_R6c(NO_BOXES), &
         &      STAT = AllocStatus )
@@ -110,7 +111,7 @@
   tfluxN = ZERO
   tfluxP = ZERO
   BRUM = ZERO 
-  BRUT = ZERO
+  BGE  = ZERO
   
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Temperature effect on pelagic bacteria:
@@ -141,19 +142,13 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   rd  =  ( p_sd(bac)*et + p_sd2(bac)*bacc ) * bacc
 
-  call quota_flux(iiPel, ppbacc, ppbacc, ppR6c, rd*(ONE-p_pe_R1c)              , tfluxC)
-  call quota_flux(iiPel, ppbacn, ppbacn, ppR6n, rd*qncPBA(bac,:)*(ONE-p_pe_R1n), tfluxN)
-  call quota_flux(iiPel, ppbacp, ppbacp, ppR6p, rd*qpcPBA(bac,:)*(ONE-p_pe_R1p), tfluxP)
+  !call quota_flux(iiPel, ppbacc, ppbacc, ppR6c, rd*(ONE-p_pe_R1c)              , tfluxC)
+  !call quota_flux(iiPel, ppbacn, ppbacn, ppR6n, rd*qncPBA(bac,:)*(ONE-p_pe_R1n), tfluxN)
+  !call quota_flux(iiPel, ppbacp, ppbacp, ppR6p, rd*qpcPBA(bac,:)*(ONE-p_pe_R1p), tfluxP)
 
-  call quota_flux(iiPel, ppbacc, ppbacc, ppR1c, rd*p_pe_R1c              , tfluxC)
-  call quota_flux(iiPel, ppbacn, ppbacn, ppR1n, rd*qncPBA(bac,:)*p_pe_R1n, tfluxN) 
-  call quota_flux(iiPel, ppbacp, ppbacp, ppR1p, rd*qpcPBA(bac,:)*p_pe_R1p, tfluxP)
-
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! Substrate quality correction depending on nutrient content
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  cuR1 = min(ONE, qpcOMT(iiR1,:)/p_qpcPBA(bac), qncOMT(iiR1,:)/ p_qncPBA(bac))
-  cuR6 = min(ONE, qpcOMT(iiR6,:)/p_qpcPBA(bac), qncOMT(iiR6,:)/ p_qncPBA(bac))
+  !call quota_flux(iiPel, ppbacc, ppbacc, ppR1c, rd*p_pe_R1c              , tfluxC)
+  !call quota_flux(iiPel, ppbacn, ppbacn, ppR1n, rd*qncPBA(bac,:)*p_pe_R1n, tfluxN) 
+  !call quota_flux(iiPel, ppbacp, ppbacp, ppR1p, rd*qpcPBA(bac,:)*p_pe_R1p, tfluxP)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-==--=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-
   ! Nutrient limitation (intracellular, always one for fixed stoichiometry)
@@ -167,40 +162,55 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   rum = iN*et*p_sum(bac)*bacc
 
-  ! Polimene et al. 2006 BACT3
-  ! rum = p_sum(bac)*et*bacc ; cuR1 = ONE ; cuR6 = ONE
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! No correction of organic material quality (Polimene et al. 2006)
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  cuR1 = ONE
+  cuR6 = ONE
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Realized Substrate Uptake rate for each detritus type and quality (cuRx)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ruR1c = (p_suhR1(bac)*cuR1 + p_sulR1(bac)*(ONE-cuR1))*R1c(:)
-  ruR2c = p_suR2(bac)*R2c(:)
-  ruR3c = p_suR3(bac)*R3c(:)
-  ruR6c = p_suR6(bac)*cuR6*R6c(:)
-  rut   = p_small + ruR1c + ruR2c + ruR6c + ruR3c
-  rtot  = R1c(:) + R2c(:) + R3c(:) + R6c(:)
+  ruR1c = p_suhR1(bac) * cuR1 * R1c(:)
+  ruR6c = p_suR6(bac) * cuR6 * R6c(:)
+  rut   = p_small + ruR1c + ruR6c
   !
   ! Weighted mean of substrate uptake
-  rnorm   = MIN(cuR1,cuR6) / &
-    (p_suhR1(bac)*cuR1+p_sulR1(bac)*(ONE-cuR1)+p_suR2(bac)+p_suR3(bac)+p_suR6(bac)*cuR6)
+  rnorm   = ONE / (p_suhR1(bac)*cuR1 + p_suR6(bac)*cuR6)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Actual uptake by bacteria (eq. 50 Vichi et al. 2007)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  rug = MM( rut*rnorm, p_qsum(bac)*bacc ) * rum
+  !BRUT = rum
+  !TEMP1 = MM_power( ruR1c*rnorm + ruR6c*rnorm, p_chuc(bac), p_chucMM(bac) )
+  !TEMP1 = MM_power( ruR1c + ruR6c, p_chuc(bac)*ruR1c/rut, p_chucMM(bac) ) ! 10s
+  TEMP1 = MM_power( rut , p_chuc(bac)*max(p_qsum(bac), ruR1c/rut), p_chucMM(bac) ) ! 10h
+  TEMP2 = rum
+  TEMP3 = ruR1c/rut
+  TEMP4 = rut
+
+  !rug = rum * MM_power( ruR1c*rnorm + ruR6c*rnorm, p_chuc(bac), p_chucMM(bac) ) 
+  !rug = rum * MM_power( ruR1c + ruR6c, p_chuc(bac)*ruR1c/rut, p_chucMM(bac) ) ! 10s
+  rug = rum * MM_power( rut , p_chuc(bac)*max(p_qsum(bac), ruR1c/rut), p_chucMM(bac) ) 
+  ruR1c = rug*ruR1c/rut
+  ruR6c = rug*ruR6c/rut
 
   BRUM = rug
-   
+  BRUT = ruR1c + ruR6c
+
+  ! Mortality toward substrates
+  call quota_flux(iiPel, ppbacc, ppbacc, ppR6c, rd*ruR6c/rut              , tfluxC)
+  call quota_flux(iiPel, ppbacn, ppbacn, ppR6n, rd*qncPBA(bac,:)*ruR6c/rut, tfluxN)
+  call quota_flux(iiPel, ppbacp, ppbacp, ppR6p, rd*qpcPBA(bac,:)*ruR6c/rut, tfluxP)
+
+  call quota_flux(iiPel, ppbacc, ppbacc, ppR1c, rd*ruR1c/rut              , tfluxC)
+  call quota_flux(iiPel, ppbacn, ppbacn, ppR1n, rd*qncPBA(bac,:)*ruR1c/rut, tfluxN)
+  call quota_flux(iiPel, ppbacp, ppbacp, ppR1p, rd*qpcPBA(bac,:)*ruR1c/rut, tfluxP)
+
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Organic Carbon uptake
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  ruR1c = rug*ruR1c/rut
-  ruR2c = rug*ruR2c/rut
-  ruR3c = rug*ruR3c/rut
-  ruR6c = rug*ruR6c/rut
 
   call quota_flux(iiPel, ppbacc, ppR1c, ppbacc, ruR1c, tfluxC)
-  call quota_flux(iiPel, ppbacc, ppR2c, ppbacc, ruR2c, tfluxC)
-  call quota_flux(iiPel, ppbacc, ppR3c, ppbacc, ruR3c, tfluxC)
   call quota_flux(iiPel, ppbacc, ppR6c, ppbacc, ruR6c, tfluxC)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -217,33 +227,33 @@
   call quota_flux(iiPel, ppbacp, ppR6p, ppbacp, ruR6p, tfluxP)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  ! Aerobic and anaerobic respiration
-  ! Anaerobic bacteria use N6r as electron acceptor, with additional carbon cost
-  ! If nitrate is present, the rate of consumption of N6r is converted to N3n
-  ! consumption (eq 19 Vichi et al., 2004 and PelChem.F90)
+  ! Aerobic respiration
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Activity + Basal respiration
   rrc = (p_pu_ra(bac) * rug) + p_srs(bac)* bacc* et
   ! Aerobic consumption of Oxygen
   call flux_vector( iiPel, ppO2o, ppO2o, -eO2*rrc/MW_C )
-  ! Anaerobic consumption of N6r
-  flN6rPBA =( ((ONE-eO2)*rrc) + (p_pu_ra_o(bac)*(ONE-eO2)*rug) )/ MW_C* p_qro
-  call flux_vector( iiPel, ppN6r, ppN6r, flN6rPBA )
-  ! Bookkeeping of reduction equivalent formation rate
-  flPTN6r(:) = flPTN6r(:) + flN6rPBA
+  ! Anaerobic consumption of Nitrate (implicit denitrification)
+  rro = p_pu_ra_o(bac) * rug
+  call flux_vector( iiPel, ppN3n, ppN4n, (ONE-eO2)* (rrc + rro) / MW_C* p_dnc) 
   ! Total Respiration
-  rrc = rrc + (p_pu_ra_o(bac)*(ONE-eO2)*rug)
-  call quota_flux( iiPel, ppbacc, ppbacc, ppO3c, rrc, tfluxC)
+  rtot = rrc + (ONE-eO2)*rro
+  call quota_flux( iiPel, ppbacc, ppbacc, ppO3c, rtot, tfluxC)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Net Production
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  run = rug - rrc
+  run = rug - rtot
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  ! Growth efficiency
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  WHERE (run.gt.p_small) BGE = run / (run+rtot)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   !             Fluxes from bacteria
   !
-  ! Vichi et al. 2007 (BACT1, There is no Carbon excretion) 
+  ! Vichi et al. 2007 (There is no Carbon excretion) 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
