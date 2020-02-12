@@ -95,7 +95,7 @@ subroutine read_create
 
      ! open mesh_mask file, get mask and vertical length scale
      fname1 = trim(mask_fname)
-     call handle_err( nf90_open(path = fname1, mode = NF90_WRITE, ncid = ncmaskid), &
+     call handle_err( nf90_open(path = fname1, mode = NF90_NOWRITE, ncid = ncmaskid), &
      &                errstring="Error opening file "//trim(mask_fname) )
      allocate(mask(jpi,jpj,jpk))
      call handle_err(nf90_inq_varid(ncmaskid, "tmask", IDmask), &

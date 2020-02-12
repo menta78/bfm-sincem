@@ -76,6 +76,7 @@
   ! p_suR3      [1/d]            Specific potential uptake for semi-refractory DOC
   ! p_suR6      [1/d]            Specific potential uptake for POM (1/d)
   ! p_sum       [1/d]            Potential specific growth rate
+  ! p_qsum      [-]              Ratio of first-slope maximum growth (p_sum) to particulate substrate limited maximum growth at inifinite bacteria concentrations
   ! p_pu_ra     [-]              Activity respiration fraction
   ! p_pu_ra_o   [-]              Additional respiration fraction at low O2 conc
   ! p_srs       [1/d]            Specific rest respiration
@@ -103,6 +104,7 @@
   real(RLEN)  :: p_suR6(iiPelBacteria)
   real(RLEN)  :: p_suR3(iiPelBacteria)
   real(RLEN)  :: p_sum(iiPelBacteria)
+  real(RLEN)  :: p_qsum(iiPelBacteria)
   real(RLEN)  :: p_pu_ra(iiPelBacteria)
   real(RLEN)  :: p_pu_ra_o(iiPelBacteria)
   real(RLEN)  :: p_srs(iiPelBacteria)

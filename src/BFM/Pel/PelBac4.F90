@@ -59,7 +59,7 @@
   integer, save :: first =0
   integer       :: AllocStatus
   integer,dimension(NO_BOXES)  :: limit
-  real(RLEN)    :: p_dnc = 0.86_RLEN  ! N/C ratio of denitrification (Paulmier et al., 2009)
+  real(RLEN)    :: p_dnc = 0.86_RLEN  ! N/C ratio used in denitrification (Paulmier et al., 2009)
   real(RLEN),allocatable,save,dimension(:) :: et,eO2,r,flN6rPBA,rrc,rro,  &
                                           rd,ruR1c,ruR1n,ruR1p,ruR2c,ruR3c,  &
                                           ruR6c,ruR6p,ruR6n,rump, rtot,rnorm,  &
@@ -81,7 +81,7 @@
         &       flN6rPBA(NO_BOXES), rrc(NO_BOXES), rd(NO_BOXES),      &
         &       ruR1c(NO_BOXES), ruR1n(NO_BOXES), ruR1p(NO_BOXES),    &
         &       ruR6c(NO_BOXES), ruR6p(NO_BOXES), ruR6n(NO_BOXES),    &
-        &       ruR2c(NO_BOXES), ruR3c(NO_BOXES), rro(NO_BOXES),      &
+        &       ruR2c(NO_BOXES), ruR3c(NO_BOXES),                     &
         &       rump(NO_BOXES), rumn(NO_BOXES), rtot(NO_BOXES),       &
         &       rumn3(NO_BOXES), rumn4(NO_BOXES), ren(NO_BOXES),      &
         &       rep(NO_BOXES), reR2c(NO_BOXES), reR3c(NO_BOXES),      &
@@ -90,7 +90,7 @@
         &       cuR6(NO_BOXES), cuR1(NO_BOXES), rnorm(NO_BOXES),      &
         &       iN1p(NO_BOXES), iNIn(NO_BOXES), iN(NO_BOXES),         &
         &       eN1p(NO_BOXES), eN4n(NO_BOXES), huln(NO_BOXES),       &
-        &       hulp(NO_BOXES), bacc(NO_BOXES), sut(NO_BOXES),        &
+        &       hulp(NO_BOXES), bacc(NO_BOXES),                       &
         &       tfluxC(NO_BOXES), tfluxN(NO_BOXES), tfluxP(NO_BOXES), &
         &       pe_N4n(NO_BOXES), pe_N1p(NO_BOXES), pe_R6c(NO_BOXES), &
         &      STAT = AllocStatus )
@@ -111,7 +111,7 @@
   tfluxN = ZERO
   tfluxP = ZERO
   BRUM = ZERO 
-  BGE  = ZERO
+  BRUT = ZERO
   
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Temperature effect on pelagic bacteria:
@@ -142,13 +142,19 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   rd  =  ( p_sd(bac)*et + p_sd2(bac)*bacc ) * bacc
 
-  !call quota_flux(iiPel, ppbacc, ppbacc, ppR6c, rd*(ONE-p_pe_R1c)              , tfluxC)
-  !call quota_flux(iiPel, ppbacn, ppbacn, ppR6n, rd*qncPBA(bac,:)*(ONE-p_pe_R1n), tfluxN)
-  !call quota_flux(iiPel, ppbacp, ppbacp, ppR6p, rd*qpcPBA(bac,:)*(ONE-p_pe_R1p), tfluxP)
+  call quota_flux(iiPel, ppbacc, ppbacc, ppR6c, rd*(ONE-p_pe_R1c)              , tfluxC)
+  call quota_flux(iiPel, ppbacn, ppbacn, ppR6n, rd*qncPBA(bac,:)*(ONE-p_pe_R1n), tfluxN)
+  call quota_flux(iiPel, ppbacp, ppbacp, ppR6p, rd*qpcPBA(bac,:)*(ONE-p_pe_R1p), tfluxP)
 
-  !call quota_flux(iiPel, ppbacc, ppbacc, ppR1c, rd*p_pe_R1c              , tfluxC)
-  !call quota_flux(iiPel, ppbacn, ppbacn, ppR1n, rd*qncPBA(bac,:)*p_pe_R1n, tfluxN) 
-  !call quota_flux(iiPel, ppbacp, ppbacp, ppR1p, rd*qpcPBA(bac,:)*p_pe_R1p, tfluxP)
+  call quota_flux(iiPel, ppbacc, ppbacc, ppR1c, rd*p_pe_R1c              , tfluxC)
+  call quota_flux(iiPel, ppbacn, ppbacn, ppR1n, rd*qncPBA(bac,:)*p_pe_R1n, tfluxN) 
+  call quota_flux(iiPel, ppbacp, ppbacp, ppR1p, rd*qpcPBA(bac,:)*p_pe_R1p, tfluxP)
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Substrate quality correction depending on nutrient content
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  cuR1 = min(ONE, qpcOMT(iiR1,:)/p_qpcPBA(bac), qncOMT(iiR1,:)/ p_qncPBA(bac))
+  cuR6 = min(ONE, qpcOMT(iiR6,:)/p_qpcPBA(bac), qncOMT(iiR6,:)/ p_qncPBA(bac))
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-==--=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-
   ! Nutrient limitation (intracellular, always one for fixed stoichiometry)
@@ -227,13 +233,16 @@
   call quota_flux(iiPel, ppbacp, ppR6p, ppbacp, ruR6p, tfluxP)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  ! Aerobic respiration
+  ! Aerobic and anaerobic respiration
+  ! Anaerobic bacteria use NO3 instead of O2, with additional carbon cost
+  ! The rate of consumption of NO3 is converted to directly to NH4
+  ! assuming an implicit denitrification.
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Activity + Basal respiration
   rrc = (p_pu_ra(bac) * rug) + p_srs(bac)* bacc* et
   ! Aerobic consumption of Oxygen
   call flux_vector( iiPel, ppO2o, ppO2o, -eO2*rrc/MW_C )
-  ! Anaerobic consumption of Nitrate (implicit denitrification)
+  ! Anaerobic consumption of Nitrate (denitrification-like)
   rro = p_pu_ra_o(bac) * rug
   call flux_vector( iiPel, ppN3n, ppN4n, (ONE-eO2)* (rrc + rro) / MW_C* p_dnc) 
   ! Total Respiration
