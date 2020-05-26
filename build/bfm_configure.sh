@@ -288,6 +288,42 @@ fi
 echo ""
 
 # -----------------------------------------------------
+# Retrieve git version control info if available:
+# -----------------------------------------------------
+# create an include files for the code
+#
+GITREPOHEADER=${BFMDIR}/include/gitrepoinfo.h
+if [ -d ${BFMDIR}/.git  ] ; then
+    BFMBRANCH=$( git rev-parse --abbrev-ref HEAD )
+    BFMCOMMIT=$( git rev-parse --short HEAD )
+    if [ $? -ne 0 ] ; then
+       echo "Unable to extract BFM git commit info!"
+       BFMCOMMIT="NOT AVAILABLE"
+       BFMBRANCH=${BFMCOMMIT}
+    fi
+    echo "   git_branch_name = '${BFMBRANCH}'" > ${GITREPOHEADER}
+    echo "   git_commit_id = '${BFMCOMMIT}'" >> ${GITREPOHEADER}
+    echo "   LEVEL1 ' BFM version:   ',TRIM(git_commit_id),' (',TRIM(git_branch_name),' branch)'" >> ${GITREPOHEADER}
+    echo "   LEVEL1 ' '" >> ${GITREPOHEADER}
+    # Annote changes to tracked files
+    if [[ $(git diff --stat) != '' ]] ; then
+        echo "Local changes to BFM git tracked files:" >>${BFMDIR}/${TEMPDIR}/gitpatch
+        git diff HEAD >> ${BFMDIR}/${TEMPDIR}/gitpatch
+    else
+        echo "No changes in BFM git tracked files" >> ${BFMDIR}/${TEMPDIR}/gitpatch
+    fi
+    cat ${BFMDIR}/${TEMPDIR}/gitpatch \
+        | sed 's,","",g' \
+        | sed 's,^,LEVEL0 ",g' \
+        | sed 's,$,",g' \
+        >> ${GITREPOHEADER}
+    rm -f ${BFMDIR}/${TEMPDIR}/gitpatch
+else
+    echo "BFM git version control is missing !"
+    echo "   LEVEL1 'BFM git version control is missing '" > ${GITREPOHEADER}
+fi
+
+# -----------------------------------------------------
 # Memory and namelist files GENERATION
 # -----------------------------------------------------
 # Additional prototype filenames with real extension, 
@@ -463,7 +499,7 @@ if [ ${GEN} ]; then
         [ ${VERBOSE} ] && echo "Memory Layout generated in local folder: ${blddir}"
 
         # Move BFM Layout files to target folders 
-        cp ${blddir}/*.F90 ${BFMDIR}/src/BFM/General
+        mv ${blddir}/*.F90 ${BFMDIR}/src/BFM/General
         mv ${BFMDIR}/src/BFM/General/init_var_bfm.F90 ${BFMDIR}/src/share
         cp ${blddir}/init_var_bfm.F90 ${BFMDIR}/src/share
         cp ${blddir}/INCLUDE.h ${BFMDIR}/src/BFM/include

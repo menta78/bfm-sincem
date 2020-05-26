@@ -228,6 +228,8 @@
    real(RLEN),allocatable,dimension(:,:,:),public :: rtmp3Db
 #endif
 
+   CHARACTER(len=PATH_MAX) :: git_commit_id
+   CHARACTER(len=PATH_MAX) :: git_branch_name
 !
 ! !REVISION HISTORY:
 !  Author(s): Marcello Vichi and Piet Ruardij
@@ -380,6 +382,13 @@ contains
    nc_deflate = 0
    if ( nc_defllev > 0) nc_deflate = 1
    !
+   ! BFM git version and patch
+   LEVEL0 LINE
+#include "gitrepoinfo.h"
+   LEVEL1 ' '
+   LEVEL0 LINE
+   LEVEL1 ' '
+   !
    !-------------------------------------------------------
    ! Write to log bfmtime setting
    !-------------------------------------------------------
@@ -389,6 +398,7 @@ contains
    LEVEL1 '               BFM System Team                 '
    LEVEL1 ' '
    LEVEL1 ' '
+
    LEVEL1 'Step 1 - INITIALIZATION (init_bfm)'
    LEVEL1 ' '
 #ifdef BFM_PARALLEL
