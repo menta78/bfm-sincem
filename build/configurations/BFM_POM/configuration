@@ -29,9 +29,9 @@
         MODE    = 'POM1D',
         CPPDEFS = 'BFM_STANDALONE INCLUDE_PELCO2 INCLUDE_DIAG BFM_POM BFM_NOPOINTERS',
         ARCH    = 'gfortran.inc',
-        PROC    = 1,
+        PROC    = 4,
         EXP     = 'pom_bfm_1d',
-        BFMEXE  = 'pom.exe'
+        BFMEXE  = 'pom_bfm.exe'
 /
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 #       CONFIGURATION VARIABLES

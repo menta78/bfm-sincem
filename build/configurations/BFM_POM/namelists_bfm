@@ -35,6 +35,8 @@
 !                        1. pelagic
 !                        2. benthic
 !                        3. pelagic and benthic
+!                        4. sea ice
+!                        5. pelagic and sea ice
 ! out_fname      string  Name of NetCDF output file
 ! out_dir        string  Path to the output file
 ! out_title      string  Name of the experiment in NetCDF file
@@ -180,12 +182,12 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
 !   char  varname: name of the var in input file
 !-------------------------------------------------------------------------!
 &bfm_init_nml
+   O2o0 = 280.0,
    N1p0 = 0.1,
    N3n0 = 1.0,
    N4n0 = 0.8,
    N5s0 = 5.0,
    N6r0 = 1.0,
-   O2o0 = 280.0,
    O3c0 = 27060.00,
    O3h0 = 2660.0,
    O5c0 = 1.0e-3,
@@ -263,28 +265,6 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
           'totsysc','totsysn','totsysp','totsyss',
 	filename_nml_conf = 'BFM_General.nml',
 /
-
-!-------------------------------------------------------------------------!
-!NAMELIST Settling_parameters
-!-------------------------------------------------------------------------!
-! BURIAL VELOCITIES into the sediment
-! NAME         [UNIT]/KIND            DESCRIPTION
-! p_burvel_R6     [m/d]              Bottom Burial Velocity for detritus
-! p_burvel_R2     [m/d]              Bottom Burial Velocity for dissolved
-! p_burvel_PI     [m/d]              Bottom Burial Velocity for plankton
-! p_burvel_O5     [m/d]              Bottom Burial Velocity for calcite
-! R6DeepBurial    logic          R6 Burial to Deep Sediment (Dunne et al., 2007)
-!-------------------------------------------------------------------------!
-&Settling_parameters
-  p_burvel_R6 = 0.5,
-  p_burvel_O5 = 30.,
-  p_burvel_R2 = 0.0,
-  p_burvel_PI = 5.0,
-  R6DeepBurial = .FALSE.,
-	filename_nml_conf = 'Benthic_Environment.nml',
-/
-
-
 
 !-------------------------------------------------------------------------!
 !NAMELIST CSYS_parameters
@@ -531,43 +511,6 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
 /
 
 !-------------------------------------------------------------------------!
-!NAMELIST PAR_parameters
-!-------------------------------------------------------------------------!
-! LightPeriodFlag    numeric Choose the light averaging period
-!                            1 = Instantanous irradiance
-!                            2 = Daily average
-!                            3 = Daylight average with explicit
-!                                photoperiod
-! LightLocationFlag  numeric Choose the parameterization of light
-!                            location in the discrete grid
-!                            1 = Light at the top of the cell
-!                            2 = Light in the middle of the cell
-!                            3 = Average Light in the cell
-! ChlAttenFlag	     numeric Choose the PAR attenuation due to Chl
-!                            1 = broadband linear attenuation
-!                            2 = 3-band tabulated attenuation coefficients
-!                                (Morel, 1988; Lengaigne et al, 2007)
-! p_PAR        [-]           Fraction of Photosynthetically Available Radiation
-! p_eps0       [1/m]         Background extinction coefficient
-! p_epsIR      [1/m]         Infrared extinction coefficient
-!                            (to use with ChlAttenFlag=2)
-! p_epsESS     [m2/g]        Specific attenuation coefficient of
-!                            suspended sediments
-! p_epsR6      [m2/mgC]      Specific attenuation coefficient of particulate
-!                            detritus
-!-------------------------------------------------------------------------!
-&PAR_parameters
-  LightPeriodFlag    =  1
-  LightLocationFlag  =  3
-  ChlAttenFlag       =  1
-  p_PAR        =  0.50
-  p_eps0       =  0.12
-  p_epsESS     =  0.04d-3
-  p_epsR6      =  0.1d-3
-	filename_nml_conf = 'Pelagic_Environment.nml',
-/
-
-!-------------------------------------------------------------------------!
 !NAMELIST MicroZoo_parameters
 !-------------------------------------------------------------------------!
 !  MICRO-ZOOPLANKTON
@@ -609,9 +552,9 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
    p_pecaco3 =  0.5,    0.5
     p_qpcMIZ =  1.85d-3,1.85d-3
     p_qncMIZ =  1.67d-2,1.67d-2
-     p_paPBA =  0.1,    1.0
 ! Food matrix parameters: take care of the notation
 !               Z5      Z6
+     p_paPBA =  0.1,    1.0
 !               P1      P2      P3      P4
 !       Z5
 p_paPPY(1,:) =  1.0,    1.0,    0.1,    0.4
@@ -685,6 +628,43 @@ p_paMEZ(2,:)=   0.0,    1.0
 /
 
 !-------------------------------------------------------------------------!
+!NAMELIST PAR_parameters
+!-------------------------------------------------------------------------!
+! LightPeriodFlag    numeric Choose the light averaging period
+!                            1 = Instantanous irradiance
+!                            2 = Daily average
+!                            3 = Daylight average with explicit
+!                                photoperiod
+! LightLocationFlag  numeric Choose the parameterization of light
+!                            location in the discrete grid
+!                            1 = Light at the top of the cell
+!                            2 = Light in the middle of the cell
+!                            3 = Average Light in the cell
+! ChlAttenFlag	     numeric Choose the PAR attenuation due to Chl
+!                            1 = broadband linear attenuation
+!                            2 = 3-band tabulated attenuation coefficients
+!                                (Morel, 1988; Lengaigne et al, 2007)
+! p_PAR        [-]           Fraction of Photosynthetically Available Radiation
+! p_eps0       [1/m]         Background extinction coefficient
+! p_epsIR      [1/m]         Infrared extinction coefficient
+!                            (to use with ChlAttenFlag=2)
+! p_epsESS     [m2/g]        Specific attenuation coefficient of
+!                            suspended sediments
+! p_epsR6      [m2/mgC]      Specific attenuation coefficient of particulate
+!                            detritus
+!-------------------------------------------------------------------------!
+&PAR_parameters
+  LightPeriodFlag    =  1
+  LightLocationFlag  =  3
+  ChlAttenFlag       =  1
+  p_PAR        =  0.50
+  p_eps0       =  0.12
+  p_epsESS     =  0.04d-3
+  p_epsR6      =  0.1d-3
+	filename_nml_conf = 'Pelagic_Environment.nml',
+/
+
+!-------------------------------------------------------------------------!
 !NAMELIST PelChem_parameters, PelChem_parameters_iron
 !-------------------------------------------------------------------------!
 !  Pelagic Chemistry parameters
@@ -706,8 +686,11 @@ p_paMEZ(2,:)=   0.0,    1.0
 ! p_q10R6N7   [-]              Q10 temperature dependence
 ! p_sR6N7     [1/d]            Specific remineralization rate of particulate
 ! p_sR1N7     [1/d]            Specific remineralization rate of dissolved
-! p_scavN7f   [1/d]            Specific scavenging rate
-! p_N7fsol    [umolFe/m3]      Solubility concentration
+! p_scavOrg   [m3 mgC-1 d-1]   Specific scavenging rate on organic matter
+! p_scavIng   [1/d]            Specific scavenging rate inorganic complex
+! p_N7fLigand [umolFe/m3]      Iron Ligand reference concentration in seawater
+! p_rDust     [m/d]            Dust sinking speed below surface (=0 not used)
+! p_rN7fsed   [umolFe/m2/d]    Iron released from seabed sediments (=0 not used)
 !-------------------------------------------------------------------------!
 &PelChem_parameters
   p_q10N4N3 = 2.367
@@ -745,25 +728,51 @@ p_paMEZ(2,:)=   0.0,    1.0
   p_rO5m         = 30.0
   KSINK_rPPY     = 0.0
   AggregateSink  = .FALSE.
+  depth_factor   = 2000.0
 	filename_nml_conf = 'Pelagic_Environment.nml',
+/
+
+!-------------------------------------------------------------------------!
+!NAMELIST Settling_parameters
+!-------------------------------------------------------------------------!
+! BURIAL VELOCITIES into the sediment
+! NAME         [UNIT]/KIND            DESCRIPTION
+! p_burvel_R6     [m/d]              Bottom Burial Velocity for detritus
+! p_burvel_R2     [m/d]              Bottom Burial Velocity for dissolved
+! p_burvel_PI     [m/d]              Bottom Burial Velocity for plankton
+! p_burvel_O5     [m/d]              Bottom Burial Velocity for calcite
+! R6DeepBurial    logic          R6 Burial to Deep Sediment (Dunne et al., 2007)
+!-------------------------------------------------------------------------!
+&Settling_parameters
+  p_burvel_R6 = 0.5,
+  p_burvel_O5 = 30.,
+  p_burvel_R2 = 0.0,
+  p_burvel_PI = 5.0,
+  R6DeepBurial = .FALSE.,
+	filename_nml_conf = 'Benthic_Environment.nml',
 /
 
 !-------------------------------------------------------------------------!
 ! NAMELIST BenthicReturn_parameters
 !-------------------------------------------------------------------------!
 ! NAME         [UNIT]/KIND            DESCRIPTION
-! p_reminQ1       [d-1]       Remineralization rate of Dissolved OM
-! p_reminQ6       [d-1]       Remineralization rate of Particulate OM
-! p_pQIN3        [-]        Partitioning coeff. between NO3 and NH4
+! p_rmnQ1x        [d-1]       Remineralization rate of Dissolved OM
+! p_rmnQ6x        [d-1]       Remineralization rate of Particulate OM
+! p_pQIN3          [-]        Partitioning coeff. between NO3 and NH4
 ! p_depscale       [m]        Depth level to scale remin. rates (for BFM-NEMO)
 ! p_q10            [-]        Q10 value for remineralization rate (=0 disable) 
 ! p_qBT           [degC]      Base Temperature for Q10 remin
 ! p_chdo        [mmol/m3]     Half-saturation Oxygen conc. for MM^2 (=0 disable)
 !-------------------------------------------------------------------------!
 &BenthicReturn_parameters
-  p_reminQ1 = 0.01
-  p_reminQ6 = 0.005
-  p_pQIN3 = 0.1
+  p_rmnQ1c  =  0.01   
+  p_rmnQ1n  =  0.01   
+  p_rmnQ1p  =  0.01   
+  p_rmnQ6c  =  0.005  
+  p_rmnQ6n  =  0.005  
+  p_rmnQ6p  =  0.005  
+  p_rmnQ6s  =  0.005
+  p_pQIN3   =  0.1
   p_depscale = 0.0
   p_q10      = 0.,
   p_qBT      = 20.0,
@@ -771,97 +780,99 @@ p_paMEZ(2,:)=   0.0,    1.0
         filename_nml_conf = 'Benthic_Environment.nml',
 /
 !-------------------------------------------------------------------------!
-!NAMELIST standalone_nml
+!NAMELIST Params_POMBFM_nml
 !-------------------------------------------------------------------------!
-!NAME		KIND	DESCRIPTION
-!nboxes 	integer	Number of water volumes (boxes)
-!indepth 	real 	Depth of each box (m)
-!latitude 	real 	Latitude of each box
-!longitude 	real 	Longitude of each box
-!maxdelt 	real 	Maximum timestep duration (s)
-!mindelt 	real 	Minimum timestep duration (s)
-!method 	integer Integration method
-!			1. Euler forward
-!			2. Runge-Kutta 2nd order
-!			3. Leap-frog
+! NAME                  [UNIT]/KIND       DESCRIPTION
+! H                         [m]           Depth
+! DTI                       [s]           Timestep
+! ALAT                      [degrees]     Latitude
+! IDIAGN                    [-]           1 = Diagnostic mode
+!                                         0 = Prognostic mode
+! IDAYS                     [d]           Length of run
+! SMOTH                     [-]           Parameter for Hasselin filter
+! IHOTST                    [-]           1 = Restart reading
+!                                         0 = Cold start
+! KL1 & KL2                 [-]           Number of top and bottom levels not equally distributed,
+! SAVEF                     [d]           Saving frequency (days)
+! NRT                       [m/d]         Relaxation constant for nutrients at surface
+! NBCT, NBCS, NBCBFM        [-]           Define surface boundary conditions for temperature, salinity & BFM tracers
+!                                         NBC = 1: Surf. B.C. is WFSURF. no radiative penetration
+!                                         NBC = 2; Surf. B.C. is WFSURF+SWRAD*(1.-TR). with SWRAD*TR penetration
+!                                         NBC = 3; Surf. B.C. is TSURF. no SW radiative penetration
+! UMOL                      [m^2/s]       Background diffusion for momentum
+! UMOLT, UMOLS,UMOLBFM      [m^2/s]       Background diffusion for T,S and BFM tracers
+! NTP                       [-]           Flag for Jerlov water type
+!                                         NTP =               1      2       3       4       5
+!                                         JERLOV TYPE   =     I      IA      IB      II      III
+! TRT,SRT                   [ ]           Relaxation time for t & S lateral advection
+! upperh                    [m]           Depth at which lat eadv start
+! SSRT                      [m/d]         Relaxation time for surface salinity flux
+! CBCMIN                                  Minimum achievable bottom drag coeff
+! Z0B                                     Bottom roughness length
 !-------------------------------------------------------------------------
-&standalone_nml
-   nboxes      = 1,
-   indepth     = 5.0,
-   latitude    = 45.0,
-   longitude   = 13.5,
-   maxdelt     = 8640.0,
-   mindelt     = 1.0,
-   method      = 2,
-	filename_nml_conf = 'Standalone.nml',
+ &Params_POMBFM
+   H       =  16.,
+   DTI     =  100.,
+   ALAT    =  45.,
+   IDIAGN  =  1,
+   IDAYS   =  360,
+   SMOTH   =  0.1,
+   IHOTST  =  0,
+   KL1     =  7,
+   KL2     =  25,
+   SAVEF   =  1,
+   NRT     =  0.2,
+   NBCT    =  2,
+   NBCS    =  1,
+   NBCBFM  =  1,
+   UMOL    =  2.e-5,
+   UMOLT   =  1.e-5,
+   UMOLS   =  1.3e-6,
+   UMOLBFM =  2.e-5,
+   NTP     =  2,
+   TRT     =  0,
+   SRT     =  1,
+   UPPERH  =  5.0,
+   SSRT    =  5.68,
+   CBCMIN  =  0.0025,
+   Z0B     =  0.01,
+	filename_nml_conf = 'pom_bfm_settings.nml',
 /
 
 !-------------------------------------------------------------------------!
-!NAMELIST time_nml
+!NAMELIST pom_input_nml
 !-------------------------------------------------------------------------!
-!Specify time related formats and variables here.
-!timefmt	integer	implicitly uses timestep=maxdelt
-!               	1- MaxN only - fake start time used.
-!               	2- start and stop - MaxN calculated.
-!               	3- start and MaxN - stop calculated.
-!               	4- simdays - fake start time used
-!			   and MaxN calculated.
-!MaxN		integer	do loop from n=1,MaxN
-!start		string	Initial time: YYYY/MM/DD HH:MM:SS
-!stop		string	Final   time: YYYY/MM/DD HH:MM:SS
-!-------------------------------------------------------------------------!
- &time_nml
-  timefmt=      2,
-  MaxN=         144,
-  simdays=      5760,
-  start=        "2000-01-01 00:00:00",
-  stop=         "2010-01-01 00:00:00",
-	filename_nml_conf = 'Standalone.nml',
-/
-
-!-------------------------------------------------------------------------!
-!NAMELIST forcings_nml
-!-------------------------------------------------------------------------!
-!forcing_method integer	Choice of the external forcing functions
-!			1 = analytical forcings
-!			2 = from file
-!			3 = interactive fluxes (not yet implemented)
 !
-!Method 1: Analytical forcing functions
-!lw		real	Sinusoidal light intensity (winter) W m^-2
-!ls		real	Sinusoidal light intensity (summer) W m^-2
-!sw		real	Sinusoidal salinity (winter)
-!ss		real	Sinusoidal salinity (summer)
-!tw		real	Sinusoidal temperature (winter) degC
-!ts		real	Sinusoidal temperature (summer) degC
-!tde		real	Sinusoidal temperature daily excursion degC
-!ww		real	Sinusoidal wind (winter) m/s
-!ws		real	Sinusoidal wind (summer) m/s
-!CO2inc         real    Linear increase in CO2 air partial pressure [% per year]
-!
-!Method 2: data file
-!forcing_file	char	Filename for external forcings
-!
-!use_external_data logical Read external data (user defined)
-!data_file	   char	   Filename for external data
+! NAME             [UNIT]/KIND       DESCRIPTION
+! wind_input         [N/m^2]         U and V components of surface wind stress
+! heat_input         [W/m^2]         Total heat flux
+! surfNut_input    [BFM units]       surface nutrient inputs (NO3,NH4,PO4,SIO4)
+! Sprofile_input       [-]           Salinity Initial Condition
+! Tprofile_input     [degC]          Water temperature Initial Condition
+! ism_input            [-]           Inorganic Suspended Matter monthly climatology
+! Sal_input            [-]           Salinity monthly climatology
+! Temp_input           [-]           Water temperature monthly climatology
+! read_restart         char          Filename of input restart file for POM
 !
 !-------------------------------------------------------------------------!
-&forcings_nml
-   forcing_method    = 1,
-   ltype             = 1,
-   lw                = 20.0,
-   ls                = 300.0,
-   sw                = 37.0,
-   ss                = 34.0,
-   tw                = 8.0,
-   ts                = 28.0,
-   tde               = 1.0,
-   ww                = 20.0,
-   ws                = 10.0,
-   forcing_file      = '',
-   use_external_data = .false.,
-   data_file         = '',
-	filename_nml_conf = 'Standalone.nml',
+&pom_input
+   ! surface forcings
+   wind_input      =  '../../inputs/pom_MA21/windstress_mon_Mussap.da',
+   heat_input      =  '../../inputs/pom_MA21/heatflux.da',
+   surfNut_input   =  '../../inputs/pom_MA21/NutrientsARPAOGS.da',
+   !
+   ! initial conditions
+   Sprofile_input  =  '../../inputs/pom_MA21/Sinit_16m.da',
+   Tprofile_input  =  '../../inputs/pom_MA21/Tinit_16m.da',
+   !
+   ! climatological profiles
+   ism_input       =  '../../inputs/pom_MA21/ISM_16m_Mussap.da',
+   Sal_input       =  '../../inputs/pom_MA21/ClimaS_MA21_16m.da',
+   Temp_input      =  '../../inputs/pom_MA21/ClimaT_MA21_16m.da',
+   !
+   ! input restart file
+   read_restart    =  './fort.70',
+        filename_nml_conf = 'pom_bfm_settings.nml',
 /
 
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
