@@ -157,7 +157,7 @@
                                UMOL,UMOLT,UMOLS,UMOLBFM,NTP,TRT,SRT,UPPERH,SSRT, &
                                CBCMIN,Z0B
 !
-      OPEN(namlst,file='params_POMBFM.nml',status='old',action='read')
+      OPEN(namlst,file='pom_bfm_settings.nml',status='old',action='read')
       READ(namlst,nml=Params_POMBFM)
       CLOSE(namlst)
 !

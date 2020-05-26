@@ -116,7 +116,7 @@
                           surfNut_input,  &
                           read_restart
 !
-     open(namlst,file='pom_input.nml',status='old',action='read',err=100)
+     open(namlst,file='pom_bfm_settings.nml',status='old',action='read',err=100)
      read(namlst,nml=pom_input, err=102)
      close(namlst)
 !
@@ -181,11 +181,11 @@
 !
 !    -----PRINT IF PROBLEM WITH NAMELIST OPENING-----
 !
-100   call error_msg_prn(NML_OPEN,"opendat.F90","pom_input.nml")
+100   call error_msg_prn(NML_OPEN,"opendat.F90","pom_bfm_settings.nml")
 !
 !     -----PRINT IF PROBLEM WITH NAMELIST READING-----
 !
-102   call error_msg_prn(NML_READ,"opendat.F90","pom_input")
+102   call error_msg_prn(NML_READ,"opendat.F90","pom_input in pom_bfm_settings.nml")
 
       end subroutine opendat
 !

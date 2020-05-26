@@ -105,7 +105,7 @@
                             surfNut_input,  &
                             read_restart
 !
-       open(namlst,file='pom_input.nml',status='old',action='read',err=100)
+       open(namlst,file='pom_bfm_settings.nml',status='old',action='read',err=100)
        read(namlst,nml=pom_input, err=102)
        rewind(namlst)
        close(namlst)
@@ -141,10 +141,10 @@
 !
 !    -----PRINT IF PROBLEMS WITH NML OPENING-----
 !
-100   call error_msg_prn(NML_OPEN,"get_TS_IC.F90","problem opening pom_input.nml")
+100   call error_msg_prn(NML_OPEN,"get_TS_IC.F90","problem opening pom_bfm_settings.nml")
 !
 !    -----PRINT IF PROBLEMS WITH NML READING-----
 !
-102   call error_msg_prn(NML_READ,"get_TS_IC.F90","pom_input")
+102   call error_msg_prn(NML_READ,"get_TS_IC.F90","pom_input in pom_bfm_settings.nml")
 !
       end subroutine get_TS_IC
