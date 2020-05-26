@@ -131,7 +131,7 @@ DESCRIPTION
                   Necessary forcings to execute the model. To specify several files, separate them by colon ';' and surround all by quotes '"'.
                   (If the path is relative, the ROOT will be ${BFMDIR})
        -D EXPDIR
-                  Input dir where are files to copy to experiment directory (Default: "${PRESET}/${EXPDIR}")
+                  Input dir to copy entirely into experiment directory (look into "${PRESET}" first)
        -e EXECMD
                   Executable command to insert in runscript (Default for NEMO: "${MPICMD}", empty for others)
        -V VALGRIND
@@ -599,9 +599,9 @@ if [ ${DEP} ]; then
         if [ "${EXPFILES}" ]; then cp ${EXPFILES} ${exedir}/; fi
         if [ "${EXPDIR}"   ]; then
            if [ -d ${presetdir}/${EXPDIR} ] ; then
-              cp ${presetdir}/${EXPDIR}/* ${exedir}
+              cp -R ${presetdir}/${EXPDIR} ${exedir}/
            elif [ -d ${EXPDIR} ] ; then
-              cp ${EXPDIR}/* ${exedir}/
+              cp -R ${EXPDIR} ${exedir}/
            else
               echo "Cannot find EXPDIR=${EXPDIR}"
            fi
