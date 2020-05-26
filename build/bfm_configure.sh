@@ -290,7 +290,7 @@ echo ""
 # -----------------------------------------------------
 # Retrieve git version control info if available:
 # -----------------------------------------------------
-# create an include files for the code
+# create an include file for the code
 #
 GITREPOHEADER=${BFMDIR}/include/gitrepoinfo.h
 if [ -d ${BFMDIR}/.git  ] ; then
@@ -378,6 +378,17 @@ if [ ${GEN} ]; then
 
 
     if [[ ${MODE} == "STANDALONE" || "$MODE" == "POM1D"  || "$MODE" == "OGS" ]]; then
+
+        # Move BFM Layout files to target folders
+        mv ${blddir}/init_var_bfm.F90 ${BFMDIR}/src/share
+        mv ${blddir}/INCLUDE.h ${BFMDIR}/src/BFM/include
+        mv ${blddir}/*.F90 ${BFMDIR}/src/BFM/General
+        if [[ "$MODE" == "OGS" ]]; then
+            cp ${BFMDIR}/include/BFM_module_list.proto.h ${blddir}/
+            sed ':a;N;$!ba;s/, \&\n/,  /g' ${blddir}/BFM_var_list.h | sed -e "s/,    /\n     integer,parameter ::/g" > ${BFMDIR}/include/BFM_var_list.h
+            mv ${BFMDIR}/src/BFM/General/BFM1D_Output_Ecology.F90 ${BFMDIR}/src/ogstm/
+        fi
+
         # list files
         find ${BFMDIR}/src/BFM/General -name "*.?90" -print > BFM.lst
         if [[ ${MODE} == "STANDALONE" ]]; then
@@ -412,13 +423,14 @@ if [ ${GEN} ]; then
 
         #set netcdf path in compiler file
         if [ ${NETCDF} ]; then
-            [ ${VERBOSE} ] && echo "setting netcd path with environment variable: ${NETCDF}"
+            [ ${VERBOSE} ] && echo "setting netcdf path with environment variable: ${NETCDF}"
             sed -e "s,\${NETCDF},${NETCDF}," ${BFMDIR}/compilers/${ARCH} > ${blddir}/${ARCH}
         else
-            [ ${VERBOSE} ] && echo "setting netcd path with default: ${NETCDF_DEFAULT}"
+            [ ${VERBOSE} ] && echo "setting netcdf path with default: ${NETCDF_DEFAULT}"
             sed -e "s,\${NETCDF},${NETCDF_DEFAULT}," ${BFMDIR}/compilers/${ARCH} > ${blddir}/${ARCH}
         fi
 
+        # Make makefile
         if [ ${VERBOSE} ]; then
             echo "Executing: "
             echo "${BFMDIR}/${SCRIPTS_BIN}/${cmd_mkmf}"
@@ -429,7 +441,6 @@ if [ ${GEN} ]; then
             echo "    BFM.lst && echo \" "
         fi
 
-        # Make makefile
         ${BFMDIR}/${SCRIPTS_BIN}/${cmd_mkmf} \
             -c "${cppdefs}" \
             -o "-I${BFMDIR}/include -I${BFMDIR}/src/BFM/include" \
@@ -437,18 +448,6 @@ if [ ${GEN} ]; then
             -p "${BFMDIR}/bin/${BFMEXE}" \
             BFM.lst && echo ""
 
-
-        # Move BFM Layout files to target folders 
-        cp ${blddir}/*.F90 ${BFMDIR}/src/BFM/General
-        mv ${BFMDIR}/src/BFM/General/init_var_bfm.F90 ${BFMDIR}/src/share
-        cp ${blddir}/init_var_bfm.F90 ${BFMDIR}/src/share
-        cp ${blddir}/INCLUDE.h ${BFMDIR}/src/BFM/include
-
-        if [[ "$MODE" == "OGS" ]]; then
-            cp ${BFMDIR}/include/BFM_module_list.proto.h ${blddir}/
-            sed ':a;N;$!ba;s/, \&\n/,  /g' ${blddir}/BFM_var_list.h | sed -e "s/,    /\n     integer,parameter ::/g" > ${BFMDIR}/include/BFM_var_list.h 
-            mv ${BFMDIR}/src/BFM/General/BFM1D_Output_Ecology.F90 ${BFMDIR}/src/ogstm/
-        fi
 
     elif [[ "$MODE" == "NEMO" || "$MODE" == "NEMO_3DVAR" ]]; then 
         #Generate NEMO configuration with subdirs
@@ -498,13 +497,13 @@ if [ ${GEN} ]; then
             ${BFMDIR}/${SCRIPTS_PROTO}/Default_bfm.fcm | tr "\&" "\n" > ${blddir}/bfm.fcm
         [ ${VERBOSE} ] && echo "Memory Layout generated in local folder: ${blddir}"
 
-        # Move BFM Layout files to target folders 
+        # Move BFM Layout files to target folders
+        mv ${blddir}/init_var_bfm.F90 ${BFMDIR}/src/share
+        mv ${blddir}/INCLUDE.h ${BFMDIR}/src/BFM/include
         mv ${blddir}/*.F90 ${BFMDIR}/src/BFM/General
-        mv ${BFMDIR}/src/BFM/General/init_var_bfm.F90 ${BFMDIR}/src/share
-        cp ${blddir}/init_var_bfm.F90 ${BFMDIR}/src/share
-        cp ${blddir}/INCLUDE.h ${BFMDIR}/src/BFM/include
-        cp ${blddir}/bfm.fcm ${BFMDIR}/src/nemo${VER}
+        mv ${blddir}/bfm.fcm ${BFMDIR}/src/nemo${VER}
     fi
+
     echo "${PRESET} generation done!"
 fi
 
