@@ -126,12 +126,12 @@ DESCRIPTION
        -x EXP
                   Name of the experiment for generation of the output folder (Default: "${EXP}")
        -F EXPFILES 
-                  files (generated or not)  to copy to experiment directory
+                  Additional files of configuration folder to copy to experiment directory
        -i FORCING 
                   Necessary forcings to execute the model. To specify several files, separate them by colon ';' and surround all by quotes '"'.
                   (If the path is relative, the ROOT will be ${BFMDIR})
        -D EXPDIR
-                  Input dir where are files to copy to experiment directory (Default: "${TEMPDIR}/${PRESET}")
+                  Input dir where are files to copy to experiment directory (Default: "${PRESET}/${EXPDIR}")
        -e EXECMD
                   Executable command to insert in runscript (Default for NEMO: "${MPICMD}", empty for others)
        -V VALGRIND
@@ -597,7 +597,15 @@ if [ ${DEP} ]; then
         cp *.nml ${exedir}/
         if [ "$MODE" == "OGS" ] ; then cp namelist* ${exedir}/; fi
         if [ "${EXPFILES}" ]; then cp ${EXPFILES} ${exedir}/; fi
-        if [ "${EXPDIR}"   ]; then cp ${EXPDIR}/* ${exedir}/; fi
+        if [ "${EXPDIR}"   ]; then
+           if [ -d ${presetdir}/${EXPDIR} ] ; then
+              cp ${presetdir}/${EXPDIR}/* ${exedir}
+           elif [ -d ${EXPDIR} ] ; then
+              cp ${EXPDIR}/* ${exedir}/
+           else
+              echo "Cannot find EXPDIR=${EXPDIR}"
+           fi
+        fi
 
         #link forcing files to exedir
         if [ "${FORCING}" ]; then
