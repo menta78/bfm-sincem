@@ -64,13 +64,15 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! BenthicReturn1 PARAMETERS (read from nml)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  real(RLEN)  :: p_reminQ1  ! Spec. remin. rate of Dissolved OM (d-1)
-  real(RLEN)  :: p_reminQ6  ! Spec. remin. rate of Particulate OM (d-1)
-  real(RLEN)  :: p_pQIN3    ! Partitioning coeff. between NO3 and NH4
-  real(RLEN)  :: p_depscale ! Depth level to scale remineralization rates (m)
-  real(RLEN)  :: p_q10      ! Q10 value for remineralization rate
-  real(RLEN)  :: p_qBT      ! Base Temperature for Q10 remin
-  real(RLEN)  :: p_chdo     ! Half-saturation Oxygen concentration for MM^2
+  real(RLEN)  :: p_rmnQ1c, &  ! Spec. remin. rate of Dissolved OM (d-1)
+                 p_rmnQ1p, p_rmnQ1n 
+  real(RLEN)  :: p_rmnQ6c, &  ! Spec. remin. rate of Particulate OM (d-1)
+                 p_rmnQ6p,p_rmnQ6n, p_rmnQ6s
+  real(RLEN)  :: p_pQIN3      ! Partitioning coeff. between NO3 and NH4
+  real(RLEN)  :: p_depscale   ! Depth level to scale remineralization rates (m)
+  real(RLEN)  :: p_q10        ! Q10 value for remineralization rate
+  real(RLEN)  :: p_qBT        ! Base Temperature for Q10 remin
+  real(RLEN)  :: p_chdo       ! Half-saturation Oxygen concentration for MM^2
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Scaling factor for remineralization rates
   real(RLEN),ALLOCATABLE, DIMENSION(:) :: RETFAC
@@ -83,8 +85,9 @@
   subroutine InitBenthicReturn()
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  namelist /BenthicReturn_parameters/ p_reminQ1, p_reminQ6, p_pQIN3, p_depscale, & 
-                                      p_q10, p_qBT, p_chdo
+  namelist /BenthicReturn_parameters/ p_rmnQ1c, p_rmnQ1n, p_rmnQ1p,            &
+                                      p_rmnQ6c, p_rmnQ6n, p_rmnQ6p, p_rmnQ6s,  &
+                                      p_pQIN3, p_depscale, p_q10, p_qBT, p_chdo
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
   !BEGIN compute

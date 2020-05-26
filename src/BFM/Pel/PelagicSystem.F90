@@ -38,6 +38,7 @@
   use mem,            ONLY: sediO5
   use mem_PelSinkSet, ONLY: p_rO5m, p_burvel_O5
 #endif
+  use mem_PelBac,     ONLY: p_version
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 !  
@@ -142,7 +143,9 @@
   ! Compute Bacteria dynamics
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   do i =1,iiPelBacteria
-     if ( CalcPelBacteria(i)) call PelBacDynamics( i )
+     if ( CalcPelBacteria(i) ) then
+           call PelBacDynamics( i )
+     endif
   end do
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=

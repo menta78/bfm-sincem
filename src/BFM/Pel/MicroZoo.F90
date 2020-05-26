@@ -266,7 +266,7 @@
   ! and partitioning between particulate and dissolved
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   rdc  = ((ONE - eO2)*p_sdo(zoo) + p_sd(zoo))*zooc
-  reac = rugc*(ONE - p_pu(zoo))*p_pu_ea(zoo)
+  reac = rugc* p_pu_ea(zoo)
   rric = reac + rdc
   rr1c = rric*p_pe_R1c
   rr6c = rric*(ONE - p_pe_R1c)

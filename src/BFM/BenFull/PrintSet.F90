@@ -3,7 +3,7 @@
 
 SUBROUTINE PrintSet(NUTR,msg)
      USE mem, ONLY:BoxNumberX_ben,BoxNumberY_ben
-     USE mem_BenthicNutrient3, ONLY:bennut_messages
+     USE mem_BenthicNutrient, ONLY:bennut_messages
      USE global_mem, ONLY: LOGUNIT
      USE bennut_variables,ONLY:sets
      USE BFM_ERROR_MSG, ONLY: set_warning_for_getm

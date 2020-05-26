@@ -3,11 +3,11 @@
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 !BOP
 !
-! !ROUTINE: BenthicNutrient3
+! !ROUTINE: BenthicNutrient
 !
 ! DESCRIPTION
 !   This file holds all alternative parameter values for parameters
-!	defined in the process BenthicNutrient3
+!	defined in the process BenthicNutrient
 !
 !
 
@@ -17,7 +17,7 @@
 !   structure of the code based on ideas of M. Vichi.
 !
 ! !INTERFACE
-  module mem_BenthicNutrient3
+  module mem_BenthicNutrient
 !
 ! !USES:
 
@@ -59,7 +59,7 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   public
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! BenthicNutrient3 PARAMETERS (read from nml)
+  ! BenthicNutrient PARAMETERS (read from nml)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   integer   :: bennut_messages=0        !0: suppress messages of the bennut-utility routines
                                         !1: give messages if PinrtSet is called.
@@ -73,14 +73,14 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! SHARED PUBLIC FUNCTIONS (must be explicited below "contains")
 
-  public InitBenthicNutrient3
+  public InitBenthicNutrient
   contains
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  subroutine InitBenthicNutrient3
+  subroutine InitBenthicNutrient
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  namelist /BenthicNutrient3_parameters/ bennut_messages,p_max_shift_change, &
+  namelist /BenthicNutrient_parameters/ bennut_messages,p_max_shift_change, &
                                          p_max_state_change,                 &
                                          p_InitCondition, p_N
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -93,12 +93,12 @@
 
    p_N=400
    write(LOGUNIT,*) "#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
-   write(LOGUNIT,*) "#  Reading BenthicNutrient3 parameters.."
-   open(NMLUNIT,file='BenthicNutrient3.nml',status='old',action='read',err=100)
-   read(NMLUNIT,nml=BenthicNutrient3_parameters,err=101)
+   write(LOGUNIT,*) "#  Reading BenthicNutrient parameters.."
+   open(NMLUNIT,file='BenthicNutrient.nml',status='old',action='read',err=100)
+   read(NMLUNIT,nml=BenthicNutrient_parameters,err=101)
    close(NMLUNIT)
    write(LOGUNIT,*) "#  Namelist is:"
-   write(LOGUNIT,nml=BenthicNutrient3_parameters)
+   write(LOGUNIT,nml=BenthicNutrient_parameters)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   !END compute
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -106,11 +106,11 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Local Error Messages
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-100 call error_msg_prn(NML_OPEN,"InitBenthicNutrient3.f90","BenthicNutrient3.nml")
-101 call error_msg_prn(NML_READ,"InitBenthicNutrient3.f90","BenthicNutrient3_parameters")
+100 call error_msg_prn(NML_OPEN,"InitBenthicNutrient.f90","BenthicNutrient.nml")
+101 call error_msg_prn(NML_READ,"InitBenthicNutrient.f90","BenthicNutrient_parameters")
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  end  subroutine InitBenthicNutrient3
-  end module mem_BenthicNutrient3
+  end  subroutine InitBenthicNutrient
+  end module mem_BenthicNutrient
 !BOP
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model 

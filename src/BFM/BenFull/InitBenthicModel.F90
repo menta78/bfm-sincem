@@ -5,39 +5,38 @@
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 !BOP
 !
-! !ROUTINE: Ecology
+! !ROUTINE: InitBenthicNutrient
 !
 ! DESCRIPTION
-! This is the main interface to call all the other sub-models of the BFM
-! Depending on the choices of macros and parameters this part activates:
-! - the sea-ice model
-! - the pelagic model
-! - the benthic model
+!   !	This routine at intialization of the benthic-organism variables
+!   !   If the FULL_BENTHIC initialization takes place.
+!
 !
 ! !INTERFACE
-  subroutine EcologyDynamics
+  subroutine InitBenthicModel
 !
 ! !USES:
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Modules (use of ONLY is strongly encouraged!)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   use global_mem, ONLY:RLEN
-  use mem,  ONLY: iiBen, iiPel, iiReset, flux
-  use mem_Param,  ONLY: CalcPelagicFlag, CalcBenthicFlag, CalcConservationFlag
-  use api_bfm, ONLY: LOGUNIT
-#ifdef INCLUDE_SEAICE
-  use mem_Param,  ONLY: CalcSeaiceFlag
-#endif
+  use mem,  ONLY: iiBen, iiPel, iiReset,InitializeModel, flux
+  use mem_Param,  ONLY: CalcPelagicFlag, CalcBenthicFlag
 
 !  
 !
 ! !AUTHORS
-!   Marcello Vichi & Piet Ruardij
+!   Piet Ruardij
+!
+!
+!
+! !REVISION_HISTORY
+!   !
 !
 ! COPYING
 !   
 !   Copyright (C) 2015 BFM System Team (bfm_st@lists.cmcc.it)
-!   Copyright (C) 2006 P. Ruardij, the mfstep group, the ERSEM team 
+!   Copyright (C) 2006 P. Ruardij 
 !   (rua@nioz.nl, vichi@bo.ingv.it)
 !
 !   This program is free software; you can redistribute it and/or modify
@@ -57,51 +56,24 @@
   ! Implicit typing is never allowed
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   IMPLICIT NONE
+
 #ifdef DEBUG
   call  flux(1,iiReset,1,1,0.0)
 #endif
 
-#ifdef INCLUDE_SEAICE
-  if ( CalcSeaiceFlag) then
+#if defined BENTHIC_FULL
+  if ( CalcBenthicFlag) then
 
-    call SeaiceSystemDynamics
+      call PelForcingForBenDynamics
+      InitializeModel=1
+      call InitBenthicNutrientDynamics
+      InitializeModel=0
 
-  end if
-#endif
-
-  if ( CalcPelagicFlag) then
-
-    call PelagicSystemDynamics
-
-  end if
-
-  if ( CalcBenthicFlag ) then
-#if defined BENTHIC_BIO
-     ! Intermediate benthic return
-     call PelForcingForBenDynamics
-     call BenthicSystemDynamics
-     call BenthicReminDynamics
-     call BenOxygenDynamics
-
-#elif defined BENTHIC_FULL
-     ! Full benthic nutrients
-     call PelForcingForBenDynamics
-     call BenthicSystemDynamics
-     call BenthicNutrientDynamics
-
-#else
-     ! Simple benthic return
-     call BenthicReturnDynamics
-#endif
   endif
-  
-  call PelagicBenthicCoupling
+#endif
 
-  if (CalcConservationFlag) &
-     call CheckMassConservationDynamics
-
-  end subroutine EcologyDynamics
-!EOC
+  end subroutine InitBenthicModel
+!BOP
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model 
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

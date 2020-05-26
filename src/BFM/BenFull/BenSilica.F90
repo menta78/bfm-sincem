@@ -39,7 +39,7 @@
     LAYER2, ADD, INTEGRAL, DERIVATIVE, RFLUX, MASS, EXPONENTIAL_INTEGRAL
   use mem_Param,  ONLY: p_poro, p_clD1D2m, p_q10diff, p_clDxm, p_d_tot,p_small
   use mem_BenSilica
-  use mem_BenthicNutrient3, ONLY:p_max_state_change,p_max_shift_change
+  use mem_BenthicNutrient, ONLY:p_max_state_change,p_max_shift_change
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! The following bennut functions are used:InitializeSet, &

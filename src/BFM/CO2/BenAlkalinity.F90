@@ -47,7 +47,7 @@
     ADD, DERIVATIVE, RFLUX, SHIFT, ONE_PER_DAY,INTEGRAL,STANDARD
   use mem_Param,  ONLY: p_poro, p_d_tot, p_d_tot_2,p_q10diff
   use mem_BenAlkalinity
-  use mem_BenthicNutrient3, ONLY:p_max_shift_change,p_max_state_change
+  use mem_BenthicNutrient, ONLY:p_max_shift_change,p_max_state_change
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! The following bennut functions are used:GetInfoFromSet, &

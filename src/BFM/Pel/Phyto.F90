@@ -159,7 +159,6 @@
   tfluxN = ZERO
   tfluxP = ZERO
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Nutrient limitations (intracellular and extracellular)
@@ -277,19 +276,29 @@
   sum  =   p_sum(phyto)*et*eiPPY(phyto,:)*fpplim
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  ! Respiration rate
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  sra  =   p_pu_ra(phyto)* sum ! activity
+  srs  =   et* p_srs(phyto)                   ! basal
+  srt  =   sra+ srs                           ! total
+  rrc  =   srt* phytoc                        ! total actual respiration
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Lysis and excretion
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  sdo  =  ( p_thdo(phyto)/( iN+ p_thdo(phyto)))* p_sdmo(phyto)  ! nutr. -stress lysis
+  ! Nutrient Stress Lysis
+  sdo = ( p_thdo(phyto)/( iN+ p_thdo(phyto)))* p_sdmo(phyto)
   ! extra lysis for high-density
-  sdo  =   sdo+ p_seo(phyto)* MM(phytoc, p_sheo(phyto))
-
-  sea  =   sum* p_pu_ea(phyto)  ! activity excretion
-
+  sdo = sdo+ p_seo(phyto)* MM(phytoc, p_sheo(phyto))
+  !
+  ! Activity Excretion
+  sea = sum * p_pu_ea(phyto)
+  !
+  ! Nutrient Stress Excretion
   if (p_netgrowth(phyto)) then
      seo = ZERO
   else 
-     ! nutrient stress excretion
-     seo = sum*(ONE-p_pu_ea(phyto))*(ONE- iN) 
+     seo = sum*(ONE-p_pu_ea(phyto)-p_pu_ra(phyto))*(ONE- iN) 
   end if
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -307,34 +316,31 @@
   rr1c  = (ONE - pe_R6) * sdo * phytoc
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  ! Respiration rate
+  ! Production, productivity and C flows
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  sra  =   p_pu_ra(phyto)*( sum - sea - seo)  ! activity
-  srs  =   et* p_srs(phyto)                   ! basal
-  srt  =   sra+ srs                           ! total
-  rrc  =   srt* phytoc                        ! total actual respiration
+  ! Gross Production
+  rugc = sum* phytoc
+
+  ! Specific loss terms
+  slc = sea + seo + srt + sdo
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  ! Production, productivity and C flows
-  ! The release of DOC is controlled by a specific switch.
-  ! Beware that this switch must be consistent with the utilization of DOC 
-  ! by Bacteria. If DOC is released in a form that is not used by 
-  ! Bacteria, it will accumulate infinitely removing carbon from the system
+  ! Exudation of carbohydrate toward DOC
+  ! 1 - to R1 (Vichi2007b)
+  ! 2 - to R2 (Vichi2004). If p_netgrowth then seo = ZERO
+  ! 3 - Activity to R1 and Nut-Stress to R2 (BFM Manual)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  rugc  =   sum* phytoc  ! gross production
-  slc  =   sea + seo + srt+ sdo  ! specific loss terms
   select case (p_switchDOC(phyto))
     case (1)
-       ! All activity excretions are assigned to R1
        rr1c = rr1c + sea*phytoc + seo*phytoc
        flPIR2c = ZERO
     case (2)
-       ! Activity excretion is only assigned to R2
-       flPIR2c = sea* phytoc
+       flPIR2c = seo*phytoc + sea*phytoc
     case (3)
-       ! Activity and Nutrient-stress excretions are assigned to R2
-       flPIR2c  =  seo*phytoc + sea*phytoc
+       rr1c = rr1c + sea*phytoc
+       flPIR2c = seo*phytoc
   end select
+
   call quota_flux( iiPel, ppphytoc ,ppO3c,ppphytoc, rugc, tfluxC )  
   call quota_flux( iiPel, ppphytoc, ppphytoc,ppR1c, rr1c, tfluxC )
   call quota_flux( iiPel, ppphytoc, ppphytoc,ppR6c, rr6c, tfluxC )
@@ -351,7 +357,7 @@
   else
      sadap  =   et*p_sum(phyto)
   end if
-  run  =   max(  ZERO, ( sum- slc)* phytoc)  ! net production
+  run  =   max(  ZERO, ( sum- (sea + seo + srt))* phytoc)  ! net production
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Nutrient Uptake: calculate maximum uptake of N, P
@@ -445,7 +451,9 @@
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
       ! Gross uptake of silicate excluding respiratory costs
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-      runs = max(ZERO, p_qscPPY(phyto) * (sum-srs) * phytoc)
+      miss = max(ZERO, phytos - p_qscPPY(phyto)*phytoc) ! intracellular missing Si
+      runs = p_qscPPY(phyto) * (sum-sra-sea-seo) * phytoc
+      rr6s = (srs+sdo) * phytos + miss
     case (2)
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
       !  Silicate uptake based on intracellular needs (note, no luxury)
@@ -453,16 +461,18 @@
       !  however this generates fake remineralization and it is not implemented
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
       rums  =   p_qus(phyto)* N5s(:)* phytoc  ! max pot uptake based on affinity
-      miss  =   max(ZERO, p_qscPPY(phyto)*phytoc - phytos) ! intracellular missing Si
-      rups  =   run* p_qscPPY(phyto)* phytos  ! Si uptake based on net C uptake
+      miss  =   sadap*(p_qscPPY(phyto)*phytoc - phytos) ! intracellular missing Si
+      rups  =   run* p_qscPPY(phyto)  ! Si uptake based on net C uptake
       runs  =   min(  rums,  rups+ miss)  ! actual uptake
+      rr6s  =   sdo*phytos
     end select
               
     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     ! Uptake and Losses of Si (only lysis)
     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    call flux_vector( iiPel, ppN5s,ppphytos, runs)
-    call flux_vector( iiPel, ppphytos, ppR6s, sdo*phytos )
+    r  =   insw(runs)
+    call flux_vector( iiPel, ppN5s, ppphytos, runs*r)
+    call flux_vector( iiPel, ppphytos, ppR6s, rr6s - runs*(ONE-r))
   endif
 
 #ifdef INCLUDE_PELFE
@@ -476,7 +486,7 @@
      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
      rumf  =   p_quf(phyto)* N7f(:)* phytoc  ! max potential uptake
      ! intracellular missing amount of Fe
-     misf  =   sadap*max(ZERO,p_xqf(phyto)*p_qfcPPY(phyto)*phytoc - phytof)  
+     misf  =   sadap*(p_xqf(phyto)*p_qfcPPY(phyto)*phytoc - phytof)  
      rupf  =   p_xqf(phyto)* run* p_qfcPPY(phyto)  ! Fe uptake based on C uptake
      runf  =   min(  rumf,  rupf+ misf)  ! actual uptake
      r  =   insw(runf)
@@ -488,7 +498,7 @@
      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
      ! Losses of Fe
      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-     rr6f  =   rr6c* p_qflc(phyto)
+     rr6f  =   rr6c* qfcPPY(phyto,:)
      rr1f  =   sdo* phytof- rr6f
      call flux_vector( iiPel, ppphytof,ppR1f, rr1f )
      call flux_vector( iiPel, ppphytof,ppR6f, rr6f )

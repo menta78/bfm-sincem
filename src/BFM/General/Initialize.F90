@@ -31,7 +31,7 @@
   use mem_BenOxygen
   use mem_ControlBennutBuffers
 #if defined BENTHIC_FULL
-  use mem_BenthicNutrient3
+  use mem_BenthicNutrient
   use mem_BenAmmonium
   use mem_BenNitrate
   use mem_BenAnoxic
@@ -125,7 +125,7 @@
       call InitFilterFeeder
       call InitBenBac
       call InitBioturbation
-      call InitBenthicNutrient3
+      call InitBenthicNutrient
       call InitBenAmmonium
       call InitBenNitrate
       call InitBenOxygen

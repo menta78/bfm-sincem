@@ -19,6 +19,7 @@
 ! !USES:
   USE global_mem, ONLY: RLEN, ZERO, ONE, BASETEMP
   USE mem_Param,  ONLY: p_small
+  USE constants,  ONLY: ZERO_KELVIN
 
 !
 !
@@ -128,15 +129,42 @@
     end function
 
     ! temperature dependency for Q10 function
-    elemental function eTq(t, q10)
+    ! (with optional argument for base temperature)
+    elemental function eTq(t, q10, base)
 
         IMPLICIT NONE
-        real(RLEN),intent(IN) :: t, q10
-        real(RLEN)            :: eTq
+        real(RLEN),intent(IN)          :: t, q10
+        real(RLEN),intent(IN),optional :: base
+        real(RLEN)                     :: eTq
+        real(RLEN)                     :: tref
 
-        eTq = exp( log(q10) * (t-BASETEMP) / BASETEMP)
+        tref = BASETEMP
+        if ( present(base) ) tref = base
+
+        eTq = exp( log(q10) * (t-tref) / tref)
 
     end function eTq
+
+    ! Arrhenius equation for temperature dependency 
+    ! (with optional argument for base temperature)
+    ! activation energy (aex) is in J mol-1
+    elemental function eTa(t, aex, base)
+
+        IMPLICIT NONE
+        real(RLEN),intent(IN)          :: t, aex
+        real(RLEN),intent(IN),optional :: base
+        real(RLEN)                     :: eTa
+        real(RLEN)                     :: tref, act
+
+        tref = BASETEMP
+        if ( present(base) ) tref = base
+
+        act  = ( aex * 1000._RLEN ) / 8.3_RLEN
+
+        eTa = exp( act * ( (ONE / (tref - ZERO_KELVIN)) - (ONE / ( t - ZERO_KELVIN)) ) )  
+
+    end function eTa
+
 
     elemental function IntegralExp(alfa,x)
 

@@ -22,6 +22,6 @@
   ARFLAGS=-r
 
   CPPFLAGS=
-  FFLAGS= -g -traceback -O0 -r8 -xHost -fp-model source ${NCDF_INC} -check all
+  FFLAGS= -O3 -r8 -fp-model source ${NCDF_INC} -xSKYLAKE-AVX512 -qopt-zmm-usage=high -no-fma
   LDFLAGS= ${NCDF_INC} ${NCDF_LIB}
 

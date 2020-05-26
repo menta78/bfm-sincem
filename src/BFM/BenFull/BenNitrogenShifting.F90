@@ -38,7 +38,7 @@
 #endif
   use constants,  ONLY: SHIFT, LAYER1, DERIVATIVE, RFLUX, LAYER2
   use mem_Param,  ONLY: p_poro, p_clDxm, p_d_tot
-  use mem_BenthicNutrient3, ONLY:p_max_shift_change,p_max_state_change
+  use mem_BenthicNutrient, ONLY:p_max_shift_change,p_max_state_change
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! The following bennut functions are used:CalculateFromSet

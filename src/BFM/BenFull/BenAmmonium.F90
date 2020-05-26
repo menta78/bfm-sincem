@@ -46,7 +46,7 @@
     SET_LAYER_INTEGRAL_UNTIL, LAYER3, INPUT_TERM, PARAMETER, STANDARD, ADD, &
     INTEGRAL, RFLUX, DERIVATIVE,INPUT_ADD_TERM,START_ADD_TERM
   use mem_Param,  ONLY: p_poro, p_d_tot, p_d_tot_2,p_clDxm, p_q10diff, p_qon_nitri
-  use mem_BenthicNutrient3, ONLY:p_max_state_change, p_InitCondition
+  use mem_BenthicNutrient, ONLY:p_max_state_change, p_InitCondition
 
   use mem_BenAmmonium
 

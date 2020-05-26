@@ -218,6 +218,12 @@ end
     xEPS                  : Total Extinction Coefficient : 1/m
     ELiPPY(PhytoPlankton) : Optimal light in PhytoPlankton : W/m2
     ABIO_eps              : Abiotic Extinction Coefficient : 1/m
+
+   #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+   # Other diagnostics
+   #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    dissO5c : Calcite dissolution: mg C/m3/d
+
 end
 
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -229,10 +235,10 @@ end
   # Benthic State Variables
   #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     group BenDetritus[cnps] (BOM) : mg C/m2: mmol N/m2 : mmol P/m2 : mmol Si/m2
-                Q1[-s]    : Sediment Labile organic Matter
-                Q11[-s]   : Sediment Labile organic Matter
-                Q6        : Sediment Particulate organic Matter
-                Q16       : Deep Sediment organic Matter
+                Q1[-s]    : Surface Sediment Labile organic Matter
+                Q11[-s]   : Deep Sediment Labile organic Matter
+                Q6        : Surface Sediment Particulate organic Matter
+                Q16       : Deep Sediment Particulate organic Matter
     end
 end
 

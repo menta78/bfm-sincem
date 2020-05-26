@@ -49,7 +49,7 @@ Module AirSeaExchange
     real(RLEN)                       :: AirSeaCO2 
     !     
     real(RLEN),intent(IN)            :: xco2   ! Atmospheric mixing ratio of Gas [ppmv]
-    real(RLEN),intent(IN)            :: patm   ! Atmospheric pressure [mbar]
+    real(RLEN),intent(IN)            :: patm   ! Atmospheric pressure [mbar=hPa]
     real(RLEN),intent(IN)            :: temp   ! in-situ temperature at surface
     real(RLEN),intent(IN)            :: salt   ! practical salinity at surface
     real(RLEN),intent(IN)            :: rho    ! in-situ density 
@@ -68,14 +68,12 @@ Module AirSeaExchange
     real(RLEN)   :: tk, tk100, tk1002, itk100
     real(RLEN)   :: pschmidt, Kw660, kwgas, K0
     ! CO2 solubility coefficients
-    real(RLEN),parameter :: A(3) = (/-58.0931_RLEN, 90.5069_RLEN, 22.2940_RLEN/), &
-                            B(3) = (/0.027766_RLEN, -0.025888_RLEN, 0.0050578_RLEN/)
+    real(RLEN),parameter :: A(3) = (/-60.2409_RLEN, 93.4517_RLEN, 23.3585_RLEN/), &
+                            B(3) = (/0.023517_RLEN, -0.023656_RLEN, 0.0047036_RLEN/)
     !! Schmidt coefficients
     real(RLEN),parameter :: Sc = 660.0_RLEN, &
          C(5)  = (/2116.8_RLEN, -136.25_RLEN, 4.7353_RLEN, -0.092307_RLEN, 0.0007555_RLEN/)
-    ! This is for alternative fit of co2starair (see Orr et al, 2017 GMD)
-    !real(RLEN)   :: phi0atm
-    !real(RLEN),parameter :: F(7) = (/-160.7333, 215.4152, 89.8920, -1.47759, 0.029941, -0.027455, 0.0053407/)
+    !
     !---------------------------------------------------------------------------
     !
     ! common arrays
@@ -106,13 +104,7 @@ Module AirSeaExchange
     ! Equilbrium [CO2*air] for atm gas at Patm & sfc-water T,S [mol/kg]
     co2starair = K0 * fco2atm * 1.0e-6_RLEN
 
-    ! Alternative computation
-    !! Solubility function for atmospheric CO2 saturation concentration (Orr et al. GMD 2017, Eq. 15)
-    !phi0atm = exp (F(1) + F(2)*itk100 + F(3)*log(tk100) + F(4)*tk1002 + salt*(F(5) + F(6)*tk100 + F(7)*tk1002))
-    !! Compute saturation concentration in atmosphere [mol/kg] at total pressure Pa as in Orr et al (GMD 2017, Eq. 16)
-    !co2starair = patma * phi0atm * xco2 * 1.0e-6_RLEN
-    ! 
-    ! Compute piston velolicty kw660 (at 25 C) from wind speed (Wanninkhof 2014, Limnol. Oceanograph. Methods, 12, 351-362)
+    ! Compute piston velocity kw660 (at 25 C) from wind speed (Wanninkhof 2014, Limnol. Oceanograph. Methods, 12, 351-362)
     kw660 = 0.251_RLEN * wind**2 * kwfac
     !  Schmidt number (Sc), ratio between the kinematic viscosity and the molecular diffusivity of the gas
     pschmidt = C(1) + C(2)*temp + C(3)*temp**2 + C(4)*temp**3 + C(5)*temp**4
