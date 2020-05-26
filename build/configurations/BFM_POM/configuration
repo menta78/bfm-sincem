@@ -31,7 +31,8 @@
         ARCH    = 'gfortran.inc',
         PROC    = 4,
         EXP     = 'pom_bfm_1d',
-        BFMEXE  = 'pom_bfm.exe'
+        BFMEXE  = 'pom_bfm.exe',
+        EXPDIR  = 'MA21'
 /
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 #       CONFIGURATION VARIABLES

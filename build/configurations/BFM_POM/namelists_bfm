@@ -857,18 +857,18 @@ p_paMEZ(2,:)=   0.0,    1.0
 !-------------------------------------------------------------------------!
 &pom_input
    ! surface forcings
-   wind_input      =  '../../inputs/pom_MA21/windstress_mon_Mussap.da',
-   heat_input      =  '../../inputs/pom_MA21/heatflux.da',
-   surfNut_input   =  '../../inputs/pom_MA21/NutrientsARPAOGS.da',
+   wind_input      =  './windstress_mon_Mussap.da',
+   heat_input      =  './heatflux.da',
+   surfNut_input   =  './NutrientsARPAOGS.da',
    !
    ! initial conditions
-   Sprofile_input  =  '../../inputs/pom_MA21/Sinit_16m.da',
-   Tprofile_input  =  '../../inputs/pom_MA21/Tinit_16m.da',
+   Sprofile_input  =  './Sinit_16m.da',
+   Tprofile_input  =  './Tinit_16m.da',
    !
    ! climatological profiles
-   ism_input       =  '../../inputs/pom_MA21/ISM_16m_Mussap.da',
-   Sal_input       =  '../../inputs/pom_MA21/ClimaS_MA21_16m.da',
-   Temp_input      =  '../../inputs/pom_MA21/ClimaT_MA21_16m.da',
+   ism_input       =  './ISM_16m_Mussap.da',
+   Sal_input       =  './ClimaS_MA21_16m.da',
+   Temp_input      =  './ClimaT_MA21_16m.da',
    !
    ! input restart file
    read_restart    =  './fort.70',
