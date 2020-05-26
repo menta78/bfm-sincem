@@ -144,11 +144,7 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   do i =1,iiPelBacteria
      if ( CalcPelBacteria(i) ) then
-        if ( p_version(i) .eq. 4) then
-           call PelBacDynamics4( i )
-        else
            call PelBacDynamics( i )
-        endif
      endif
   end do
 
