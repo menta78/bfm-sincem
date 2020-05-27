@@ -14,5 +14,5 @@
   ARFLAGS=-r
 
   CPPFLAGS=
-  FFLAGS= -O3 -fdefault-real-8 -funroll-all-loops -fcray-pointer -ftree-vectorize ${NCDF_INC}
+  FFLAGS= -O3 -fdefault-real-8 -funroll-all-loops -fcray-pointer -ftree-vectorize -ffree-line-length-256 ${NCDF_INC}
   LDFLAGS= ${NCDF_INC} ${NCDF_LIB} 
