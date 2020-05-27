@@ -25,11 +25,12 @@
 #  EXPLICIT_SINK    : use of D3SOURCE and D3SINK
 
 &BFM_conf
-        MODE    = 'STANDALONE',
-        CPPDEFS = 'BFM_STANDALONE INCLUDE_PELCO2 INCLUDE_DIAG',
-        ARCH    = 'gfortran.inc',
-        PROC    = 4,
-        EXP     = 'standalone',
+        MODE     = 'STANDALONE',
+        CPPDEFS  = 'BFM_STANDALONE INCLUDE_PELCO2 INCLUDE_DIAG',
+        ARCH     = 'gfortran.inc',
+        PROC     = 4,
+        EXP      = 'standalone',
+        EXPFILES = 'CMIP5_Historical_GHG_1765_2005.dat'
 /
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 #       CONFIGURATION VARIABLES
