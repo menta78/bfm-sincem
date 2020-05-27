@@ -1,5 +1,4 @@
-# What is the BFM
-#---------------------------------
+## What is the BFM
 
 The Biogeochemical Flux Model (BFM) is a numerical model for the simulation 
 of the dynamics of major biogeochemical properties in marine ecosystems.
@@ -12,8 +11,7 @@ and in the doc/ directory
 Instructions for compilation and running are available on the web site
 http://www.bfm-community.eu/documentation
 
-# Members of the BFM agreement
-#---------------------------------
+## Members of the BFM agreement
 
 The development of the BFM is supported by a system team through a formal agreement. 
 The agreement establishes a program for model development that is discussed 
@@ -22,4 +20,4 @@ by the system team into the different releases of the model.
 The agreement is open to entrance of more contributors and more information can be 
 requested to info(at)bfm-community.eu
 Current members of the consortium are: 
-CMCC, OGS, UNIBO, UCT
+CMCC, OGS, UNIBO, UCT, SYKE
