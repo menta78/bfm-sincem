@@ -1,6 +1,12 @@
-# Basic script to generate plots of BFM STANDALONE results with HTML index
+# Python script to generate plots of BFM STANDALONE results
+# with HTML index file in the experiment directory
 #
-# usage: python standalone_diag.py <bfm-output.nc>
+# T.Lovato for BFM System Team (2020)
+#
+# Prerequisite: install "bfm_standalone_diag" python conda environment
+#   `conda env create -f environment.yml`
+#
+# Usage: python standalone_diag.py <bfm-output.nc>
 #
 
 from matplotlib import use
