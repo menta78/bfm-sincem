@@ -45,7 +45,7 @@ def diagnostics():
     }
 
     # compartments dict
-    compartments = {'pel': 'Pelagic', 'ben': 'Benthic'}
+    compartments = {'pel': 'Pelagic', 'ben': 'Benthic', 'ice': 'Seaice'}
 
     # plot resolution
     res = 200
@@ -66,6 +66,15 @@ def diagnostics():
         'living': ['Y1', 'Y2', 'Y3', 'Y4', 'Y5', 'H1', 'H2'],
         'detritus': ['Q1', 'Q6'],
         'quotas': ['detritus']
+    }
+
+    layout['ice'] = {
+        'inorganic': ['F2', 'F3', 'I1', 'I3', 'I4', 'I5'],
+        'phytoplankton': [ 'S1', 'S2'],
+        'zooplankton': ['X1'],
+        'bacteria': ['T1'],
+        'detritus': ['U1', 'U6'], 
+        'quotas': ['phytoplankton', 'zooplankton', 'bacteria', 'detritus']
     }
 
     # initialize HTML dict
