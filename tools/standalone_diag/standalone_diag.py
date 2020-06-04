@@ -18,6 +18,10 @@ CMass = 12.0
 
 
 def diagnostics():
+    # plot resolution
+    res = 200
+
+    # script path
     curpath = os.path.dirname(os.path.abspath(argv[0]))
 
     # check input arguments
@@ -27,6 +31,7 @@ def diagnostics():
 
     print('Begin processing file: ' + argv[1])
 
+    # input data path
     datapath = os.path.dirname(os.path.abspath(argv[1]))
 
     # create output folder in experiment
@@ -46,9 +51,6 @@ def diagnostics():
 
     # compartments dict
     compartments = {'pel': 'Pelagic', 'ben': 'Benthic', 'ice': 'Seaice'}
-
-    # plot resolution
-    res = 200
 
     # initialize component dicts
     layout = {}
@@ -70,10 +72,10 @@ def diagnostics():
 
     layout['ice'] = {
         'inorganic': ['F2', 'F3', 'I1', 'I3', 'I4', 'I5'],
-        'phytoplankton': [ 'S1', 'S2'],
+        'phytoplankton': ['S1', 'S2'],
         'zooplankton': ['X1'],
         'bacteria': ['T1'],
-        'detritus': ['U1', 'U6'], 
+        'detritus': ['U1', 'U6'],
         'quotas': ['phytoplankton', 'zooplankton', 'bacteria', 'detritus']
     }
 
@@ -143,9 +145,13 @@ def diagnostics():
 def create_index(curpath, datapath, constituents, compartments, html, outpath):
     ''' create HTML index from template '''
     template = curpath + '/index.template'
-    # Read in the file
+
+    # Read in the template file
     with open(template, 'r') as file:
         filedata = file.read()
+
+    # add experiment path
+    filedata = filedata.replace('_EXP_PATH_', datapath)
 
     # fill in navigation bar
     navs = []
@@ -154,32 +160,30 @@ def create_index(curpath, datapath, constituents, compartments, html, outpath):
     navs.append('QUOTAS')
     txt = ''
     for nn in navs:
-        txt = txt + '\t\t<a href="#' + nn + '">' + nn + '</a>\n'
+        txt += '\t\t<a href="#' + nn + '">' + nn + '</a>\n'
     filedata = filedata.replace('_NAV_ITEMS_', txt)
-
-    # add experiment path
-    filedata = filedata.replace('_EXP_PATH_', datapath)
 
     # fill in plots by constituent
     txt = ''
     for cons in html.keys():
         cname = constituents[cons].upper() if cons != 'quotas' else 'QUOTAS'
-        txt = txt + '<div id="' + cname + '" class="anchor"> </div>\n'
-        txt = txt + '<div class="constituent">\n<h2>' + cname + '</h2>\n'
+        txt += '<div id="' + cname + '" class="anchor"> </div>\n'
+        txt += '<div class="constituent">\n<h2>' + cname + '</h2>\n'
+        # by compartment
         for comp in html[cons].keys():
             if html[cons][comp]['name']:
                 cc = html[cons][comp]
-                txt = txt + '<div class="compartment">\n'
-                txt = txt + '\t<h4>' + compartments[comp] + '</h4>\n'
+                txt += '<div class="compartment">\n'
+                txt += '\t<h4>' + compartments[comp] + '</h4>\n'
                 for pname, fname in zip(cc['name'], cc['file']):
-                    txt = txt + '\t<div class="plot">\n'
-                    txt = txt + '\t\t<a href="' + fname + '" ><img class="image" src="' + fname + '" alt="" /></a>\n'
-                    txt = txt + '\t\t<h3>' + pname + '</h3>\n\t</div>\n'
-                txt = txt + '</div>\n'
-        txt = txt + '</div>\n<div style="clear: left; padding-bottom: 2em;"> </div>\n\n'
+                    txt += '\t<div class="plot">\n'
+                    txt += '\t\t<a href="' + fname + '" ><img class="image" src="' + fname + '" alt="" /></a>\n'
+                    txt += '\t\t<h3>' + pname + '</h3>\n\t</div>\n'
+                txt += '</div>\n'
+        txt += '</div>\n<div style="clear: left; padding-bottom: 2em;"> </div>\n\n'
     filedata = filedata.replace('_PLOT_ITEMS_', txt)
 
-    # Write the file out again
+    # Write HTML file to data folder
     with open(outpath + '/index.html', 'w') as file:
         file.write(filedata)
 
