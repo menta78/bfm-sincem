@@ -1,0 +1,174 @@
+<!DOCTYPE HTML>
+<!--
+    T.Lovato for BFM System Team 2020
+-->
+<html>
+<head>
+	<title>BFM Standalone diagnostics</title>
+        <link href="https://fonts.googleapis.com/css?family=Lato|Source+Sans+Pro:300,400,600" rel="stylesheet">
+	<link rel="icon" href="https://cmcc-foundation.github.io/www.bfm-community.eu/favicon.ico" type="image/x-icon"/>
+
+<!-- Add here object styles (like in css files) -->
+<style>
+
+html, body, div, section { 
+    font-family: 'Source Sans Pro', sans-serif;
+    background: #f0f0f0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    vertical-align: baseline;
+}
+
+.head-wrap {
+    background: #FFF; 
+    border-bottom-color: #d9d9d9; 
+    border-bottom-style: solid; 
+    border-bottom-width: medium; 
+    position: fixed; 
+    top: 0;
+    width: 100%;
+}
+
+.anchor {
+    padding-top: 270px; 
+    margin-top: -270px;
+}
+
+.constituent {
+    margin-bottom: 2em;
+    margin-left: 5%;
+    margin-right: 5%;
+    display: block;
+}
+
+.plot {
+    float: left;
+    margin-right: 1%;
+}
+
+.compartment {
+    width: 100%;
+    float: left;
+}
+
+.image {
+    display: block;
+    width: 500px;
+    border: solid 6px #ebebeb;
+}
+/* titles */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #888;
+}
+
+h1 {
+    font-family: 'Lato', sans-serif;
+    color: #000000;
+    text-shadow: 0.05em 0.075em 0 rgba(0, 0, 0, 0.1);
+    text-align: center;
+    text-transform: uppercase;
+    font-size: 4.5em;
+    letter-spacing: 10px;
+}
+
+h2 {
+    font-size: 2em;
+    font-weight: 600;
+    letter-spacing: 4px;
+    margin: 0 0 1.5em 0;
+    line-height: 1.75em;
+    color: #575757;
+    margin-block-start: 0em;
+    margin-block-end: 0.5em;
+    background-color: #FFF;
+    text-align: center;
+}
+
+h3 {
+    font-size: 1.3em;
+    margin-block-start: 0;
+    margin-block-end: 2em;
+    text-align: center;
+}
+
+h4 {
+    font-size: 1.4em;
+    font-weight: 500;
+    letter-spacing: 4px;
+    margin: 0 0 1.5em 0;
+    line-height: 1.75em;
+    color: #575757;
+    margin-block-start: 0em;
+    margin-block-end: 0em;
+}
+
+/* navigation bar */
+.topnav {
+     background: inherit;
+     overflow: hidden;
+     display: inline-block;
+}
+/* Style the links inside the navigation bar */
+.topnav a {
+      float: left;
+      color: rgb(0,67,85);
+      text-align: center;
+      padding: 0.2em 0em;
+      width: 200px;
+      text-decoration: none;
+      font-size: 2em;
+      font-weight: 600;
+      border-bottom-color: #d9d9d9; 
+      border-bottom-style: solid; 
+      border-bottom-width: thin;
+}
+
+/* Change the color of links on hover */
+.topnav a:hover {
+     text-shadow: 0.05em 0.075em 0 rgba(0, 0, 0, 0.15);
+}
+
+</style>
+</head>
+
+
+<!-- Java scripts to load visualization links -->
+
+<script>
+
+</script>
+
+<!-- BODY BODY BODY -->
+
+<body class="homepage">
+
+
+<!-- Header -->
+<div id="header-wrapper" class="head-wrap">
+
+       	<!-- Page title -->
+	<div "header" style="background: inherit;">
+	<h1 id="logo">
+                <img src="https://cmcc-foundation.github.io/www.bfm-community.eu/img/logos/BFM_Short_logo.svg" height="70" style="margin:-10px 20px">BFM Standalone</a>
+        </h1>
+        <p style="font-size: larger; margin-top: -40px; text-align: center;">_EXP_PATH_</p>
+        </div>
+
+	<!-- Navigation bar -->
+        <div id="menu" style="background: inherit; text-align: center;">
+	<div class="topnav">
+_NAV_ITEMS_
+	</div>
+	</div>
+</div>
+<div id="head-space" style="background: inherit; padding-top: 270px;" > </div>
+<!-- Show plots by constituent -->
+_PLOT_ITEMS_
+
+</body>
+
+</html>
