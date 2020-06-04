@@ -40,7 +40,8 @@ def diagnostics():
         'n': 'nitrogen',
         'p': 'phosphorus',
         's': 'silica',
-        'o': 'oxygen'
+        'o': 'oxygen',
+        'l': 'chlorophyll'
     }
 
     # compartments dict

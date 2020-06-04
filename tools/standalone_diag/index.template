@@ -118,7 +118,7 @@ h4 {
       color: rgb(0,67,85);
       text-align: center;
       padding: 0.2em 0em;
-      width: 200px;
+      margin-right: 25px;
       text-decoration: none;
       font-size: 2em;
       font-weight: 600;
