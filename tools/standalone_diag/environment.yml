@@ -1,0 +1,19 @@
+
+---
+name: bfm_standalone_diag
+channels:
+  - conda-forge
+
+dependencies:
+  # Multi language support:
+  - python>=3.6
+  - numpy
+  - matplotlib
+  - netcdf4
+  - pyyaml
+  - pudb
+  - yapf
+  - pip
+  # regular pip packages
+  - pip:
+    - ncPyTools

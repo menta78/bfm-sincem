@@ -39,7 +39,7 @@ $> cd $BFMDIR/build
 
 The user-dependent options are set either through the command line of the script or by adjusting (or adding) an architecture file in directory `$BFMDIR/compilers`. Default file is `gfortran.inc`. The standard GNU gmake variables are used for compiler and archiver names. **Remember** to add the right path for the NetCDF library files in the appropriate `.inc` file.
 
-If preset is not specified (see below), the **STANDALONE** zero-dimensional configuration is compiled by default with the command
+If preset is not specified, the **STANDALONE** zero-dimensional configuration is compiled by default with the command
 ```bash
 [$BFMDIR/build]> ./bfm_configure.sh -gcd
 ```
@@ -60,8 +60,21 @@ $> cd $BFMDIR/run/standalone
 ```
 **TIP**: use `./bfm_standalone.x &> outputfile` to redirect the screen output messages to a file in bash.
 
+Finally, realize an organized set of plots for BFM STANDALONE preset using the `standalone_diag` python script from the execution folder (usage details in tools README) :
+```bash
+[$BFMDIR/run/standalone]> python  ../../tools/standalone_diag/standalone_diag.py BFM_Standalone.nc`
+```
+
 A list of the available presets can be obtained using the command
 ```bash
 [$BFMDIR/build]> ./bfm_configure.sh -P 
 ```
 Refer to the model documentation for a description of the available presets.
+
+To compile a specific preset use the following
+```bash
+[$BFMDIR/build]> ./bfm_configure.sh -gcd -p <preset_name> 
+```
+
+
+```
