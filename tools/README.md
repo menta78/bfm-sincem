@@ -41,6 +41,7 @@ This tool also derives the integrated (gross and net) primary production down to
 Change the variable `COMPILER` in the `Makefile` with the name of the included compiler file from the Compilers directory. Run gmake. The tool requires NetCDF-4.3+ libraries. 
 
 **Usage**
+
 Data processing is controlled using the namelist `chlsat.nml` (Check the example provided for explanations of the input parameters):
 
 `$>./chlsat.x -f chlsat.nml`
