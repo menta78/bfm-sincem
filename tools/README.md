@@ -11,16 +11,18 @@ This tool merges the output files produced by `BFM_NEMO` when run in parallel wi
 The 1D BFM output files are remapped into NEMO 3D grid and all variables are copied in output file along with NEMO `tmask`.
 
 **Setup**
-- To debug (OMP parallel or serial) export variable DEBUG equal to yes: export DEBUG=yes
-- To execute load netcdf-4.3+ libraries
-Change the variable `COMPILER` in the `Makefile` with the name of the included compiler file from the Compilers directory. Run gmake.
+
+Change the variable `COMPILER` in the `Makefile` with the name of the included compiler file from the Compilers directory. Run gmake. 
+
+The tool requires NetCDF-4.3+ libraries. To debug (OMP parallel or serial) export variable DEBUG equal to yes, namely `$> export DEBUG=yes`
 
 **Usage**
-`bnmerge` is controlled by the namelist `bnmerge.nml` (see the example provided)
 
-`$>./bnmerge -f bnmerge.nml`
+Data processing is controlled using the namelist `bnmerge.nml` (Check the example provided for explanations of the input parameters):
 
-A batch execution script (`bnmerge.sh`) is provided as an example to generate reconstruction on CMCC clusters.
+`$>./bnmerge.x -f bnmerge.nml`
+
+A batch execution script (`bnmerge.sh`) is provided as an example to generate and use the reconstruction tool on CMCC clusters.
 
 ## chlsat
 This code computes the chlorophyll concentration as seen by satellite considering:
@@ -30,26 +32,31 @@ This code computes the chlorophyll concentration as seen by satellite considerin
 
 Input files are the chlorophyll concentration (variable `Chla`) and the attenuation coefficient
 (variable `xEPS`), both with the same number of time stamps, and the mask file.
-It also allows to compute the attenuation coefficient using the BFM formula from Chl
-concentration, background attenuation and chl specific absorption but neglecting
-the contribution from inorganic suspended matter and detritus.
-Check the ORCA2 mask to see in the history how to generate the mask file from the `mesh_mask`.
-The standard `mesh_mask.nc` file can also be used directly.
-Check the namelist `chlsat.nml` for explanations of the input parameters
+It also allows to compute the attenuation coefficient using the BFM formula from Chl concentration, background attenuation and chl specific absorption but neglecting the contribution from inorganic suspended matter and detritus.
 
-This tool also computes the integrated primary production (gross and net) down to 1% and
-0.1% light level by setting the flag `compute_intpp` and providing the paths to the files
-containing BFM diagnostics `ruPPYc` and `resPPYc`.
+This tool also derives the integrated (gross and net) primary production down to 1% and 0.1% light level by setting the flag `compute_intpp` within the input namelist and providing the path to the files containing BFM output fields `ruPPYc` and `resPPYc`.
+
+**Setup**
+
+Change the variable `COMPILER` in the `Makefile` with the name of the included compiler file from the Compilers directory. Run gmake. The tool requires NetCDF-4.3+ libraries. 
+
+**Usage**
+Data processing is controlled using the namelist `chlsat.nml` (Check the example provided for explanations of the input parameters):
+
+`$>./chlsat.x -f chlsat.nml`
+
 
 ## standalone_diag
 Create plots of BFM output state variables and nutriets ratios for STANDALONE simualtions with HTML index file.
 
 **Setup**
+
 A working python environment for conda `bfm_standalone_diag` can be created using the provided `environment.yml` file with
 
 `$> conda env create -f environment.yml`
 
 **Usage**
+
 Processing is done by `standalone_diag.py` that requires BFM STANDALONE output file as input:
 
 `(bfm_standalone_diag)$> python standalone_diag.py <bfm_output.nc>`
