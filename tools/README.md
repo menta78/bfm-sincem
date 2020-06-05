@@ -61,6 +61,6 @@ Processing is done by `standalone_diag.py` that requires BFM STANDALONE output f
 
 `(bfm_standalone_diag)$> python standalone_diag.py <bfm_output.nc>`
 
-The script will generate a new folder `standalone_html` in the same location of the output file that contains plots produced on the base of available output fields (`images` directory) and an HTML index file to visualize the figure. 
+The script will generate a new folder `standalone_html` in the same location of the output file that contains plots produced on the base of available output fields (`standalone_html/images` directory) and an HTML index file to visualize the figure. 
 
 
