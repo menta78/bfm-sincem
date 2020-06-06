@@ -205,7 +205,7 @@ SUBROUTINE trc_trp_bfm( kstp )
          ! compute global statistics of variables and 
          ! print into bfm.log file
          !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-         IF ( (kstp-nit000)<20 .OR. MOD(kstp,200)==0 .OR. kstp==nitend) THEN
+         IF ( (kstp-nit000)<100 .OR. MOD(kstp,200)==0 .OR. kstp==nitend) THEN
            IF (D3STATETYPE(m)>=ALLTRANSPORT) THEN
               ztraf = glob_sum( trn(:,:,:,m) * cvol(:,:,:) )
               zmin  = MINVAL( trn(:,:,:,m), mask= ((tmask*SPREAD(tmask_i,DIM=3,NCOPIES=jpk).NE.0.)) )
