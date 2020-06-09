@@ -292,7 +292,7 @@ echo ""
 # -----------------------------------------------------
 # create an include file for the code
 #
-GITREPOHEADER=${BFMDIR}/include/gitrepoinfo.h
+GIT_CODE_INFO=${BFMDIR}/include/git_code_info.h
 if [ -d ${BFMDIR}/.git  ] ; then
     BFMBRANCH=$( git rev-parse --abbrev-ref HEAD )
     BFMCOMMIT=$( git rev-parse --short HEAD )
@@ -301,10 +301,10 @@ if [ -d ${BFMDIR}/.git  ] ; then
        BFMCOMMIT="NOT AVAILABLE"
        BFMBRANCH=${BFMCOMMIT}
     fi
-    echo "   git_branch_name = '${BFMBRANCH}'" > ${GITREPOHEADER}
-    echo "   git_commit_id = '${BFMCOMMIT}'" >> ${GITREPOHEADER}
-    echo "   LEVEL1 ' BFM version:   ',TRIM(git_commit_id),' (',TRIM(git_branch_name),' branch)'" >> ${GITREPOHEADER}
-    echo "   LEVEL1 ' '" >> ${GITREPOHEADER}
+    echo "   git_branch_name = '${BFMBRANCH}'" > ${GIT_CODE_INFO}
+    echo "   git_commit_id = '${BFMCOMMIT}'" >> ${GIT_CODE_INFO}
+    echo "   LEVEL1 ' BFM version:   ',TRIM(git_commit_id),' (',TRIM(git_branch_name),' branch)'" >> ${GIT_CODE_INFO}
+    echo "   LEVEL1 ' '" >> ${GIT_CODE_INFO}
     # Annote changes to tracked files
     if [[ $(git diff --stat) != '' ]] ; then
         echo "Local changes to BFM git tracked files:" >>${BFMDIR}/${TEMPDIR}/gitpatch
@@ -316,11 +316,11 @@ if [ -d ${BFMDIR}/.git  ] ; then
         | sed 's,","",g' \
         | sed 's,^,LEVEL0 ",g' \
         | sed 's,$,",g' \
-        >> ${GITREPOHEADER}
+        >> ${GIT_CODE_INFO}
     rm -f ${BFMDIR}/${TEMPDIR}/gitpatch
 else
     echo "BFM git version control is missing !"
-    echo "   LEVEL1 'BFM git version control is missing '" > ${GITREPOHEADER}
+    echo "   LEVEL1 'BFM git version control is missing '" > ${GIT_CODE_INFO}
 fi
 
 # -----------------------------------------------------
