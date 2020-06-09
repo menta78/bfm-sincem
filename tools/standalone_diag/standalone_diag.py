@@ -138,7 +138,7 @@ def diagnostics():
                      outpath)
 
     print(
-        'Processing completed. \n\nOpen index.html or inspect content of diagnostics_html/images.\n'
+        'Processing completed. \n\nType \'open diagnostics_html/index.html\' or inspect content of diagnostics_html/images.\n'
     )
 
     return
@@ -215,6 +215,9 @@ def pl(nc, var, group, leg):
         if var == 'O3c' and 'O3h' in nc.variables:
             plot(dates, nc('O3h'))
             leg.append('O3h')
+        elif var == 'N3n' and 'N4n' in nc.variables:
+            plot(dates, nc('N4n'))
+            leg.append('N4n')
         if leg:
             legend(leg)
             ylabel(group.upper() + ' ['+ units + ']')
