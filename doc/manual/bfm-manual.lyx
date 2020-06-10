@@ -1,7 +1,9 @@
-#LyX 2.1 created this file. For more info see http://www.lyx.org/
-\lyxformat 474
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
 \begin_document
 \begin_header
+\save_transient_properties true
+\origin unavailable
 \textclass scrbook
 \begin_preamble
 \usepackage{listings}
@@ -48,16 +50,18 @@ eqs-within-sections
 \language_package default
 \inputencoding auto
 \fontencoding global
-\font_roman times
-\font_sans helvet
-\font_typewriter courier
-\font_math auto
+\font_roman "times" "default"
+\font_sans "helvet" "default"
+\font_typewriter "cmtl" "default"
+\font_math "auto" "auto"
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
-\font_sf_scale 100
-\font_tt_scale 100
+\font_sf_scale 100 100
+\font_tt_scale 80 100
+\use_microtype false
+\use_dash_ligatures true
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -87,6 +91,7 @@ eqs-within-sections
 \suppress_date true
 \justification true
 \use_refstyle 0
+\use_minted 0
 \index Index
 \shortcut idx
 \color #008000
@@ -99,7 +104,10 @@ eqs-within-sections
 \tocdepth 3
 \paragraph_separation indent
 \paragraph_indentation default
-\quotes_language english
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
 \papercolumns 2
 \papersides 2
 \paperpagestyle headings
@@ -133,12 +141,16 @@ begin{titlepage}
 \end_inset
 
 
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
 \align center
 \begin_inset Graphics
-	filename Figures/all_logos.png
+	filename /Users/lovato/GIT/bfm/doc/logos/BFM-Consortium_members.png
 	lyxscale 25
 	scale 40
 
@@ -172,7 +184,7 @@ height "1pt"
 \align center
 
 \size giant
-The Biogeochemical Flux Model (BFM)
+Biogeochemical Flux Model (BFM)
 \begin_inset Newline newline
 \end_inset
 
@@ -198,7 +210,7 @@ Equation Description and User Manual
 \begin_inset Newline newline
 \end_inset
 
-BFM version 5.1
+BFM version 5.2
 \end_layout
 
 \begin_layout Standard
@@ -231,12 +243,12 @@ The BFM System Team
 
 \begin_layout Standard
 \align center
-Release 1.1, August 2015
+Release 1.2, June 2020
 \begin_inset Newline newline
 \end_inset
 
------ BFM Report series N.
- 1 -----
+—– BFM Report series N.
+ 1 —–
 \begin_inset Newline newline
 \end_inset
 
@@ -254,7 +266,7 @@ http://bfm-community.eu
 \begin_inset Newline newline
 \end_inset
 
-info@bfm-community.eu
+bfm_st@cmcc.it
 \end_layout
 
 \begin_layout Standard
@@ -282,7 +294,7 @@ height "1pt"
 
 
 \begin_inset Graphics
-	filename Figures/BFM-gray.pdf
+	filename /Users/lovato/GIT/bfm/doc/logos/BFM_Full_logo.png
 	width 50text%
 
 \end_inset
@@ -318,14 +330,13 @@ This document should be cited as:
 \begin_inset Newline newline
 \end_inset
 
-Vichi M., Lovato T., Lazzari P., Cossarini G., Gutierrez Mlot E., Mattia G., Masina
- S., McKiver W.
- J., Pinardi N., Solidoro C., Tedesco L., Zavatarelli M.
- (2015).
+Vichi M., Lovato T., Butenschön M., Tedesco L., Lazzari P., Cossarini G., Masina
+ S., Pinardi N., Solidoro C., Zavatarelli M.
+ (2020).
  The Biogeochemical Flux Model (BFM): Equation Description and User Manual.
- BFM version 5.1.
+ BFM version 5.2.
  BFM Report series N.
- 1, Release 1.1, August 2015, Bologna, Italy, http://bfm-community.eu, pp.
+ 1, Release 1.2, June 2020, Bologna, Italy, http://bfm-community.eu, pp.
  104
 \end_layout
 
@@ -335,7 +346,7 @@ Vichi M., Lovato T., Lazzari P., Cossarini G., Gutierrez Mlot E., Mattia G., Mas
 \begin_inset VSpace 13cm
 \end_inset
 
-Copyright 2015, The BFM System Team.
+Copyright 2020, The BFM System Team.
  This work is licensed under the Creative Commons Attribution-Noncommercial-No
  Derivative Works 2.5 License.
  To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-
@@ -440,6 +451,7 @@ The BFM is a direct descendant of the European Regional Seas Ecosystem Model
 \begin_inset CommandInset citation
 LatexCommand citep
 key "baretta95,barettabekker97"
+literal "true"
 
 \end_inset
 
@@ -452,6 +464,7 @@ key "baretta95,barettabekker97"
 \begin_inset CommandInset citation
 LatexCommand citet
 key "vichi07_part1"
+literal "true"
 
 \end_inset
 
@@ -461,6 +474,7 @@ key "vichi07_part1"
 \begin_inset CommandInset citation
 LatexCommand citet
 key "blackford95"
+literal "true"
 
 \end_inset
 
@@ -470,6 +484,7 @@ key "blackford95"
 \begin_inset CommandInset citation
 LatexCommand citet
 key "vichi07_part1"
+literal "true"
 
 \end_inset
 
@@ -496,6 +511,7 @@ an.eu) is given in the companying manual of this release
 \begin_inset CommandInset citation
 LatexCommand citet
 key "BFM-NEMO-manual"
+literal "true"
 
 \end_inset
 
@@ -598,6 +614,7 @@ The BFM is free software and is protected by the GNU Public License
 \begin_inset CommandInset href
 LatexCommand href
 target "http://www.gnu.org/licenses/gpl.html"
+literal "false"
 
 \end_inset
 
@@ -606,11 +623,7 @@ target "http://www.gnu.org/licenses/gpl.html"
 \end_layout
 
 \begin_layout Quote
-Copyright 2013, The BFM System Team (
-\lang british
-info
-\lang american
-@bfm-community.eu)
+Copyright 2020, The BFM System Team (bfm_st@cmcc.it)
 \begin_inset Newline newline
 \end_inset
 
@@ -675,6 +688,7 @@ The BFM equations are written following the notation proposed by
 \begin_inset CommandInset citation
 LatexCommand citet
 key "vichi07_part1"
+literal "true"
 
 \end_inset
 
@@ -683,6 +697,7 @@ key "vichi07_part1"
 \begin_inset CommandInset citation
 LatexCommand citet
 key "vichi07_part1"
+literal "true"
 
 \end_inset
 
@@ -753,6 +768,7 @@ reference "fig:Scheme-Pelagic"
 \begin_inset CommandInset citation
 LatexCommand citep
 key "ruardij95a"
+literal "true"
 
 \end_inset
 
@@ -760,6 +776,7 @@ key "ruardij95a"
 \begin_inset CommandInset citation
 LatexCommand citet
 key "vichi04"
+literal "true"
 
 \end_inset
 
@@ -775,6 +792,7 @@ Following
 \begin_inset CommandInset citation
 LatexCommand citet
 key "vichi07_part1"
+literal "true"
 
 \end_inset
 
@@ -912,7 +930,7 @@ centerline{
 
 \begin_inset Tabular
 <lyxtabular version="3" rows="23" columns="6">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="block" valignment="top" width="1.5cm">
 <column alignment="block" valignment="top" width="2cm">
 <column alignment="block" valignment="top" width="1cm">
@@ -2868,7 +2886,7 @@ centering
 
 \begin_inset Tabular
 <lyxtabular version="3" rows="11" columns="2">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top">
 <column alignment="left" valignment="top">
 <row>
@@ -3177,7 +3195,7 @@ centerline{
 
 
 \begin_inset Graphics
-	filename Figures/bfm_scheme_V5_pelagic.eps
+	filename Figures/bfm_ecosystem_schemes_pelagic.eps
 
 \end_inset
 
@@ -3213,6 +3231,7 @@ Scheme of the state variables and pelagic interactions of the reference
 \begin_inset CommandInset citation
 LatexCommand citet
 key "blackford95"
+literal "true"
 
 \end_inset
 
@@ -3220,6 +3239,7 @@ key "blackford95"
 \begin_inset CommandInset citation
 LatexCommand citet
 key "vichi07_part1"
+literal "true"
 
 \end_inset
 
@@ -3298,6 +3318,7 @@ etic Available Radiation (PAR)
 \begin_inset CommandInset citation
 LatexCommand citet
 key "sakshaug97"
+literal "true"
 
 \end_inset
 
@@ -3317,6 +3338,7 @@ reference "tab:Parameters-PAR"
 \begin_inset CommandInset citation
 LatexCommand citet
 key "morel88"
+literal "true"
 
 \end_inset
 
@@ -3324,6 +3346,7 @@ key "morel88"
 \begin_inset CommandInset citation
 LatexCommand citet
 key "lengaigne07"
+literal "true"
 
 \end_inset
 
@@ -3461,9 +3484,9 @@ Pelagic_Environment.nml
 \begin_layout Enumerate
 Instantaneous value (
 \family typewriter
-LightPeriodFlag=
+LightPeriodFlag=1
 \family default
-1)
+)
 \end_layout
 
 \begin_layout Enumerate
@@ -3477,9 +3500,9 @@ LightPeriodFlag=2
 \begin_layout Enumerate
 Daylight average (with explicit photoperiod, 
 \family typewriter
-LightPeriodFlag=
+LightPeriodFlag=3
 \family default
-3)
+)
 \end_layout
 
 \begin_layout Standard
@@ -3510,9 +3533,9 @@ at the upper interface, thus
 
  (
 \family typewriter
-LightLocationFlag=
+LightLocationFlag=1
 \family default
-1), 
+), 
 \end_layout
 
 \begin_layout Enumerate
@@ -3520,14 +3543,15 @@ middle of the cell as in
 \begin_inset CommandInset citation
 LatexCommand citet
 key "lazzari12"
+literal "true"
 
 \end_inset
 
  (
 \family typewriter
-LightLocationFlag=
+LightLocationFlag=2
 \family default
-2),
+),
 \lang english
 
 \begin_inset Formula 
@@ -3547,6 +3571,7 @@ integrated over level depth as in
 \begin_inset CommandInset citation
 LatexCommand citet
 key "vichi07_part1"
+literal "true"
 
 \end_inset
 
@@ -3554,9 +3579,9 @@ key "vichi07_part1"
 \lang american
 (
 \family typewriter
-LightLocationFlag=
+LightLocationFlag=3
 \family default
-3),
+),
 \begin_inset Formula 
 \begin{equation}
 E_{PAR}=\frac{E_{PAR}^{k}}{\lambda^{k}\Delta z^{k}}\left(1-\exp\left(-\lambda^{k}\Delta z^{k}\right)\right)\label{eq:avail_rad}
@@ -3589,6 +3614,7 @@ E m
 \begin_inset CommandInset citation
 LatexCommand citep
 key "reinart98"
+literal "true"
 
 \end_inset
 
@@ -3618,7 +3644,7 @@ centering{
 
 \begin_inset Tabular
 <lyxtabular version="3" rows="9" columns="4">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="2cm">
 <column alignment="left" valignment="top" width="2cm">
 <column alignment="left" valignment="top" width="2cm">
@@ -4215,6 +4241,7 @@ Synechococcus
 \begin_inset CommandInset citation
 LatexCommand citep
 key "worden04"
+literal "true"
 
 \end_inset
 
@@ -4384,7 +4411,7 @@ reference "box:phytoplankton"
  
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Iron-in-phytoplankton"
+reference "subsec:Iron-in-phytoplankton"
 
 \end_inset
 
@@ -4396,7 +4423,7 @@ When Chl constituent is not used (see Sec.
  
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Light-limitation-and-optimal-light"
+reference "subsec:Light-limitation-and-optimal-light"
 
 \end_inset
 
@@ -4405,6 +4432,7 @@ reference "sub:Light-limitation-and-optimal-light"
 \begin_inset CommandInset citation
 LatexCommand citet
 key "ebenhoeh97"
+literal "true"
 
 \end_inset
 
@@ -4425,7 +4453,7 @@ reference "eq:phytoplankton_Chl"
  
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Light-limitation-and-optimal-light"
+reference "subsec:Light-limitation-and-optimal-light"
 
 \end_inset
 
@@ -4442,7 +4470,7 @@ status open
 \align left
 \begin_inset Tabular
 <lyxtabular version="3" rows="37" columns="4">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top" width="2cm">
 <column alignment="left" valignment="top" width="2cm">
@@ -4710,7 +4738,7 @@ Basal specific respiration rate
 \begin_layout Plain Layout
 
 \size scriptsize
-\begin_inset Formula $d_{0{}_{P}}$
+\begin_inset Formula $d_{0_{P}}$
 \end_inset
 
 
@@ -6481,7 +6509,7 @@ Pelagic_Ecology.nml: Phyto_parameters
 Photosynthesis and carbon dynamics
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:Photosynthesis-and-carbon"
+name "subsec:Photosynthesis-and-carbon"
 
 \end_inset
 
@@ -6494,6 +6522,7 @@ Photosynthesis is primarily controlled by light by means of the non-dimensional
 \begin_inset CommandInset citation
 LatexCommand citet
 key "jassby76"
+literal "true"
 
 \end_inset
 
@@ -6538,7 +6567,7 @@ The maximum chl-specific photosynthetic rate
  
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Multiple-nutrient-limitation"
+reference "subsec:Multiple-nutrient-limitation"
 
 \end_inset
 
@@ -6555,6 +6584,7 @@ reference "sub:Multiple-nutrient-limitation"
 \begin_inset CommandInset citation
 LatexCommand citep
 key "jassby76,behrenfeld04"
+literal "true"
 
 \end_inset
 
@@ -6596,6 +6626,7 @@ where
 \begin_inset CommandInset citation
 LatexCommand citep
 key "lazzari12"
+literal "true"
 
 \end_inset
 
@@ -6606,6 +6637,7 @@ key "lazzari12"
 \begin_inset CommandInset citation
 LatexCommand citep
 key "vichi07_part2"
+literal "true"
 
 \end_inset
 
@@ -6633,6 +6665,7 @@ Note that it is possible to further control temperature limitation with
 \begin_inset CommandInset citation
 LatexCommand citep
 key "vichi07_part2"
+literal "true"
 
 \end_inset
 
@@ -6755,7 +6788,7 @@ which is usually included for those phytoplankton population that are indedible
 Multiple nutrient limitation
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:Multiple-nutrient-limitation"
+name "subsec:Multiple-nutrient-limitation"
 
 \end_inset
 
@@ -6768,6 +6801,7 @@ The BFM inherits the treatment of nutrient limitation from the original
 \begin_inset CommandInset citation
 LatexCommand citet
 key "barettabekker97"
+literal "true"
 
 \end_inset
 
@@ -6784,6 +6818,7 @@ key "barettabekker97"
 \begin_inset CommandInset citation
 LatexCommand citet
 key "droop73"
+literal "true"
 
 \end_inset
 
@@ -6791,6 +6826,7 @@ key "droop73"
 \begin_inset CommandInset citation
 LatexCommand citet
 key "barettabekker97"
+literal "true"
 
 \end_inset
 
@@ -6799,6 +6835,7 @@ key "barettabekker97"
 \begin_inset CommandInset citation
 LatexCommand citet
 key "vichi04"
+literal "true"
 
 \end_inset
 
@@ -6824,7 +6861,7 @@ reference "tab:phytoplankton_parameters"
  
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Iron-in-phytoplankton"
+reference "subsec:Iron-in-phytoplankton"
 
 \end_inset
 
@@ -6832,6 +6869,7 @@ reference "sub:Iron-in-phytoplankton"
 \begin_inset CommandInset citation
 LatexCommand citep
 key "lazzari12"
+literal "true"
 
 \end_inset
 
@@ -6897,7 +6935,7 @@ Note that the ratios between brackets can be larger than 1 because the nutrient
  
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Nutrient-uptake"
+reference "subsec:Nutrient-uptake"
 
 \end_inset
 
@@ -6920,6 +6958,7 @@ reference "tab:phytoplankton_parameters"
 \begin_inset CommandInset citation
 LatexCommand citep
 key "flynn03"
+literal "true"
 
 \end_inset
 
@@ -6932,6 +6971,7 @@ key "flynn03"
 \begin_inset CommandInset citation
 LatexCommand citet
 key "contois59"
+literal "true"
 
 \end_inset
 
@@ -6955,6 +6995,7 @@ The Contois formulation implements a control on dissolved nutrient uptake
 \begin_inset CommandInset citation
 LatexCommand citet
 key "tsiaras08"
+literal "true"
 
 \end_inset
 
@@ -6976,6 +7017,7 @@ ive approach
 \begin_inset CommandInset citation
 LatexCommand citep
 key "flynn03"
+literal "true"
 
 \end_inset
 
@@ -7016,6 +7058,7 @@ reference "eq:phytoplankton_gpp"
 \begin_inset CommandInset citation
 LatexCommand citet
 key "lazzari12"
+literal "true"
 
 \end_inset
 
@@ -7035,6 +7078,7 @@ reference "tab:iron_parameters"
 \begin_inset CommandInset citation
 LatexCommand citet
 key "vichi07_part1"
+literal "true"
 
 \end_inset
 
@@ -7053,14 +7097,14 @@ ll synthesis and sinking (Secs.
  
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Chlorophyll-synthesis-acclimation"
+reference "subsec:Chlorophyll-synthesis-acclimation"
 
 \end_inset
 
  and 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Phytoplankton-sinking"
+reference "subsec:Phytoplankton-sinking"
 
 \end_inset
 
@@ -7071,7 +7115,7 @@ reference "sub:Phytoplankton-sinking"
 Nutrient uptake
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:Nutrient-uptake"
+name "subsec:Nutrient-uptake"
 
 \end_inset
 
@@ -7089,6 +7133,7 @@ A major problem in modelling nutrient uptake is to deal with unbalanced
 \begin_inset CommandInset citation
 LatexCommand citep
 key "morel87"
+literal "true"
 
 \end_inset
 
@@ -7097,6 +7142,7 @@ key "morel87"
 \begin_inset CommandInset citation
 LatexCommand citet
 key "barettabekker97"
+literal "true"
 
 \end_inset
 
@@ -7240,7 +7286,7 @@ reference "eq:phytoplankton_net_growth"
 Nutrient loss associated with lysis
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:Nutrient-loss-lysis"
+name "subsec:Nutrient-loss-lysis"
 
 \end_inset
 
@@ -7264,6 +7310,7 @@ The redistribution of the cellular elements C, N and P over the excretion
 \begin_inset CommandInset citation
 LatexCommand citep
 key "barettabekker97"
+literal "true"
 
 \end_inset
 
@@ -7305,7 +7352,7 @@ In the case of Si, the release is always in particulate form   and thus
 Exudation of carbohydrates
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:Exudation-of-carbohydrates"
+name "subsec:Exudation-of-carbohydrates"
 
 \end_inset
 
@@ -7361,6 +7408,7 @@ reference "tab:phytoplankton_parameters"
 \begin_inset CommandInset citation
 LatexCommand citep
 key "barettabekker97"
+literal "true"
 
 \end_inset
 
@@ -7368,6 +7416,7 @@ key "barettabekker97"
 \begin_inset CommandInset citation
 LatexCommand citet
 key "vichi07_part1"
+literal "true"
 
 \end_inset
 
@@ -7402,12 +7451,13 @@ p_switchDOC=3
 
 \end_inset
 
- However, the ERSEM-II parameterization not only leads to the desired extra
+However, the ERSEM-II parameterization not only leads to the desired extra
  release of C-enriched DOM but also to a decrease of the population biomass.
  It has been shown by 
 \begin_inset CommandInset citation
 LatexCommand citet
 key "vichi04"
+literal "true"
 
 \end_inset
 
@@ -7418,6 +7468,7 @@ key "vichi04"
 \begin_inset CommandInset citation
 LatexCommand citet
 key "lazzari12"
+literal "true"
 
 \end_inset
 
@@ -7563,7 +7614,7 @@ Different parameterizations for the chlorophyll synthesis.
 Chlorophyll synthesis and photoacclimation
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:Chlorophyll-synthesis-acclimation"
+name "subsec:Chlorophyll-synthesis-acclimation"
 
 \end_inset
 
@@ -7584,6 +7635,7 @@ reference "eq:phytoplankton_Chl"
 \begin_inset CommandInset citation
 LatexCommand citet
 key "geider96,geider97"
+literal "true"
 
 \end_inset
 
@@ -7601,6 +7653,7 @@ s, nutrient availability and turnover rate.
 \begin_inset CommandInset citation
 LatexCommand citep
 key "geider97,blackford04"
+literal "true"
 
 \end_inset
 
@@ -7608,6 +7661,7 @@ key "geider97,blackford04"
 \begin_inset CommandInset citation
 LatexCommand citep
 key "geider98,flynn01"
+literal "true"
 
 \end_inset
 
@@ -7624,6 +7678,7 @@ reference "box:phytoplankton_Chl_synthesis"
 \begin_inset CommandInset citation
 LatexCommand citet
 key "vichi09"
+literal "true"
 
 \end_inset
 
@@ -7631,6 +7686,7 @@ key "vichi09"
 \begin_inset CommandInset citation
 LatexCommand citet
 key "lazzari12"
+literal "true"
 
 \end_inset
 
@@ -7644,6 +7700,7 @@ key "lazzari12"
 \begin_inset CommandInset citation
 LatexCommand citet
 key "geider97"
+literal "true"
 
 \end_inset
 
@@ -7689,6 +7746,7 @@ reference "eq:chlsyn_OGS"
 \begin_inset CommandInset citation
 LatexCommand citet
 key "lazzari12"
+literal "true"
 
 \end_inset
 
@@ -7722,6 +7780,7 @@ The ratio is down-regulated when the rate of light absorption (governed
 \begin_inset CommandInset citation
 LatexCommand citet
 key "geider96"
+literal "true"
 
 \end_inset
 
@@ -7738,6 +7797,7 @@ key "geider96"
 \begin_inset CommandInset citation
 LatexCommand citep
 key "jassby76,behrenfeld04"
+literal "true"
 
 \end_inset
 
@@ -7873,7 +7933,7 @@ reference "eq:chlsyn_NIOZ"
 Light limitation and photoacclimation based on optimal light
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:Light-limitation-and-optimal-light"
+name "subsec:Light-limitation-and-optimal-light"
 
 \end_inset
 
@@ -7886,6 +7946,7 @@ This parameterization is alternative to the one above and is consistent
 \begin_inset CommandInset citation
 LatexCommand citep
 key "ebenhoeh97"
+literal "true"
 
 \end_inset
 
@@ -8021,7 +8082,7 @@ status open
 \align left
 \begin_inset Tabular
 <lyxtabular version="3" rows="9" columns="4">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="3cm">
 <column alignment="left" valignment="top" width="2cm">
 <column alignment="left" valignment="top" width="2cm">
@@ -8570,7 +8631,7 @@ rs_iron
 Iron in phytoplankton
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:Iron-in-phytoplankton"
+name "subsec:Iron-in-phytoplankton"
 
 \end_inset
 
@@ -8595,6 +8656,7 @@ INCLUDE_PELFE
 \begin_inset CommandInset citation
 LatexCommand citet
 key "vichi07_part1"
+literal "true"
 
 \end_inset
 
@@ -8676,6 +8738,7 @@ reference "eq:phytoplankton_gpp"
 \begin_inset CommandInset citation
 LatexCommand citep
 key "sunda97"
+literal "true"
 
 \end_inset
 
@@ -8689,7 +8752,7 @@ The regulating factor inhibits carbon fixation, but iron can still be taken
  
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Nutrient-uptake"
+reference "subsec:Nutrient-uptake"
 
 \end_inset
 
@@ -8724,7 +8787,7 @@ It is assumed that the only physiological iron loss from phytoplankton is
 Phytoplankton sinking
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:Phytoplankton-sinking"
+name "subsec:Phytoplankton-sinking"
 
 \end_inset
 
@@ -8744,6 +8807,7 @@ The sinking of biogenic material is a fundamental process for the simulation
 \begin_inset CommandInset citation
 LatexCommand citep
 key "varela95"
+literal "true"
 
 \end_inset
 
@@ -8820,6 +8884,7 @@ In addition to the original ERSEM parameterization
 \begin_inset CommandInset citation
 LatexCommand citep
 key "barettabekker95"
+literal "true"
 
 \end_inset
 
@@ -8827,6 +8892,7 @@ key "barettabekker95"
 \begin_inset CommandInset citation
 LatexCommand citet
 key "vichi07_part1"
+literal "true"
 
 \end_inset
 
@@ -8834,6 +8900,7 @@ key "vichi07_part1"
 \begin_inset CommandInset citation
 LatexCommand citet
 key "vichi04"
+literal "true"
 
 \end_inset
 
@@ -8841,6 +8908,7 @@ key "vichi04"
 \begin_inset CommandInset citation
 LatexCommand citet
 key "polimene06"
+literal "true"
 
 \end_inset
 
@@ -8850,6 +8918,7 @@ n and to BACT2 and BACT3 for the
 \begin_inset CommandInset citation
 LatexCommand citet
 key "vichi04"
+literal "true"
 
 \end_inset
 
@@ -8857,6 +8926,7 @@ key "vichi04"
 \begin_inset CommandInset citation
 LatexCommand citet
 key "polimene06"
+literal "true"
 
 \end_inset
 
@@ -8940,6 +9010,7 @@ s).
 \begin_inset CommandInset citation
 LatexCommand citep
 key "polimene06"
+literal "true"
 
 \end_inset
 
@@ -8950,6 +9021,7 @@ key "polimene06"
 \begin_inset CommandInset citation
 LatexCommand citep
 key "heissenberger96"
+literal "true"
 
 \end_inset
 
@@ -8957,6 +9029,7 @@ key "heissenberger96"
 \begin_inset CommandInset citation
 LatexCommand citep
 key "stoderegger98"
+literal "true"
 
 \end_inset
 
@@ -8967,6 +9040,7 @@ key "stoderegger98"
 \begin_inset CommandInset citation
 LatexCommand citep
 key "stoderegger98"
+literal "true"
 
 \end_inset
 
@@ -9090,7 +9164,7 @@ status open
 \align left
 \begin_inset Tabular
 <lyxtabular version="3" rows="23" columns="5">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top" width="2cm">
 <column alignment="left" valignment="top" width="2cm">
@@ -10727,6 +10801,7 @@ f_{_{B}}^{o}=\frac{\left(O^{(2)}\right)^{3}}{\left(O^{(2)}\right)^{3}+\left(h_{_
 \begin_inset CommandInset citation
 LatexCommand citet
 key "vichi04"
+literal "true"
 
 \end_inset
 
@@ -10742,7 +10817,7 @@ The non dimensional regulating factor based on the nutritional content of
 \begin_layout Standard
 \begin_inset Formula 
 \begin{equation}
-f_{_{B}}^{n,p}=\min\left(1,\,\frac{B_{p}/B_{c}}{p^{^{opt}}},\,\frac{B_{n}/B_{c}}{n^{^{opt}}}\right);\label{eq:bact_quota_regulation}
+f_{_{B}}^{n,p}=\min\left(1,\,\frac{B_{p}/B_{c}}{p^{^{opt}}},\,\frac{B_{n}/B_{c}}{n^{^{opt}}}\right)\label{eq:bact_quota_regulation}
 \end{equation}
 
 \end_inset
@@ -10775,6 +10850,7 @@ optimal
 \begin_inset CommandInset citation
 LatexCommand citep
 key "goldman78"
+literal "true"
 
 \end_inset
 
@@ -10868,7 +10944,7 @@ where
 BACT1 parameterization 
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:BACT1"
+name "subsec:BACT1"
 
 \end_inset
 
@@ -10962,7 +11038,7 @@ The uptake of the nutrient components in the dissolved and particulate fractions
 Nutrient release and uptake
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:BACT1-Nutrient-release-uptake"
+name "subsec:BACT1-Nutrient-release-uptake"
 
 \end_inset
 
@@ -11070,7 +11146,7 @@ reference "eq:bacteria_C"
 BACT2 parameterization
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:BACT2"
+name "subsec:BACT2"
 
 \end_inset
 
@@ -11082,6 +11158,7 @@ In this parameterization originally proposed by
 \begin_inset CommandInset citation
 LatexCommand citet
 key "vichi04"
+literal "true"
 
 \end_inset
 
@@ -11194,7 +11271,7 @@ The uptake dynamics is similar to the one for phytoplankton, with affinity
  the optimal quota and the net carbon uptake
 \begin_inset Formula 
 \begin{equation}
-G_{B}=\sum_{j=1,2,6}\left.\frac{dB_{c}}{dt}\right|_{R_{c}^{(j)}}^{upt}-\left.\frac{dB_{c}}{dt}\right|_{O^{(3)}}^{rsp}.\label{eq:bacteria_net_growth}
+G_{B}=\sum_{j=1,2,6}\left.\frac{dB_{c}}{dt}\right|_{R_{c}^{(j)}}^{upt}-\left.\frac{dB_{c}}{dt}\right|_{O^{(3)}}^{rsp}\label{eq:bacteria_net_growth}
 \end{equation}
 
 \end_inset
@@ -11259,7 +11336,7 @@ optimal
 BACT3 parameterization 
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:BACT3"
+name "subsec:BACT3"
 
 \end_inset
 
@@ -11315,7 +11392,7 @@ The Nutrient release and uptake parameterization is the same described for
  
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:BACT1-Nutrient-release-uptake"
+reference "subsec:BACT1-Nutrient-release-uptake"
 
 \end_inset
 
@@ -11368,6 +11445,7 @@ where
 \begin_inset CommandInset citation
 LatexCommand citep
 key "stoderegger98"
+literal "true"
 
 \end_inset
 
@@ -11461,6 +11539,7 @@ citep{broekhuizen95}
 \begin_inset CommandInset citation
 LatexCommand citet
 key "vichi07_part1"
+literal "true"
 
 \end_inset
 
@@ -11469,6 +11548,7 @@ key "vichi07_part1"
 \begin_inset CommandInset citation
 LatexCommand citet
 key "barettabekker95"
+literal "true"
 
 \end_inset
 
@@ -11476,6 +11556,7 @@ key "barettabekker95"
 \begin_inset CommandInset citation
 LatexCommand citet
 key "broekhuizen95"
+literal "true"
 
 \end_inset
 
@@ -11495,7 +11576,7 @@ reference "box:zooplankton"
  
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Zooplankton-fixed-quota"
+reference "subsec:Zooplankton-fixed-quota"
 
 \end_inset
 
@@ -11601,7 +11682,7 @@ status open
 \align left
 \begin_inset Tabular
 <lyxtabular version="3" rows="19" columns="4">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top" width="2cm">
 <column alignment="left" valignment="top" width="2cm">
@@ -12662,7 +12743,7 @@ status open
 \align left
 \begin_inset Tabular
 <lyxtabular version="3" rows="16" columns="4">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top" width="2cm">
 <column alignment="left" valignment="top" width="3cm">
@@ -13581,7 +13662,7 @@ Pelagic_Ecology.nml: MesoZoo_parameters
 Food availability
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:Zoo-Food-availability"
+name "subsec:Zoo-Food-availability"
 
 \end_inset
 
@@ -13617,6 +13698,7 @@ is the availability of prey
 \begin_inset CommandInset citation
 LatexCommand citet
 key "gentleman03"
+literal "true"
 
 \end_inset
 
@@ -13624,6 +13706,7 @@ key "gentleman03"
 \begin_inset CommandInset citation
 LatexCommand citet
 key "gibson05"
+literal "true"
 
 \end_inset
 
@@ -13631,6 +13714,7 @@ key "gibson05"
 \begin_inset CommandInset citation
 LatexCommand citet
 key "barettabekker95"
+literal "true"
 
 \end_inset
 
@@ -13638,6 +13722,7 @@ key "barettabekker95"
 \begin_inset CommandInset citation
 LatexCommand citet
 key "broekhuizen95"
+literal "true"
 
 \end_inset
 
@@ -13690,6 +13775,7 @@ reference "eq:flip_flop_rule"
 \begin_inset CommandInset citation
 LatexCommand citep
 key "gentleman03"
+literal "true"
 
 \end_inset
 
@@ -13755,6 +13841,7 @@ reference "eq:zooplankton_ingestion"
 LatexCommand citep
 before "cf."
 key "mitra05"
+literal "true"
 
 \end_inset
 
@@ -13764,6 +13851,7 @@ n
 \begin_inset CommandInset citation
 LatexCommand citep
 key "barettabekker97"
+literal "true"
 
 \end_inset
 
@@ -13772,6 +13860,7 @@ key "barettabekker97"
 LatexCommand citet
 after "TER"
 key "andersen04"
+literal "true"
 
 \end_inset
 
@@ -13815,6 +13904,7 @@ reference "eq:zooplankton_out_N"
 \begin_inset CommandInset citation
 LatexCommand citep
 key "frost04,anderson05"
+literal "true"
 
 \end_inset
 
@@ -13853,9 +13943,10 @@ for mesozooplankton the carbon loss term reads:
 
 \begin_layout Standard
 \begin_inset Formula 
-\begin{equation}
-\left.\frac{dZ_{c}}{dt}\right|_{R_{c}^{(6)}}^{rel}=\beta_{_{Z}}I_{c}+(d_{0_{Z}}+doxy_{0_{Z}}(1-f_{Z}^{o}))\,f_{_{Z}}^{T}\,Z_{c}+d_{_{Z}}^{dns}\,Z_{c}^{\gamma_{_{Z}}}+Q_{Z}^{c}\label{eq:zooplankton_out-3}
-\end{equation}
+\begin{align}
+\left.\frac{dZ_{c}}{dt}\right|_{R_{c}^{(6)}}^{rel} & =\beta_{_{Z}}I_{c}+(d_{0_{Z}}+doxy_{0_{Z}}(1-f_{Z}^{o}))\,f_{_{Z}}^{T}\,Z_{c}+\nonumber \\
+ & +d_{_{Z}}^{dns}\,Z_{c}^{\gamma_{_{Z}}}+Q_{Z}^{c}\label{eq:zooplankton_out-3}
+\end{align}
 
 \end_inset
 
@@ -13910,7 +14001,7 @@ centerline{
 
 \begin_inset Tabular
 <lyxtabular version="3" rows="5" columns="4">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="center" valignment="middle" width="2cm">
 <column alignment="center" valignment="top">
 <column alignment="center" valignment="top">
@@ -14965,7 +15056,7 @@ name "sec:non-living"
 Oxygen and anoxic processes
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:Oxygen-anoxic-processes"
+name "subsec:Oxygen-anoxic-processes"
 
 \end_inset
 
@@ -14980,6 +15071,7 @@ The dynamics of dissolved oxygen and carbon dioxide are important closures
 \begin_inset CommandInset citation
 LatexCommand citet
 key "olsen05"
+literal "true"
 
 \end_inset
 
@@ -14988,6 +15080,7 @@ key "olsen05"
 \begin_inset CommandInset citation
 LatexCommand citet
 key "orr2017"
+literal "true"
 
 \end_inset
 
@@ -15008,6 +15101,7 @@ Anaerobic processes and denitrification dynamics are a consequence of oxygen
 \begin_inset CommandInset citation
 LatexCommand citet
 key "ruardij95a"
+literal "true"
 
 \end_inset
 
@@ -15015,6 +15109,7 @@ key "ruardij95a"
 \begin_inset CommandInset citation
 LatexCommand citet
 key "vichi04"
+literal "true"
 
 \end_inset
 
@@ -15204,7 +15299,7 @@ reference "eq:bacteria_rsp"
  enhance the denitrification flux in the following way:
 \begin_inset Formula 
 \begin{align}
-\!\!\!\!\NSP\left.\frac{dN^{(3)}}{dt}\right|^{denit}\NSP= & \Lambda_{_{N^{(3)}}}^{denit}\,f_{_{n}}^{T}\left[\frac{1}{\mathcal{M}_{o}^{*}}\Omega_{_{c}}^{o}\left(1-f_{_{B}}^{o}\right)\left.\frac{dB_{c}}{dt}\right|_{O^{(3)}}^{rsp}\right]N^{(3)}\cdot\label{eq:nitrate_denitrification}
+\!\!\!\!\NSP\left.\frac{dN^{(3)}}{dt}\right|^{denit}\NSP= & \Lambda_{_{N^{(3)}}}^{denit}\,f_{_{n}}^{T}\left[\frac{1}{\mathcal{M}_{o}^{*}}\Omega_{_{c}}^{o}\left(1-f_{_{B}}^{o}\right)\left.\frac{dB_{c}}{dt}\right|_{O^{(3)}}^{rsp}\right]N^{(3)}\label{eq:nitrate_denitrification}
 \end{align}
 
 \end_inset
@@ -15292,7 +15387,7 @@ centerline{
 
 \begin_inset Tabular
 <lyxtabular version="3" rows="19" columns="4">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="block" valignment="top" width="2cm">
 <column alignment="left" valignment="top" width="3cm">
 <column alignment="left" valignment="top">
@@ -16435,7 +16530,7 @@ Chemical stoichiometric coefficients and general parameters involving pelagic
 Dissolved inorganic nutrients
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:Dissolved-inorganic-nutrients"
+name "subsec:Dissolved-inorganic-nutrients"
 
 \end_inset
 
@@ -16850,6 +16945,7 @@ Dissolved inorganic iron species are scavenged onto particle surfaces owing
 \begin_inset CommandInset citation
 LatexCommand citet
 key "johnson97"
+literal "true"
 
 \end_inset
 
@@ -16859,6 +16955,7 @@ key "johnson97"
 \begin_inset CommandInset citation
 LatexCommand citet
 key "archer00,parekh04,lefevre99"
+literal "true"
 
 \end_inset
 
@@ -16866,6 +16963,7 @@ key "archer00,parekh04,lefevre99"
 \begin_inset CommandInset citation
 LatexCommand citet
 key "johnson97"
+literal "true"
 
 \end_inset
 
@@ -16873,6 +16971,7 @@ key "johnson97"
 \begin_inset CommandInset citation
 LatexCommand citet
 key "aumont03"
+literal "true"
 
 \end_inset
 
@@ -16900,7 +16999,7 @@ with a given time constant
 Dissolved and particulate organic matter
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:Non-living-organic"
+name "subsec:Non-living-organic"
 
 \end_inset
 
@@ -16962,21 +17061,21 @@ reference "eq:DOC_R2c"
  
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:BACT1"
+reference "subsec:BACT1"
 
 \end_inset
 
 , 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:BACT2"
+reference "subsec:BACT2"
 
 \end_inset
 
  and 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:BACT3"
+reference "subsec:BACT3"
 
 \end_inset
 
@@ -17174,6 +17273,7 @@ INCLUDE_PELCO2
 \begin_inset CommandInset citation
 LatexCommand citep
 key "zeebe01book,blackford02"
+literal "true"
 
 \end_inset
 
@@ -17181,6 +17281,7 @@ key "zeebe01book,blackford02"
 \begin_inset CommandInset citation
 LatexCommand citet
 key "orr2015"
+literal "true"
 
 \end_inset
 
@@ -17189,6 +17290,7 @@ key "orr2015"
 \begin_inset CommandInset citation
 LatexCommand citep
 key "dickson2007"
+literal "true"
 
 \end_inset
 
@@ -17459,7 +17561,7 @@ and
 \end_inset
 
  and 
-\begin_inset Formula $N{}^{(5)}$
+\begin_inset Formula $N^{(5)}$
 \end_inset
 
  are the model state variables for DIC, total alkalinity, total phosphorus
@@ -17495,6 +17597,7 @@ The effects of biogeochemical processes on alkalinity linked to the N cycle
 \begin_inset CommandInset citation
 LatexCommand citet
 key "wolf-gladrow07"
+literal "true"
 
 \end_inset
 
@@ -17537,6 +17640,7 @@ The equilibrium constants are also computed from temperature and salinity
 \begin_inset CommandInset citation
 LatexCommand citet
 key "zeebe01book"
+literal "true"
 
 \end_inset
 
@@ -17580,6 +17684,7 @@ reference "eq:TA"
 \begin_inset CommandInset citation
 LatexCommand citep
 key "munhoven2013"
+literal "true"
 
 \end_inset
 
@@ -17600,6 +17705,7 @@ key "munhoven2013"
 \begin_inset CommandInset citation
 LatexCommand citet
 key "visinelli2016"
+literal "true"
 
 \end_inset
 
@@ -17658,13 +17764,15 @@ ic concentration of inorganic carbon or to set it constant to a certain
 \begin_inset CommandInset citation
 LatexCommand citet
 key "wanninkhof2014"
+literal "true"
 
 \end_inset
 
- and are implemented followinf the apporach proposed by 
+ and are implemented following the apporach proposed by 
 \begin_inset CommandInset citation
 LatexCommand citet
 key "orr2017"
+literal "true"
 
 \end_inset
 
@@ -17696,7 +17804,7 @@ centering{
 
 \begin_inset Tabular
 <lyxtabular version="3" rows="8" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top">
 <column alignment="left" valignment="top" width="2cm">
 <column alignment="left" valignment="top" width="6cm">
@@ -17862,7 +17970,7 @@ p_kdca
 \begin_layout Plain Layout
 
 \size scriptsize
-\begin_inset Formula $d{}^{-1}$
+\begin_inset Formula $d^{-1}$
 \end_inset
 
 
@@ -18093,6 +18201,7 @@ of diatom chlorophyll have been found in Antarctic sea ice
 \begin_inset CommandInset citation
 LatexCommand citep
 key "thomas02"
+literal "true"
 
 \end_inset
 
@@ -18142,6 +18251,7 @@ The sea ice extension of the BFM described here (BFM-SI) has been published
 \begin_inset CommandInset citation
 LatexCommand citep
 key "tedesco10,tedesco12,tedesco14"
+literal "true"
 
 \end_inset
 
@@ -18149,6 +18259,7 @@ key "tedesco10,tedesco12,tedesco14"
 \begin_inset CommandInset citation
 LatexCommand citet
 key "tedesco2010bfm"
+literal "true"
 
 \end_inset
 
@@ -18159,6 +18270,7 @@ key "tedesco2010bfm"
 \begin_inset CommandInset citation
 LatexCommand citet
 key "tedesco14"
+literal "true"
 
 \end_inset
 
@@ -18251,7 +18363,7 @@ centering
 
  
 \begin_inset Graphics
-	filename Figures/BFM-SI.png
+	filename Figures/bfm_ecosystem_schemes_seaice.eps
 	width 100text%
 
 \end_inset
@@ -18331,7 +18443,7 @@ Legend: IO = Inorganic; LO = Living organic; NO = Non-living organic.
  
 \begin_inset Tabular
 <lyxtabular version="3" rows="13" columns="4">
-<features rotate="0" tabularvalignment="middle" tabularwidth="100text%">
+<features tabularvalignment="middle" tabularwidth="100text%">
 <column alignment="none" valignment="top" special="@{\extracolsep\fill\vrule height 12pt depth 8pt width0pt\ }l">
 <column alignment="left" valignment="top">
 <column alignment="left" valignment="top">
@@ -19021,7 +19133,7 @@ Ecological and physiological parameters in BFM-SI.
  
 \begin_inset Tabular
 <lyxtabular version="3" rows="26" columns="4">
-<features rotate="0" tabularvalignment="middle" tabularwidth="100text%">
+<features tabularvalignment="middle" tabularwidth="100text%">
 <column alignment="none" valignment="top" special="@{\extracolsep\fill\vrule height 12pt depth 8pt width0pt\ }l">
 <column alignment="left" valignment="top">
 <column alignment="left" valignment="top">
@@ -20736,6 +20848,7 @@ where
 \begin_inset CommandInset citation
 LatexCommand citet
 key "tedesco09a,tedesco10"
+literal "true"
 
 \end_inset
 
@@ -21065,6 +21178,7 @@ The rate of change of net photosynthesis is thus primarily controlled by
 \begin_inset CommandInset citation
 LatexCommand citet
 key "geider98"
+literal "true"
 
 \end_inset
 
@@ -21115,7 +21229,7 @@ reference "tab:BFM-SI_parameters"
   
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Chlorophyll-synthesis-acclimation"
+reference "subsec:Chlorophyll-synthesis-acclimation"
 
 \end_inset
 
@@ -21149,6 +21263,7 @@ Even in isolated brine pockets, bacteria, heterotrophic protozoa and small
 \begin_inset CommandInset citation
 LatexCommand citep
 key "arri95"
+literal "true"
 
 \end_inset
 
@@ -21158,6 +21273,7 @@ key "arri95"
 \begin_inset CommandInset citation
 LatexCommand citep
 key "lizo91"
+literal "true"
 
 \end_inset
 
@@ -21166,6 +21282,7 @@ key "lizo91"
 \begin_inset CommandInset citation
 LatexCommand citep
 key "diec91"
+literal "true"
 
 \end_inset
 
@@ -21432,6 +21549,7 @@ A full description of the coupling issues is given in
 \begin_inset CommandInset citation
 LatexCommand citet
 key "tedesco14"
+literal "true"
 
 \end_inset
 
@@ -21582,6 +21700,7 @@ reference "fig:BAL_scheme"
 \begin_inset CommandInset citation
 LatexCommand citet
 key "tedesco10"
+literal "true"
 
 \end_inset
 
@@ -21673,6 +21792,7 @@ The rates of advection and diffusion of dissolved and particulate substances
 \begin_inset CommandInset citation
 LatexCommand citep
 key "cota91a"
+literal "true"
 
 \end_inset
 
@@ -21683,6 +21803,7 @@ key "cota91a"
 \begin_inset CommandInset citation
 LatexCommand cite
 key "lizo91"
+literal "true"
 
 \end_inset
 
@@ -21694,6 +21815,7 @@ High biomass is usually found in area of slow ice growth rate
 \begin_inset CommandInset citation
 LatexCommand citep
 key "lege92"
+literal "true"
 
 \end_inset
 
@@ -21703,6 +21825,7 @@ key "lege92"
 \begin_inset CommandInset citation
 LatexCommand citep
 key "cota91a"
+literal "true"
 
 \end_inset
 
@@ -21713,6 +21836,7 @@ n just below the ice and reduces the flux of nutrients upward by reducing
 \begin_inset CommandInset citation
 LatexCommand citep
 key "goss85"
+literal "true"
 
 \end_inset
 
@@ -21729,6 +21853,7 @@ It is assumed here that the entrapment of dissolved matter follows the same
 \begin_inset CommandInset citation
 LatexCommand citet
 key "tedesco09a"
+literal "true"
 
 \end_inset
 
@@ -21832,13 +21957,14 @@ l nutrient availability for surface communities, and indirectly to internal
  and bottom communities, and finally to surface waters once sea ice has
  totally melted away.
  In the Baltic Sea, for instance, 5% of the total annual flux of N and P
- and 20--40% of lead and cadmium are deposited as snow: due to the intense
+ and 20–40% of lead and cadmium are deposited as snow: due to the intense
  stratification of most of the Baltic waters, sea ice is the major source
  of nutrients and trace elements to the surface Baltic waters during the
  melting season 
 \begin_inset CommandInset citation
 LatexCommand citep
 key "gran06a"
+literal "true"
 
 \end_inset
 
@@ -21936,74 +22062,19 @@ Installation
 \end_layout
 
 \begin_layout Standard
-The BFM code repository is made available through a distributed git repository,
- which requires access authentication by using the username and password
- provided in the registration to the BFM website (http://www.bfm-community.eu/).
- The code can be downloaded using the following git instruction
-\end_layout
-
-\begin_layout Standard
-\begin_inset listings
-lstparams "basicstyle={\small\ttfamily}"
-inline false
-status open
-
-\begin_layout Plain Layout
-
-% git clone  http://username:password@dev.cmcc.it/git/bfm.git 
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-Alternatively, it is possible to retrieve a tarball archive from the website.
- After downloading the tarball file, create a directory for the BFM and
- move into that directory.
- Uncompress and extract the contents of the tarball.
- The downloaded file will have a different name based on the version.
- For example: 
-\end_layout
-
-\begin_layout Standard
-\begin_inset listings
-lstparams "basicstyle={\small\ttfamily}"
-inline false
-status open
-
-\begin_layout Plain Layout
-
-% mkdir $HOME/BFM 
-\end_layout
-
-\begin_layout Plain Layout
-
-% cd $HOME/BFM
-\end_layout
-
-\begin_layout Plain Layout
-
-% gunzip bfm-release-<version>.tgz
-\end_layout
-
-\begin_layout Plain Layout
-
-% tar xvf bfm-release-<version>.tar
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-This operation will create and populate the directory 
+The BFM code repository is made available through the website (http://www.bfm-com
+munity.eu/).
+ After the compilation of the online form, an email will be automatically
+ sent to you with a temporary link to download the code compressed archive.The
+ upacked folder contains the 
 \family typewriter
-bfm
+build
 \family default
- containing the source files and the directory 
+ environment, 
+\family typewriter
+src
+\family default
+ files and the directory 
 \family typewriter
 run
 \family default
@@ -22108,7 +22179,7 @@ System Requirements
 
 \begin_layout Standard
 The BFM can be run on any UNIX-based architecture and it has been tested
- on linux, Mac OSX and IBM-iDataplex systems.
+ on linux and Mac OSX systems.
  
 \end_layout
 
@@ -22117,8 +22188,9 @@ The software requirements are:
 \end_layout
 
 \begin_layout Itemize
-PERL (version 5.8.2 and above), used automatically during compilation time
- to generate the code from the model template (see Sec.
+PERL (version 5.8.2 and above) including Switch module, used automatically
+ during compilation time to generate the code from the model template (see
+ Sec.
  
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -22136,17 +22208,24 @@ FORTRAN 90/95 compiler.
 \end_layout
 
 \begin_layout Itemize
-NetCDF library (version 4 and above are recommended, http://www.unidata.ucar.edu/so
-ftware/netcdf) .
+NetCDF library (version 4 and above, http://www.unidata.ucar.edu/software/netcdf)
+ .
  It is mandatory that the library has been compiled with the same compiler
  used for the model compilation since the F90 netcdf module is used.
+\end_layout
+
+\begin_layout Itemize
+GNU make.
+ Makefile only works with GNU make, therefore substitute your system make
+ or use an alias to ensure that the right one is set in case you are not
+ on a linux machine.
 \end_layout
 
 \begin_layout Section
 Configuration: BFM Presets
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:Presets"
+name "subsec:Presets"
 
 \end_inset
 
@@ -22218,7 +22297,7 @@ Presets are composed of three different main files:
  (compilation and deployment options)
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:preset_configuration"
+name "subsec:preset_configuration"
 
 \end_inset
 
@@ -22447,7 +22526,7 @@ reference "sec:Memory-layout"
  (memory layout configuration file)
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:preset_layout"
+name "subsec:preset_layout"
 
 \end_inset
 
@@ -22491,7 +22570,7 @@ reference "sec:Memory-layout"
  (namelist file with standard values)
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:preset_namelists_bfm"
+name "subsec:preset_namelists_bfm"
 
 \end_inset
 
@@ -22509,6 +22588,7 @@ BFM input namelists follows
 LatexCommand href
 name "F90 namelist standard"
 target "http://publib.boulder.ibm.com/infocenter/comphelp/v101v121/topic/com.ibm.xlf121.aix.doc/language_ref/namelistio.html"
+literal "false"
 
 \end_inset
 
@@ -22560,7 +22640,7 @@ nmlcreator
  
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Adding-subgroup"
+reference "subsec:Adding-subgroup"
 
 \end_inset
 
@@ -22646,7 +22726,7 @@ $BFMDIR/build
 \shape italic
 bfm_configure.sh
 \shape default
- using default preset, namely the STANDALONE_PELAGIC:
+ using default preset, namely the STANDALONE:
 \end_layout
 
 \begin_layout Standard
@@ -22775,22 +22855,22 @@ status open
 
 \begin_layout Plain Layout
 
-STANDALONE_PELAGIC generation done!
+STANDALONE generation done!
 \end_layout
 
 \begin_layout Plain Layout
 
-Starting STANDALONE_PELAGIC compilation...
+Starting STANDALONE compilation...
 \end_layout
 
 \begin_layout Plain Layout
 
-STANDALONE_PELAGIC compilation done!
+STANDALONE compilation done!
 \end_layout
 
 \begin_layout Plain Layout
 
-Go to $BFMDIR/run/standalone.pelagic and execute command: ./bfm_standalone.x
+Go to $BFMDIR/run/standalone and execute command: ./bfm_standalone.x
 \end_layout
 
 \end_inset
@@ -22818,7 +22898,7 @@ status open
 
 \begin_layout Plain Layout
 
-./bfm_configure.sh -gcd -p CO2TEST
+./bfm_configure.sh -gcd -p STANDALONE_SEAICE
 \end_layout
 
 \end_inset
@@ -22915,7 +22995,7 @@ centering
 
 \begin_inset Tabular
 <lyxtabular version="3" rows="17" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top">
 <column alignment="left" valignment="top">
 <column alignment="left" valignment="top" width="0pt">
@@ -23467,7 +23547,7 @@ Description
 \begin_layout Standard
 The execution of the configuration script described in the previous section
  creates the executable and the running environment for the default preset
- of the STANDALONE model (called STANDALONE_PELAGIC).
+ of the STANDALONE model (called STANDALONE).
  The list of the available presets is obtained with the command 
 \family typewriter
 bfm_configure.sh -P
@@ -23483,7 +23563,7 @@ reference "sec:Test-cases"
 .
  The generated namelists are copied to the directory 
 \family typewriter
-$BFMDIR/run/standalone.pelagic
+$BFMDIR/run/standalone
 \family default
  and the model is run by executing 
 \family typewriter
@@ -23590,7 +23670,7 @@ centering
 
 \begin_inset Tabular
 <lyxtabular version="3" rows="7" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="none" valignment="top" width="3cm">
 <column alignment="none" valignment="top" width="3cm">
 <column alignment="none" valignment="top" width="2.22956in">
@@ -23673,12 +23753,12 @@ STANDALONE configuration:
 
 \begin_layout Plain Layout
 2.
- benthic (not yet available)
+ benthic return
 \end_layout
 
 \begin_layout Plain Layout
 3.
- pelagic and benthic (not yet available)
+ pelagic and benthic return
 \end_layout
 
 \end_inset
@@ -23948,7 +24028,7 @@ CL{
 
 \begin_inset Tabular
 <lyxtabular version="3" rows="11" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="middle" width="5cm">
 <column alignment="left" valignment="middle" width="2cm">
 <column alignment="left" valignment="middle" width="6cm">
@@ -24054,7 +24134,7 @@ CalcBenthicFlag
 
 \family typewriter
 \size footnotesize
-integer
+logical
 \family default
  
 \end_layout
@@ -24067,36 +24147,7 @@ integer
 \begin_layout Plain Layout
 
 \size footnotesize
-Switch for the benthic model (only option 1.
- is currently allowed)
-\end_layout
-
-\begin_layout Plain Layout
-
-\size footnotesize
-1.
- no benthic model; 
-\end_layout
-
-\begin_layout Plain Layout
-
-\size footnotesize
-2.
- simple benthic return; 
-\end_layout
-
-\begin_layout Plain Layout
-
-\size footnotesize
-3.
- benthic organisms and intermediate complexity nutrient regeneration; 
-\end_layout
-
-\begin_layout Plain Layout
-
-\size footnotesize
-4.
- benthic organisms and full nutrient regeneration (early diagenesis) 
+Switch for the benthic model 
 \end_layout
 
 \end_inset
@@ -24549,7 +24600,7 @@ CL{
 
 \begin_inset Tabular
 <lyxtabular version="3" rows="4" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="middle" width="5cm">
 <column alignment="left" valignment="middle" width="2cm">
 <column alignment="left" valignment="middle" width="6cm">
@@ -24921,6 +24972,10 @@ the Euler scheme (
 method=1
 \family default
 ):
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
@@ -24973,6 +25028,10 @@ status collapsed
 method=2
 \family default
 ):
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
@@ -24990,6 +25049,10 @@ the leap-frog scheme (
 method=3
 \family default
 ):
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
@@ -25027,7 +25090,7 @@ centering
 
 \begin_inset Tabular
 <lyxtabular version="3" rows="8" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="none" valignment="top" width="3cm">
 <column alignment="none" valignment="top" width="3cm">
 <column alignment="none" valignment="top" width="5cm">
@@ -25411,7 +25474,7 @@ centering
 
 \begin_inset Tabular
 <lyxtabular version="3" rows="6" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="none" valignment="top" width="3cm">
 <column alignment="none" valignment="top" width="2.27546in">
 <column alignment="none" valignment="top" width="2.59696in">
@@ -25939,7 +26002,7 @@ centering
 
 \begin_inset Tabular
 <lyxtabular version="3" rows="16" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="4cm">
 <column alignment="left" valignment="top" width="3cm">
 <column alignment="none" valignment="top" width="5cm">
@@ -26850,94 +26913,6 @@ standalone/external_data.F90
  state variable(s) with the input value(s) at the prescribed time(s).
 \end_layout
 
-\begin_layout Standard
-\begin_inset Float figure
-wide true
-sideways false
-status open
-
-\begin_layout Plain Layout
-\begin_inset Graphics
-	filename Figures/co2test_NOAA_CO2.eps
-	scale 40
-
-\end_inset
-
-
-\begin_inset Graphics
-	filename Figures/co2test_DIC.eps
-	scale 40
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Graphics
-	filename Figures/co2test_pH_T.eps
-	scale 40
-
-\end_inset
-
-
-\begin_inset Graphics
-	filename Figures/co2test_DIC_T.eps
-	scale 40
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Caption Standard
-
-\begin_layout Plain Layout
-\begin_inset CommandInset label
-LatexCommand label
-name "fig:Examples-co2test"
-
-\end_inset
-
-Examples from the 
-\family typewriter
-CO2TEST
-\family default
- simulation.
- Top panels: atmospheric CO
-\begin_inset Formula $_{2}$
-\end_inset
-
- partial pressure from the NOAA marine boundary layer data at 33N (http://www.esr
-l.noaa.gov/gmd/ccgg/mbl/) and DIC with temperature set to the constant value
- of 25 
-\begin_inset Formula $^{o}C$
-\end_inset
-
- (default run).
- Bottom panels: pH and DIC values obtained with seasonally varying temperature
- (
-\family typewriter
-tw=14, ts=27
-\family default
- in 
-\family typewriter
-Standalone.nml
-\family default
-)
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
 \begin_layout Section
 Test cases
 \begin_inset CommandInset label
@@ -26950,73 +26925,13 @@ name "sec:Test-cases"
 \end_layout
 
 \begin_layout Subsection
-STANDALONE_CO2TEST: carbonate system model
-\end_layout
-
-\begin_layout Standard
-The most simple test case is
-\family typewriter
- STANDALONE_CO2TEST
-\family default
- that generates the run directory
-\family typewriter
- run/standalone.co2test
-\family default
-.
- if the BFM is configured with 
-\family typewriter
-bfm_configure.sh -gcd -p CO2TEST
-\family default
-.
- It simulates a simple carbonate system equilibrium using the routines developed
- by OCMIP (
-\family typewriter
-CalcCO2Method=2
-\family default
- in 
-\family typewriter
-Carbonate_Dynamics.nml
-\family default
-).
- Initial conditions are set for a Mediterranean station with high alkalinity
- value and output is created every 60 days.
- The system is forced with observed atmospheric CO
-\begin_inset Formula $_{2}$
-\end_inset
-
- increase over the period 1979-2009.
- The default simulation prescribes a constant temperature value and it is
- interesting to note the differences shown in Fig.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:Examples-co2test"
-
-\end_inset
-
- when seasonal variability of temperature is turned on.
- The seasonal cycle in temperature can be prescribed by changing the winter
- and summer temperature minima and maxima of the analytical forcing functions
- (Sec.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "tab:Parameters-forcings"
-
-\end_inset
-
-).
- 
-\end_layout
-
-\begin_layout Subsection
-STANDALONE_PELAGIC: the full pelagic BFM
+STANDALONE: the dafault pelagic BFM
 \end_layout
 
 \begin_layout Standard
 The standard test case for the full BFM is created in directory 
 \family typewriter
-run/standalone.pelagic
+run/standalone
 \family default
  and it is the default preset when the code is generated and compiled without
  any option.
@@ -27050,20 +26965,25 @@ reference "tab:Parameters-bfm"
 
 ).
  The time evolutions of temperature, irradiance, nutrients (the system is
- sustained with regenerated nutrients only, therefore nitrate plot is logarithmi
-c and goes very close to 0), chlorophyll and gross primary production are
- shown in Figs.
+ sustained with regenerated nutrients only), chlorophyll and gross primary
+ production are shown in Figs.
  
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "fig:test-case-ETW-EIR"
+reference "fig:standalone-inorganics"
+plural "false"
+caps "false"
+noprefix "false"
 
 \end_inset
 
--
+ and 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "fig:test-case-CHLA-ruPPYc"
+reference "fig:standalone-living"
+plural "false"
+caps "false"
+noprefix "false"
 
 \end_inset
 
@@ -27092,6 +27012,7 @@ reference "chap:sea-ice"
 \begin_inset CommandInset citation
 LatexCommand citet
 key "tedesco14"
+literal "true"
 
 \end_inset
 
@@ -27130,7 +27051,7 @@ http://meteora.ucsd.edu/~pierce/ncview_home_page.html
 
 \end_inset
 
-), with the Python utility PyNcview 
+) or with the Python utility PyNcview 
 \begin_inset Flex URL
 status collapsed
 
@@ -27141,17 +27062,30 @@ https://sourceforge.net/projects/pyncview/
 
 \end_inset
 
- or with 
-\family typewriter
-ncbrowse
-\family default
 .
- Matlab users can use the 
+ 
+\end_layout
+
+\begin_layout Standard
+In the 
 \family typewriter
-bfm_ncload.m
+tools
 \family default
- utility available in the tools directory.
- The figures presented in Sec.
+ directory a simple python script named 
+\family typewriter
+standalone_diag
+\family default
+ is made available to perform diagnostic plots of BFM standalone presets
+ (see usage details in 
+\family typewriter
+tools/README.md
+\family default
+).
+ 
+\end_layout
+
+\begin_layout Standard
+The figures presented in Sec.
  
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -27159,7 +27093,7 @@ reference "sec:Test-cases"
 
 \end_inset
 
- have been produced with pyncview.
+ have been produced with this tool.
 \begin_inset ERT
 status open
 
@@ -27182,40 +27116,37 @@ sideways false
 status open
 
 \begin_layout Plain Layout
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-
-\backslash
-CL{
-\end_layout
+\begin_inset Graphics
+	filename Figures/standalone/c-pel-inorganic.png
+	lyxscale 30
+	scale 50
 
 \end_inset
 
 
 \begin_inset Graphics
-	filename Figures/temperate_pelagic_ETW.eps
-	scale 40
+	filename Figures/standalone/n-pel-inorganic.png
+	lyxscale 30
+	scale 50
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename Figures/standalone/o-pel-inorganic.png
+	lyxscale 30
+	scale 50
 
 \end_inset
 
 
 \begin_inset Graphics
-	filename Figures/temperate_pelagic_EIR.eps
-	scale 40
-
-\end_inset
-
-
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-}
-\end_layout
+	filename Figures/standalone/p-pel-inorganic.png
+	lyxscale 30
+	scale 50
 
 \end_inset
 
@@ -27226,15 +27157,17 @@ status open
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
-Sample output of the STANDALONE_PELAGIC test case: temperature (left) and
- irradiance (right)
+Output of the STANDALONE test case: Dissolved Inorganic Carbon (O3c) and
+ Alkalinity (O3h), Nitrate (N3n) and Ammonia (N4n), Dissolved Oxygen (O2o),
+ and Phosphate (N1p).
+ 
 \begin_inset CommandInset label
 LatexCommand label
-name "fig:test-case-ETW-EIR"
+name "fig:standalone-inorganics"
 
 \end_inset
 
- 
+
 \end_layout
 
 \end_inset
@@ -27254,33 +27187,18 @@ sideways false
 status open
 
 \begin_layout Plain Layout
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-
-\backslash
-CL{
-\end_layout
+\begin_inset Graphics
+	filename Figures/standalone/l-pel-phytoplankton.png
+	lyxscale 30
+	scale 50
 
 \end_inset
 
 
 \begin_inset Graphics
-	filename Figures/temperate_pelagic_PO4.eps
-	scale 60
-
-\end_inset
-
-
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-}
-\end_layout
+	filename Figures/standalone/c-pel-zooplankton.png
+	lyxscale 30
+	scale 50
 
 \end_inset
 
@@ -27288,33 +27206,18 @@ status open
 \end_layout
 
 \begin_layout Plain Layout
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-
-\backslash
-CL{
-\end_layout
+\begin_inset Graphics
+	filename Figures/standalone/c-pel-gross-production.png
+	lyxscale 30
+	scale 50
 
 \end_inset
 
 
 \begin_inset Graphics
-	filename Figures/temperate_pelagic_NO3.eps
-	scale 60
-
-\end_inset
-
-
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-}
-\end_layout
+	filename Figures/standalone/c-pel-respiration.png
+	lyxscale 30
+	scale 50
 
 \end_inset
 
@@ -27325,107 +27228,17 @@ status open
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
-Sample output of the STANDALONE_PELAGIC test case: phosphate (top) and nitrate
- (bottom) 
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset Float figure
-wide true
-sideways false
-status open
-
-\begin_layout Plain Layout
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-
-\backslash
-CL{
-\end_layout
-
-\end_inset
-
-
-\begin_inset Graphics
-	filename Figures/temperate_pelagic_chla.eps
-	scale 60
-
-\end_inset
-
-
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-
-\backslash
-CL{
-\end_layout
-
-\end_inset
-
-
-\begin_inset Graphics
-	filename Figures/temperate_pelagic_ruPPYc.eps
-	scale 60
-
-\end_inset
-
-
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Caption Standard
-
-\begin_layout Plain Layout
-Sample output of the STANDALONE_PELAGIC test case: Chlorophyll-a (top) and
- gross primary production (bottom)
+Output of the STANDALONE test case: phytoplankton Chlorophyll-a in (P1-4l),
+ zooplankton biomass (Z1-4c), gross primary (ruPPYc) and secondary (ruZOOc)
+ production, and respiration rates of living organism groups (resPPYc, resPBAc,
+ resZOOc)
 \begin_inset CommandInset label
 LatexCommand label
-name "fig:test-case-CHLA-ruPPYc"
+name "fig:standalone-living"
 
 \end_inset
 
- 
+
 \end_layout
 
 \end_inset
@@ -27519,7 +27332,7 @@ lstparams "basicstyle={\normalsize\ttfamily}"
 inline false
 status open
 
-\begin_layout LyX-Code
+\begin_layout Plain Layout
 
 D3STATE(NO_D3_BOX_STATES,NO_BOXES)
 \end_layout
@@ -27533,7 +27346,7 @@ lstparams "basicstyle={\normalsize\ttfamily}"
 inline false
 status open
 
-\begin_layout LyX-Code
+\begin_layout Plain Layout
 
 D2STATE(NO_D2_BOX_STATES,NO_BOXES_XY)
 \end_layout
@@ -27604,7 +27417,7 @@ lstparams "basicstyle={\normalsize\ttfamily}"
 inline false
 status open
 
-\begin_layout LyX-Code
+\begin_layout Plain Layout
 
 PhytoPlankton(iiP1,iiC)
 \end_layout
@@ -27620,7 +27433,7 @@ The model state variables and components are defined in the model layout
  
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Presets"
+reference "subsec:Presets"
 
 \end_inset
 
@@ -27726,7 +27539,7 @@ Compare this code with the equation for food availability and capture efficiency
   
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Zoo-Food-availability"
+reference "subsec:Zoo-Food-availability"
 
 \end_inset
 
@@ -27847,7 +27660,7 @@ lstparams "basicstyle={\normalsize\ttfamily},language=Fortran"
 inline false
 status open
 
-\begin_layout LyX-Code
+\begin_layout Plain Layout
 
 sum(D3SOURCE(j,:,:)-D3SINK(j,:,:))
 \end_layout
@@ -28277,7 +28090,7 @@ Invocation tree for PelagicSystemDynamics
 Computation of pelagic reaction terms
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:Computation-of-pelagic"
+name "subsec:Computation-of-pelagic"
 
 \end_inset
 
@@ -28315,6 +28128,7 @@ The routines for the computation of light availability are only used when
 LatexCommand citep
 before "as in ERSEM-II,"
 key "ebenhoeh97"
+literal "true"
 
 \end_inset
 
@@ -28322,7 +28136,7 @@ key "ebenhoeh97"
  
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Light-limitation-and-optimal-light"
+reference "subsec:Light-limitation-and-optimal-light"
 
 \end_inset
 
@@ -28699,7 +28513,7 @@ layout
   
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Presets"
+reference "subsec:Presets"
 
 \end_inset
 
@@ -28993,6 +28807,7 @@ According to the theoretical model description, variables are defined as
 \begin_inset CommandInset citation
 LatexCommand citep
 key "blackford95"
+literal "true"
 
 \end_inset
 
@@ -29543,7 +29358,7 @@ The configuration can be also modified at compilation time by means of the
  
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Presets"
+reference "subsec:Presets"
 
 \end_inset
 
@@ -29622,7 +29437,7 @@ Example 1.
  Adding a subgroup
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:Adding-subgroup"
+name "subsec:Adding-subgroup"
 
 \end_inset
 
@@ -29637,6 +29452,7 @@ on group , such as macrozooplankton
 LatexCommand citep
 before "as done for instance by"
 key "berline11"
+literal "true"
 
 \end_inset
 
@@ -30072,6 +29888,7 @@ ry for Global Ocean Simulations) and the climatological simulations were
 \begin_inset CommandInset citation
 LatexCommand citet
 key "vichi07_part2"
+literal "true"
 
 \end_inset
 
@@ -30081,7 +29898,7 @@ key "vichi07_part2"
  
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Iron-in-phytoplankton"
+reference "subsec:Iron-in-phytoplankton"
 
 \end_inset
 
@@ -30191,12 +30008,12 @@ The preprocessing script will take care during compilation to generate an
 \family typewriter
 ppP1f
 \family default
-, \SpecialChar \ldots{}
+, \SpecialChar ldots
 ) and pointers (
 \family typewriter
 P1f
 \family default
-, \SpecialChar \ldots{}
+, \SpecialChar ldots
 ) to access the new variables from the model code.
 \end_layout
 
@@ -30205,7 +30022,7 @@ New groups can also be defined in order to use the facilities shown in Sec.
  
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Computation-of-pelagic"
+reference "subsec:Computation-of-pelagic"
 
 \end_inset
 
@@ -30277,7 +30094,7 @@ Example 3.
  Removing components from zooplankton
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:Zooplankton-fixed-quota"
+name "subsec:Zooplankton-fixed-quota"
 
 \end_inset
 
@@ -30311,6 +30128,7 @@ p
 \family default
  constituents:
 \begin_inset listings
+lstparams "language=Fortran,basicstyle={\ttfamily}"
 inline false
 status open
 
@@ -30628,6 +30446,7 @@ r
 \begin_inset CommandInset citation
 LatexCommand citep
 key "blackford95"
+literal "true"
 
 \end_inset
 
