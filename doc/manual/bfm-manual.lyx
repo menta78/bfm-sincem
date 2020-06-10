@@ -27558,7 +27558,7 @@ status open
 \noindent
 \align center
 \begin_inset Graphics
-	filename Figures/variable-mapping.eps
+	filename Figures/memory-variable-mapping.eps
 	scale 80
 
 \end_inset
@@ -27782,7 +27782,7 @@ status open
 \noindent
 \align center
 \begin_inset Graphics
-	filename Figures/D3SOURCE-array.eps
+	filename Figures/memory-d3source-array.eps
 	scale 80
 
 \end_inset
