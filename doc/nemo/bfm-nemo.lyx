@@ -1,7 +1,9 @@
-#LyX 2.1 created this file. For more info see http://www.lyx.org/
-\lyxformat 474
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
 \begin_document
 \begin_header
+\save_transient_properties true
+\origin unavailable
 \textclass scrbook
 \begin_preamble
 \usepackage{listings}
@@ -48,16 +50,18 @@ eqs-within-sections
 \language_package default
 \inputencoding auto
 \fontencoding global
-\font_roman times
-\font_sans helvet
-\font_typewriter courier
-\font_math auto
+\font_roman "times" "default"
+\font_sans "helvet" "default"
+\font_typewriter "courier" "default"
+\font_math "auto" "auto"
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
-\font_sf_scale 100
-\font_tt_scale 100
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -87,6 +91,7 @@ eqs-within-sections
 \suppress_date true
 \justification true
 \use_refstyle 0
+\use_minted 0
 \index Index
 \shortcut idx
 \color #008000
@@ -99,7 +104,10 @@ eqs-within-sections
 \tocdepth 3
 \paragraph_separation indent
 \paragraph_indentation default
-\quotes_language english
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
 \papercolumns 2
 \papersides 2
 \paperpagestyle headings
@@ -133,12 +141,16 @@ begin{titlepage}
 \end_inset
 
 
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
 \align center
 \begin_inset Graphics
-	filename Figures/all_logos.png
+	filename /Users/lovato/GIT/bfm/doc/logos/BFM-Consortium_members.png
 	lyxscale 25
 	scale 40
 
@@ -186,7 +198,7 @@ Coupling BFM with ocean models:
 
 
 \size largest
-the NEMO model 
+the NEMO model (V3.6) 
 \size default
 
 \begin_inset Newline newline
@@ -234,12 +246,12 @@ M.
 
 \begin_layout Standard
 \align center
-Release 1.0, August 2015
+Release 1.1, June 2020
 \begin_inset Newline newline
 \end_inset
 
------ BFM Report series N.
- 2 -----
+—– BFM Report series N.
+ 2 —–
 \begin_inset Newline newline
 \end_inset
 
@@ -257,7 +269,7 @@ http://bfm-community.eu
 \begin_inset Newline newline
 \end_inset
 
-info@bfm-community.eu
+bfm_st@cmcc.it
 \end_layout
 
 \begin_layout Standard
@@ -285,8 +297,8 @@ height "1pt"
 
 
 \begin_inset Graphics
-	filename Figures/BFM-gray.png
-	lyxscale 10
+	filename /Users/lovato/GIT/bfm/doc/logos/BFM_Full_logo.png
+	lyxscale 40
 	width 50text%
 
 \end_inset
@@ -342,10 +354,12 @@ This document should be cited as:
 \end_inset
 
 Vichi M., Lovato T., Gutierrez Mlot E., McKiver W.
- (2015). Coupling BFM with Ocean models: the NEMO model (Nucleus for the
- European Modelling of the Ocean).
+ (2020).
+ Coupling BFM with Ocean models: the NEMO model (Nucleus for the European
+ Modelling of the Ocean).
  BFM Report series N.
- 2, Release 1.0, August 2015, Bologna, Italy, http://bfm-community.eu, pp. 31
+ 2, Release 1.1, June 2020, Bologna, Italy, http://bfm-community.eu, pp.
+ 31
 \end_layout
 
 \begin_layout Address
@@ -354,7 +368,7 @@ Vichi M., Lovato T., Gutierrez Mlot E., McKiver W.
 \begin_inset VSpace 13cm
 \end_inset
 
-Copyright 2015, The BFM System Team.
+Copyright 2020, The BFM System Team.
  This work is licensed under the Creative Commons Attribution-Noncommercial-No
  Derivative Works 2.5 License.
  To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-
@@ -438,6 +452,7 @@ parts
 \begin_inset CommandInset citation
 LatexCommand citet
 key "obrien73"
+literal "true"
 
 \end_inset
 
@@ -445,6 +460,7 @@ key "obrien73"
 \begin_inset CommandInset citation
 LatexCommand citet
 key "Robinson1997"
+literal "true"
 
 \end_inset
 
@@ -452,6 +468,7 @@ key "Robinson1997"
 \begin_inset CommandInset citation
 LatexCommand citet
 key "HofmanLascara1998"
+literal "true"
 
 \end_inset
 
@@ -459,6 +476,7 @@ key "HofmanLascara1998"
 \begin_inset CommandInset citation
 LatexCommand citet
 key "vichi07_part1"
+literal "true"
 
 \end_inset
 
@@ -474,6 +492,7 @@ We use the conceptual framework proposed by
 \begin_inset CommandInset citation
 LatexCommand citet
 key "vichi07_part1"
+literal "true"
 
 \end_inset
 
@@ -482,6 +501,7 @@ key "vichi07_part1"
 \begin_inset CommandInset citation
 LatexCommand citet
 key "Robinson1997"
+literal "true"
 
 \end_inset
 
@@ -492,6 +512,7 @@ key "Robinson1997"
 \begin_inset CommandInset citation
 LatexCommand citealp
 key "vichi07_part1"
+literal "true"
 
 \end_inset
 
@@ -659,6 +680,7 @@ n, just as it happens for temperature and salinity on OGCM.
 \begin_inset CommandInset citation
 LatexCommand citet
 key "butenschoen12"
+literal "true"
 
 \end_inset
 
@@ -668,6 +690,7 @@ key "butenschoen12"
 \begin_inset CommandInset citation
 LatexCommand citep
 key "madec08"
+literal "true"
 
 \end_inset
 
@@ -746,6 +769,7 @@ BFM and NEMO are separated codes that are maintained by different groups
 \begin_inset CommandInset citation
 LatexCommand citep
 key "madec08"
+literal "true"
 
 \end_inset
 
@@ -820,6 +844,7 @@ The biogeochemical processes of the BFM are controlled by their own namelist
 \begin_inset CommandInset citation
 LatexCommand citep
 key "BFM-manual"
+literal "true"
 
 \end_inset
 
@@ -989,6 +1014,7 @@ In addition to this part that is common to other biogeochemical models in
 \begin_inset CommandInset citation
 LatexCommand citet
 key "BFM-manual"
+literal "true"
 
 \end_inset
 
@@ -1412,7 +1438,7 @@ status open
 \noindent
 \align center
 \begin_inset Graphics
-	filename ../manual/Figures/variable-mapping.eps
+	filename /Users/lovato/GIT/bfm/doc/manual/Figures/memory-variable-mapping.eps
 	scale 80
 
 \end_inset
@@ -1436,6 +1462,7 @@ Layout of the main memory array for the pelagic variables and schematic
 \begin_inset CommandInset citation
 LatexCommand citealp
 key "BFM-manual"
+literal "true"
 
 \end_inset
 
@@ -1833,7 +1860,7 @@ name "sec:Boundary-conditions-TOP"
 \end_layout
 
 \begin_layout Standard
-Since version 3.6, NEMO allows to define different types of boundary conditions
+In version 3.6, NEMO allows to define different types of boundary conditions
  for biogeochemical tracers.
  For every single variable it is possible to define a field of surface boundary
  conditions, such as deposition of dust or nitrogen, which is then interpolated
@@ -2008,6 +2035,7 @@ One of the largest coupling mechanism between ocean physics and biogeochemistry
 LatexCommand citep
 before "e.g."
 key "patara12"
+literal "true"
 
 \end_inset
 
@@ -2133,6 +2161,7 @@ ln_qsr_rgb=.true.
 \begin_inset CommandInset citation
 LatexCommand citet
 key "lengaigne07"
+literal "true"
 
 \end_inset
 
@@ -2140,6 +2169,7 @@ key "lengaigne07"
 \begin_inset CommandInset citation
 LatexCommand citet
 key "morel88"
+literal "true"
 
 \end_inset
 
@@ -2314,11 +2344,11 @@ Installation
 \begin_layout Standard
 Both the BFM and NEMO codes have to be downloaded from the respective distributi
 on sites.
- The coupling is officially maintained from NEMO version 3.6 and BFM version
- 5.1.
+ The present coupling is officially distributed for NEMO version 3.6 and
+ BFM version 5.2.
  Please contact the BFM System Team 
 \family typewriter
-(bfm_st@lists.cmcc.it)
+(bfm_st@cmcc.it)
 \family default
  for information on the use of BFM with the stable version of NEMO 3.4.1.
  In the following, it is assumed that the NEMO code is found in a directory
@@ -2350,7 +2380,7 @@ reference "chap:Running-GYRE_BFM"
 \family typewriter
 GYRE_BFM
 \family default
- is already distributed with NEMO 3.6 (and above) in the directory 
+ is already distributed with NEMO 3.6 in the directory 
 \family typewriter
 NEMOGCM/CONFIG
 \family default
@@ -2608,6 +2638,7 @@ macro is used to enable the creation of a simulation log file when using
 \begin_inset CommandInset citation
 LatexCommand citep
 key "BFM-manual"
+literal "true"
 
 \end_inset
 
@@ -2647,6 +2678,7 @@ This file contains the list of state variables defined in the BFM.
 \begin_inset CommandInset citation
 LatexCommand citep
 key "BFM-manual"
+literal "true"
 
 \end_inset
 
@@ -3008,6 +3040,7 @@ PELAGOS stands for PELAGic biogeochemistry for Global Ocean Simulations
 \begin_inset CommandInset citation
 LatexCommand citep
 key "vichi07_part2"
+literal "true"
 
 \end_inset
 
@@ -3019,6 +3052,7 @@ key "vichi07_part2"
 \begin_inset CommandInset citation
 LatexCommand citet
 key "vichi07_part1"
+literal "true"
 
 \end_inset
 
@@ -3227,6 +3261,7 @@ A 9 years-long simulation was performed with the PELAGOS2 configuration
 \begin_inset CommandInset citation
 LatexCommand citet
 key "LargeYager2008"
+literal "true"
 
 \end_inset
 
@@ -3234,6 +3269,7 @@ key "LargeYager2008"
 \begin_inset CommandInset citation
 LatexCommand citet
 key "DaiTren2002"
+literal "true"
 
 \end_inset
 
@@ -3241,6 +3277,7 @@ key "DaiTren2002"
 \begin_inset CommandInset citation
 LatexCommand citet
 key "dacunha2007"
+literal "true"
 
 \end_inset
 
@@ -3252,6 +3289,7 @@ Configurations/ORCA2_LIM_PISCES).
 \begin_inset CommandInset citation
 LatexCommand citet
 key "WOA09"
+literal "true"
 
 \end_inset
 
@@ -3359,17 +3397,21 @@ BFM uses its own libraries for NetCDF output that are specifically built
 LatexCommand citep
 before "see Chap. 6 in"
 key "BFM-manual"
+literal "true"
 
 \end_inset
 
 .
- One new feature of NEMO 3.6 is the availability of the external library
- XIOS, which allows to use an external I/O server and distribute the computation
- and preparation of output over different processes and with a different
- domain decomposition.
- The XIOS library functions cannot be used with the BFM yet, therefore it
- is needed to post-process the output before accessing the three-dimensional
- domain fields.
+ 
+\end_layout
+
+\begin_layout Standard
+Since version 3.6 of NEMO, the external library XIOS can be used to distribute
+ the computation and preparation of output over different processes and
+ with a different domain decomposition.
+ The XIOS library functions can be used also with BFM, as a set iof dedicate
+ XML files are produced to select the required output files and fields as
+ in NEMO.
 \end_layout
 
 \begin_layout Section
@@ -3392,11 +3434,7 @@ onal fields on the ocean model grid.
 \end_layout
 
 \begin_layout Standard
-This operation is done with the tools 
-\family typewriter
-bnremap
-\family default
- and 
+This operation is done with the tool 
 \family typewriter
 bnmerge
 \family default
@@ -3404,32 +3442,18 @@ bnmerge
 \family typewriter
 $BFMDIR/tools
 \family default
- directory: 
-\end_layout
-
-\begin_layout Itemize
-
-\family typewriter
-bnremap
-\family default
- works with a serial single-domain simulation, while 
-\end_layout
-
-\begin_layout Itemize
-
-\family typewriter
-bnmerge
-\family default
- must be used when the model is run in parallel mode.
- In this case the model produces one output file per domain containing a
- vector with the ocean grid points of that specific domain only and the
- domains must be merged together to obtain the full domain.
+ directory that allows to merge together the individual output files per
+ domain containing a vector with the ocean grid points of that specific
+ domain only into the full 3D domain.
 \end_layout
 
 \begin_layout Standard
-Both applications are controlled with a namelist (see the examples contained
- in each tool folder), where it is possible to specify the list of variables
- to be remapped and the names of the files.
+The application is controlled with a namelist (see use details in 
+\family typewriter
+$BFMDIR/tools/README.md
+\family default
+), where it is possible to specify the list of variables to be remapped
+ and the names of the files.
 \end_layout
 
 \begin_layout Standard
@@ -3474,6 +3498,7 @@ the optical depth and a tolerance level as described in eq.
 \begin_inset CommandInset citation
 LatexCommand citet
 key "vichi07_part1"
+literal "true"
 
 \end_inset
 
