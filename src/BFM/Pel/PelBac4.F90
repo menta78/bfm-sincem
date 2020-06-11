@@ -170,7 +170,7 @@
   TEMP1 = MM_power( rut , rugch, 3 )
   TEMP2 = et
   TEMP3 = ruR1c/rut
-  TEMP4 = rut 
+  TEMP4 = rut
 
   rug = rum * MM_power( rut , rugch, 3 ) 
   ruR1c = rug*ruR1c/rut
