@@ -384,7 +384,7 @@ contains
    !
    ! BFM git version and patch
    LEVEL0 LINE
-#include "gitrepoinfo.h"
+#include "git_code_info.h"
    LEVEL1 ' '
    LEVEL0 LINE
    LEVEL1 ' '

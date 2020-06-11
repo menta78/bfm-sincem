@@ -66,6 +66,8 @@ def diagnostics():
         'zooplankton': ['Z3', 'Z4', 'Z5', 'Z6'],
         'bacteria': ['B1'],
         'detritus': ['R1', 'R6'],
+        'gross production': ['ruPPY', 'ruZOO'],
+        'respiration': ['resPPY', 'resPBA', 'resZOO'],
         'quotas': ['phytoplankton', 'zooplankton', 'bacteria', 'detritus']
     }
 
@@ -106,11 +108,11 @@ def diagnostics():
                     leg = []
                     for v in layout[comp][grp]:
                         vcon = v + cons
-                        pl(nc, vcon, leg)
+                        pl(nc, vcon, grp, leg)
                     # save plot
                     if leg:
                         filename = "images/{}-{}-{}.png".format(
-                            cons, comp, grp)
+                            cons, comp, grp).replace(' ','-')
                         f.savefig(outpath + '/' + filename, dpi=res)
                         html[cons][comp]['name'].append(grp)
                         html[cons][comp]['file'].append(filename)
@@ -122,9 +124,9 @@ def diagnostics():
                 for v in layout[comp][grp]:
                     f = figure()
                     leg = []
-                    plq(nc, v, leg)
+                    plq(nc, v, grp, leg)
                     if leg:
-                        filename = "images/quotas-{}-{}.png".format(v, comp)
+                        filename = "images/quotas-{}-{}.png".format(v, comp).replace(' ','-')
                         f.savefig(outpath + '/' + filename, dpi=res)
                         html['quotas'][comp]['name'].append(' '.join(
                             [v, '-', grp]))
@@ -136,7 +138,7 @@ def diagnostics():
                      outpath)
 
     print(
-        'Processing completed. \n\nOpen index.html or inspect content of diagnostics_html/images.\n'
+        'Processing completed. \n\nType \'open diagnostics_html/index.html\' or inspect content of diagnostics_html/images.\n'
     )
 
     return
@@ -196,7 +198,7 @@ def create_index(curpath, datapath, constituents, compartments, html, outpath):
     return
 
 
-def pl(nc, var, leg):
+def pl(nc, var, group, leg):
     ''' Plot state variables of groups '''
     dates = num2date(nc("time"),
                      nc.variables["time"].units,
@@ -213,13 +215,16 @@ def pl(nc, var, leg):
         if var == 'O3c' and 'O3h' in nc.variables:
             plot(dates, nc('O3h'))
             leg.append('O3h')
+        elif var == 'N3n' and 'N4n' in nc.variables:
+            plot(dates, nc('N4n'))
+            leg.append('N4n')
         if leg:
             legend(leg)
-            ylabel(units)
+            ylabel(group.upper() + ' ['+ units + ']')
     return
 
 
-def plq(nc, var, leg):
+def plq(nc, var, group, leg):
     ''' Plot quota values of constituents '''
     dates = num2date(nc("time"),
                      nc.variables["time"].units,
@@ -253,6 +258,7 @@ def plq(nc, var, leg):
             legend(leg, loc=1)
             plot(dates, 16. * ones(dates.shape), "k:")
             plot(dates, 106. / 16. * ones(dates.shape), "k:")
+            ylabel(' '.join([var.upper(), '-', group.upper(), '[ratio]']))
     return
 
 
