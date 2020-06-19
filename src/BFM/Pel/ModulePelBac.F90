@@ -76,7 +76,6 @@
   ! p_suR3      [1/d]            Specific potential uptake for semi-refractory DOC
   ! p_suR6      [1/d]            Specific potential uptake for POM (1/d)
   ! p_sum       [1/d]            Potential specific growth rate
-  ! p_qsum      [-]              Ratio of first-slope maximum growth (p_sum) to particulate substrate limited maximum growth at inifinite bacteria concentrations
   ! p_pu_ra     [-]              Activity respiration fraction
   ! p_pu_ra_o   [-]              Additional respiration fraction at low O2 conc
   ! p_srs       [1/d]            Specific rest respiration
@@ -92,6 +91,8 @@
   ! p_ruep      [1/d]            Relaxation timescale for P uptake/remin.
   ! p_rec       [1/d]            Relaxation timescale for semi-labile excretion
   ! p_pu_ea_R3  [-]              Excretion of semi-refractory DOC
+  ! p_chuc      [mgC/m3]         Half saturation total carbon uptake from substrate
+  ! p_chuc_lim  [-]              Scaling factor of p_chuc to set minimum value
   integer     :: p_version(iiPelBacteria), itrp
   integer, parameter ::       BACT1=1,BACT2=2,BACT3=3
   real(RLEN)  :: p_q10(iiPelBacteria)
@@ -104,7 +105,6 @@
   real(RLEN)  :: p_suR6(iiPelBacteria)
   real(RLEN)  :: p_suR3(iiPelBacteria)
   real(RLEN)  :: p_sum(iiPelBacteria)
-  real(RLEN)  :: p_qsum(iiPelBacteria)
   real(RLEN)  :: p_pu_ra(iiPelBacteria)
   real(RLEN)  :: p_pu_ra_o(iiPelBacteria)
   real(RLEN)  :: p_srs(iiPelBacteria)
@@ -121,8 +121,8 @@
   real(RLEN)  :: p_rec(iiPelBacteria)
   real(RLEN)  :: p_pu_ea_R3(iiPelBacteria)
   real(RLEN)  :: p_chuc(iiPelBacteria)
-  real(RLEN)  :: p_qsum(iiPelBacteria)
-  integer     :: p_chucMM(iiPelBacteria)
+  real(RLEN)  :: p_chuc_lim(iiPelBacteria)
+  real(RLEN)  :: p_dep(iiPelBacteria)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! SHARED PUBLIC FUNCTIONS (must be explicited below "contains")
@@ -139,7 +139,7 @@
   namelist /PelBacteria_parameters/ p_version, p_q10, p_chdo, p_sd, p_sd2, p_suhR1, &
     p_sulR1, p_suR2, p_suR6, p_sum, p_pu_ra, p_pu_ra_o, p_pu_ea_R3, p_srs, &
     p_suR3, p_qpcPBA, p_qlpc, p_qncPBA, p_qlnc, p_qun, p_qup, p_chn, p_chp, &
-    p_ruen, p_ruep, p_rec, p_chuc, p_chucMM, p_qsum
+    p_ruen, p_ruep, p_rec, p_chuc, p_chuc_lim, p_dep
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   !BEGIN compute
@@ -188,6 +188,11 @@
      D3STATETYPE(ppR2c)=NOTRANSPORT
      write(LOGUNIT,*) " Disable R2c transport as no bacterial group use it "
   endif
+  if ( itrp > 3 ) then 
+     D3STATETYPE(ppR3c)=NOTRANSPORT
+     D3STATETYPE(ppR2c)=NOTRANSPORT
+     write(LOGUNIT,*) " Disable R2c & R3c transport as no bacterial group use it "
+   endif
    write(LOGUNIT,*) ""
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Write parameter list to the log
