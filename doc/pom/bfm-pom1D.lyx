@@ -69,7 +69,16 @@ eqs-within-sections
 \index_command default
 \paperfontsize default
 \spacing single
-\use_hyperref false
+\use_hyperref true
+\pdf_bookmarks true
+\pdf_bookmarksnumbered false
+\pdf_bookmarksopen false
+\pdf_bookmarksopenlevel 1
+\pdf_breaklinks false
+\pdf_pdfborder false
+\pdf_colorlinks false
+\pdf_backref false
+\pdf_pdfusetitle true
 \papersize a4paper
 \use_geometry true
 \use_package amsmath 1
@@ -198,7 +207,7 @@ Coupling BFM with ocean models:
 
 
 \size largest
-the 1D Princeton Ocean Model (user manual)
+the 1D Princeton Ocean Model
 \end_layout
 
 \begin_layout Standard
@@ -322,8 +331,7 @@ This document should be cited as:
 Zavatarelli M., Pinardi N., Mussap G., Lovato T., Amadio C.
  Butenschön M., Vichi M.
  (2020).
- Coupling BFM with Ocean models: the 1D Princeton Ocean Model (user manual)
- .
+ Coupling BFM with Ocean models: the 1D Princeton Ocean Model.
  BFM Report series N.
  3, Release 1.0, June 2020, Bologna, Italy, http://bfm-community.eu, pp.
  58
@@ -367,7 +375,7 @@ Introduction
 \end_layout
 
 \begin_layout Standard
-This report describes the on-line coupling between the one-dimensional version
+This report describes the online coupling between the one-dimensional version
  of the Princeton Ocean Model (hereafter POM1D), developed by 
 \begin_inset CommandInset citation
 LatexCommand citet
@@ -376,36 +384,21 @@ literal "true"
 
 \end_inset
 
-, and the Biogeochemical Flux Model (hereafter BFM, 
-\begin_inset CommandInset citation
-LatexCommand citep
-key "vichi07_part1"
-literal "true"
-
-\end_inset
-
-).
- The complete modeling system (POM1D, BFM and the coupling subroutines)
- is freely downloadable from the BFM web site (http://bfm-community.eu).
+, and the Biogeochemical Flux Model (hereafter BFM), in term of the main
+ equations and their translation into a computer code, and its code is distribut
+ed with BFM (see details in http://bfm-community.eu).
  
 \end_layout
 
 \begin_layout Standard
-The report describes the main characteristics of POM1D and the coupling
- technique with BFM, in term of the main equations and their translation
- into a computer code, and it should be used in close coordination with
- the BFM core manual.
- The report is organised as follows:
+The report is organised as follows:
 \end_layout
 
 \begin_layout Standard
 Section 2 describes the governing equations and the boundary conditions
- of the BFM-POM1D system.
- The BFM equations description is limited to the equations describing the
- benthic-pelagic coupling, implemented in the BFM-POM1D system and not yet
- described in the current version of the BFM user manual.
- The BFM-POM1D manual should then be used in close coordination with the
- 
+ used in the POM1D to simulate the ocean physical dynamics.
+ A full description of biogeochemical equations is given in the BFM core
+ manual 
 \begin_inset CommandInset citation
 LatexCommand citet
 key "BFM-manual"
@@ -413,7 +406,7 @@ literal "true"
 
 \end_inset
 
- manual.
+.
 \end_layout
 
 \begin_layout Standard
@@ -460,10 +453,10 @@ ed in the Gulf of Trieste.
 \end_layout
 
 \begin_layout Chapter
-The components of the BFM-POM1D modeling system
+POM1D physical model 
 \begin_inset CommandInset label
 LatexCommand label
-name "chap:POM-BFMcomponents"
+name "chap:POM1Dmodel"
 
 \end_inset
 
@@ -471,17 +464,6 @@ name "chap:POM-BFMcomponents"
 \end_layout
 
 \begin_layout Section
-POM1D
-\begin_inset CommandInset label
-LatexCommand label
-name "sec:POM"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Subsection
 General
 \end_layout
 
@@ -529,7 +511,7 @@ literal "true"
 .
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 The Governing equations
 \begin_inset CommandInset label
 LatexCommand label
@@ -954,7 +936,7 @@ where
  are background diffusion coefficients.
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 The surface and bottom boundary conditions
 \end_layout
 
@@ -1328,7 +1310,7 @@ adiabatic
 
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 The parameterisation of lateral advection.
 \begin_inset CommandInset label
 LatexCommand label
@@ -1445,7 +1427,7 @@ non zero
  described in the following section.
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Diagnostic mode
 \begin_inset CommandInset label
 LatexCommand label
@@ -1510,7 +1492,7 @@ l model implementation.
  quality of the assembled climatology.
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 The POM1D computer code.
 \end_layout
 
@@ -1530,16 +1512,6 @@ http://www.ccpo.odu.edu/POMWEB/contrib-code/obl.f
 FORTRAN95
 \family default
  syntaxis and compilers.
- It is therefore fully consistent with the BFM coding (see 
-\begin_inset CommandInset citation
-LatexCommand citealt
-key "BFM-manual"
-literal "true"
-
-\end_inset
-
-).
- 
 \end_layout
 
 \begin_layout Section
@@ -1774,7 +1746,7 @@ literal "true"
 \end_layout
 
 \begin_layout Chapter
-The physical biological coupling
+BFM-POM1D physical biological coupling
 \end_layout
 
 \begin_layout Section
@@ -2014,7 +1986,7 @@ The temporal total rate of change for a generic, pelagic (water column)
 
 \begin_layout Standard
 where the first term of the equation right hand side, indicates the rate
- of change dependent on the physical processes (handled by the POM1D-BFM
+ of change dependent on the physical processes (handled by the BFM-POM1D
  coupling), while the second term indicates the rate of change dependent
  on the biogeochemical processes (handled by BFM).
  Therefore the physical rate of change is solved by the equation for a non
@@ -2083,23 +2055,8 @@ where
 \end_layout
 
 \begin_layout Standard
-The only 
-\begin_inset Quotes eld
-\end_inset
-
-benthic
-\begin_inset Quotes erd
-\end_inset
-
- BFM state variables involved in the definition of the 
-\begin_inset Quotes eld
-\end_inset
-
-benthic pelagic coupling
-\begin_inset Quotes erd
-\end_inset
-
- is the benthic dissolved and particulate detritus (
+The BFM benthic state variables involved in the definition of the benthic-pelagi
+c coupling are the dissolved and particulate detritus (
 \begin_inset Formula $Q_{c,n,p}^{(1)}$
 \end_inset
 
@@ -2107,44 +2064,11 @@ benthic pelagic coupling
 \begin_inset Formula $Q_{c,n,p,s}^{(6)}$
 \end_inset
 
-), whose temporal rates of change are entirely defined by eq.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "eq:BPC-ret"
-
-\end_inset
-
-, 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "eq:BPC-Q1"
-
-\end_inset
-
- and 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "eq:BPC-Si-1"
-
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Standard
-As previously stated, these benthic state variables are physically connected
- with the pelagic coupled processes via the definition of the sedimentary
- particulate organic matter flux and the definition of the bottom boundary
- condition for the pelagic dissolved nutrients (see sec.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:The-BFMboundary-conditions"
-
-\end_inset
-
-).
+), whose temporal rates of change are described in the BFM core manual.
+ These benthic state variables are physically connected with the pelagic
+ coupled processes via the definition of the sedimentary particulate organic
+ matter flux and the definition of the bottom boundary condition for the
+ pelagic dissolved nutrients, as described in the following section.
 \end_layout
 
 \begin_layout Standard
@@ -2362,17 +2286,8 @@ w_{s}(0,t)=0\label{eq:WSBC}
 \end_layout
 
 \begin_layout Standard
-At the ocean bottom the pelagic (water column) dynamics is coupled with
- the simple benthic return closure described in section 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:The-BFMgoverning-equations"
-
-\end_inset
-
-.
- The benthic-pelagic coupling involve the pelagic particulate organic matter
- (
+At the ocean bottom, the benthic-pelagic coupling involves the burial of
+ pelagic particulate organic matter (
 \begin_inset Formula $R_{c,n,p,s}^{\left(6\right)}$
 \end_inset
 
@@ -2400,11 +2315,8 @@ dinoflagellates
 \begin_inset Formula $P_{c,n,p}^{\left(4\right)}$
 \end_inset
 
- functional types) and the complete dissolved inorganic nutrient pool (
-\begin_inset Formula $N$
-\end_inset
-
-).
+ functional types) and the release toward the water column of dissolved
+ inorganic nutrients.
  The benthic-pelagic coupling is then defined by the following bottom boundary
  conditions:
 \begin_inset VSpace defskip
@@ -2454,23 +2366,14 @@ name "NBenPelFlux"
 \end_layout
 
 \begin_layout Standard
-However, the boundary condition 
+Note that the boundary condition 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "eq:NBenPelF"
 
 \end_inset
 
- is not yet implemented in the POM1D code.
- The sediment water fluxes are currently handled by the BFM benthic closure
- (see section 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:The-BFMgoverning-equations"
-
-\end_inset
-
-).
+ is handled by the BFM benthic closure scheme.
 \end_layout
 
 \begin_layout Standard
@@ -2554,22 +2457,8 @@ reference "eq:sigmalev-1-1"
 \end_layout
 
 \begin_layout Standard
-The complete set of the governing equations (secs.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec: POM-Governing-equations"
-
-\end_inset
-
- and 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:The-BFMgoverning-equations"
-
-\end_inset
-
-) are then recasted in the new coordinate system as follows (the 
+The complete set of the physical biological coupled governing equations
+ are then recasted in the new coordinate system as follows (the 
 \begin_inset Formula $^{*}$
 \end_inset
 
@@ -2772,7 +2661,7 @@ reference "eq:GeneqBFM"
  arrow indicates the prescribed, time varying, temperature and salinity
  vertical profiles, required by the diagnostic mode.
  The numerical integration method and scheme, used to compute the forward
- in time solution of all the BFM-POM1d state variables, is the same.
+ in time solution of all the BFM-POM1D state variables, is the same.
  The sensitivity of the BFM-POM1D to coupling technique and to integration
  schemes has been tested by 
 \begin_inset CommandInset citation
@@ -2785,7 +2674,7 @@ literal "true"
 , and it was found that the source splitting (SoS) technique is more accurate.
  POM1D uses, for the active tracers, a time integration method based on
  SoS with a leapfrog scheme.
- The BFM-POM system carries out the final integration of the non-conservative
+ The BFM-POM1D system carries out the final integration of the non-conservative
  tracers adopting the same coupling technique and numerical scheme.
  The leapfrog numerical scheme is adopted also for the integration in time
  of the benthic particulate organic matter (
@@ -3203,39 +3092,9 @@ reference "eq:sigmaQL"
 
 \begin_layout Standard
 The discretisation and the integration of the equations accounting for the
- benthic-pelagic coupling (eq.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "eq:BPC-ret"
-
-\end_inset
-
-, 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "eq:BPC-Q1"
-
-\end_inset
-
-, 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "eq:BPC-Si-1"
-
-\end_inset
-
-) is made trough an explicit leapfrog scheme.
+ benthic-pelagic coupling is made trough an explicit leapfrog scheme.
  The equations discretisation is straightforward and, as an example, only
- the discrete form of eq.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "eq:BPC-ret"
-
-\end_inset
-
- is given:
+ the discrete form of benthic organic particulate detritus is given:
 \begin_inset VSpace defskip
 \end_inset
 
@@ -3456,40 +3315,28 @@ root
 \end_layout
 
 \begin_layout Standard
-
+The BFM-POM1D couling interface is located in the directory 
 \family typewriter
-$BFMdir/src/BFM
+$BFMDIR/src/pom 
 \family default
- contains the full BFM code, while the directory $BFMdir/pom contains the
- 
+that contains the 
 \family typewriter
-program main (main_pombfm1d.F90
+program main
 \family default
-) code driving the system, as well as the POM1D subroutines and modules
- (in directory 
+ code driving the system (
 \family typewriter
-$BFMdir/pom/phys
+main_pombfm1d.F90
 \family default
-) and the soubroutines operating the coupling between BFM and POM1D (directory
- 
+),the POM1D subroutines and modules or ocean physics (
+\family typewriter
+$BFMDIR/src/pom/phys
+\family default
+), and the soubroutines operating the coupling (
 \family typewriter
 $BFMdir/pom/coupling
 \family default
 ).
- It is recalled that the implementation and the use of the BFM-POM1D system
- requires the previous implementation of the BFM code as described in 
-\begin_inset CommandInset citation
-LatexCommand citet
-key "BFM-manual"
-literal "true"
-
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Standard
-An example of the namelists needed for the modeling system parameterisation
+ An example of the namelists needed for the modeling system parameterisation
  is provided in the BFM-POM1D test case.
 \end_layout
 
@@ -3565,7 +3412,11 @@ Name
 \begin_layout Plain Layout
 
 \size tiny
-Directory path
+Directory (
+\family typewriter
+$BFMDIR/src/po
+\family default
+m)
 \end_layout
 
 \end_inset
@@ -3602,7 +3453,7 @@ Routine ADVERTE
 
 \family typewriter
 \size tiny
-$BFMdir/pom/phys
+phys
 \end_layout
 
 \end_inset
@@ -3640,7 +3491,7 @@ Routine CALCDEPTH
 
 \family typewriter
 \size tiny
-$BFMdir/pom/phys
+phys
 \end_layout
 
 \end_inset
@@ -3678,7 +3529,7 @@ Routine DENS
 
 \family typewriter
 \size tiny
-$BFMdir/pom/phys
+phys
 \end_layout
 
 \end_inset
@@ -3723,7 +3574,7 @@ env_forcing_pom_bfm_1d
 
 \family typewriter
 \size tiny
-$BFMdir/pom/coupling
+coupling
 \end_layout
 
 \end_inset
@@ -3761,7 +3612,7 @@ Module Forcing
 
 \family typewriter
 \size tiny
-$BFMdir/pom/coupling
+coupling
 \end_layout
 
 \end_inset
@@ -3799,7 +3650,7 @@ Routine FORCING_MANAGER
 
 \family typewriter
 \size tiny
-$BFMdir/pom/coupling
+coupling
 \end_layout
 
 \end_inset
@@ -3837,7 +3688,7 @@ Routine get_RST
 
 \family typewriter
 \size tiny
-$BFMdir/pom/coupling
+coupling
 \end_layout
 
 \end_inset
@@ -3875,7 +3726,7 @@ Routine get_TS_IC
 
 \family typewriter
 \size tiny
-$BFMdir/pom/coupling
+coupling
 \end_layout
 
 \end_inset
@@ -3913,7 +3764,7 @@ Routine lf2d
 
 \family typewriter
 \size tiny
-$BFMdir/pom/coupling
+coupling
 \end_layout
 
 \end_inset
@@ -3949,9 +3800,6 @@ Program MAIN
 
 \begin_layout Plain Layout
 
-\family typewriter
-\size tiny
-$BFMdir/pom
 \end_layout
 
 \end_inset
@@ -3989,7 +3837,7 @@ Routine opendat
 
 \family typewriter
 \size tiny
-$BFMdir/pom/phys
+phys
 \end_layout
 
 \end_inset
@@ -4027,7 +3875,7 @@ Routine pom_bfm_1d
 
 \family typewriter
 \size tiny
-$BFMdir/pom/coupling
+coupling
 \end_layout
 
 \end_inset
@@ -4065,7 +3913,7 @@ Routine pom_dia_bfm
 
 \family typewriter
 \size tiny
-$BFMdir/pom/coupling
+coupling
 \end_layout
 
 \end_inset
@@ -4103,7 +3951,7 @@ Routine pom_ini_bfm
 
 \family typewriter
 \size tiny
-$BFMdir/pom/coupling
+coupling
 \end_layout
 
 \end_inset
@@ -4141,7 +3989,7 @@ Routine pom_to_bfm
 
 \family typewriter
 \size tiny
-$BFMdir/pom/phys
+phys
 \end_layout
 
 \end_inset
@@ -4179,7 +4027,7 @@ Routine PROFQ
 
 \family typewriter
 \size tiny
-$BFMdir/pom/phys
+phys
 \end_layout
 
 \end_inset
@@ -4217,7 +4065,7 @@ Routine PROFTS
 
 \family typewriter
 \size tiny
-$BFMdir/pom/phys
+phys
 \end_layout
 
 \end_inset
@@ -4255,7 +4103,7 @@ Routine PROFUV
 
 \family typewriter
 \size tiny
-$BFMdir/pom/phys
+phys
 \end_layout
 
 \end_inset
@@ -4293,7 +4141,7 @@ Routine restart_BFM_inPOM
 
 \family typewriter
 \size tiny
-$BFMdir/pom/coupling
+coupling
 \end_layout
 
 \end_inset
@@ -4331,7 +4179,7 @@ Routine set_initial_conditions
 
 \family typewriter
 \size tiny
-$BFMdir/pom/coupling
+coupling
 \end_layout
 
 \end_inset
@@ -4369,7 +4217,7 @@ Module Service
 
 \family typewriter
 \size tiny
-$BFMdir/pom/coupling
+coupling
 \end_layout
 
 \end_inset
@@ -4407,7 +4255,7 @@ Routine vdiff_SOS
 
 \family typewriter
 \size tiny
-$BFMdir/pom/coupling
+coupling
 \end_layout
 
 \end_inset
@@ -4436,9 +4284,12 @@ vdiff_SOS.F90
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
-Listing of all the programs, subroutines and modules contained in the directorie
-s phys and coupling, along with the directory pathway and the corresponding
- filenames.
+Listing of all the programs, subroutines and modules contained in BFM-POM1D
+ interface, the directory pathway from the reference 
+\family typewriter
+$BFMDIR/src/pom
+\family default
+ and the corresponding filenames.
 \begin_inset CommandInset label
 LatexCommand label
 name "tab:CodesLIsting-1"
@@ -4470,9 +4321,9 @@ The
 \family typewriter
 module POM
 \family default
- (filename: 
+ (
 \family typewriter
-$BFMdir/src/pom/phys/POMModule.F90
+phys/POMModule.F90
 \family default
 ) 
 \begin_inset CommandInset label
@@ -6911,9 +6762,9 @@ The
 \family typewriter
 module Service
 \family default
- (filename 
+ (
 \family typewriter
-$BFMdir/src/pom/coupling/ModuleService.F90
+coupling/ModuleService.F90
 \family default
 )
 \begin_inset CommandInset label
@@ -6978,16 +6829,17 @@ SUBROUTINE
 CalcVerticalExtinction (
 \family default
 see 
-\family typewriter
-
 \begin_inset CommandInset citation
-LatexCommand citealp
+LatexCommand citet
 key "BFM-manual"
-literal "true"
+literal "false"
 
 \end_inset
 
 ).
+ 
+\family typewriter
+
 \begin_inset VSpace defskip
 \end_inset
 
@@ -7744,9 +7596,9 @@ The program
 \family typewriter
 MAIN
 \family default
- (Filename: 
+ (
 \family typewriter
-$BFMdir/src/pom/main_pombfm1d.F90)
+main_pombfm1d.F90)
 \begin_inset CommandInset label
 LatexCommand label
 name "sec:program-MAIN"
@@ -8775,7 +8627,7 @@ Subroutine adverte
 \family default
  
 \family typewriter
-($BFMDIR/src/POM/phys/vdiff_SOS.F90)
+(phys/vdiff_SOS.F90)
 \begin_inset CommandInset label
 LatexCommand label
 name "subsec:adverte"
@@ -8977,7 +8829,7 @@ Subroutine CALCDEPTH
 \family default
  
 \family typewriter
-($BFMDIR/src/POM/phys/calcdepth.F90)
+(phys/calcdepth.F90)
 \begin_inset CommandInset label
 LatexCommand label
 name "subsec:CALCDEPTH"
@@ -9040,7 +8892,7 @@ Subroutine DENS
 \family default
 (
 \family typewriter
-$BFMDIR/src/POM/phys/dens.F90)
+phys/dens.F90)
 \begin_inset CommandInset label
 LatexCommand label
 name "subsec:DENS"
@@ -9144,7 +8996,7 @@ Subroutine env_forcing_pom_bfm_1d
 \family default
 (
 \family typewriter
-$BFMDIR/src/POM/coupling/env_forcing_pom_bfm_1d .F90)
+coupling/env_forcing_pom_bfm_1d .F90)
 \begin_inset CommandInset label
 LatexCommand label
 name "subsec:env_forcing_pom_bfm_1"
@@ -9232,7 +9084,7 @@ literal "true"
 \begin_layout Subsection
 
 \family typewriter
-Module Forcing ($BFMDIR/src/POM/coupling/ModuleForcing.F90
+Module Forcing (coupling/ModuleForcing.F90
 \family default
 )
 \begin_inset CommandInset label
@@ -9584,7 +9436,7 @@ Subroutine FORCING_MANAGER
 \family default
 (
 \family typewriter
-$BFMDIR/src/POM/coupling/ModuleForcing.F90
+coupling/ModuleForcing.F90
 \family default
 )
 \begin_inset CommandInset label
@@ -10920,7 +10772,7 @@ Subroutine get_rst
 \family default
 (
 \family typewriter
-$BFMDIR/src/POM/coupling/get_rst.F90
+coupling/get_rst.F90
 \family default
 )
 \begin_inset CommandInset label
@@ -10994,7 +10846,7 @@ Subroutine Routine get_TS_IC
 \family default
 (
 \family typewriter
-$BFMDIR/src/POM/coupling/get_TS_IC.F90
+coupling/get_TS_IC.F90
 \family default
 )
 \begin_inset CommandInset label
@@ -11148,7 +11000,7 @@ Subroutine LF1D
 \family default
 (
 \family typewriter
-$BFMDIR/src/POM/coupling/LF1D.F90
+coupling/LF1D.F90
 \family default
 )
 \begin_inset CommandInset label
@@ -11394,9 +11246,13 @@ status open
 \end_layout
 
 \begin_layout Subsection
-Subroutine opendat (
+Subroutine 
 \family typewriter
-$BFMDIR/src/POM/phys/opendat.F90
+opendat
+\family default
+ (
+\family typewriter
+phys/opendat.F90
 \family default
 )
 \begin_inset CommandInset label
@@ -11511,9 +11367,13 @@ statement.
 \end_layout
 
 \begin_layout Subsection
-Subroutine pom_bfm_1d (
+Subroutine 
 \family typewriter
-$BFMDIR/src/POM/coupling/pom_bfm_1d.F90
+pom_bfm_1d
+\family default
+ (
+\family typewriter
+coupling/pom_bfm_1d.F90
 \family default
 )
 \begin_inset CommandInset label
@@ -11813,9 +11673,13 @@ TT=savef+(DTI/SEC_IN_DAY
 \end_layout
 
 \begin_layout Subsection
-Subroutine pom_dia_bfm 
+Subroutine 
 \family typewriter
-($BFMDIR/src/POM/coupling/pom_dia_bfm_1d.F90
+pom_dia_bfm
+\family default
+ 
+\family typewriter
+(coupling/pom_dia_bfm_1d.F90
 \family default
 )
 \begin_inset CommandInset label
@@ -11901,9 +11765,13 @@ literal "true"
 \end_layout
 
 \begin_layout Subsection
-Subroutine pom_ini_BFM 
+Subroutine 
 \family typewriter
-($BFMDIR/src/POM/coupling/pom_ini_bfm_1d.F90
+pom_ini_BFM
+\family default
+ 
+\family typewriter
+(coupling/pom_ini_bfm_1d.F90
 \family default
 )
 \begin_inset CommandInset label
@@ -12810,9 +12678,13 @@ and
 \end_layout
 
 \begin_layout Subsection
-Subroutine pom_to_bfm 
+Subroutine 
 \family typewriter
-($BFMDIR/src/POM/phys/pom_to_bfm.F90
+pom_to_bfm
+\family default
+ 
+\family typewriter
+(phys/pom_to_bfm.F90
 \family default
 )
 \begin_inset CommandInset label
@@ -13450,9 +13322,13 @@ name "tab:Array-to-array"
 \end_layout
 
 \begin_layout Subsection
-Subroutine PROFQ 
+Subroutine 
 \family typewriter
-($BFMDIR/src/POM/phys/profq1D.F90
+PROFQ
+\family default
+ 
+\family typewriter
+(phys/profq1D.F90
 \family default
 )
 \begin_inset Foot
@@ -13744,9 +13620,13 @@ reference "subsec:DENS"
 \end_layout
 
 \begin_layout Subsection
-Subroutine PROFTS 
+Subroutine 
 \family typewriter
-($BFMDIR/src/POM/phys/profts.F90)
+PROFTS
+\family default
+ 
+\family typewriter
+(phys/profts.F90)
 \begin_inset Foot
 status open
 
@@ -15371,9 +15251,13 @@ T_{n+1}^{km-\frac{1}{2}}=\frac{c^{km}-VHP^{km-1}-\widetilde{T}_{n+1}^{km-\frac{1
 \end_layout
 
 \begin_layout Subsection
-Subroutine PROFUV 
+Subroutine 
 \family typewriter
-($BFMDIR/src/POM/phys/profuv.F90)
+PROFUV
+\family default
+ 
+\family typewriter
+(phys/profuv.F90)
 \begin_inset CommandInset label
 LatexCommand label
 name "subsec:PROFUV"
@@ -15465,9 +15349,13 @@ BSTRESS
 \end_layout
 
 \begin_layout Subsection
-Subroutine restart_BFM_inPOM 
+Subroutine 
 \family typewriter
-($BFMDIR/src/POM/coupling/restart_BFM_inPOM.F90)
+restart_BFM_inPOM
+\family default
+ 
+\family typewriter
+(coupling/restart_BFM_inPOM.F90)
 \end_layout
 
 \begin_layout Standard
@@ -15562,9 +15450,13 @@ status open
 \end_layout
 
 \begin_layout Subsection
-Subroutine set_initial_conditions 
+Subroutine 
 \family typewriter
-($BFMDIR/src/POM/coupling/set_initial conditions.F90)
+set_initial_conditions
+\family default
+ 
+\family typewriter
+(coupling/set_initial_conditions.F90)
 \begin_inset CommandInset label
 LatexCommand label
 name "subsec:Subroutine-set_initial_condition"
@@ -15674,9 +15566,13 @@ literal "true"
 \end_layout
 
 \begin_layout Subsection
-Subroutine vdiff_SOS 
+Subroutine 
 \family typewriter
-($BFMDIR/src/POM/coupling/vdiff_SOS.F90)
+vdiff_SOS
+\family default
+ 
+\family typewriter
+(coupling/vdiff_SOS.F90)
 \begin_inset CommandInset label
 LatexCommand label
 name "subsec:vdiff_SOS"
@@ -16607,7 +16503,7 @@ status open
 \end_layout
 
 \begin_layout Chapter
-Installation, configuration and compilation
+Running BFM-POM1D
 \end_layout
 
 \begin_layout Section
@@ -17105,10 +17001,6 @@ BFM_POM contains all the namelists needed for a run using the benthic submodel.
  return closure, the only relevant namelist is 
 \family typewriter
 BenthicReturn1.nml
-\end_layout
-
-\begin_layout Chapter
-Running BFM-POM1D
 \end_layout
 
 \begin_layout Section
