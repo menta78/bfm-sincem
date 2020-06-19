@@ -3044,9 +3044,8 @@ literal "true"
 \begin_layout Standard
 PELAGOS2 is the coarsest global ocean resolution but still requires a parallel
  computing environment for its usage.
- One needs to have a fully functioning NEMO implementation of the ORCA2_LIM
- configuration before attempting to run PELAGOS2 (see details here: http://www.ne
-mo-ocean.eu/Using-NEMO/Configurations/ORCA2_LIM_PISCES).
+ One needs to have a fully functioning implementation of the ORCA2_LIM reference
+ configuration before attempting to run PELAGOS2.
  The default set up is the same as ORCA2_LIM with the following features:
 \end_layout
 
@@ -3226,7 +3225,7 @@ The run directory is created in
 \family typewriter
 $BFMDIR_RUN/pelagos2
 \family default
- just like all other BFM presets and the nemo executable is linked to there.
+ just like all other BFM presets and the NEMO executable is linked to there.
 \end_layout
 
 \begin_layout Section
@@ -3260,8 +3259,15 @@ literal "true"
 \end_inset
 
 ).
- All data are available on the NEMO web site (http://www.nemo-ocean.eu/Using-NEMO/
-Configurations/ORCA2_LIM_PISCES).
+ Input data can be retrieved from NEMO Reference configurations inputs 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "ORCA2_LIM_data"
+literal "false"
+
+\end_inset
+
+.
  The initial conditions of both physical and biogeochemical variables were
  set using the World Ocean Atlas 2009 climatological fields (
 \begin_inset CommandInset citation
