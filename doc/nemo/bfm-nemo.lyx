@@ -69,7 +69,16 @@ eqs-within-sections
 \index_command default
 \paperfontsize default
 \spacing single
-\use_hyperref false
+\use_hyperref true
+\pdf_bookmarks true
+\pdf_bookmarksnumbered false
+\pdf_bookmarksopen false
+\pdf_bookmarksopenlevel 1
+\pdf_breaklinks false
+\pdf_pdfborder false
+\pdf_colorlinks false
+\pdf_backref false
+\pdf_pdfusetitle true
 \papersize a4paper
 \use_geometry true
 \use_package amsmath 1
@@ -198,7 +207,7 @@ Coupling BFM with ocean models:
 
 
 \size largest
-the NEMO model (V3.6) 
+the NEMO model V3.6 
 \size default
 
 \begin_inset Newline newline
@@ -355,7 +364,7 @@ This document should be cited as:
 
 Vichi M., Lovato T., Gutierrez Mlot E., McKiver W.
  (2020).
- Coupling BFM with Ocean models: the NEMO model (Nucleus for the European
+ Coupling BFM with Ocean models: the NEMO model V3.6 (Nucleus for the European
  Modelling of the Ocean).
  BFM Report series N.
  2, Release 1.1, June 2020, Bologna, Italy, http://bfm-community.eu, pp.
@@ -840,11 +849,11 @@ BFM and TOP parameters
 
 \begin_layout Standard
 The biogeochemical processes of the BFM are controlled by their own namelist
- files as described in the manual 
+ files as described in the BFM core manual 
 \begin_inset CommandInset citation
-LatexCommand citep
+LatexCommand citet
 key "BFM-manual"
-literal "true"
+literal "false"
 
 \end_inset
 
@@ -1010,17 +1019,10 @@ In addition to this part that is common to other biogeochemical models in
  the TOP interface, the BFM allows to choose the specific mode of initialization
  for each variable in the namelist bfm_init_nml.
  This is the same namelist used for the STANDALONE model as described in
- 
-\begin_inset CommandInset citation
-LatexCommand citet
-key "BFM-manual"
-literal "true"
-
-\end_inset
-
- but when coupled with NEMO it also allows to specify if each variable should
- start from the initial file given in the namelist above, from a constant
- homogeneous value or from an analytical profile: 
+ BFM core manual (chap.
+ 5), but when coupled with NEMO it also allows to specify if each variable
+ should start from the initial file given in the namelist above, from a
+ constant homogeneous value or from an analytical profile: 
 \end_layout
 
 \begin_layout Standard
@@ -1458,15 +1460,7 @@ name "fig:Remapping"
 
 Layout of the main memory array for the pelagic variables and schematic
  of the remapping into the NEMO three-dimensional ocean grid for transport
- processes (see 
-\begin_inset CommandInset citation
-LatexCommand citealp
-key "BFM-manual"
-literal "true"
-
-\end_inset
-
- for a description of the code naming).
+ processes (see BFM core manual for a description of the code naming).
 \end_layout
 
 \end_inset
@@ -2634,15 +2628,7 @@ BFM_PARALLEL
 \family default
 macro is used to enable the creation of a simulation log file when using
  parallel execution on multiple processors.
- Please refer to the BFM manual 
-\begin_inset CommandInset citation
-LatexCommand citep
-key "BFM-manual"
-literal "true"
-
-\end_inset
-
- for further details on the other macros.
+ Please refer to the BFM core manual for further details on the other macros.
  
 \end_layout
 
@@ -2674,15 +2660,7 @@ layout:
 \begin_layout Standard
 This file contains the list of state variables defined in the BFM.
  This is independent of the coupled configuration and it is fully detailed
- in the BFM manual 
-\begin_inset CommandInset citation
-LatexCommand citep
-key "BFM-manual"
-literal "true"
-
-\end_inset
-
-.
+ in the BFM core manual.
 \end_layout
 
 \begin_layout Subsubsection*
@@ -2891,8 +2869,8 @@ Serial and parallel simulations
 GYRE_BFM is the simplest example to run as a single process on a desktop
  computer because the grid is rather coarse.
  However, the default GYRE configuration in NEMO is set up to use parallel
- computation and the advanced XIOS server (http://www.nemo-ocean.eu/Using-NEMO/Use
-r-Guides/Basics/XIOS-IO-server-installation-and-use).
+ computation and the advanced XIOS library (see chap.
+ 11 of NEMO v3.6 manual).
  To compile in serial mode it is necessary to remove the macro 
 \family typewriter
 key_mpp_mpi
@@ -3392,16 +3370,8 @@ Introduction
 
 \begin_layout Standard
 BFM uses its own libraries for NetCDF output that are specifically built
- to create diagnostic rates between the biogeochemical variables 
-\begin_inset CommandInset citation
-LatexCommand citep
-before "see Chap. 6 in"
-key "BFM-manual"
-literal "true"
-
-\end_inset
-
-.
+ to create diagnostic rates between the biogeochemical variables (see Chap.
+ 8 in BFM core manual).
  
 \end_layout
 
@@ -3409,9 +3379,30 @@ literal "true"
 Since version 3.6 of NEMO, the external library XIOS can be used to distribute
  the computation and preparation of output over different processes and
  with a different domain decomposition.
- The XIOS library functions can be used also with BFM, as a set iof dedicate
- XML files are produced to select the required output files and fields as
- in NEMO.
+ 
+\end_layout
+
+\begin_layout Standard
+The XIOS library functions can be used also with BFM, as a set of dedicated
+ XML files are produced during code generation to setup required output
+ files and fields as in NEMO.
+ In particular, 
+\family typewriter
+field_def_bfm.xml
+\family default
+ file contains the description of all accessible BFM variables and 
+\family typewriter
+file_def_bfm.xml
+\family default
+ it is used to select the variables to be included in the output files.
+ In order to be used by XIOS, these two files must be integrated in the
+ general general NEMO 
+\family typewriter
+iodef.xml
+\family default
+ file (using the include sentence)
+\family typewriter
+.
 \end_layout
 
 \begin_layout Section
