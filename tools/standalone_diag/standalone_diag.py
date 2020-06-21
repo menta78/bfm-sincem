@@ -68,6 +68,8 @@ def diagnostics():
         'detritus': ['R1', 'R6'],
         'gross production': ['ruPPY', 'ruZOO'],
         'respiration': ['resPPY', 'resPBA', 'resZOO'],
+        'air-sea flux': ['jsurO3', 'jsurO2'],
+        'calcite': ['O5'],
         'quotas': ['phytoplankton', 'zooplankton', 'bacteria', 'detritus']
     }
 
