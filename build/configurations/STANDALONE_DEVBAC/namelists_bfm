@@ -275,9 +275,9 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
 ! NOTE: The file "CMIP5_Historical_GHG_1765_2005.dat" is located in "$BFMDIR/tools" folder
 !-----------------------------------------------------------------------------------!
 &CSYS_parameters
-    AtmCO20         =  367.0E0
+    AtmCO20         =  370.0E0
     MaxIterPHsolver = 50
-    CalcBioAlk      =  .TRUE.
+    CalcBioAlk      =  .FALSE.
     p_kdca          =  10.9
     p_nomega        =  1
     Co2fluxfac      = 1.0
