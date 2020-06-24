@@ -324,6 +324,14 @@ end{titlepage}
 \end_layout
 
 \begin_layout Quote
+The BFM system team is gratefully endebted with Prof.
+ George L.
+ Mellor for allowing us to distribute the FORTRAN95 computer code of the
+ one-dimensional Princeton Ocean Model that evolved from the original FORTRAN77
+ version of the model.
+\end_layout
+
+\begin_layout Quote
 This document should be cited as:
 \begin_inset Newline newline
 \end_inset
@@ -1490,259 +1498,6 @@ l model implementation.
  coupled marine ecosystem dynamics.
  Clearly, the reliability of the simulations is crucially dependent on the
  quality of the assembled climatology.
-\end_layout
-
-\begin_layout Section
-The POM1D computer code.
-\end_layout
-
-\begin_layout Standard
-The POM1D computer code available from the BFM website evolves from the
- 
-\family typewriter
-FORTRAN77
-\family default
- code of the one-dimensional POM available from the POM web site (
-\family typewriter
-http://www.ccpo.odu.edu/POMWEB/contrib-code/obl.f
-\family default
-).
- The whole code has been adapted in order to comply with the 
-\family typewriter
-FORTRAN95
-\family default
- syntaxis and compilers.
-\end_layout
-
-\begin_layout Section
-BFM
-\end_layout
-
-\begin_layout Subsection
-General
-\end_layout
-
-\begin_layout Standard
-BFM, is a biomass and functional group based marine ecosystem model, representin
-g the system in eulerian coordinates by a selection of chemical and biological
- processes that simulates the pelagic (water column) and the benthic pelagic
- coupling (water sediment interface) dynamics in the marine ecosystem.
- The carbon(
-\begin_inset Formula $C$
-\end_inset
-
-), nitrogen (
-\begin_inset Formula $N$
-\end_inset
-
-), phosphorus (
-\begin_inset Formula $P$
-\end_inset
-
-) silicon (
-\begin_inset Formula $Si$
-\end_inset
-
-), and oxygen (
-\begin_inset Formula $O$
-\end_inset
-
-) biogeochemical cycles are solved independently over a variety chemical
- functional families (CFFs) and functional groups (LFGs).
- CFFs are divided into organic (e.g.
- particulate and dissolved detritus) and inorganic (e.g.
- nutrients, dissolved oxygen and carbon dioxide) while the LFGs represent
- the biota (phytoplankton, bacteria, micro- and meso-zooplankton).
- LFGs and CFFs are measured in mass 
-\begin_inset Formula $\left[mgC/\left(m^{3},m^{2}\right)\right]$
-\end_inset
-
- or molecular weight 
-\begin_inset Formula $\left[mmol\left(N,P,Si,O\right)/\left(m^{3},m^{2}\right)\right]$
-\end_inset
-
- concentration (relative to volume in the pelagic domain and relative to
- surface in the benthic domain) units of the major chemical elements (carbon,
- nitrogen phosphorus, silicon, oxygen).
-\end_layout
-
-\begin_layout Subsection
-The governing equations
-\begin_inset CommandInset label
-LatexCommand label
-name "subsec:The-BFMgoverning-equations"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The governing equations, as well as the code structure of the BFM, are fully
- described in the dedicated BFM report 
-\begin_inset CommandInset citation
-LatexCommand citep
-key "BFM-manual"
-literal "true"
-
-\end_inset
-
- available from the BFM web site.
- The present report does not provide specific BFM details, since it is focusing
- only on the BFM coupling with POM1D.
- For BFM equations, model structure details and state variables code naming,
- the reader is then referred to such report .
- 
-\end_layout
-
-\begin_layout Standard
-However, the BFM coupling with POM1D described here, utilises a BFM version
- that includes a simple 
-\begin_inset Quotes eld
-\end_inset
-
-benthic return process
-\begin_inset Quotes erd
-\end_inset
-
- not yet described in the BFM documentation.
- Such benthic 
-\begin_inset Quotes eld
-\end_inset
-
-closure
-\begin_inset Quotes erd
-\end_inset
-
- is a simplified description of the processes defining the so-called 
-\begin_inset Quotes eld
-\end_inset
-
-benthic pelagic coupling
-\begin_inset Quotes erd
-\end_inset
-
- (the organic matter cycling across the water sediment interface, modulated
- by sedimentary and diffusive fluxes) and requires the definition of the
- benthic particulate matter (carbon, phosphorous, nitrogen and silicon content),
- 
-\begin_inset Formula $Q_{c,n,p,s}^{(6)}$
-\end_inset
-
-, and dissolved (carbon, phosphorous, nitrogen content) labile organic matter,
- 
-\begin_inset Formula $Q_{c,n,p}^{(1)}$
-\end_inset
-
-, state variables , whose temporal rates of change are defined (adopting
- the symbol convention used in 
-\begin_inset CommandInset citation
-LatexCommand citealt
-key "BFM-manual"
-literal "true"
-
-\end_inset
-
-, table 1.1) as:
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset Formula 
-\begin{equation}
-\frac{\partial Q_{c,n,p}^{(6)}}{\partial t}=-\frac{w_{b}}{H+z_{b}}\left[R_{c,n,p}^{\left(6\right)}+\left(1-\xi_{c,n,p}\right)P_{c,n,p}^{\left(1,4\right)}\right]_{z=z_{b}}-\mu_{Q^{6}\left(c,n,p\right)}Q_{c,n,p}^{(6)}\mid_{z=z_{b}}\label{eq:BPC-ret}
-\end{equation}
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset Formula 
-\begin{equation}
-\frac{\partial Q_{c,n,p}^{(1)}}{\partial t}=-\frac{w_{b}}{H+z_{b}}\xi_{c,n,p}P_{c,n,p}^{\left(1,4\right)}\mid_{z=z_{b}}-\mu_{Q_{\left(c,n,p\right)}^{1}}Q_{c,n,p}^{(1)}\mid_{z=z_{b}}\label{eq:BPC-Q1}
-\end{equation}
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset Formula 
-\begin{equation}
-\frac{\partial Q_{s}^{(6)}}{\partial t}=-\frac{w_{b}}{H+z_{b}}\left[R_{s}^{\left(6\right)}+P_{s}^{\left(1\right)}\right]_{z=z_{b}}-\mu_{Q_{s}^{6}}Q_{s}^{(6)}\mid_{z=z_{b}}\label{eq:BPC-Si-1}
-\end{equation}
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset VSpace defskip
-\end_inset
-
-where 
-\begin_inset Formula $w_{b}$
-\end_inset
-
-is a burial velocity (negative 
-\begin_inset Formula $m/s$
-\end_inset
-
- and user defined); 
-\begin_inset Formula $0\leq\xi\leq1$
-\end_inset
-
- is a coefficient partitioning the settling phytoplankton 
-\begin_inset Formula $P_{c,n,p}^{(1,4)}$
-\end_inset
-
- (diatoms and dinoflagellates carbon, nitrogen and phosphorus content) into
- benthic particulate and dissolved orgsanic matter.
- 
-\begin_inset Formula $\mu_{Q_{c,n,p,s}^{(1,6)}}$
-\end_inset
-
- 
-\begin_inset Formula $\left(s\right)$
-\end_inset
-
- are a user defined recycling time scales operating the conversion of the
- benthic organic matter into pelagic dissolved nutrients and effectively
- defining the bottom boundary condition for the nutrients in the water column
- (section:
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:The-BFMboundary-conditions"
-
-\end_inset
-
-).
-\end_layout
-
-\begin_layout Subsection
-The BFM computer code
-\end_layout
-
-\begin_layout Standard
-The latest tested version of the BFM (currently Version 5 written in FORTRAN95)
- can be downloaded from the BFM community model website.
- It is stressed again that the complete BFM documentation can be found in
- the 
-\begin_inset CommandInset citation
-LatexCommand citet
-key "BFM-manual"
-literal "true"
-
-\end_inset
-
- report, dowloadable form the BFM web site.
 \end_layout
 
 \begin_layout Chapter
@@ -16535,508 +16290,11 @@ Running BFM-POM1D
 \end_layout
 
 \begin_layout Section
-Installation
-\begin_inset CommandInset label
-LatexCommand label
-name "sec:Installation"
-
-\end_inset
-
- 
-\end_layout
-
-\begin_layout Standard
-Both the BFM and POM1D can be downloaded from the BFM distribution sites.
- In the following, it is assumed that the main code of the coupled system
- is found in 
-\family typewriter
-$BFMDIR/src/pom, the
-\family default
- BFM code is found in 
-\family typewriter
-$BFMDIR/src/bfm
-\family default
-, the POM1D code is found in 
-\family typewriter
-$BFMDIR/src/pom/phys
-\family default
- and the code coupling the two systems is found in BFM in 
-\family typewriter
-$BFMDIR/src/pom
-\family default
-/
-\family typewriter
-coupling
-\family default
-.
-\end_layout
-
-\begin_layout Standard
-The default basic configuration of BFM-POM1D can be found in 
-\family typewriter
-${BFMDIR}/build/configurations/BFM_POM
-\family default
- .
-\end_layout
-
-\begin_layout Standard
-In order to successfully install the BFM-POM1D System, the user must initially
- instally the BFM STANDALONE model as described in sections 4.1 of 
-\begin_inset CommandInset citation
-LatexCommand citet
-key "BFM-manual"
-literal "true"
-
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Standard
-The BFM version effectively coupled (and tested) with the one dimensional
- POM version is version 5.1.
-\end_layout
-
-\begin_layout Standard
-The BFM source code version 5.1 has to be downloaded from the BFM web site
- or trough the git repository.
- In the example below it is assumed that the tarball has been downloaded.
- The downloaded file may have a different name based on the version.
- As a final step create the required basic environmental variables pointing
- at the root directories as: 
-\end_layout
-
-\begin_layout Standard
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-\size tiny
-% mkdir $HOME/BFM 
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-\size tiny
-% cd $HOME/BFM 
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-\size tiny
-% gunzip bfm-release-<??????>.tgz 
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-\size tiny
-% tar xvf bfm-release-<??????>.tar 
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-\size tiny
-% export BFMDIR=$HOME/BFM 
-\end_layout
-
-\begin_layout Standard
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Section
-Configuration
-\begin_inset CommandInset label
-LatexCommand label
-name "sec:Configuration"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-Configuration and deployment of the model is done automatically by the script
- 
-\emph on
-bfm_configure.sh
-\emph default
- (see the BFM manual for more information or simply run 
-\family typewriter
-\emph on
-./bfm_configure.sh -h
-\family default
-\emph default
-), located in 
-\shape italic
-${BFMDIR}/build
-\shape default
-/.
-\end_layout
-
-\begin_layout Standard
-An experiment is defined by a model layout structure, namelists, and initial
- input values (see section 4.2 in 
-\begin_inset CommandInset citation
-LatexCommand citet
-key "BFM-manual"
-literal "true"
-
-\end_inset
-
-).
- These definitions put together with compilation and run options is what
- is called a 
-\series bold
-PRESET
-\series default
-.
- 
-\end_layout
-
-\begin_layout Standard
-The default BFM_POM configuration is generated, compiled and deployed with
- the command: 
-\end_layout
-
-\begin_layout Standard
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-\emph on
-% cd $BFMDIR/build 
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-\emph on
-% ./bfm_configure.sh -gcd -a -p BFM_POM -m POM1D
-\end_layout
-
-\begin_layout Subsection
-The BFM-POM1D preset
-\end_layout
-
-\begin_layout Standard
-The BFM-POM1D preset is contained in the directory 
-\shape italic
-${BFMDIR}/build/configurations/
-\shape default
-BFM_POM and it is all you need to create a particular experiment.
-\end_layout
-
-\begin_layout Standard
-The BFM-POM1D preset directory contains the following files:
-\end_layout
-
-\begin_layout Standard
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Subsubsection*
-
-\family typewriter
-Configuration
-\family default
-: compilation deployement options 
-\end_layout
-
-\begin_layout Standard
-Below the content of the 
-\family typewriter
-configuration
-\family default
- namelist is shown:
-\end_layout
-
-\begin_layout Standard
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-\size tiny
-&BFM_conf
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-\size tiny
-        MODE    = 'POM1D',
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-\size tiny
-        CPPDEFS = 'BFM_STANDALONE
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-\size tiny
-                   INCLUDE_PELCO2
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-\size tiny
-INCLUDE_DIAG
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-\size tiny
-                   INCLUDE_BEN 
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-\size tiny
-                   INCLUDE_BENCO2
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-\size tiny
-                   BFM_POM
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-\size tiny
-                   BFM_NOPOINTERS',
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-\size tiny
-        ARCH    = 'gfortran.inc',
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-\size tiny
-PROC    = 1,
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-\size tiny
-        EXP     = 'pom_bfm_1d',
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-\size tiny
-BFMEXE  = 'pom.exe'
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-\size tiny
-/
-\end_layout
-
-\begin_layout Standard
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-where:
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-MODE = 'POM1D'
-\family default
- indicates that the BFM core is compiled for an execution coupled with POM1D.
- withe pre-compilerr macros.
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-CPPDEFS
-\family default
-=
-\family typewriter
-'BFM_STANDALONE INCLUDE_PELCO2 INCLUDE_DIAG INCLUDE_BEN INCLUDE_BENCO2 BFM_POM
- BFM_NOPOINTERS
-\family default
-', state the inclusion of the BFM model, (
-\family typewriter
-BFM_STANDALONE
-\family default
-), the inclusion in the simulation of the 
-\begin_inset Formula $CO_{2}$
-\end_inset
-
- dynamics in the pelagic (
-\family typewriter
-INCLUDE_PELCO2
-\family default
-) and in the benthic (
-\family typewriter
-INCLUDE_BENCO2
-\family default
-) domains (within the limitations imposed by the use of the simple benthic
- closure), the no use of pointers (
-\family typewriter
-BFM_NOPOINTER
-\family default
-S) and the possibility to store diagnostic output (
-\family typewriter
-INCLUDE_DIAG
-\family default
-).
- 
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-ARCH
-\family default
-    = 'gfortran.inc' indicate the use of a 
-\family typewriter
-GFORTRAN
-\family default
- compiler.
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-PROC=4
-\family default
- indicate the use of 4 processors for a run utilising a parallel computer.
- However, the lack of the 
-\family typewriter
-CPPDEFS 
-\family default
-key 
-\family typewriter
-BFM_PARALLEL
-\family default
- makes this statement unuseful, since the run will be carried out using
- a single processor (the limited run time for a 1D simulation allow this
- simple computational configuration).
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-EXP
-\family default
-= 'pom_bfm_1d' defines the experiment naming.
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-BFMEXE
-\family default
-  = 'pom.exe' defines the executable file naming.
-\end_layout
-
-\begin_layout Standard
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Subsubsection*
-
-\family typewriter
-Layout:
-\family default
- Memory layout configuration file
-\end_layout
-
-\begin_layout Standard
-This file contains the list of the BFM state variables.
- This is indepent from the coupled configuration and it is therefore fully
- described in the BFM manual 
-\begin_inset CommandInset citation
-LatexCommand citep
-key "BFM-manual"
-literal "true"
-
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Subsubsection*
-namelists_bfm: template namelist file for BFM with standard values.
-\end_layout
-
-\begin_layout Standard
-This file contains all the standard values of the namelists used for the
- experiment.
-\end_layout
-
-\begin_layout Standard
-In addition to the above files the directory 
-\shape italic
-${BFMDIR}/build/configurations/
-\shape default
-BFM_POM contains all the namelists needed for a run using the benthic submodel.
- However, given that the version used here implies only theuse of the benthic
- return closure, the only relevant namelist is 
-\family typewriter
-BenthicReturn1.nml
-\end_layout
-
-\begin_layout Section
 Description
 \end_layout
 
 \begin_layout Standard
-The BFM_POM1D configuration is based on the work carried out by 
+The BFM-POM1D configuration is based on the work carried out by 
 \begin_inset CommandInset citation
 LatexCommand citet
 key "mussap1"
@@ -17060,31 +16318,58 @@ literal "true"
 
 \end_inset
 
- by implementing the coupled system in the gulf of Trieste.
- The configuration simulates the annual cycle of a water column located
- in the centre of the gulf under climatological forcing conditions.
- Simulations are carried out in diagnostic mode, as detailed in section
- 
+ and it represent the evolution of biogeochemical processes in the middle
+ of the Gulf of Trieste (Italy).
+ The default configuration is a 10 years long simulation of a water column
+ located in the centre of the gulf driven by climatological forcing conditions,
+ with the prescription of sewater temperature and salinity profiles using
+ the diagnostic mode (see details in section 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "subsec:Diagnostic-mode"
 
 \end_inset
 
-.
- The reader is referred to the paper quoted above and to the 
+).
+ All the input files are contained in the configuration folder BFM-POM1D
+ and the reader is referred to the papers quoted above for details, as well
+ for the selected paramterizations and settings.
+\end_layout
+
+\begin_layout Section
+Execute the model
+\end_layout
+
+\begin_layout Standard
+Code compilation and deployment of the model is done automatically by the
+ script 
+\emph on
+bfm_configure.sh
+\emph default
+ (see the BFM core manual for its usage and environment setup) by using
+ the following command
+\end_layout
+
+\begin_layout Standard
+
 \family typewriter
-params_POMBFM
+\emph on
+$> ./bfm_configure.sh -gcd -p BFM_POM
+\end_layout
+
+\begin_layout Standard
+Once that model setup is completed go the run folder (
+\family typewriter
+${BFMDIR}/run/bfm-pom1d
 \family default
- namelist description (sec.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:pom_bfm_settings-namelist"
+) and launch the executable
+\end_layout
 
-\end_inset
+\begin_layout Standard
 
-) for more information about the implementation in the Gulf of Trieste.
+\family typewriter
+\emph on
+$> ./bfm_pom.exe
 \end_layout
 
 \begin_layout Section
@@ -17092,11 +16377,20 @@ Results
 \end_layout
 
 \begin_layout Standard
-The user can replicate some of the results obtained for the gulf of Trieste
- implementation, since the forcing files used to carry out the simulations
- are available trough the BFM web site.
- below we show some of the results to be compared with the results obtained
- by the user.
+As illustrated in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:BFM-POM1D-Trieste"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, the configuration simulates the coupled phisical and biogeochemical dynamics
+ in the gulf of Trieste with a winter peak of phytoplankton that occurs
+ along the entire water column and a progressive deepening of biological
+ activity during the summer stratified conditions.
 \end_layout
 
 \begin_layout Standard
@@ -17141,6 +16435,13 @@ BFM-POM1D implementation in the Gulf of Trieste.
 \end_inset
 
 .
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:BFM-POM1D-Trieste"
+
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -17163,23 +16464,6 @@ BFM-POM1D implementation in the Gulf of Trieste.
 
 \begin_layout Standard
 
-\end_layout
-
-\begin_layout Standard
-
-\end_layout
-
-\begin_layout Chapter
-\noindent
-Acknowledgements
-\end_layout
-
-\begin_layout Standard
-The BFM system team is gratefully endebted with Prof.
- George L.
- Mellor for allowing us to distribute the FORTRAN95 computer code of the
- one-dimensional Princeton Ocean Model that evolved from the original FORTRAN77
- version of the model.
 \end_layout
 
 \begin_layout Standard
@@ -17208,7 +16492,7 @@ twocolumn
 \begin_layout Standard
 \begin_inset CommandInset bibtex
 LatexCommand bibtex
-bibfiles "bfm-pom1D-references"
+bibfiles "bfm-pom-references"
 options "bibtotoc,elsart-harv"
 
 \end_inset
