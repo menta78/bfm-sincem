@@ -792,7 +792,9 @@ p_paMEZ(2,:)=   0.0,    1.0
 ! SMOTH                     [-]           Parameter for Hasselin filter
 ! IHOTST                    [-]           1 = Restart reading
 !                                         0 = Cold start
-! KL1 & KL2                 [-]           Number of top and bottom levels not equally distributed,
+! KL1 & KL2                 [-]           Establish Surface/bottom logarithmic layers distribution
+!                                         KL1: Surface logarithmic distribution. The numers of layers is KL1-2
+!                                         KL2: Bottom logarithic distribution. The numers of layers is KB-KL2-1
 ! SAVEF                     [d]           Saving frequency (days)
 ! NRT                       [m/d]         Relaxation constant for nutrients at surface
 ! NBCT, NBCS, NBCBFM        [-]           Define surface boundary conditions for temperature, salinity & BFM tracers

@@ -15761,97 +15761,89 @@ status open
 
 \begin_layout Plain Layout
 
-! H                    [m]       Depth 
+! NAME                  [UNIT]/KIND       DESCRIPTION 
 \end_layout
 
 \begin_layout Plain Layout
 
-! DTI                  [s]       Timestep 
+! H                         [m]           Depth 
 \end_layout
 
 \begin_layout Plain Layout
 
-! ALAT                 [degrees] Latitude 
+! DTI                       [s]           Timestep 
 \end_layout
 
 \begin_layout Plain Layout
 
-! IDIAGN               [-]       1 = Diagnostic mode 
+! ALAT                      [degrees]     Latitude 
 \end_layout
 
 \begin_layout Plain Layout
 
-!                                0 = Prognostic mode            
+! IDIAGN                    [-]           1 = Diagnostic mode 
 \end_layout
 
 \begin_layout Plain Layout
 
-! IDAYS                [d]       Length of run  
+!                                         0 = Prognostic mode 
 \end_layout
 
 \begin_layout Plain Layout
 
-! SMOTH                [-]       Parameter for Hasselin filter  
+! IDAYS                     [d]           Length of run 
 \end_layout
 
 \begin_layout Plain Layout
 
-! IHOTST               [-]       1 = Restart reading 
+! SMOTH                     [-]           Parameter for Hasselin filter
+ 
 \end_layout
 
 \begin_layout Plain Layout
 
-!                                0 = Cold start 
+! IHOTST                    [-]           1 = Restart reading 
 \end_layout
 
 \begin_layout Plain Layout
 
-! KL1 & KL2            [-]       Establish Surface/bottom logarithmic layers
- distribution 
+!                                         0 = Cold start 
 \end_layout
 
 \begin_layout Plain Layout
 
-!                      KL1: Surface logarithmic distribution.
+! KL1 & KL2                 [-]           Establish Surface/bottom logarithmic
+ layers distribution 
+\end_layout
+
+\begin_layout Plain Layout
+
+!                                         KL1: Surface logarithmic distribution.
  The numers of layers is KL1-2 
 \end_layout
 
 \begin_layout Plain Layout
 
-!                      KL2: Bottom logarithic distribution.
- The numers of layers is KB-KL2-1
+!                                         KL2: Bottom logarithic distribution.
+ The numers of layers is KB-KL2-1 
 \end_layout
 
 \begin_layout Plain Layout
 
+! SAVEF                     [d]           Saving frequency (days) 
 \end_layout
 
 \begin_layout Plain Layout
 
-! SAVEF                [hours]       Output averaging and Saving frequency
- (days) 
+! NRT                       [m/d]         Relaxation constant for nutrients
+ at surface
 \end_layout
 
 \begin_layout Plain Layout
 
-! NRT                  [m/d]     Relaxation constant for nutrients at surface
-  
-\end_layout
-
-\begin_layout Plain Layout
-
-! NBCT, NBCS, NBCBFM   [-]       Define surface boundary conditions for
- temperature, salinity & BFM tracers
-\end_layout
-
-\begin_layout Plain Layout
-
-!
-\end_layout
-
-\begin_layout Plain Layout
-
-! NBC = 1: Surf.
+! NBCT, NBCS, NBCBFM        [-]           Define surface boundary conditions
+ for temperature, salinity & BFM tracers !                             
+            NBC = 1: Surf.
  B.C.
  is WFSURF.
  no radiative penetration 
@@ -15859,69 +15851,81 @@ status open
 
 \begin_layout Plain Layout
 
-! NBC = 2; Surf.
+!                                         NBC = 2; Surf.
  B.C.
  is WFSURF+SWRAD*(1.-TR).
- with SWRAD*TR penetration      
+ with SWRAD*TR penetration 
 \end_layout
 
 \begin_layout Plain Layout
 
-! NBC = 3; Surf.
+!                                         NBC = 3; Surf.
  B.C.
  is TSURF.
- no SW radiative penetration
+ no SW radiative penetration 
 \end_layout
 
 \begin_layout Plain Layout
 
-!  
-\end_layout
-
-\begin_layout Plain Layout
-
-! UMOL                 [m^2/s]   Background diffusion for momentum  
-\end_layout
-
-\begin_layout Plain Layout
-
-! UMOLT, UMOLS,UMOLBFM [m^2/s]   Background diffusion for T,S and BFM tracers
-  
-\end_layout
-
-\begin_layout Plain Layout
-
-! NTP                  [-]       Flag for Jerlov water type
-\end_layout
-
-\begin_layout Plain Layout
-
-!                      NTP =               1      2       3       4    
-   5               
-\end_layout
-
-\begin_layout Plain Layout
-
-!                      JERLOV TYPE   =     I      IA      IB      II   
-   III 
-\end_layout
-
-\begin_layout Plain Layout
-
-! TRT,SRT              [ ]        Relaxation time for t & S lateral advection
+! UMOL                      [m^2/s]       Background diffusion for momentum
  
 \end_layout
 
 \begin_layout Plain Layout
 
-! upperh               [m]        Depth at which lateral advection starts
+! UMOLT, UMOLS,UMOLBFM      [m^2/s]       Background diffusion for T,S and
+ BFM tracers 
+\end_layout
+
+\begin_layout Plain Layout
+
+! NTP                       [-]           Flag for Jerlov water type 
+\end_layout
+
+\begin_layout Plain Layout
+
+!                                         NTP =               1      2 
+      3       4       5 
+\end_layout
+
+\begin_layout Plain Layout
+
+!                                         JERLOV TYPE   =     I      IA
+      IB      II      III 
+\end_layout
+
+\begin_layout Plain Layout
+
+! TRT,SRT                   [ ]           Relaxation time for t & S lateral
+ advection 
+\end_layout
+
+\begin_layout Plain Layout
+
+! upperh                    [m]           Depth at which lat eadv start
  
 \end_layout
 
 \begin_layout Plain Layout
 
-! SSRT                 [m/d]      Relaxation time for surface salinity flux
- 
+! SSRT                      [m/d]         Relaxation time for surface salinity
+ flux 
+\end_layout
+
+\begin_layout Plain Layout
+
+! CBCMIN                                  Minimum achievable bottom drag
+ coeff 
+\end_layout
+
+\begin_layout Plain Layout
+
+! Z0B                                     Bottom roughness length
+\end_layout
+
+\begin_layout Plain Layout
+
+!
 \end_layout
 
 \begin_layout Plain Layout
@@ -15951,7 +15955,7 @@ IDIAGN  =  1,
 
 \begin_layout Plain Layout
 
-IDAYS   =  1800,  
+IDAYS   =  3600,  
 \end_layout
 
 \begin_layout Plain Layout
@@ -15976,7 +15980,7 @@ KL2     =  25,
 
 \begin_layout Plain Layout
 
-SAVEF   =  1,  
+SAVEF   =  30,  
 \end_layout
 
 \begin_layout Plain Layout
@@ -16041,12 +16045,12 @@ UPPERH  =  5.0,
 
 \begin_layout Plain Layout
 
-SSRT    =  5.68    /  
+SSRT    =  5.68    
 \end_layout
 
 \begin_layout Plain Layout
 
-!-=-=-= !END namelist !-=-=-=
+/
 \end_layout
 
 \end_inset
@@ -16150,11 +16154,6 @@ status open
 
 \begin_layout Plain Layout
 
-! !DESCRIPTION !
-\end_layout
-
-\begin_layout Plain Layout
-
 ! -----DEFINE PATH TO DATA FILES-------
 \end_layout
 
@@ -16165,50 +16164,58 @@ status open
 
 \begin_layout Plain Layout
 
-! wind_input:      path to the windstress data 
+! NAME             [UNIT]/KIND       DESCRIPTION 
 \end_layout
 
 \begin_layout Plain Layout
 
-! surfaceS_input:  path to the surface salinity data ! radiance_input: 
- path to the shortwave (solar) radiation data 
+! wind_input         [N/m^2]         U and V components of surface wind
+ stress 
 \end_layout
 
 \begin_layout Plain Layout
 
-! ism_input:       path to the suspended sediment data 
+! heat_input         [W/m^2]         Total heat flux 
 \end_layout
 
 \begin_layout Plain Layout
 
-! Sal_input:       path to the (time varying) salinity vertical profile
- data 
+! surfNut_input    [BFM units]       surface nutrient inputs (NO3,NH4,PO4,SIO4)
+ 
 \end_layout
 
 \begin_layout Plain Layout
 
-! Temp_input:      path to the (time varying) temperature vertical profile
- data 
+! Sprofile_input       [-]           Salinity Initial Condition 
 \end_layout
 
 \begin_layout Plain Layout
 
-! Sprofile_input:  path to the salinity initial conditions data 
+! Tprofile_input     [degC]          Water temperature Initial Condition
+ 
 \end_layout
 
 \begin_layout Plain Layout
 
-! Tprofile_input:  path to the temperature initial conditions data 
+! ism_input            [-]           Inorganic Suspended Matter monthly
+ climatology 
 \end_layout
 
 \begin_layout Plain Layout
 
-! heat_input:      path to the heat flux loss terms (Qb+Qh+Qe) data 
+! Sal_input            [-]           Salinity monthly climatology 
 \end_layout
 
 \begin_layout Plain Layout
 
-! read_restart:    path to the restart file.
+! Temp_input           [-]           Water temperature monthly climatology
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+! read_restart         char          Filename of input restart file for
+ POM
 \end_layout
 
 \begin_layout Plain Layout
@@ -16273,11 +16280,12 @@ surfNut_input   =  '/input/NutrientsARPAOGS.da',
 
 \begin_layout Plain Layout
 
-read_restart    =  '/input/fort.70' / 
+read_restart    =  '/input/fort.70' 
 \end_layout
 
 \begin_layout Plain Layout
 
+/
 \end_layout
 
 \end_inset
@@ -16286,7 +16294,7 @@ read_restart    =  '/input/fort.70' /
 \end_layout
 
 \begin_layout Chapter
-Running BFM-POM1D
+Running BFM_POM1D
 \end_layout
 
 \begin_layout Section
@@ -16294,7 +16302,7 @@ Description
 \end_layout
 
 \begin_layout Standard
-The BFM-POM1D configuration is based on the work carried out by 
+The BFM_POM1D configuration is based on the work carried out by 
 \begin_inset CommandInset citation
 LatexCommand citet
 key "mussap1"
@@ -16331,7 +16339,7 @@ reference "subsec:Diagnostic-mode"
 \end_inset
 
 ).
- All the input files are contained in the configuration folder BFM-POM1D
+ All the input files are contained in the configuration folder BFM_POM1D
  and the reader is referred to the papers quoted above for details, as well
  for the selected paramterizations and settings.
 \end_layout
@@ -16354,13 +16362,13 @@ bfm_configure.sh
 
 \family typewriter
 \emph on
-$> ./bfm_configure.sh -gcd -p BFM_POM
+$> ./bfm_configure.sh -gcd -p BFM_POM1D
 \end_layout
 
 \begin_layout Standard
 Once that model setup is completed go the run folder (
 \family typewriter
-${BFMDIR}/run/bfm-pom1d
+${BFMDIR}/run/bfm_pom1d
 \family default
 ) and launch the executable
 \end_layout
@@ -16370,6 +16378,15 @@ ${BFMDIR}/run/bfm-pom1d
 \family typewriter
 \emph on
 $> ./bfm_pom.exe
+\end_layout
+
+\begin_layout Standard
+The model will perform a 10 year long simulation saving output data every
+ 30 days (see also description of 
+\family typewriter
+Params_POMBFM
+\family default
+ namelist).
 \end_layout
 
 \begin_layout Section
@@ -16401,9 +16418,40 @@ status open
 
 \begin_layout Plain Layout
 \align center
+A
 \begin_inset Graphics
-	filename Figures/bfm-pom-trieste-plot.png
-	lyxscale 80
+	filename Figures/bfm_pom1d/p-pel-N1p.png
+	lyxscale 30
+	scale 50
+
+\end_inset
+
+B
+\begin_inset Graphics
+	filename Figures/bfm_pom1d/l-pel-Chla.png
+	lyxscale 30
+	scale 50
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+C
+\begin_inset Graphics
+	filename Figures/bfm_pom1d/c-pel-Z5c.png
+	lyxscale 30
+	scale 50
+
+\end_inset
+
+D
+\begin_inset Graphics
+	filename Figures/bfm_pom1d/c-pel-Z4c.png
+	lyxscale 30
+	scale 50
 
 \end_inset
 
@@ -16415,22 +16463,20 @@ status open
 
 \begin_layout Plain Layout
 BFM-POM1D implementation in the Gulf of Trieste.
- climatological annual cycles of: a.
- Phosphate (
+ Climatological annual cycles computed over the last 5 years of simulation
+ for A) Phosphate (
 \begin_inset Formula $mmolP/m^{3})$
 \end_inset
 
-, Chlorophyll (
+, B) Chlorophyll (
 \begin_inset Formula $mg/m^{3}),$
 \end_inset
 
- c.
- Microzooplankton and heterotrophic flagellates (
+ C) Microzooplankton (
 \begin_inset Formula $mgC/m^{3})$
 \end_inset
 
-, d.
- Omnivorous zooplankton (
+, D) Omnivorous zooplankton (
 \begin_inset Formula $mgC/m^{3})$
 \end_inset
 
@@ -16449,16 +16495,8 @@ name "fig:BFM-POM1D-Trieste"
 
 \end_layout
 
-\begin_layout Plain Layout
-
-\end_layout
-
 \end_inset
 
-
-\end_layout
-
-\begin_layout Standard
 
 \end_layout
 
