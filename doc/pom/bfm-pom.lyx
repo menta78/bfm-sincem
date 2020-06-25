@@ -324,7 +324,7 @@ end{titlepage}
 \end_layout
 
 \begin_layout Quote
-The BFM system team is gratefully endebted with Prof.
+The BFM system team is gratefully indebted with Prof.
  George L.
  Mellor for allowing us to distribute the FORTRAN95 computer code of the
  one-dimensional Princeton Ocean Model that evolved from the original FORTRAN77
@@ -336,8 +336,8 @@ This document should be cited as:
 \begin_inset Newline newline
 \end_inset
 
-Zavatarelli M., Pinardi N., Mussap G., Lovato T., Amadio C.
- Butenschön M., Vichi M.
+Zavatarelli M., Pinardi N., Mussap G., Lovato T., Amadio C., Butenschön M., Vichi
+ M.
  (2020).
  Coupling BFM with Ocean models: the 1D Princeton Ocean Model.
  BFM Report series N.
@@ -399,7 +399,11 @@ ed with BFM (see details in http://bfm-community.eu).
 \end_layout
 
 \begin_layout Standard
-The report is organised as follows:
+The report is 
+\lang british
+organised
+\lang american
+ as follows:
 \end_layout
 
 \begin_layout Standard
@@ -423,7 +427,7 @@ Section 3 is devoted to the description of the general characteristics of
  The coupled equations and the relative boundary conditions are described
  along with the equation transformation coherent with the vertical coordinate
  system adopted.
- The section closes with an overview of the discretised equations and of
+ The section closes with an overview of the discretized equations and of
  the numerical technique and scheme used to solve them.
 \end_layout
 
@@ -695,7 +699,7 @@ Where
 \begin_inset Formula $\left(kg/m^{3}\right)$
 \end_inset
 
- are the istantaneous and reference seawater density respectively.
+ are the instantaneous and reference seawater density respectively.
  The solar radiation, 
 \begin_inset Formula $R$
 \end_inset
@@ -705,7 +709,7 @@ Where
 \end_inset
 
 , reaching the sea surface and penetrating the water column, is vertically
- attenuated following a double exponential decay relationship, parameterised
+ attenuated following a double exponential decay relationship, parameterized
  according to 
 \begin_inset CommandInset citation
 LatexCommand citet
@@ -949,7 +953,7 @@ The surface and bottom boundary conditions
 \end_layout
 
 \begin_layout Standard
-The surface boundary conditions (applied at the depth of surfacemost gridpoint,
+The surface boundary conditions (applied at the depth of surface-most gridpoint,
  
 \begin_inset Formula $z_{s}$
 \end_inset
@@ -1338,7 +1342,7 @@ literal "true"
 
 \end_inset
 
-) of lateral advection, by specifing a lateral temperature and salinity
+) of lateral advection, by specifying a lateral temperature and salinity
  flux based on prescribed time varying temperature and salinity climatological
  profiles.
  The lateral temperature (
@@ -1567,7 +1571,7 @@ with
 \begin_layout Standard
 The computational grid is vertically staggered.
  The sigma coordinate position of all the variables computed by the modeling
- system is schematised in Fig.
+ system is schematized in Fig.
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "fig:Vgrid-1-1"
@@ -1897,7 +1901,8 @@ with the only, but very important, exception of the dissolved nutrients
 \begin_layout Standard
 Concerning the inorganic nutrients, given the mainly coastal implementation
  of the BFM-POM1D system, it has been adopted a surface boundary condition
- defining a surface flux accounting for external (riverborne) nutrient input.
+ defining a surface flux accounting for external (river-borne) nutrient
+ input.
  The condition is defined by relaxing the prognostically computed surface
  nutrient (
 \begin_inset Formula $N$
@@ -2391,7 +2396,7 @@ name "sec:Info&Integr"
 The time evolution of physical variables is managed by the POM1D component
  of the modeling system and transferred to BFM.
  The information flow occurring between the model components of the system
- is schematised in Fig.
+ is schematized in Fig.
  
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -2473,7 +2478,7 @@ Scheme of the information flow between the ocean model and the biogeochemical
  mode.
  The blue arrows refer to the use in the prognostic mode only while the
  green arrows refer to the use in diagnostic mode only.
- Numerical driver is a generic name for the source spilitting solver used
+ Numerical driver is a generic name for the source splitting solver used
  to advance in time the coupled solution of the BFM state variables, while
  the forward in time solution of the physical state variables in embedded
  in POM1D
@@ -2493,7 +2498,7 @@ Scheme of the information flow between the ocean model and the biogeochemical
 The numerical solution of all the BFM-POM1D state variables is carried out
  in two steps according to the SoS technique, involving an explicit and
  an implicit integration.
- The explict leapfrog generate an intermediate solution.
+ The explicit leapfrog generate an intermediate solution.
  It might not be needed and, when needed, involves different equation terms
  in the specific equation.
  The characteristics of the (if needed) explicit leapfrog integration are
@@ -2918,7 +2923,7 @@ where
 \end_layout
 
 \begin_layout Standard
-Finally the time sequence is resetted:
+Finally the time sequence is reset:
 \end_layout
 
 \begin_layout Standard
@@ -8718,8 +8723,8 @@ reference "fig:PyearForc-1"
 \family typewriter
 ICOUNTF
 \family default
- is the model counter for data readings and it is resetted each time the
- end of file is reached).
+ is the model counter for data readings and it is reset each time the end
+ of file is reached).
 \begin_inset VSpace defskip
 \end_inset
 
@@ -8749,7 +8754,7 @@ status open
 \begin_layout Plain Layout
 Schematic of the forcing files structure and perpetual forcing timeline.
  ICOUNTF is the model counter for the data readings.
- It is resetted each time the end of file is reached
+ It is reset each time the end of file is reached
 \begin_inset CommandInset label
 LatexCommand label
 name "fig:PyearForc-1"
@@ -8899,7 +8904,11 @@ literal "true"
 \end_layout
 
 \begin_layout Standard
-The section start with the call to the subroutine opendat (sec.
+The section start with the call to the subroutine 
+\family typewriter
+opendat
+\family default
+ (sec.
  
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -8934,12 +8943,12 @@ IFCHGE
 IFINT
 \family default
  progressively count the iterations.
- It is resetted to zero in the interpolation section, when 
+ It is reset to zero in the interpolation section, when 
 \family typewriter
 IFINT=IFCHGE
 \family default
 .
- It is initialised at 
+ It is initialized at 
 \family typewriter
 (IFCHGE/2)-1
 \family default
@@ -8955,7 +8964,7 @@ Afterward all the forcing data undergoes a double reading, allowing the
 \family typewriter
 ICOUNTF
 \family default
- counter closes the initialisation and first reading section.
+ counter closes the initialization and first reading section.
 \end_layout
 
 \begin_layout Subsection*
@@ -9716,7 +9725,7 @@ status open
 \end_layout
 
 \begin_layout Standard
-the data reading counter is resetted:
+the data reading counter is reset:
 \begin_inset listings
 lstparams "basicstyle={\tiny\ttfamily}"
 inline false
@@ -9908,7 +9917,7 @@ It is reminded that every time the
 \begin_inset Formula $D_{tf+1}$
 \end_inset
 
- windstress and surface data are updated the conversion to the POM units
+ wind-stress and surface data are updated the conversion to the POM units
  is operated (change of sign included) e.g.:
 \begin_inset VSpace defskip
 \end_inset
@@ -10315,7 +10324,7 @@ clipped
 \end_inset
 
  if negative values are generated (unlikely case).
- In this case the forward in time solution is resetted to a very low value:
+ In this case the forward in time solution is reset to a very low value:
 \begin_inset VSpace defskip
 \end_inset
 
@@ -10470,7 +10479,11 @@ status open
 \end_layout
 
 \begin_layout Subsection
-opendat (
+
+\lang british
+opendat
+\lang american
+ (
 \family typewriter
 phys/opendat.F90
 \family default
@@ -10865,7 +10878,7 @@ status open
 
 TT
 \family default
- records the time (in days) ellapsed between two adjacent output writings.
+ records the time (in days) elapsed between two adjacent output writings.
  It is passed as dummy argument to subroutine 
 \family typewriter
 pom_dia_bfm
@@ -10989,7 +11002,7 @@ This subroutine is called by
 \family typewriter
 program main
 \family default
- and ensures a BFM setup and state variable initialisation consistent and
+ and ensures a BFM setup and state variable initialization consistent and
  coherent with the coupled 1D modelling system setup.
  All the requested input is managed trough modules.
  The BFM 1D array size is defined by the 
@@ -11215,9 +11228,9 @@ NO_BOXES_XY=1
 \end_layout
 
 \begin_layout Standard
-The routine then define and initialise all the masks needed for the computation
- (in a 1D setup this is almost reduntant, however), defines the total number
- of variables to be computed and initialise also the netcdf output files,
+The routine then define and initialize all the masks needed for the computation
+ (in a 1D setup this is almost redundant, however), defines the total number
+ of variables to be computed and initialize also the netcdf output files,
  trough the BFM (
 \begin_inset CommandInset citation
 LatexCommand citealp
@@ -11317,7 +11330,7 @@ reference "sec:modulePOM"
 
 \end_inset
 
-), whose valuee is set in the namelist 
+), whose value is set in the namelist 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sec:pom_bfm_settings-namelist"
@@ -11612,7 +11625,7 @@ reference "subsec:Subroutine-set_initial_condition"
 
 \end_inset
 
-) that can be customised by the user in order to provide (via hardwiring
+) that can be customized by the user in order to provide (via hardwiring
  or data file reading) an initial conditions set more consistent with the
  specific implementation that is being defined.
 \end_layout
@@ -11900,7 +11913,7 @@ reference "eq:Phys+bgc"
 
 \begin_layout Standard
 Essentially the subroutine operate a simple data transfer between arrays,
- with the only difference of the wind velocity, that is (approximayely)
+ with the only difference of the wind velocity, that is (approximatively)
  computed back from the wind stress data assuming an air density values
  
 \begin_inset Formula $\rho_{a}=1.25$
@@ -11914,7 +11927,7 @@ Essentially the subroutine operate a simple data transfer between arrays,
 \end_layout
 
 \begin_layout Standard
-The correspondance between the 
+The correspondence between the 
 \begin_inset Quotes eld
 \end_inset
 
@@ -11930,7 +11943,7 @@ destination
 \begin_inset Quotes erd
 \end_inset
 
- arrays involved in the transfer is summarised in tab.
+ arrays involved in the transfer is summarized in tab.
  
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -13347,7 +13360,7 @@ reference "eq:doubleExp-1"
 
 \end_inset
 
-is then discretised as follows:
+is then discretized as follows:
 \end_layout
 
 \begin_layout Standard
@@ -13519,7 +13532,7 @@ literal "true"
 
 \end_inset
 
- optical water type as summarised in table
+ optical water type as summarized in table
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:JWtypes"
@@ -14940,7 +14953,7 @@ status open
 
 \begin_layout Standard
 After that, the surface boundary diffusive fluxes for the gases (oxygen
- and carbon dioxyde) and nutrients (nitrate ammonium, phosphate, silicate)
+ and carbon dioxide) and nutrients (nitrate ammonium, phosphate, silicate)
  are stored into the 
 \family typewriter
 surflux
@@ -15010,7 +15023,7 @@ reference "eq:NBenPelF"
  and inserted into the biogeochemical rate of change trough a procedure
  handled by the BFM core.
  The variable botflux is therefore set to zero, but future version of the
- code will use the bottom diffusove flux as a bottom boundary condition.
+ code will use the bottom diffusive flux as a bottom boundary condition.
  
 \end_layout
 
@@ -15187,7 +15200,7 @@ reference "eq:burial flux"
 \end_inset
 
  value for (respectively) the particulate organic matter and the phytoplankton
- is user defined trough an assignement to the BFM parameters 
+ is user defined trough an assignment to the BFM parameters 
 \family typewriter
 p_burvel_R6
 \family default
@@ -15416,9 +15429,9 @@ reference "eq:sinking"
 \end_inset
 
 .
- This occur trough a call to the 
+ This occur trough a call to the subroutine
 \family typewriter
-subroutine adverte
+ adverte
 \family default
  (sec.
  
@@ -16330,7 +16343,7 @@ literal "true"
  of the Gulf of Trieste (Italy).
  The default configuration is a 10 years long simulation of a water column
  located in the centre of the gulf driven by climatological forcing conditions,
- with the prescription of sewater temperature and salinity profiles using
+ with the prescription of seawater temperature and salinity profiles using
  the diagnostic mode (see details in section 
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -16341,7 +16354,7 @@ reference "subsec:Diagnostic-mode"
 ).
  All the input files are contained in the configuration folder BFM_POM1D
  and the reader is referred to the papers quoted above for details, as well
- for the selected paramterizations and settings.
+ for the selected parameterizations and settings.
 \end_layout
 
 \begin_layout Section
@@ -16404,7 +16417,7 @@ noprefix "false"
 
 \end_inset
 
-, the configuration simulates the coupled phisical and biogeochemical dynamics
+, the configuration simulates the coupled physical and biogeochemical dynamics
  in the gulf of Trieste with a winter peak of phytoplankton that occurs
  along the entire water column and a progressive deepening of biological
  activity during the summer stratified conditions.
