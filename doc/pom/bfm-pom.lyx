@@ -69,7 +69,16 @@ eqs-within-sections
 \index_command default
 \paperfontsize default
 \spacing single
-\use_hyperref false
+\use_hyperref true
+\pdf_bookmarks true
+\pdf_bookmarksnumbered false
+\pdf_bookmarksopen false
+\pdf_bookmarksopenlevel 1
+\pdf_breaklinks false
+\pdf_pdfborder false
+\pdf_colorlinks false
+\pdf_backref false
+\pdf_pdfusetitle true
 \papersize a4paper
 \use_geometry true
 \use_package amsmath 1
@@ -151,7 +160,7 @@ begin{titlepage}
 \align center
 \begin_inset Graphics
 	filename /Users/lovato/GIT/bfm/doc/logos/BFM-Consortium_members.png
-	lyxscale 25
+	lyxscale 20
 	scale 40
 
 \end_inset
@@ -198,7 +207,7 @@ Coupling BFM with ocean models:
 
 
 \size largest
-the 1D Princeton Ocean Model (user manual)
+the 1D Princeton Ocean Model
 \end_layout
 
 \begin_layout Standard
@@ -315,6 +324,14 @@ end{titlepage}
 \end_layout
 
 \begin_layout Quote
+The BFM system team is gratefully endebted with Prof.
+ George L.
+ Mellor for allowing us to distribute the FORTRAN95 computer code of the
+ one-dimensional Princeton Ocean Model that evolved from the original FORTRAN77
+ version of the model.
+\end_layout
+
+\begin_layout Quote
 This document should be cited as:
 \begin_inset Newline newline
 \end_inset
@@ -322,8 +339,7 @@ This document should be cited as:
 Zavatarelli M., Pinardi N., Mussap G., Lovato T., Amadio C.
  Butenschön M., Vichi M.
  (2020).
- Coupling BFM with Ocean models: the 1D Princeton Ocean Model (user manual)
- .
+ Coupling BFM with Ocean models: the 1D Princeton Ocean Model.
  BFM Report series N.
  3, Release 1.0, June 2020, Bologna, Italy, http://bfm-community.eu, pp.
  58
@@ -367,7 +383,7 @@ Introduction
 \end_layout
 
 \begin_layout Standard
-This report describes the on-line coupling between the one-dimensional version
+This report describes the online coupling between the one-dimensional version
  of the Princeton Ocean Model (hereafter POM1D), developed by 
 \begin_inset CommandInset citation
 LatexCommand citet
@@ -376,36 +392,21 @@ literal "true"
 
 \end_inset
 
-, and the Biogeochemical Flux Model (hereafter BFM, 
-\begin_inset CommandInset citation
-LatexCommand citep
-key "vichi07_part1"
-literal "true"
-
-\end_inset
-
-).
- The complete modeling system (POM1D, BFM and the coupling subroutines)
- is freely downloadable from the BFM web site (http://bfm-community.eu).
+, and the Biogeochemical Flux Model (hereafter BFM), in term of the main
+ equations and their translation into a computer code, and its code is distribut
+ed with BFM (see details in http://bfm-community.eu).
  
 \end_layout
 
 \begin_layout Standard
-The report describes the main characteristics of POM1D and the coupling
- technique with BFM, in term of the main equations and their translation
- into a computer code, and it should be used in close coordination with
- the BFM core manual.
- The report is organised as follows:
+The report is organised as follows:
 \end_layout
 
 \begin_layout Standard
 Section 2 describes the governing equations and the boundary conditions
- of the BFM-POM1D system.
- The BFM equations description is limited to the equations describing the
- benthic-pelagic coupling, implemented in the BFM-POM1D system and not yet
- described in the current version of the BFM user manual.
- The BFM-POM1D manual should then be used in close coordination with the
- 
+ used in the POM1D to simulate the ocean physical dynamics.
+ A full description of biogeochemical equations is given in the BFM core
+ manual 
 \begin_inset CommandInset citation
 LatexCommand citet
 key "BFM-manual"
@@ -413,7 +414,7 @@ literal "true"
 
 \end_inset
 
- manual.
+.
 \end_layout
 
 \begin_layout Standard
@@ -460,10 +461,10 @@ ed in the Gulf of Trieste.
 \end_layout
 
 \begin_layout Chapter
-The components of the BFM-POM1D modeling system
+POM1D physical model 
 \begin_inset CommandInset label
 LatexCommand label
-name "chap:POM-BFMcomponents"
+name "chap:POM1Dmodel"
 
 \end_inset
 
@@ -471,17 +472,6 @@ name "chap:POM-BFMcomponents"
 \end_layout
 
 \begin_layout Section
-POM1D
-\begin_inset CommandInset label
-LatexCommand label
-name "sec:POM"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Subsection
 General
 \end_layout
 
@@ -529,7 +519,7 @@ literal "true"
 .
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 The Governing equations
 \begin_inset CommandInset label
 LatexCommand label
@@ -954,7 +944,7 @@ where
  are background diffusion coefficients.
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 The surface and bottom boundary conditions
 \end_layout
 
@@ -1328,7 +1318,7 @@ adiabatic
 
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 The parameterisation of lateral advection.
 \begin_inset CommandInset label
 LatexCommand label
@@ -1445,7 +1435,7 @@ non zero
  described in the following section.
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Diagnostic mode
 \begin_inset CommandInset label
 LatexCommand label
@@ -1510,271 +1500,8 @@ l model implementation.
  quality of the assembled climatology.
 \end_layout
 
-\begin_layout Subsection
-The POM1D computer code.
-\end_layout
-
-\begin_layout Standard
-The POM1D computer code available from the BFM website evolves from the
- 
-\family typewriter
-FORTRAN77
-\family default
- code of the one-dimensional POM available from the POM web site (
-\family typewriter
-http://www.ccpo.odu.edu/POMWEB/contrib-code/obl.f
-\family default
-).
- The whole code has been adapted in order to comply with the 
-\family typewriter
-FORTRAN95
-\family default
- syntaxis and compilers.
- It is therefore fully consistent with the BFM coding (see 
-\begin_inset CommandInset citation
-LatexCommand citealt
-key "BFM-manual"
-literal "true"
-
-\end_inset
-
-).
- 
-\end_layout
-
-\begin_layout Section
-BFM
-\end_layout
-
-\begin_layout Subsection
-General
-\end_layout
-
-\begin_layout Standard
-BFM, is a biomass and functional group based marine ecosystem model, representin
-g the system in eulerian coordinates by a selection of chemical and biological
- processes that simulates the pelagic (water column) and the benthic pelagic
- coupling (water sediment interface) dynamics in the marine ecosystem.
- The carbon(
-\begin_inset Formula $C$
-\end_inset
-
-), nitrogen (
-\begin_inset Formula $N$
-\end_inset
-
-), phosphorus (
-\begin_inset Formula $P$
-\end_inset
-
-) silicon (
-\begin_inset Formula $Si$
-\end_inset
-
-), and oxygen (
-\begin_inset Formula $O$
-\end_inset
-
-) biogeochemical cycles are solved independently over a variety chemical
- functional families (CFFs) and functional groups (LFGs).
- CFFs are divided into organic (e.g.
- particulate and dissolved detritus) and inorganic (e.g.
- nutrients, dissolved oxygen and carbon dioxide) while the LFGs represent
- the biota (phytoplankton, bacteria, micro- and meso-zooplankton).
- LFGs and CFFs are measured in mass 
-\begin_inset Formula $\left[mgC/\left(m^{3},m^{2}\right)\right]$
-\end_inset
-
- or molecular weight 
-\begin_inset Formula $\left[mmol\left(N,P,Si,O\right)/\left(m^{3},m^{2}\right)\right]$
-\end_inset
-
- concentration (relative to volume in the pelagic domain and relative to
- surface in the benthic domain) units of the major chemical elements (carbon,
- nitrogen phosphorus, silicon, oxygen).
-\end_layout
-
-\begin_layout Subsection
-The governing equations
-\begin_inset CommandInset label
-LatexCommand label
-name "subsec:The-BFMgoverning-equations"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The governing equations, as well as the code structure of the BFM, are fully
- described in the dedicated BFM report 
-\begin_inset CommandInset citation
-LatexCommand citep
-key "BFM-manual"
-literal "true"
-
-\end_inset
-
- available from the BFM web site.
- The present report does not provide specific BFM details, since it is focusing
- only on the BFM coupling with POM1D.
- For BFM equations, model structure details and state variables code naming,
- the reader is then referred to such report .
- 
-\end_layout
-
-\begin_layout Standard
-However, the BFM coupling with POM1D described here, utilises a BFM version
- that includes a simple 
-\begin_inset Quotes eld
-\end_inset
-
-benthic return process
-\begin_inset Quotes erd
-\end_inset
-
- not yet described in the BFM documentation.
- Such benthic 
-\begin_inset Quotes eld
-\end_inset
-
-closure
-\begin_inset Quotes erd
-\end_inset
-
- is a simplified description of the processes defining the so-called 
-\begin_inset Quotes eld
-\end_inset
-
-benthic pelagic coupling
-\begin_inset Quotes erd
-\end_inset
-
- (the organic matter cycling across the water sediment interface, modulated
- by sedimentary and diffusive fluxes) and requires the definition of the
- benthic particulate matter (carbon, phosphorous, nitrogen and silicon content),
- 
-\begin_inset Formula $Q_{c,n,p,s}^{(6)}$
-\end_inset
-
-, and dissolved (carbon, phosphorous, nitrogen content) labile organic matter,
- 
-\begin_inset Formula $Q_{c,n,p}^{(1)}$
-\end_inset
-
-, state variables , whose temporal rates of change are defined (adopting
- the symbol convention used in 
-\begin_inset CommandInset citation
-LatexCommand citealt
-key "BFM-manual"
-literal "true"
-
-\end_inset
-
-, table 1.1) as:
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset Formula 
-\begin{equation}
-\frac{\partial Q_{c,n,p}^{(6)}}{\partial t}=-\frac{w_{b}}{H+z_{b}}\left[R_{c,n,p}^{\left(6\right)}+\left(1-\xi_{c,n,p}\right)P_{c,n,p}^{\left(1,4\right)}\right]_{z=z_{b}}-\mu_{Q^{6}\left(c,n,p\right)}Q_{c,n,p}^{(6)}\mid_{z=z_{b}}\label{eq:BPC-ret}
-\end{equation}
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset Formula 
-\begin{equation}
-\frac{\partial Q_{c,n,p}^{(1)}}{\partial t}=-\frac{w_{b}}{H+z_{b}}\xi_{c,n,p}P_{c,n,p}^{\left(1,4\right)}\mid_{z=z_{b}}-\mu_{Q_{\left(c,n,p\right)}^{1}}Q_{c,n,p}^{(1)}\mid_{z=z_{b}}\label{eq:BPC-Q1}
-\end{equation}
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset Formula 
-\begin{equation}
-\frac{\partial Q_{s}^{(6)}}{\partial t}=-\frac{w_{b}}{H+z_{b}}\left[R_{s}^{\left(6\right)}+P_{s}^{\left(1\right)}\right]_{z=z_{b}}-\mu_{Q_{s}^{6}}Q_{s}^{(6)}\mid_{z=z_{b}}\label{eq:BPC-Si-1}
-\end{equation}
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset VSpace defskip
-\end_inset
-
-where 
-\begin_inset Formula $w_{b}$
-\end_inset
-
-is a burial velocity (negative 
-\begin_inset Formula $m/s$
-\end_inset
-
- and user defined); 
-\begin_inset Formula $0\leq\xi\leq1$
-\end_inset
-
- is a coefficient partitioning the settling phytoplankton 
-\begin_inset Formula $P_{c,n,p}^{(1,4)}$
-\end_inset
-
- (diatoms and dinoflagellates carbon, nitrogen and phosphorus content) into
- benthic particulate and dissolved orgsanic matter.
- 
-\begin_inset Formula $\mu_{Q_{c,n,p,s}^{(1,6)}}$
-\end_inset
-
- 
-\begin_inset Formula $\left(s\right)$
-\end_inset
-
- are a user defined recycling time scales operating the conversion of the
- benthic organic matter into pelagic dissolved nutrients and effectively
- defining the bottom boundary condition for the nutrients in the water column
- (section:
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:The-BFMboundary-conditions"
-
-\end_inset
-
-).
-\end_layout
-
-\begin_layout Subsection
-The BFM computer code
-\end_layout
-
-\begin_layout Standard
-The latest tested version of the BFM (currently Version 5 written in FORTRAN95)
- can be downloaded from the BFM community model website.
- It is stressed again that the complete BFM documentation can be found in
- the 
-\begin_inset CommandInset citation
-LatexCommand citet
-key "BFM-manual"
-literal "true"
-
-\end_inset
-
- report, dowloadable form the BFM web site.
-\end_layout
-
 \begin_layout Chapter
-The physical biological coupling
+BFM-POM1D physical biological coupling
 \end_layout
 
 \begin_layout Section
@@ -2014,7 +1741,7 @@ The temporal total rate of change for a generic, pelagic (water column)
 
 \begin_layout Standard
 where the first term of the equation right hand side, indicates the rate
- of change dependent on the physical processes (handled by the POM1D-BFM
+ of change dependent on the physical processes (handled by the BFM-POM1D
  coupling), while the second term indicates the rate of change dependent
  on the biogeochemical processes (handled by BFM).
  Therefore the physical rate of change is solved by the equation for a non
@@ -2083,23 +1810,8 @@ where
 \end_layout
 
 \begin_layout Standard
-The only 
-\begin_inset Quotes eld
-\end_inset
-
-benthic
-\begin_inset Quotes erd
-\end_inset
-
- BFM state variables involved in the definition of the 
-\begin_inset Quotes eld
-\end_inset
-
-benthic pelagic coupling
-\begin_inset Quotes erd
-\end_inset
-
- is the benthic dissolved and particulate detritus (
+The BFM benthic state variables involved in the definition of the benthic-pelagi
+c coupling are the dissolved and particulate detritus (
 \begin_inset Formula $Q_{c,n,p}^{(1)}$
 \end_inset
 
@@ -2107,44 +1819,11 @@ benthic pelagic coupling
 \begin_inset Formula $Q_{c,n,p,s}^{(6)}$
 \end_inset
 
-), whose temporal rates of change are entirely defined by eq.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "eq:BPC-ret"
-
-\end_inset
-
-, 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "eq:BPC-Q1"
-
-\end_inset
-
- and 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "eq:BPC-Si-1"
-
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Standard
-As previously stated, these benthic state variables are physically connected
- with the pelagic coupled processes via the definition of the sedimentary
- particulate organic matter flux and the definition of the bottom boundary
- condition for the pelagic dissolved nutrients (see sec.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:The-BFMboundary-conditions"
-
-\end_inset
-
-).
+), whose temporal rates of change are described in the BFM core manual.
+ These benthic state variables are physically connected with the pelagic
+ coupled processes via the definition of the sedimentary particulate organic
+ matter flux and the definition of the bottom boundary condition for the
+ pelagic dissolved nutrients, as described in the following section.
 \end_layout
 
 \begin_layout Standard
@@ -2362,17 +2041,8 @@ w_{s}(0,t)=0\label{eq:WSBC}
 \end_layout
 
 \begin_layout Standard
-At the ocean bottom the pelagic (water column) dynamics is coupled with
- the simple benthic return closure described in section 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:The-BFMgoverning-equations"
-
-\end_inset
-
-.
- The benthic-pelagic coupling involve the pelagic particulate organic matter
- (
+At the ocean bottom, the benthic-pelagic coupling involves the burial of
+ pelagic particulate organic matter (
 \begin_inset Formula $R_{c,n,p,s}^{\left(6\right)}$
 \end_inset
 
@@ -2400,11 +2070,8 @@ dinoflagellates
 \begin_inset Formula $P_{c,n,p}^{\left(4\right)}$
 \end_inset
 
- functional types) and the complete dissolved inorganic nutrient pool (
-\begin_inset Formula $N$
-\end_inset
-
-).
+ functional types) and the release toward the water column of dissolved
+ inorganic nutrients.
  The benthic-pelagic coupling is then defined by the following bottom boundary
  conditions:
 \begin_inset VSpace defskip
@@ -2454,23 +2121,14 @@ name "NBenPelFlux"
 \end_layout
 
 \begin_layout Standard
-However, the boundary condition 
+Note that the boundary condition 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "eq:NBenPelF"
 
 \end_inset
 
- is not yet implemented in the POM1D code.
- The sediment water fluxes are currently handled by the BFM benthic closure
- (see section 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:The-BFMgoverning-equations"
-
-\end_inset
-
-).
+ is handled by the BFM benthic closure scheme.
 \end_layout
 
 \begin_layout Standard
@@ -2554,22 +2212,8 @@ reference "eq:sigmalev-1-1"
 \end_layout
 
 \begin_layout Standard
-The complete set of the governing equations (secs.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec: POM-Governing-equations"
-
-\end_inset
-
- and 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:The-BFMgoverning-equations"
-
-\end_inset
-
-) are then recasted in the new coordinate system as follows (the 
+The complete set of the physical biological coupled governing equations
+ are then recasted in the new coordinate system as follows (the 
 \begin_inset Formula $^{*}$
 \end_inset
 
@@ -2772,7 +2416,7 @@ reference "eq:GeneqBFM"
  arrow indicates the prescribed, time varying, temperature and salinity
  vertical profiles, required by the diagnostic mode.
  The numerical integration method and scheme, used to compute the forward
- in time solution of all the BFM-POM1d state variables, is the same.
+ in time solution of all the BFM-POM1D state variables, is the same.
  The sensitivity of the BFM-POM1D to coupling technique and to integration
  schemes has been tested by 
 \begin_inset CommandInset citation
@@ -2785,7 +2429,7 @@ literal "true"
 , and it was found that the source splitting (SoS) technique is more accurate.
  POM1D uses, for the active tracers, a time integration method based on
  SoS with a leapfrog scheme.
- The BFM-POM system carries out the final integration of the non-conservative
+ The BFM-POM1D system carries out the final integration of the non-conservative
  tracers adopting the same coupling technique and numerical scheme.
  The leapfrog numerical scheme is adopted also for the integration in time
  of the benthic particulate organic matter (
@@ -3203,39 +2847,9 @@ reference "eq:sigmaQL"
 
 \begin_layout Standard
 The discretisation and the integration of the equations accounting for the
- benthic-pelagic coupling (eq.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "eq:BPC-ret"
-
-\end_inset
-
-, 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "eq:BPC-Q1"
-
-\end_inset
-
-, 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "eq:BPC-Si-1"
-
-\end_inset
-
-) is made trough an explicit leapfrog scheme.
+ benthic-pelagic coupling is made trough an explicit leapfrog scheme.
  The equations discretisation is straightforward and, as an example, only
- the discrete form of eq.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "eq:BPC-ret"
-
-\end_inset
-
- is given:
+ the discrete form of benthic organic particulate detritus is given:
 \begin_inset VSpace defskip
 \end_inset
 
@@ -3456,40 +3070,28 @@ root
 \end_layout
 
 \begin_layout Standard
-
+The BFM-POM1D couling interface is located in the directory 
 \family typewriter
-$BFMdir/src/BFM
+$BFMDIR/src/pom 
 \family default
- contains the full BFM code, while the directory $BFMdir/pom contains the
- 
+that contains the 
 \family typewriter
-program main (main_pombfm1d.F90
+program main
 \family default
-) code driving the system, as well as the POM1D subroutines and modules
- (in directory 
+ code driving the system (
 \family typewriter
-$BFMdir/pom/phys
+main_pombfm1d.F90
 \family default
-) and the soubroutines operating the coupling between BFM and POM1D (directory
- 
+),the POM1D subroutines and modules or ocean physics (
+\family typewriter
+$BFMDIR/src/pom/phys
+\family default
+), and the soubroutines operating the coupling (
 \family typewriter
 $BFMdir/pom/coupling
 \family default
 ).
- It is recalled that the implementation and the use of the BFM-POM1D system
- requires the previous implementation of the BFM code as described in 
-\begin_inset CommandInset citation
-LatexCommand citet
-key "BFM-manual"
-literal "true"
-
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Standard
-An example of the namelists needed for the modeling system parameterisation
+ An example of the namelists needed for the modeling system parameterisation
  is provided in the BFM-POM1D test case.
 \end_layout
 
@@ -3526,10 +3128,10 @@ module
 \family default
 s, and of all the 
 \family typewriter
-subroutine
+subroutines
 \family default
-s is provided, with the aim to facilitate the implementation and use of
- the coupled modeling system.
+ is provided, with the aim to facilitate the implementation and use of the
+ coupled modeling system.
 \end_layout
 
 \begin_layout Standard
@@ -3542,18 +3144,19 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="23" columns="3">
+<lyxtabular version="3" rows="26" columns="3">
 <features tabularvalignment="middle">
+<column alignment="center" valignment="top" width="4cm">
 <column alignment="center" valignment="top" width="3cm">
-<column alignment="center" valignment="top" width="3cm">
-<column alignment="center" valignment="top" width="3.3cm">
+<column alignment="center" valignment="top" width="4.5cm">
 <row>
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
 
-\size tiny
+\series bold
+\size footnotesize
 Name
 \end_layout
 
@@ -3564,8 +3167,12 @@ Name
 
 \begin_layout Plain Layout
 
-\size tiny
-Directory path
+\series bold
+\size footnotesize
+Directory 
+\family typewriter
+\series default
+($BFMDIR/src/pom)
 \end_layout
 
 \end_inset
@@ -3575,7 +3182,8 @@ Directory path
 
 \begin_layout Plain Layout
 
-\size tiny
+\series bold
+\size footnotesize
 Filename
 \end_layout
 
@@ -3589,8 +3197,8 @@ Filename
 \begin_layout Plain Layout
 
 \family typewriter
-\size tiny
-Routine ADVERTE
+\size footnotesize
+Program MAIN
 \end_layout
 
 \end_inset
@@ -3600,9 +3208,6 @@ Routine ADVERTE
 
 \begin_layout Plain Layout
 
-\family typewriter
-\size tiny
-$BFMdir/pom/phys
 \end_layout
 
 \end_inset
@@ -3613,7 +3218,223 @@ $BFMdir/pom/phys
 \begin_layout Plain Layout
 
 \family typewriter
-\size tiny
+\size footnotesize
+main_pombfm1d.F90
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+\size footnotesize
+Modules
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\size footnotesize
+POM
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\size footnotesize
+phys
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\size footnotesize
+POMModule.F90
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\size footnotesize
+Service
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\size footnotesize
+coupling
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\size footnotesize
+ModuleService.F90
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\size footnotesize
+Forcing
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\size footnotesize
+coupling
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\size footnotesize
+ModuleForcing.F90
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+\size footnotesize
+Subroutines
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\size footnotesize
+ADVERTE
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\size footnotesize
+phys
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\size footnotesize
 vdiff_SOS.F90
 \end_layout
 
@@ -3627,8 +3448,8 @@ vdiff_SOS.F90
 \begin_layout Plain Layout
 
 \family typewriter
-\size tiny
-Routine CALCDEPTH
+\size footnotesize
+CALCDEPTH
 \end_layout
 
 \end_inset
@@ -3639,8 +3460,8 @@ Routine CALCDEPTH
 \begin_layout Plain Layout
 
 \family typewriter
-\size tiny
-$BFMdir/pom/phys
+\size footnotesize
+phys
 \end_layout
 
 \end_inset
@@ -3651,7 +3472,7 @@ $BFMdir/pom/phys
 \begin_layout Plain Layout
 
 \family typewriter
-\size tiny
+\size footnotesize
 calcdepth.F90
 \end_layout
 
@@ -3665,8 +3486,8 @@ calcdepth.F90
 \begin_layout Plain Layout
 
 \family typewriter
-\size tiny
-Routine DENS 
+\size footnotesize
+DENS 
 \end_layout
 
 \end_inset
@@ -3677,8 +3498,8 @@ Routine DENS
 \begin_layout Plain Layout
 
 \family typewriter
-\size tiny
-$BFMdir/pom/phys
+\size footnotesize
+phys
 \end_layout
 
 \end_inset
@@ -3689,7 +3510,7 @@ $BFMdir/pom/phys
 \begin_layout Plain Layout
 
 \family typewriter
-\size tiny
+\size footnotesize
 dens.F90
 \end_layout
 
@@ -3703,14 +3524,7 @@ dens.F90
 \begin_layout Plain Layout
 
 \family typewriter
-\size tiny
-Routine
-\end_layout
-
-\begin_layout Plain Layout
-
-\family typewriter
-\size tiny
+\size footnotesize
 env_forcing_pom_bfm_1d 
 \end_layout
 
@@ -3722,8 +3536,8 @@ env_forcing_pom_bfm_1d
 \begin_layout Plain Layout
 
 \family typewriter
-\size tiny
-$BFMdir/pom/coupling
+\size footnotesize
+coupling
 \end_layout
 
 \end_inset
@@ -3734,7 +3548,7 @@ $BFMdir/pom/coupling
 \begin_layout Plain Layout
 
 \family typewriter
-\size tiny
+\size footnotesize
 env_forcing_pom_bfm_1d.F90
 \end_layout
 
@@ -3748,8 +3562,8 @@ env_forcing_pom_bfm_1d.F90
 \begin_layout Plain Layout
 
 \family typewriter
-\size tiny
-Module Forcing
+\size footnotesize
+FORCING_MANAGER
 \end_layout
 
 \end_inset
@@ -3760,8 +3574,8 @@ Module Forcing
 \begin_layout Plain Layout
 
 \family typewriter
-\size tiny
-$BFMdir/pom/coupling
+\size footnotesize
+coupling
 \end_layout
 
 \end_inset
@@ -3772,7 +3586,7 @@ $BFMdir/pom/coupling
 \begin_layout Plain Layout
 
 \family typewriter
-\size tiny
+\size footnotesize
 ModuleForcing.F90
 \end_layout
 
@@ -3786,8 +3600,8 @@ ModuleForcing.F90
 \begin_layout Plain Layout
 
 \family typewriter
-\size tiny
-Routine FORCING_MANAGER
+\size footnotesize
+get_RST
 \end_layout
 
 \end_inset
@@ -3798,8 +3612,8 @@ Routine FORCING_MANAGER
 \begin_layout Plain Layout
 
 \family typewriter
-\size tiny
-$BFMdir/pom/coupling
+\size footnotesize
+coupling
 \end_layout
 
 \end_inset
@@ -3810,45 +3624,7 @@ $BFMdir/pom/coupling
 \begin_layout Plain Layout
 
 \family typewriter
-\size tiny
-ModuleForcing.F90
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\family typewriter
-\size tiny
-Routine get_RST
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\family typewriter
-\size tiny
-$BFMdir/pom/coupling
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\family typewriter
-\size tiny
+\size footnotesize
 get_rst.F90
 \end_layout
 
@@ -3862,8 +3638,8 @@ get_rst.F90
 \begin_layout Plain Layout
 
 \family typewriter
-\size tiny
-Routine get_TS_IC
+\size footnotesize
+get_TS_IC
 \end_layout
 
 \end_inset
@@ -3874,8 +3650,8 @@ Routine get_TS_IC
 \begin_layout Plain Layout
 
 \family typewriter
-\size tiny
-$BFMdir/pom/coupling
+\size footnotesize
+coupling
 \end_layout
 
 \end_inset
@@ -3886,7 +3662,7 @@ $BFMdir/pom/coupling
 \begin_layout Plain Layout
 
 \family typewriter
-\size tiny
+\size footnotesize
 get_TS_IC.F90
 \end_layout
 
@@ -3900,8 +3676,8 @@ get_TS_IC.F90
 \begin_layout Plain Layout
 
 \family typewriter
-\size tiny
-Routine lf2d
+\size footnotesize
+lf1d
 \end_layout
 
 \end_inset
@@ -3912,8 +3688,8 @@ Routine lf2d
 \begin_layout Plain Layout
 
 \family typewriter
-\size tiny
-$BFMdir/pom/coupling
+\size footnotesize
+coupling
 \end_layout
 
 \end_inset
@@ -3924,8 +3700,8 @@ $BFMdir/pom/coupling
 \begin_layout Plain Layout
 
 \family typewriter
-\size tiny
-LF2D.F90
+\size footnotesize
+LF1D.F90
 \end_layout
 
 \end_inset
@@ -3938,8 +3714,8 @@ LF2D.F90
 \begin_layout Plain Layout
 
 \family typewriter
-\size tiny
-Program MAIN
+\size footnotesize
+opendat
 \end_layout
 
 \end_inset
@@ -3950,8 +3726,8 @@ Program MAIN
 \begin_layout Plain Layout
 
 \family typewriter
-\size tiny
-$BFMdir/pom
+\size footnotesize
+phys
 \end_layout
 
 \end_inset
@@ -3962,45 +3738,7 @@ $BFMdir/pom
 \begin_layout Plain Layout
 
 \family typewriter
-\size tiny
-main_pombfm1d.F90
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\family typewriter
-\size tiny
-Routine opendat
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\family typewriter
-\size tiny
-$BFMdir/pom/phys
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\family typewriter
-\size tiny
+\size footnotesize
 opendat.F90
 \end_layout
 
@@ -4014,8 +3752,8 @@ opendat.F90
 \begin_layout Plain Layout
 
 \family typewriter
-\size tiny
-Routine pom_bfm_1d
+\size footnotesize
+pom_bfm_1d
 \end_layout
 
 \end_inset
@@ -4026,8 +3764,8 @@ Routine pom_bfm_1d
 \begin_layout Plain Layout
 
 \family typewriter
-\size tiny
-$BFMdir/pom/coupling
+\size footnotesize
+coupling
 \end_layout
 
 \end_inset
@@ -4038,7 +3776,7 @@ $BFMdir/pom/coupling
 \begin_layout Plain Layout
 
 \family typewriter
-\size tiny
+\size footnotesize
 pom_bfm_1d.F90
 \end_layout
 
@@ -4052,8 +3790,8 @@ pom_bfm_1d.F90
 \begin_layout Plain Layout
 
 \family typewriter
-\size tiny
-Routine pom_dia_bfm
+\size footnotesize
+pom_dia_bfm
 \end_layout
 
 \end_inset
@@ -4064,8 +3802,8 @@ Routine pom_dia_bfm
 \begin_layout Plain Layout
 
 \family typewriter
-\size tiny
-$BFMdir/pom/coupling
+\size footnotesize
+coupling
 \end_layout
 
 \end_inset
@@ -4076,7 +3814,7 @@ $BFMdir/pom/coupling
 \begin_layout Plain Layout
 
 \family typewriter
-\size tiny
+\size footnotesize
 pom_dia_bfm.F90
 \end_layout
 
@@ -4090,8 +3828,8 @@ pom_dia_bfm.F90
 \begin_layout Plain Layout
 
 \family typewriter
-\size tiny
-Routine pom_ini_bfm
+\size footnotesize
+pom_ini_bfm
 \end_layout
 
 \end_inset
@@ -4102,8 +3840,8 @@ Routine pom_ini_bfm
 \begin_layout Plain Layout
 
 \family typewriter
-\size tiny
-$BFMdir/pom/coupling
+\size footnotesize
+coupling
 \end_layout
 
 \end_inset
@@ -4114,7 +3852,7 @@ $BFMdir/pom/coupling
 \begin_layout Plain Layout
 
 \family typewriter
-\size tiny
+\size footnotesize
 pom_ini_bfm_1d.F90
 \end_layout
 
@@ -4128,8 +3866,8 @@ pom_ini_bfm_1d.F90
 \begin_layout Plain Layout
 
 \family typewriter
-\size tiny
-Routine pom_to_bfm
+\size footnotesize
+pom_to_bfm
 \end_layout
 
 \end_inset
@@ -4140,8 +3878,8 @@ Routine pom_to_bfm
 \begin_layout Plain Layout
 
 \family typewriter
-\size tiny
-$BFMdir/pom/phys
+\size footnotesize
+phys
 \end_layout
 
 \end_inset
@@ -4152,7 +3890,7 @@ $BFMdir/pom/phys
 \begin_layout Plain Layout
 
 \family typewriter
-\size tiny
+\size footnotesize
 pom_to_bfm.F90
 \end_layout
 
@@ -4166,8 +3904,8 @@ pom_to_bfm.F90
 \begin_layout Plain Layout
 
 \family typewriter
-\size tiny
-Routine PROFQ
+\size footnotesize
+PROFQ
 \end_layout
 
 \end_inset
@@ -4178,8 +3916,8 @@ Routine PROFQ
 \begin_layout Plain Layout
 
 \family typewriter
-\size tiny
-$BFMdir/pom/phys
+\size footnotesize
+phys
 \end_layout
 
 \end_inset
@@ -4190,7 +3928,7 @@ $BFMdir/pom/phys
 \begin_layout Plain Layout
 
 \family typewriter
-\size tiny
+\size footnotesize
 profq1d.F90
 \end_layout
 
@@ -4204,8 +3942,8 @@ profq1d.F90
 \begin_layout Plain Layout
 
 \family typewriter
-\size tiny
-Routine PROFTS
+\size footnotesize
+PROFTS
 \end_layout
 
 \end_inset
@@ -4216,8 +3954,8 @@ Routine PROFTS
 \begin_layout Plain Layout
 
 \family typewriter
-\size tiny
-$BFMdir/pom/phys
+\size footnotesize
+phys
 \end_layout
 
 \end_inset
@@ -4228,7 +3966,7 @@ $BFMdir/pom/phys
 \begin_layout Plain Layout
 
 \family typewriter
-\size tiny
+\size footnotesize
 profTS.F90
 \end_layout
 
@@ -4242,8 +3980,8 @@ profTS.F90
 \begin_layout Plain Layout
 
 \family typewriter
-\size tiny
-Routine PROFUV
+\size footnotesize
+PROFUV
 \end_layout
 
 \end_inset
@@ -4254,8 +3992,8 @@ Routine PROFUV
 \begin_layout Plain Layout
 
 \family typewriter
-\size tiny
-$BFMdir/pom/phys
+\size footnotesize
+phys
 \end_layout
 
 \end_inset
@@ -4266,7 +4004,7 @@ $BFMdir/pom/phys
 \begin_layout Plain Layout
 
 \family typewriter
-\size tiny
+\size footnotesize
 profu.F90
 \end_layout
 
@@ -4280,8 +4018,8 @@ profu.F90
 \begin_layout Plain Layout
 
 \family typewriter
-\size tiny
-Routine restart_BFM_inPOM
+\size footnotesize
+restart_BFM_inPOM
 \end_layout
 
 \end_inset
@@ -4292,8 +4030,8 @@ Routine restart_BFM_inPOM
 \begin_layout Plain Layout
 
 \family typewriter
-\size tiny
-$BFMdir/pom/coupling
+\size footnotesize
+coupling
 \end_layout
 
 \end_inset
@@ -4304,7 +4042,7 @@ $BFMdir/pom/coupling
 \begin_layout Plain Layout
 
 \family typewriter
-\size tiny
+\size footnotesize
 restart_BFM_inPOM.F90
 \end_layout
 
@@ -4318,8 +4056,8 @@ restart_BFM_inPOM.F90
 \begin_layout Plain Layout
 
 \family typewriter
-\size tiny
-Routine set_initial_conditions
+\size footnotesize
+set_initial_conditions
 \end_layout
 
 \end_inset
@@ -4330,8 +4068,8 @@ Routine set_initial_conditions
 \begin_layout Plain Layout
 
 \family typewriter
-\size tiny
-$BFMdir/pom/coupling
+\size footnotesize
+coupling
 \end_layout
 
 \end_inset
@@ -4342,7 +4080,7 @@ $BFMdir/pom/coupling
 \begin_layout Plain Layout
 
 \family typewriter
-\size tiny
+\size footnotesize
 set_initial_conditions.F90
 \end_layout
 
@@ -4356,45 +4094,7 @@ set_initial_conditions.F90
 \begin_layout Plain Layout
 
 \family typewriter
-\size tiny
-Module Service
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\family typewriter
-\size tiny
-$BFMdir/pom/coupling
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\family typewriter
-\size tiny
-ModuleService.F90
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\family typewriter
-\size tiny
+\size footnotesize
 Routine vdiff_SOS
 \end_layout
 
@@ -4406,8 +4106,8 @@ Routine vdiff_SOS
 \begin_layout Plain Layout
 
 \family typewriter
-\size tiny
-$BFMdir/pom/coupling
+\size footnotesize
+coupling
 \end_layout
 
 \end_inset
@@ -4418,7 +4118,7 @@ $BFMdir/pom/coupling
 \begin_layout Plain Layout
 
 \family typewriter
-\size tiny
+\size footnotesize
 vdiff_SOS.F90
 \end_layout
 
@@ -4436,9 +4136,12 @@ vdiff_SOS.F90
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
-Listing of all the programs, subroutines and modules contained in the directorie
-s phys and coupling, along with the directory pathway and the corresponding
- filenames.
+Listing of all the programs, subroutines and modules contained in BFM-POM1D
+ interface, the directory pathway from the reference 
+\family typewriter
+$BFMDIR/src/pom
+\family default
+ and the corresponding filenames.
 \begin_inset CommandInset label
 LatexCommand label
 name "tab:CodesLIsting-1"
@@ -4465,14 +4168,1028 @@ name "tab:CodesLIsting-1"
 
 \end_layout
 
+\begin_layout Standard
+\begin_inset Newpage clearpage
+\end_inset
+
+
+\end_layout
+
 \begin_layout Section
+Program 
+\family typewriter
+MAIN
+\family default
+ (
+\family typewriter
+main_pombfm1d.F90)
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:program-MAIN"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
 The 
 \family typewriter
-module POM
+main
 \family default
- (filename: 
+ program of the BFM-POM1D coupled system has been structured around the
+ basis the POM1D 
 \family typewriter
-$BFMdir/src/pom/phys/POMModule.F90
+main
+\family default
+ program, to which have been added the calls to specific subroutines handling
+ the BFM initial condition definition (or restart reading) and the execution
+ of the BFM core.
+\end_layout
+
+\begin_layout Standard
+A flow chart illustrating the structure of the main program is displayed
+ in fig 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:MAIN-FlowChart"
+
+\end_inset
+
+.
+ The blue boxes indicate model branching points or loop structure, while
+ red boxes refer to specific routines called within the 
+\family typewriter
+main 
+\family default
+body.
+ Black/grey boxes indicate non modular sections of code directly inserted
+ into the 
+\family typewriter
+main
+\family default
+ body.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename Figures/coupling_workflow.png
+	lyxscale 30
+	width 95text%
+	height 95theight%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+The BFM-POM1D 
+\family typewriter
+main
+\family default
+ program flowchart.
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:MAIN-FlowChart"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The 
+\family typewriter
+main
+\family default
+ program consist of two logical parts: the first part is the system initialisati
+on procedure, where the model setup and the parameters relative to the specific
+ problem treated are prepared.
+ The second part is the time stepping loop, where the forward in time numerical
+ integration is carried out via the index 
+\family typewriter
+intt
+\family default
+.
+ In the following, these two logical parts are treated separately.
+ A description of the general structure of the program with particular reference
+ to the branching points and to the non modular code is provided, while
+ the various subroutines are described in detail in dedicated sections of
+ this report (sec.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:BFM-POM1D-subroutines"
+
+\end_inset
+
+).
+ 
+\end_layout
+
+\begin_layout Subsection*
+Initialisation
+\end_layout
+
+\begin_layout Standard
+The reading of the namelist
+\family typewriter
+ params_POMBFM 
+\family default
+(sec.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:pom_bfm_settings-namelist"
+
+\end_inset
+
+) provides the model with all the information needed for a general setup.
+ Subsequently all the physical variables (contained in 
+\family typewriter
+mo
+\family default
+dule
+\family typewriter
+ POM
+\family default
+) are given a first initialisation by setting them to zero and the vertical
+ coordinate system is finalised on the basis of the parameters 
+\family typewriter
+KL1
+\family default
+, 
+\family typewriter
+KL2
+\family default
+ and 
+\family typewriter
+KB
+\family default
+ (section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:modulePOM"
+
+\end_inset
+
+) trough subroutine
+\family typewriter
+ CALCDEPTH,
+\family default
+ sec.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:CALCDEPTH"
+
+\end_inset
+
+).
+ At this stage the program computes also the value of the Coriolis parameter
+ (
+\family typewriter
+COR
+\family default
+), the number of iterations needed to carry out an IDAYS simulation (
+\family typewriter
+IEND
+\family default
+) and twice the the time step 
+\family typewriter
+DT2
+\family default
+.
+\end_layout
+
+\begin_layout Standard
+The value of the 
+\family typewriter
+ihotst 
+\family default
+(sec.
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:modulePOM"
+
+\end_inset
+
+) parameter detemines the branch toward a 
+\begin_inset Quotes eld
+\end_inset
+
+cold
+\begin_inset Quotes erd
+\end_inset
+
+ (from initial conditions) or a 
+\begin_inset Quotes eld
+\end_inset
+
+hot
+\begin_inset Quotes erd
+\end_inset
+
+ (from a restart file) start:
+\end_layout
+
+\begin_layout Itemize
+If i
+\family typewriter
+hotst=0 
+\family default
+(
+\begin_inset Quotes eld
+\end_inset
+
+cold
+\begin_inset Quotes erd
+\end_inset
+
+ start ), subroutine
+\family typewriter
+ get_TS_IC
+\family default
+ (sec.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:get-TS-IC"
+
+\end_inset
+
+) is called.
+ It handles the reading of the 
+\begin_inset Formula $T$
+\end_inset
+
+ and 
+\begin_inset Formula $S$
+\end_inset
+
+ initial conditions.
+ Subsequently, the subroutine
+\family typewriter
+ DENS
+\family default
+ (sec.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:DENS"
+
+\end_inset
+
+ is called in order to provide the initial density field.
+\end_layout
+
+\begin_layout Itemize
+If
+\family typewriter
+ ihotst=1 
+\family default
+(
+\begin_inset Quotes eld
+\end_inset
+
+hot
+\begin_inset Quotes erd
+\end_inset
+
+ start) subroutine
+\family typewriter
+ get_rst 
+\family default
+(sec.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:get_rst"
+
+\end_inset
+
+) is called, handling the reading of the file needed to provide the restart
+ conditions for POM1D.
+ 
+\end_layout
+
+\begin_layout Standard
+The 
+\family typewriter
+main
+\family default
+ program flow converges towards the initialisation of the BFM state variables
+ that is handled by subroutine
+\family typewriter
+ pom_ini_bfm_1d
+\family default
+ (sec.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:pom_ini_BFM"
+
+\end_inset
+
+), again on the basis of the 
+\family typewriter
+ihotst
+\family default
+ value.
+ This ends the initialisation part.
+\end_layout
+
+\begin_layout Subsection*
+Timestepping 
+\end_layout
+
+\begin_layout Standard
+Once terminated the setup and initialisation phase, the time marching loop
+ starts and proceeds across a number of iterations defined by the loop 
+\family typewriter
+intt=1, IEND.
+ 
+\family default
+The first operation iteratively carried out by the time marching loop, is
+ the definition of the time varying forcing and (in case of a diagnostic
+ simulation) of the prescribed data.
+ Such operations are handled by the dedicated subroutine 
+\family typewriter
+Forcing_manager 
+\family default
+(sec.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:FORCING_MANAGER"
+
+\end_inset
+
+).
+ 
+\end_layout
+
+\begin_layout Standard
+Immediately after 
+\family typewriter
+subroutine PROFQ
+\family default
+ (sec.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:PROFQ"
+
+\end_inset
+
+) is called.
+ It contains the coding of the 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "Mellor-Yamada82"
+literal "true"
+
+\end_inset
+
+ 2.5 turbulence closure that outputs the vertical turbulent diffusion coefficient
+s 
+\begin_inset Formula $K_{M}$
+\end_inset
+
+, 
+\begin_inset Formula $K_{H}$
+\end_inset
+
+ and 
+\begin_inset Formula $K_{q}$
+\end_inset
+
+ to be used to compute the vertical distribution of all the state variables
+ that are prognostically treated.
+\end_layout
+
+\begin_layout Standard
+The program flows then branches according to the user choice to perform
+ (with respect to the physical variables) a prognostic or diagnostic simulation.
+ The choice is finalised by the (0/1) value of the parameter
+\family typewriter
+ IDIAGN
+\family default
+.
+\end_layout
+
+\begin_layout Itemize
+if 
+\family typewriter
+IDIAGN=0
+\family default
+ the run is prognostical.
+ Before proceeding to the computation of the 
+\begin_inset Formula $T$
+\end_inset
+
+ and 
+\begin_inset Formula $S$
+\end_inset
+
+ vertical profiles the program computes the lateral 
+\begin_inset Formula $T$
+\end_inset
+
+ and 
+\begin_inset Formula $S$
+\end_inset
+
+ advective fluxes 
+\family typewriter
+
+\begin_inset Formula $\varPhi_{T}$
+\end_inset
+
+, 
+\begin_inset Formula $\varPhi_{S}$
+\end_inset
+
+, 
+\family default
+(coded as
+\family typewriter
+ wtadv and wsadv
+\family default
+) according to eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:LTS"
+
+\end_inset
+
+ and applies them to the vertical 
+\begin_inset Formula $T$
+\end_inset
+
+ and 
+\begin_inset Formula $S$
+\end_inset
+
+ profiles via a leapfrog integration (eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:IntermedTS"
+
+\end_inset
+
+) that provides an intermediate temperature and salinity profile 
+\begin_inset Formula $\widetilde{T}$
+\end_inset
+
+, 
+\begin_inset Formula $\widetilde{S}$
+\end_inset
+
+ (stored in the 
+\family typewriter
+TF
+\family default
+ and 
+\family typewriter
+SF
+\family default
+ arrays).
+ Below it is reported the procedure applied to the temperature profile.
+ The salinity procedure is identical.
+ Note that the computation of 
+\family typewriter
+wtadv
+\family default
+ and 
+\family typewriter
+swadv
+\family default
+ can be avoided simply by setting 
+\begin_inset Formula $(TRT,SRT)=0$
+\end_inset
+
+ (sec.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:pom_bfm_settings-namelist"
+
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\tiny\ttfamily}"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+!
+\end_layout
+
+\begin_layout Plain Layout
+
+!            -----COMPUTE LATERAL ADVECTION TERM FOR T&S----- 
+\end_layout
+
+\begin_layout Plain Layout
+
+              wtadv(:) = ZERO              
+\end_layout
+
+\begin_layout Plain Layout
+
+              wsadv(:) = ZERO 
+\end_layout
+
+\begin_layout Plain Layout
+
+              IF(TRT.ne.ZERO) THEN 
+\end_layout
+
+\begin_layout Plain Layout
+
+                 do K = 1, KB
+\end_layout
+
+\begin_layout Plain Layout
+
+                     if((-ZZ(K)*H).ge.upperH)   &
+\end_layout
+
+\begin_layout Plain Layout
+
+                     wtadv(K) = (tstar(k)-T(k))/(TRT*SEC_PER_DAY) 
+\end_layout
+
+\begin_layout Plain Layout
+
+                 enddo 
+\end_layout
+
+\begin_layout Plain Layout
+
+              ENDIF
+\end_layout
+
+\begin_layout Plain Layout
+
+!             -----COMPUTE TEMPERATURE----- 
+\end_layout
+
+\begin_layout Plain Layout
+
+              TF(:) = TB(:) + (WTADV(:) * DT2)
+\end_layout
+
+\begin_layout Plain Layout
+
+!
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+in the above code 
+\family typewriter
+tstar
+\family default
+ is the (time interpolated) temperature profile computed (along with the
+ corresponding inteerpolated salinity 
+\family typewriter
+sstar
+\family default
+) by the subroutine FORCING_MANAGER (sec.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:FORCING_MANAGER"
+
+\end_inset
+
+)
+\end_layout
+
+\begin_layout Standard
+Before proceeding to the final computation of the 
+\begin_inset Formula $T$
+\end_inset
+
+and 
+\begin_inset Formula $S$
+\end_inset
+
+ forward in time vertical profiles the main program accomplishes the computation
+ of the virtual surface salinity flux 
+\family typewriter
+wssurf
+\family default
+ according to eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:SBC"
+
+\end_inset
+
+:
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\tiny\ttfamily}"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+!
+\end_layout
+
+\begin_layout Plain Layout
+
+!            -----COMPUTE SURFACE SALINITY FLUX----- 
+\end_layout
+
+\begin_layout Plain Layout
+
+             wssurf = -(ssurf-S(1))*SSRT/SEC_PER_DAY
+\end_layout
+
+\begin_layout Plain Layout
+
+!
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The computation of the final 
+\begin_inset Formula $T$
+\end_inset
+
+ and 
+\begin_inset Formula $S$
+\end_inset
+
+ forward in time vertical profiles is then closed by the call to 
+\family typewriter
+subroutine PROFTS
+\family default
+ (sec.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:PROFTS"
+
+\end_inset
+
+) 
+\end_layout
+
+\begin_layout Itemize
+if 
+\family typewriter
+IDIAGN=1 
+\family default
+the run is diagnostical.
+ The vertical 
+\begin_inset Formula $T$
+\end_inset
+
+ and 
+\begin_inset Formula $S$
+\end_inset
+
+ profiles are computed via the linear interpolation of the climatological
+ data that occurs in subroutine
+\family typewriter
+ Forcing_manager
+\family default
+ (sec.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:FORCING_MANAGER"
+
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Standard
+The two 
+\family typewriter
+IDIAGN
+\family default
+ branches of program 
+\family typewriter
+main
+\family default
+ converge then towards the computation of the Coriolis terms 
+\begin_inset Formula $fu$
+\end_inset
+
+ and 
+\begin_inset Formula $fv$
+\end_inset
+
+ appearing in eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:UVeq"
+
+\end_inset
+
+.
+ The Coriolis terms are then used to compute (via explicit leapfrog integration)
+ the intermediate, forward in time, 
+\begin_inset Formula $\widetilde{u}$
+\end_inset
+
+ and 
+\begin_inset Formula $\widetilde{v}$
+\end_inset
+
+ velocity profiles (eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:IntermedUV"
+
+\end_inset
+
+), that are stored in the 
+\family typewriter
+UF
+\family default
+ and 
+\family typewriter
+VF
+\family default
+ arrays.
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\tiny\ttfamily}"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+!
+\end_layout
+
+\begin_layout Plain Layout
+
+              UF(:) = UB(:) + DT2 * COR * V(:) ! CORIOLIS TERM AND EXPLICIT
+ LEAPFROG
+\end_layout
+
+\begin_layout Plain Layout
+
+              VF(:) = VB(:) - DT2 * COR * U(:) ! CORIOLIS TERM AND EXPLICIT
+ LEAPFROG
+\end_layout
+
+\begin_layout Plain Layout
+
+!
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The temporal update of the velocity profiles is then concluded by the sequential
+ two calls to subroutine
+\family typewriter
+ PROFUV
+\family default
+ (sec.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:PROFUV"
+
+\end_inset
+
+).
+ After these calls the computation of the physical state variables closes
+ with the application of the 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "Asselin72"
+literal "true"
+
+\end_inset
+
+ filter (eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:Asselin"
+
+\end_inset
+
+) and with the restoration of the time sequence for all the physical variables.
+ Below it is shown the time sequence restoration for the temperature state,
+ being identical for all the other state variables.
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\tiny\ttfamily}"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+! 
+\end_layout
+
+\begin_layout Plain Layout
+
+!     -----RESTORE TIME SEQUENCE----- 
+\end_layout
+
+\begin_layout Plain Layout
+
+!
+\end_layout
+
+\begin_layout Plain Layout
+
+      TB(:) = T(:)
+\end_layout
+
+\begin_layout Plain Layout
+
+      T(:)  = TF(:)
+\end_layout
+
+\begin_layout Plain Layout
+
+!
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Density is updated trough a call to 
+\family typewriter
+subroutine DENS
+\family default
+ (sec.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:DENS"
+
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Standard
+The call to the 
+\family typewriter
+subroutine Pom_bfm_1d
+\family default
+ (sec.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:pom_bfm_1d"
+
+\end_inset
+
+) executes BFM, as well as the physical biological coupling and the SoS
+ time integration of the BFM prognostic variables.
+ This last call conclude the sequence of operations contained in the time
+ marching loop, and the cycle starts anew.
+ However, at a 
+\family typewriter
+savef 
+\family default
+frequency (see sec.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:moduleService"
+
+\end_inset
+
+) the routine handling the output writing is called (
+\family typewriter
+subroutine pom_dia_bfm_id, 
+\family default
+sec.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:pom_dia_bfm"
+
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Section
+Shared modules
+\end_layout
+
+\begin_layout Subsection
+Module POM (
+\family typewriter
+phys/POMModule.F90
 \family default
 ) 
 \begin_inset CommandInset label
@@ -5075,9 +5792,9 @@ integer(ilong) :: KL1, KL2
 \end_layout
 
 \begin_layout Standard
-Dummy arguments for the 
+Dummy arguments for the subroutine
 \family typewriter
-subroutine CALCDEPTH
+ CALCDEPTH
 \family default
  (sec.
  
@@ -5189,9 +5906,9 @@ literal "true"
 
 \end_inset
 
- in 
+ in subroutine
 \family typewriter
-subroutine PROFQ
+ PROFQ
 \family default
  (sec.
  
@@ -5245,9 +5962,9 @@ literal "true"
 
 \end_inset
 
- in 
+ in subroutine
 \family typewriter
-subroutine PROFQ(
+ PROFQ(
 \family default
 sec.
 
@@ -5329,9 +6046,9 @@ reference "eq:NutSurflux"
 
 \end_inset
 
-) in 
+) in subroutine
 \family typewriter
-subroutine PROFTS
+ PROFTS
 \family default
  (sec.
  
@@ -5438,9 +6155,9 @@ literal "true"
 
 \end_inset
 
- water type in 
+ water type in subroutine
 \family typewriter
-subroutine PROFTS
+ PROFTS
 \family default
  (sec.
  
@@ -5509,9 +6226,9 @@ Q2F
 \end_inset
 
 .
- The profiles are computed by 
+ The profiles are computed by subroutine
 \family typewriter
-subroutine PROFQ (
+ PROFQ (
 \family default
 sec.
 
@@ -5591,9 +6308,9 @@ Q2LF
 \end_inset
 
 .
- The profiles are computed by 
+ The profiles are computed by subroutine
 \family typewriter
-subroutine PROFQ
+ PROFQ
 \family default
  
 \family typewriter
@@ -5701,9 +6418,9 @@ literal "true"
 \end_inset
 
 .
- Density computation is carried out in 
+ Density computation is carried out in subroutine
 \family typewriter
-subroutine DENS
+ DENS
 \family default
 .
  Note that 
@@ -5995,9 +6712,9 @@ SWRAD
 \begin_inset Formula $W/m^{2}$
 \end_inset
 
- in 
+ in subroutine
 \family typewriter
-subroutine pom_to_bfm
+ pom_to_bfm
 \family default
  (sec.
  
@@ -6512,9 +7229,9 @@ reference "eq:BBC"
 \end_inset
 
 .
- Computed in 
+ Computed in subroutine
 \family typewriter
-subroutine PROFUV (sec.
+ PROFUV (sec.
  
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -6630,9 +7347,9 @@ surface salinity flux
 
 .
  see eq.
- It is used in 
+ It is used in subroutine
 \family typewriter
-subroutine PROFTS
+ PROFTS
 \family default
  (sec.
  
@@ -6906,14 +7623,10 @@ The bottom roughness length
 .
 \end_layout
 
-\begin_layout Section
-The 
+\begin_layout Subsection
+Module Service (
 \family typewriter
-module Service
-\family default
- (filename 
-\family typewriter
-$BFMdir/src/pom/coupling/ModuleService.F90
+coupling/ModuleService.F90
 \family default
 )
 \begin_inset CommandInset label
@@ -6956,9 +7669,9 @@ The time varying prescribed inorganic suspended matter concentration
 
  vertical profile.
  it is computed via linear interpolation between time adjacent climatological
- values in 
+ values in subroutine
 \family typewriter
-SUBROUTINE FORCING_MANAGER
+ FORCING_MANAGER
 \family default
  (
 \begin_inset CommandInset ref
@@ -6969,25 +7682,22 @@ reference "subsec:FORCING_MANAGER"
 
 ).
  It is used to compute the light vertical extinction coefficient in the
- BFM 
-\family typewriter
-SUBROUTINE
-\family default
- 
+ BFM subroutine 
 \family typewriter
 CalcVerticalExtinction (
 \family default
 see 
-\family typewriter
-
 \begin_inset CommandInset citation
-LatexCommand citealp
+LatexCommand citet
 key "BFM-manual"
-literal "true"
+literal "false"
 
 \end_inset
 
 ).
+ 
+\family typewriter
+
 \begin_inset VSpace defskip
 \end_inset
 
@@ -7100,12 +7810,8 @@ t, read_restart
 \end_layout
 
 \begin_layout Standard
-These 
-\family typewriter
-character
-\family default
- variables contains the pathways to the initial condition and forcing data
- input.
+These character variables contains the pathways to the initial condition
+ and forcing data input.
  their content is provided via namelist (sec.
  
 \begin_inset CommandInset ref
@@ -7117,2122 +7823,10 @@ reference "sec:BFM-POM1D-subroutines"
 ).
 \end_layout
 
-\begin_layout Section
-The 
-\family typewriter
-pom_bfm_settings.nml
-\family default
- namelist 
-\begin_inset CommandInset label
-LatexCommand label
-name "sec:pom_bfm_settings-namelist"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-This file is a container of the two main namelists to control the BFM-POM1D
- setup (
-\family typewriter
-Params_POMBFM
-\family default
-) and initial conditions and external forcings (
-\family typewriter
-pom_input
-\family default
-).
-\end_layout
-
-\begin_layout Standard
-The namelist 
-\family typewriter
-Params_POMBFM
-\family default
- is read in the 
-\family typewriter
-MAIN
-\family default
- program and provides all the values for the variables that define the code
- setup and control.
- All of them are stored into 
-\family typewriter
-module POM
-\family default
- (sec.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:modulePOM"
-
-\end_inset
-
-) or 
-\family typewriter
-module service 
-\family default
-(sec.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:moduleService"
-
-\end_inset
-
-).
- Below the namelist set for the implementation used in Mussap et al.
- 
-\begin_inset CommandInset citation
-LatexCommand citeyearpar
-key "mussap1,mussap3"
-literal "true"
-
-\end_inset
-
- and 
-\begin_inset CommandInset citation
-LatexCommand citet
-key "mussap2"
-literal "true"
-
-\end_inset
-
- is reported as an example.
-\end_layout
-
-\begin_layout Standard
-\begin_inset listings
-lstparams "language=Fortran,basicstyle={\tiny\ttfamily}"
-inline false
-status open
-
-\begin_layout Plain Layout
-
-! NAMELIST params_POMBFM
-\end_layout
-
-\begin_layout Plain Layout
-
-!
-\end_layout
-
-\begin_layout Plain Layout
-
-! H                    [m]       Depth 
-\end_layout
-
-\begin_layout Plain Layout
-
-! DTI                  [s]       Timestep 
-\end_layout
-
-\begin_layout Plain Layout
-
-! ALAT                 [degrees] Latitude 
-\end_layout
-
-\begin_layout Plain Layout
-
-! IDIAGN               [-]       1 = Diagnostic mode 
-\end_layout
-
-\begin_layout Plain Layout
-
-!                                0 = Prognostic mode            
-\end_layout
-
-\begin_layout Plain Layout
-
-! IDAYS                [d]       Length of run  
-\end_layout
-
-\begin_layout Plain Layout
-
-! SMOTH                [-]       Parameter for Hasselin filter  
-\end_layout
-
-\begin_layout Plain Layout
-
-! IHOTST               [-]       1 = Restart reading 
-\end_layout
-
-\begin_layout Plain Layout
-
-!                                0 = Cold start 
-\end_layout
-
-\begin_layout Plain Layout
-
-! KL1 & KL2            [-]       Establish Surface/bottom logarithmic layers
- distribution 
-\end_layout
-
-\begin_layout Plain Layout
-
-!                      KL1: Surface logarithmic distribution.
- The numers of layers is KL1-2 
-\end_layout
-
-\begin_layout Plain Layout
-
-!                      KL2: Bottom logarithic distribution.
- The numers of layers is KB-KL2-1
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-! SAVEF                [hours]       Output averaging and Saving frequency
- (days) 
-\end_layout
-
-\begin_layout Plain Layout
-
-! NRT                  [m/d]     Relaxation constant for nutrients at surface
-  
-\end_layout
-
-\begin_layout Plain Layout
-
-! NBCT, NBCS, NBCBFM   [-]       Define surface boundary conditions for
- temperature, salinity & BFM tracers
-\end_layout
-
-\begin_layout Plain Layout
-
-!
-\end_layout
-
-\begin_layout Plain Layout
-
-! NBC = 1: Surf.
- B.C.
- is WFSURF.
- no radiative penetration 
-\end_layout
-
-\begin_layout Plain Layout
-
-! NBC = 2; Surf.
- B.C.
- is WFSURF+SWRAD*(1.-TR).
- with SWRAD*TR penetration      
-\end_layout
-
-\begin_layout Plain Layout
-
-! NBC = 3; Surf.
- B.C.
- is TSURF.
- no SW radiative penetration
-\end_layout
-
-\begin_layout Plain Layout
-
-!  
-\end_layout
-
-\begin_layout Plain Layout
-
-! UMOL                 [m^2/s]   Background diffusion for momentum  
-\end_layout
-
-\begin_layout Plain Layout
-
-! UMOLT, UMOLS,UMOLBFM [m^2/s]   Background diffusion for T,S and BFM tracers
-  
-\end_layout
-
-\begin_layout Plain Layout
-
-! NTP                  [-]       Flag for Jerlov water type
-\end_layout
-
-\begin_layout Plain Layout
-
-!                      NTP =               1      2       3       4    
-   5               
-\end_layout
-
-\begin_layout Plain Layout
-
-!                      JERLOV TYPE   =     I      IA      IB      II   
-   III 
-\end_layout
-
-\begin_layout Plain Layout
-
-! TRT,SRT              [ ]        Relaxation time for t & S lateral advection
- 
-\end_layout
-
-\begin_layout Plain Layout
-
-! upperh               [m]        Depth at which lateral advection starts
- 
-\end_layout
-
-\begin_layout Plain Layout
-
-! SSRT                 [m/d]      Relaxation time for surface salinity flux
- 
-\end_layout
-
-\begin_layout Plain Layout
-
-!  &Params_POMBFM  
-\end_layout
-
-\begin_layout Plain Layout
-
-H       =  16.,  
-\end_layout
-
-\begin_layout Plain Layout
-
-DTI     =  100.,  
-\end_layout
-
-\begin_layout Plain Layout
-
-ALAT    =  45.,  
-\end_layout
-
-\begin_layout Plain Layout
-
-IDIAGN  =  1,  
-\end_layout
-
-\begin_layout Plain Layout
-
-IDAYS   =  1800,  
-\end_layout
-
-\begin_layout Plain Layout
-
-SMOTH   =  0.1,  
-\end_layout
-
-\begin_layout Plain Layout
-
-IHOTST  =  0,  
-\end_layout
-
-\begin_layout Plain Layout
-
-KL1     =  7,  
-\end_layout
-
-\begin_layout Plain Layout
-
-KL2     =  25,  
-\end_layout
-
-\begin_layout Plain Layout
-
-SAVEF   =  1,  
-\end_layout
-
-\begin_layout Plain Layout
-
-NRT     =  0.2,  
-\end_layout
-
-\begin_layout Plain Layout
-
-NBCT    =  2,  
-\end_layout
-
-\begin_layout Plain Layout
-
-NBCS    =  1,  
-\end_layout
-
-\begin_layout Plain Layout
-
-NBCBFM  =  1,  
-\end_layout
-
-\begin_layout Plain Layout
-
-UMOL    =  2.e-5,  
-\end_layout
-
-\begin_layout Plain Layout
-
-UMOLT   =  1.e-5,  
-\end_layout
-
-\begin_layout Plain Layout
-
-UMOLS   =  1.3e-6,  
-\end_layout
-
-\begin_layout Plain Layout
-
-UMOLBFM =  2.e-5,  
-\end_layout
-
-\begin_layout Plain Layout
-
-NTP     =  2,  
-\end_layout
-
-\begin_layout Plain Layout
-
-TRT     =  0,  
-\end_layout
-
-\begin_layout Plain Layout
-
-SRT     =  1,  
-\end_layout
-
-\begin_layout Plain Layout
-
-UPPERH  =  5.0,  
-\end_layout
-
-\begin_layout Plain Layout
-
-SSRT    =  5.68    /  
-\end_layout
-
-\begin_layout Plain Layout
-
-!-=-=-= !END namelist !-=-=-=
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-This namelist
-\family typewriter
- pom_input
-\family default
- is read three times: in 
-\family typewriter
-subroutine
-\family default
- 
-\family typewriter
-FORCING_MANAGER (
-\family default
-sec.
-
-\family typewriter
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:FORCING_MANAGER"
-
-\end_inset
-
-), subroutine get_TS_IC 
-\family default
-(sec.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:get-TS-IC"
-
-\end_inset
-
-) and
-\family typewriter
- subroutine get_rst
-\family default
- (sec.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:get_rst"
-
-\end_inset
-
-).
- It provides the directory paths to all the data files (surface forcing,
- prescribed 
-\begin_inset Formula $T$
-\end_inset
-
-, 
-\begin_inset Formula $S$
-\end_inset
-
-, inorganic suspended sediment vertical profiles and surface nutrient concentrat
-ion values) to be read by the coupled system.
- The example below is again taken from the BFM-POM1D implementation of Mussap
- et.
- al.
- 
-\begin_inset CommandInset citation
-LatexCommand citeyearpar
-key "mussap1,mussap3"
-literal "true"
-
-\end_inset
-
-, 
-\begin_inset CommandInset citation
-LatexCommand citet
-key "mussap2"
-literal "true"
-
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Standard
-\begin_inset listings
-lstparams "language=Fortran,basicstyle={\tiny\ttfamily}"
-inline false
-status open
-
-\begin_layout Plain Layout
-
-! NAMELIST: pom_input
-\end_layout
-
-\begin_layout Plain Layout
-
-! !DESCRIPTION !
-\end_layout
-
-\begin_layout Plain Layout
-
-! -----DEFINE PATH TO DATA FILES-------
-\end_layout
-
-\begin_layout Plain Layout
-
-!
-\end_layout
-
-\begin_layout Plain Layout
-
-! wind_input:      path to the windstress data 
-\end_layout
-
-\begin_layout Plain Layout
-
-! surfaceS_input:  path to the surface salinity data ! radiance_input: 
- path to the shortwave (solar) radiation data 
-\end_layout
-
-\begin_layout Plain Layout
-
-! ism_input:       path to the suspended sediment data 
-\end_layout
-
-\begin_layout Plain Layout
-
-! Sal_input:       path to the (time varying) salinity vertical profile
- data 
-\end_layout
-
-\begin_layout Plain Layout
-
-! Temp_input:      path to the (time varying) temperature vertical profile
- data 
-\end_layout
-
-\begin_layout Plain Layout
-
-! Sprofile_input:  path to the salinity initial conditions data 
-\end_layout
-
-\begin_layout Plain Layout
-
-! Tprofile_input:  path to the temperature initial conditions data 
-\end_layout
-
-\begin_layout Plain Layout
-
-! heat_input:      path to the heat flux loss terms (Qb+Qh+Qe) data 
-\end_layout
-
-\begin_layout Plain Layout
-
-! read_restart:    path to the restart file.
-\end_layout
-
-\begin_layout Plain Layout
-
-!
-\end_layout
-
-\begin_layout Plain Layout
-
-&pom_input 
-\end_layout
-
-\begin_layout Plain Layout
-
-wind_input      =  '/input/windstress_mon_Mussap.da', 
-\end_layout
-
-\begin_layout Plain Layout
-
-surfaceS_input  =  '/input/Ssurf_16m.da', 
-\end_layout
-
-\begin_layout Plain Layout
-
-radiance_input  =  '/input/radiance_daily_Mussap.da', 
-\end_layout
-
-\begin_layout Plain Layout
-
-ism_input       =  '/input/ISM_16m_Mussap.da', 
-\end_layout
-
-\begin_layout Plain Layout
-
-Sal_input       =  '/input/ClimaS_MA21_16m.da', 
-\end_layout
-
-\begin_layout Plain Layout
-
-Temp_input      =  '/input/ClimaT_MA21_16m.da', 
-\end_layout
-
-\begin_layout Plain Layout
-
-Sprofile_input  =  '/input/Sinit_16m.da', 
-\end_layout
-
-\begin_layout Plain Layout
-
-Tprofile_input  =  '/input/Tinit_16m.da', 
-\end_layout
-
-\begin_layout Plain Layout
-
-heat_input      =  '/input/heatflux.da', 
-\end_layout
-
-\begin_layout Plain Layout
-
-surfNut_input   =  '/input/NutrientsARPAOGS.da', 
-\end_layout
-
-\begin_layout Plain Layout
-
-read_restart    =  '/input/fort.70' / 
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Section
-The program 
-\family typewriter
-MAIN
-\family default
- (Filename: 
-\family typewriter
-$BFMdir/src/pom/main_pombfm1d.F90)
-\begin_inset CommandInset label
-LatexCommand label
-name "sec:program-MAIN"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The 
-\family typewriter
-main
-\family default
- program of the BFM-POM1D coupled system has been structured around the
- basis the POM1D 
-\family typewriter
-main
-\family default
- program, to which have been added the calls to specific subroutines handling
- the BFM initial condition definition (or restart reading) and the execution
- of the BFM core.
-\end_layout
-
-\begin_layout Standard
-A flow chart illustrating the structure of the main program is displayed
- in fig 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:MAIN-FlowChart"
-
-\end_inset
-
-.
- The blue boxes indicate model branching points or loop structure, while
- red boxes refer to specific routines called within the 
-\family typewriter
-main 
-\family default
-body.
- Black/grey boxes indicate non modular sections of code directly inserted
- into the 
-\family typewriter
-main
-\family default
- body.
- 
-\end_layout
-
-\begin_layout Standard
-\begin_inset Float figure
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-\align center
-\begin_inset Graphics
-	filename Figures/coupling_workflow.png
-	lyxscale 30
-	width 95text%
-	height 95theight%
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\align center
-\begin_inset Caption Standard
-
-\begin_layout Plain Layout
-The BFM-POM1D 
-\family typewriter
-main
-\family default
- program flowchart.
-\begin_inset CommandInset label
-LatexCommand label
-name "fig:MAIN-FlowChart"
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The 
-\family typewriter
-main
-\family default
- program consist of two logical parts: the first part is the system initialisati
-on procedure, where the model setup and the parameters relative to the specific
- problem treated are prepared.
- The second part is the time stepping loop, where the forward in time numerical
- integration is carried out via the index 
-\family typewriter
-intt
-\family default
-.
- In the following, these two logical parts are treated separately.
- A description of the general structure of the program with particular reference
- to the branching points and to the non modular code is provided, while
- the various subroutines are described in detail in dedicated sections of
- this report (sec.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:BFM-POM1D-subroutines"
-
-\end_inset
-
-).
- 
-\end_layout
-
-\begin_layout Subsection*
-Initialisation
-\end_layout
-
-\begin_layout Standard
-The reading of the 
-\family typewriter
-namelist params_POMBFM 
-\family default
-(sec.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:pom_bfm_settings-namelist"
-
-\end_inset
-
-) provides the model with all the information needed for a general setup.
- Subsequently all the physical variables (contained in 
-\family typewriter
-module POM
-\family default
-) are given a first initialisation by setting them to zero and the vertical
- coordinate system is finalised on the basis of the parameters 
-\family typewriter
-KL1
-\family default
-, 
-\family typewriter
-KL2
-\family default
- and 
-\family typewriter
-KB
-\family default
- (section 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:modulePOM"
-
-\end_inset
-
-) trough 
-\family typewriter
-Subroutine CALCDEPTH,
-\family default
- sec.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:CALCDEPTH"
-
-\end_inset
-
-).
- At this stage the program computes also the value of the Coriolis parameter
- (
-\family typewriter
-COR
-\family default
-), the number of iterations needed to carry out an IDAYS simulation (
-\family typewriter
-IEND
-\family default
-) and twice the the time step 
-\family typewriter
-DT2
-\family default
-.
-\end_layout
-
-\begin_layout Standard
-The value of the 
-\family typewriter
-ihotst 
-\family default
-(sec.
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:modulePOM"
-
-\end_inset
-
-) parameter detemines the branch toward a 
-\begin_inset Quotes eld
-\end_inset
-
-cold
-\begin_inset Quotes erd
-\end_inset
-
- (from initial conditions) or a 
-\begin_inset Quotes eld
-\end_inset
-
-hot
-\begin_inset Quotes erd
-\end_inset
-
- (from a restart file) start:
-\end_layout
-
-\begin_layout Itemize
-If i
-\family typewriter
-hotst=0 
-\family default
-(
-\begin_inset Quotes eld
-\end_inset
-
-cold
-\begin_inset Quotes erd
-\end_inset
-
- start ), 
-\family typewriter
-subroutine get_TS_IC
-\family default
- (sec.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:get-TS-IC"
-
-\end_inset
-
-) is called.
- It handles the reading of the 
-\begin_inset Formula $T$
-\end_inset
-
- and 
-\begin_inset Formula $S$
-\end_inset
-
- initial conditions.
- Subsequently, the 
-\family typewriter
-subroutine DENS
-\family default
- (sec.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:DENS"
-
-\end_inset
-
- is called in order to provide the initial density field.
-\end_layout
-
-\begin_layout Itemize
-If
-\family typewriter
- ihotst=1 
-\family default
-(
-\begin_inset Quotes eld
-\end_inset
-
-hot
-\begin_inset Quotes erd
-\end_inset
-
- start) 
-\family typewriter
-subroutine get_rst 
-\family default
-(sec.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:get_rst"
-
-\end_inset
-
-) is called, handling the reading of the file needed to provide the restart
- conditions for POM1D.
- 
-\end_layout
-
-\begin_layout Standard
-The 
-\family typewriter
-main
-\family default
- program flow converges towards the initialisation of the BFM state variables
- that is handled by 
-\family typewriter
-subroutine pom_ini_bfm_1d
-\family default
- (sec.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:pom_ini_BFM"
-
-\end_inset
-
-), again on the basis of the 
-\family typewriter
-ihotst
-\family default
- value.
- This ends the initialisation part.
-\end_layout
-
-\begin_layout Subsection*
-Timestepping 
-\end_layout
-
-\begin_layout Standard
-Once terminated the setup and initialisation phase, the time marching loop
- starts and proceeds across a number of iterations defined by the loop 
-\family typewriter
-intt=1, IEND.
- 
-\family default
-The first operation iteratively carried out by the time marching loop, is
- the definition of the time varying forcing and (in case of a diagnostic
- simulation) of the prescribed data.
- Such operations are handled by the dedicated subroutine 
-\family typewriter
-Forcing_manager 
-\family default
-(sec.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:FORCING_MANAGER"
-
-\end_inset
-
-).
- 
-\end_layout
-
-\begin_layout Standard
-Immediately after 
-\family typewriter
-subroutine PROFQ
-\family default
- (sec.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:PROFQ"
-
-\end_inset
-
-) is called.
- It contains the coding of the 
-\begin_inset CommandInset citation
-LatexCommand citet
-key "Mellor-Yamada82"
-literal "true"
-
-\end_inset
-
- 2.5 turbulence closure that outputs the vertical turbulent diffusion coefficient
-s 
-\begin_inset Formula $K_{M}$
-\end_inset
-
-, 
-\begin_inset Formula $K_{H}$
-\end_inset
-
- and 
-\begin_inset Formula $K_{q}$
-\end_inset
-
- to be used to compute the vertical distribution of all the state variables
- that are prognostically treated.
-\end_layout
-
-\begin_layout Standard
-The program flows then branches according to the user choice to perform
- (with respect to the physical variables) a prognostic or diagnostic simulation.
- The choice is finalised by the (0/1) value of the 
-\family typewriter
-parameter IDIAGN
-\family default
-.
-\end_layout
-
-\begin_layout Itemize
-if 
-\family typewriter
-IDIAGN=0
-\family default
- the run is prognostical.
- Before proceeding to the computation of the 
-\begin_inset Formula $T$
-\end_inset
-
- and 
-\begin_inset Formula $S$
-\end_inset
-
- vertical profiles the program computes the lateral 
-\begin_inset Formula $T$
-\end_inset
-
- and 
-\begin_inset Formula $S$
-\end_inset
-
- advective fluxes 
-\family typewriter
-
-\begin_inset Formula $\varPhi_{T}$
-\end_inset
-
-, 
-\begin_inset Formula $\varPhi_{S}$
-\end_inset
-
-, 
-\family default
-(coded as
-\family typewriter
- wtadv and wsadv
-\family default
-) according to eq.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "eq:LTS"
-
-\end_inset
-
- and applies them to the vertical 
-\begin_inset Formula $T$
-\end_inset
-
- and 
-\begin_inset Formula $S$
-\end_inset
-
- profiles via a leapfrog integration (eq.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "eq:IntermedTS"
-
-\end_inset
-
-) that provides an intermediate temperature and salinity profile 
-\begin_inset Formula $\widetilde{T}$
-\end_inset
-
-, 
-\begin_inset Formula $\widetilde{S}$
-\end_inset
-
- (stored in the 
-\family typewriter
-TF
-\family default
- and 
-\family typewriter
-SF
-\family default
- arrays).
- Below it is reported the procedure applied to the temperature profile.
- The salinity procedure is identical.
- Note that the computation of 
-\family typewriter
-wtadv
-\family default
- and 
-\family typewriter
-swadv
-\family default
- can be avoided simply by setting 
-\begin_inset Formula $(TRT,SRT)=0$
-\end_inset
-
- (sec.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:pom_bfm_settings-namelist"
-
-\end_inset
-
-).
-\end_layout
-
-\begin_layout Standard
-\begin_inset listings
-lstparams "basicstyle={\tiny\ttfamily}"
-inline false
-status open
-
-\begin_layout Plain Layout
-
-!
-\end_layout
-
-\begin_layout Plain Layout
-
-!            -----COMPUTE LATERAL ADVECTION TERM FOR T&S----- 
-\end_layout
-
-\begin_layout Plain Layout
-
-              wtadv(:) = ZERO              
-\end_layout
-
-\begin_layout Plain Layout
-
-              wsadv(:) = ZERO 
-\end_layout
-
-\begin_layout Plain Layout
-
-              IF(TRT.ne.ZERO) THEN 
-\end_layout
-
-\begin_layout Plain Layout
-
-                 do K = 1, KB
-\end_layout
-
-\begin_layout Plain Layout
-
-                     if((-ZZ(K)*H).ge.upperH)   &
-\end_layout
-
-\begin_layout Plain Layout
-
-                     wtadv(K) = (tstar(k)-T(k))/(TRT*SEC_PER_DAY) 
-\end_layout
-
-\begin_layout Plain Layout
-
-                 enddo 
-\end_layout
-
-\begin_layout Plain Layout
-
-              ENDIF
-\end_layout
-
-\begin_layout Plain Layout
-
-!             -----COMPUTE TEMPERATURE----- 
-\end_layout
-
-\begin_layout Plain Layout
-
-              TF(:) = TB(:) + (WTADV(:) * DT2)
-\end_layout
-
-\begin_layout Plain Layout
-
-!
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset VSpace defskip
-\end_inset
-
-in the above code 
-\family typewriter
-tstar
-\family default
- is the (time interpolated) temperature profile computed (along with the
- corresponding inteerpolated salinity 
-\family typewriter
-sstar
-\family default
-) by the subroutine FORCING_MANAGER (sec.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:FORCING_MANAGER"
-
-\end_inset
-
-)
-\end_layout
-
-\begin_layout Standard
-Before proceeding to the final computation of the 
-\begin_inset Formula $T$
-\end_inset
-
-and 
-\begin_inset Formula $S$
-\end_inset
-
- forward in time vertical profiles the main program accomplishes the computation
- of the virtual surface salinity flux 
-\family typewriter
-wssurf
-\family default
- according to eq.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "eq:SBC"
-
-\end_inset
-
-:
-\end_layout
-
-\begin_layout Standard
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset listings
-lstparams "basicstyle={\tiny\ttfamily}"
-inline false
-status open
-
-\begin_layout Plain Layout
-
-!
-\end_layout
-
-\begin_layout Plain Layout
-
-!            -----COMPUTE SURFACE SALINITY FLUX----- 
-\end_layout
-
-\begin_layout Plain Layout
-
-             wssurf = -(ssurf-S(1))*SSRT/SEC_PER_DAY
-\end_layout
-
-\begin_layout Plain Layout
-
-!
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The computation of the final 
-\begin_inset Formula $T$
-\end_inset
-
- and 
-\begin_inset Formula $S$
-\end_inset
-
- forward in time vertical profiles is then closed by the call to 
-\family typewriter
-subroutine PROFTS
-\family default
- (sec.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:PROFTS"
-
-\end_inset
-
-) 
-\end_layout
-
-\begin_layout Itemize
-if 
-\family typewriter
-IDIAGN=1 
-\family default
-the run is diagnostical.
- The vertical 
-\begin_inset Formula $T$
-\end_inset
-
- and 
-\begin_inset Formula $S$
-\end_inset
-
- profiles are computed via the linear interpolation of the climatological
- data that occurs in 
-\family typewriter
-subroutine Forcing_manager
-\family default
- (sec.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:FORCING_MANAGER"
-
-\end_inset
-
-).
-\end_layout
-
-\begin_layout Standard
-The two 
-\family typewriter
-IDIAGN
-\family default
- branches of program 
-\family typewriter
-main
-\family default
- converge then towards the computation of the Coriolis terms 
-\begin_inset Formula $fu$
-\end_inset
-
- and 
-\begin_inset Formula $fv$
-\end_inset
-
- appearing in eq.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "eq:UVeq"
-
-\end_inset
-
-.
- The Coriolis terms are then used to compute (via explicit leapfrog integration)
- the intermediate, forward in time, 
-\begin_inset Formula $\widetilde{u}$
-\end_inset
-
- and 
-\begin_inset Formula $\widetilde{v}$
-\end_inset
-
- velocity profiles (eq.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "eq:IntermedUV"
-
-\end_inset
-
-), that are stored in the 
-\family typewriter
-UF
-\family default
- and 
-\family typewriter
-VF
-\family default
- arrays.
-\end_layout
-
-\begin_layout Standard
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset listings
-lstparams "basicstyle={\tiny\ttfamily}"
-inline false
-status open
-
-\begin_layout Plain Layout
-
-!
-\end_layout
-
-\begin_layout Plain Layout
-
-              UF(:) = UB(:) + DT2 * COR * V(:) ! CORIOLIS TERM AND EXPLICIT
- LEAPFROG
-\end_layout
-
-\begin_layout Plain Layout
-
-              VF(:) = VB(:) - DT2 * COR * U(:) ! CORIOLIS TERM AND EXPLICIT
- LEAPFROG
-\end_layout
-
-\begin_layout Plain Layout
-
-!
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The temporal update of the velocity profiles is then concluded by the sequential
- two calls to 
-\family typewriter
-subroutine PROFUV
-\family default
- (sec.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:PROFUV"
-
-\end_inset
-
-).
- After these calls the computation of the physical state variables closes
- with the application of the 
-\begin_inset CommandInset citation
-LatexCommand citet
-key "Asselin72"
-literal "true"
-
-\end_inset
-
- filter (eq.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "eq:Asselin"
-
-\end_inset
-
-) and with the restoration of the time sequence for all the physical variables.
- Below it is shown the time sequence restoration for the temperature state,
- being identical for all the other state variables.
-\end_layout
-
-\begin_layout Standard
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset listings
-lstparams "basicstyle={\tiny\ttfamily}"
-inline false
-status open
-
-\begin_layout Plain Layout
-
-! 
-\end_layout
-
-\begin_layout Plain Layout
-
-!     -----RESTORE TIME SEQUENCE----- 
-\end_layout
-
-\begin_layout Plain Layout
-
-!
-\end_layout
-
-\begin_layout Plain Layout
-
-      TB(:) = T(:)
-\end_layout
-
-\begin_layout Plain Layout
-
-      T(:)  = TF(:)
-\end_layout
-
-\begin_layout Plain Layout
-
-!
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-Density is updated trough a call to 
-\family typewriter
-subroutine DENS
-\family default
- (sec.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:DENS"
-
-\end_inset
-
-).
-\end_layout
-
-\begin_layout Standard
-The call to the 
-\family typewriter
-subroutine Pom_bfm_1d
-\family default
- (sec.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:pom_bfm_1d"
-
-\end_inset
-
-) executes BFM, as well as the physical biological coupling and the SoS
- time integration of the BFM prognostic variables.
- This last call conclude the sequence of operations contained in the time
- marching loop, and the cycle starts anew.
- However, at a 
-\family typewriter
-savef 
-\family default
-frequency (see sec.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:moduleService"
-
-\end_inset
-
-) the routine handling the output writing is called (
-\family typewriter
-subroutine pom_dia_bfm_id, 
-\family default
-sec.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:pom_dia_bfm"
-
-\end_inset
-
-).
-\end_layout
-
-\begin_layout Section
-The BFM-POM1D subroutines
-\begin_inset CommandInset label
-LatexCommand label
-name "sec:BFM-POM1D-subroutines"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-This section describes in detail all the subroutines and modules of the
- BFM-POM1D modeling system.
- as listed in Tab.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "tab:CodesLIsting-1"
-
-\end_inset
-
-.
- The subroutines are alphabetically ordered.
-\end_layout
-
 \begin_layout Subsection
-
+Module Forcing 
 \family typewriter
-Subroutine adverte
-\family default
- 
-\family typewriter
-($BFMDIR/src/POM/phys/vdiff_SOS.F90)
-\begin_inset CommandInset label
-LatexCommand label
-name "subsec:adverte"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-This subroutine is called by subroutine 
-\family typewriter
-vdiff_SOS 
-\family default
-(sec.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:vdiff_SOS"
-
-\end_inset
-
-) and compute the sinking rate of change for the BFM particulate pelagic
- state variables (phytoplankton and particulate organic matter) that are
- subject to downward vertical advection (the second term in the left hand
- side of eq.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "eq:GeneqBFM"
-
-\end_inset
-
-):
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset Formula 
-\begin{equation}
-\frac{\partial C_{p}}{\partial t}\mid^{sinking}=\frac{\partial w_{s}C_{p}}{\partial z}\label{eq:sinking}
-\end{equation}
-
-\end_inset
-
-
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The subroutine dummy arguments are:
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-F
-\family default
-: The sinking BFM state variable
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-FDWDT:
-\family default
- The output sinking flux
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-W
-\family default
-: The sinking velocity
-\end_layout
-
-\begin_layout Standard
-The discrete form of eq.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "eq:sinking"
-
-\end_inset
-
- corresponds to the first term in the left hand side of eq.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "eq:explicitLF-sink"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The surface and bottom boundary conditions are eqs.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "eq:WSBC"
-
-\end_inset
-
- and 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "eq:WBBC"
-
-\end_inset
-
- respectively.
- The phytoplankton sinking velocity is time and space varying and is computed
- in the BFM subroutine handling the phytoplankton dynamics (
-\family typewriter
-subroutine PhytoDynamics
-\family default
-; see 
-\begin_inset CommandInset citation
-LatexCommand citealp
-key "BFM-manual"
-literal "true"
-
-\end_inset
-
-).
- The particulate detritus constant sinking velocity is user defined trough
- the variable 
-\family typewriter
-p_rR6m
-\family default
-, whose value is set trough the BFM 
-\family typewriter
-namelist PelGlobal_parameters
-\family default
-.
- The burial velocity 
-\begin_inset Formula $w_{b}$
-\end_inset
-
- of eq.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "eq:WBBC"
-
-\end_inset
-
- for phytoplankton and particulate detritus are defined by the value of
- the variables 
-\family typewriter
-p_burvel_PI
-\family default
- (phytoplankton) and 
-\family typewriter
-p_burvel_R6
-\family default
- (particulate detritus) that can be set by the user in the BFM 
-\family typewriter
-namelist Settling_parameters.
-\end_layout
-
-\begin_layout Standard
-The particulate material exiting the lower water column trough the water
- sediment interface flux 
-\begin_inset Formula $\left(w_{b}C_{p}\right)_{z=-H}$
-\end_inset
-
- enters the benthic compartment trough eq.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "eq:burial flux"
-
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Standard
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Subsection
-
-\family typewriter
-Subroutine CALCDEPTH
-\family default
- 
-\family typewriter
-($BFMDIR/src/POM/phys/calcdepth.F90)
-\begin_inset CommandInset label
-LatexCommand label
-name "subsec:CALCDEPTH"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-This subroutine established the vertical coordinate system (sec.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:The-vertical-coordinate-1-1"
-
-\end_inset
-
-).
- The subroutine is called only once, when setting up the model, at the start
- of the 
-\family typewriter
-main
-\family default
- program (sec.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:program-MAIN"
-
-\end_inset
-
-) Subroutine input (
-\family typewriter
-KB, KL1, KL2
-\family default
-) and output (
-\family typewriter
-Z, ZZ, DZ, DZZ
-\family default
-), are handled by the 
-\family typewriter
-module POM
-\family default
- (sec.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:modulePOM"
-
-\end_inset
-
-).
-\end_layout
-
-\begin_layout Subsection
-
-\family typewriter
-Subroutine DENS 
-\family default
-(
-\family typewriter
-$BFMDIR/src/POM/phys/dens.F90)
-\begin_inset CommandInset label
-LatexCommand label
-name "subsec:DENS"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The subroutine compute the 
-\begin_inset Quotes eld
-\end_inset
-
-in situ
-\begin_inset Quotes erd
-\end_inset
-
- density using the 
-\begin_inset CommandInset citation
-LatexCommand citet
-key "UNESCO81"
-literal "true"
-
-\end_inset
-
- equation of state, as adapted by 
-\begin_inset CommandInset citation
-LatexCommand citet
-key "Mellor91"
-literal "true"
-
-\end_inset
-
-.
- The 
-\begin_inset Quotes eld
-\end_inset
-
-in situ
-\begin_inset Quotes erd
-\end_inset
-
- density is determined as a function of salinity, potential temperature
- and pressure; the latter is approximated by the hydrostatic relation and
- constant density.
- The actual density is normalized on 
-\begin_inset Formula $10^{3}kg/m^{3}$
-\end_inset
-
-.
- Since in 
-\family typewriter
-subroutine PROFQ
-\family default
- (sec.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:PROFQ"
-
-\end_inset
-
-) only gradients are needed, the density value used is 
-\family typewriter
-
-\begin_inset Formula $RHO=(\rho-\rho_{0})10^{-3}$
-\end_inset
-
-
-\family default
- in order to reduce round-off error.
- Subroutine input 
-\family typewriter
-(T, S, ZZ, H, RHO0) 
-\family default
-and output (
-\family typewriter
-RHO
-\family default
-) are handled by 
-\family typewriter
-module POM
-\family default
-.
- (sec 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:modulePOM"
-
-\end_inset
-
-).
- 
-\end_layout
-
-\begin_layout Subsection
-
-\family typewriter
-Subroutine env_forcing_pom_bfm_1d 
-\family default
-(
-\family typewriter
-$BFMDIR/src/POM/coupling/env_forcing_pom_bfm_1d .F90)
-\begin_inset CommandInset label
-LatexCommand label
-name "subsec:env_forcing_pom_bfm_1"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-This subroutine is called from 
-\family typewriter
-subroutine pom_bfm_1d
-\family default
- (sec.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:pom_bfm_1d"
-
-\end_inset
-
-) and handles the calling of all the subroutines that provides BFM with
- all the needed information about the physical environment: 
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-subroutine pom_to_bfm
-\family default
- (sec.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:pom_to_bfm"
-
-\end_inset
-
-): Transfers the POM1D state variables into the correspondent BFM's.
- 
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-subroutine CalcVerticalExtinction
-\family default
- .
- It is a BFM subroutine, see 
-\begin_inset CommandInset citation
-LatexCommand citet
-key "BFM-manual"
-literal "true"
-
-\end_inset
-
-.
- Computes the 
-\begin_inset Formula $z$
-\end_inset
-
- dependent light vertical extinction coefficients.
- 
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-subroutine CalcLightDistribution.
-
-\family default
- It is a BFM subroutine, see 
-\begin_inset CommandInset citation
-LatexCommand citet
-key "BFM-manual"
-literal "true"
-
-\end_inset
-
-.
- It defines the irradiance vertical profile.
-\end_layout
-
-\begin_layout Subsection
-
-\family typewriter
-Module Forcing ($BFMDIR/src/POM/coupling/ModuleForcing.F90
+(coupling/ModuleForcing.F90
 \family default
 )
 \begin_inset CommandInset label
@@ -9248,9 +7842,9 @@ name "subsec:Module-Forcing"
 This module contains all the definitions of arrays and scalars needed to
  read (and prepare for the time linear interpolation) the data needed to
  define the physical and biogeochemical model forcing.
- The module contains also the 
+ The module contains also the subroutine
 \family typewriter
-subroutine FORCING_MANAGER
+ FORCING_MANAGER
 \family default
  (sec 
 \begin_inset CommandInset ref
@@ -9577,14 +8171,493 @@ WSV#
  These data are used in both modes.
 \end_layout
 
+\begin_layout Section
+Subroutines for physics and coupling
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:BFM-POM1D-subroutines"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This section describes in detail all the subroutines and modules of the
+ BFM-POM1D modeling system.
+ as listed in Tab.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "tab:CodesLIsting-1"
+
+\end_inset
+
+.
+ The subroutines are alphabetically ordered.
+\end_layout
+
 \begin_layout Subsection
+ADVERTE 
+\family typewriter
+(phys/vdiff_SOS.F90)
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:adverte"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This subroutine is called by subroutine 
+\family typewriter
+vdiff_SOS 
+\family default
+(sec.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:vdiff_SOS"
+
+\end_inset
+
+) and compute the sinking rate of change for the BFM particulate pelagic
+ state variables (phytoplankton and particulate organic matter) that are
+ subject to downward vertical advection (the second term in the left hand
+ side of eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:GeneqBFM"
+
+\end_inset
+
+):
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial C_{p}}{\partial t}\mid^{sinking}=\frac{\partial w_{s}C_{p}}{\partial z}\label{eq:sinking}
+\end{equation}
+
+\end_inset
+
+
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The subroutine dummy arguments are:
+\end_layout
+
+\begin_layout Standard
 
 \family typewriter
-Subroutine FORCING_MANAGER 
+F
+\family default
+: The sinking BFM state variable
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+FDWDT:
+\family default
+ The output sinking flux
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+W
+\family default
+: The sinking velocity
+\end_layout
+
+\begin_layout Standard
+The discrete form of eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:sinking"
+
+\end_inset
+
+ corresponds to the first term in the left hand side of eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:explicitLF-sink"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The surface and bottom boundary conditions are eqs.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:WSBC"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:WBBC"
+
+\end_inset
+
+ respectively.
+ The phytoplankton sinking velocity is time and space varying and is computed
+ in the BFM subroutine handling the phytoplankton dynamics (subroutine
+\family typewriter
+ PhytoDynamics
+\family default
+; see 
+\begin_inset CommandInset citation
+LatexCommand citealp
+key "BFM-manual"
+literal "true"
+
+\end_inset
+
+).
+ The particulate detritus constant sinking velocity is user defined trough
+ the variable 
+\family typewriter
+p_rR6m
+\family default
+, whose value is set trough the BFM namelist
+\family typewriter
+ PelGlobal_parameters
+\family default
+.
+ The burial velocity 
+\begin_inset Formula $w_{b}$
+\end_inset
+
+ of eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:WBBC"
+
+\end_inset
+
+ for phytoplankton and particulate detritus are defined by the value of
+ the variables 
+\family typewriter
+p_burvel_PI
+\family default
+ (phytoplankton) and 
+\family typewriter
+p_burvel_R6
+\family default
+ (particulate detritus) that can be set by the user in the BFM namelist
+\family typewriter
+ Settling_parameters.
+\end_layout
+
+\begin_layout Standard
+The particulate material exiting the lower water column trough the water
+ sediment interface flux 
+\begin_inset Formula $\left(w_{b}C_{p}\right)_{z=-H}$
+\end_inset
+
+ enters the benthic compartment trough eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:burial flux"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace defskip
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+CALCDEPTH 
+\family typewriter
+(phys/calcdepth.F90)
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:CALCDEPTH"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This subroutine established the vertical coordinate system (sec.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:The-vertical-coordinate-1-1"
+
+\end_inset
+
+).
+ The subroutine is called only once, when setting up the model, at the start
+ of the 
+\family typewriter
+main
+\family default
+ program (sec.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:program-MAIN"
+
+\end_inset
+
+) Subroutine input (
+\family typewriter
+KB, KL1, KL2
+\family default
+) and output (
+\family typewriter
+Z, ZZ, DZ, DZZ
+\family default
+), are handled by the module
+\family typewriter
+ POM
+\family default
+ (sec.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:modulePOM"
+
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Subsection
+DENS
+\family typewriter
+ 
 \family default
 (
 \family typewriter
-$BFMDIR/src/POM/coupling/ModuleForcing.F90
+phys/dens.F90)
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:DENS"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The subroutine compute the 
+\begin_inset Quotes eld
+\end_inset
+
+in situ
+\begin_inset Quotes erd
+\end_inset
+
+ density using the 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "UNESCO81"
+literal "true"
+
+\end_inset
+
+ equation of state, as adapted by 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "Mellor91"
+literal "true"
+
+\end_inset
+
+.
+ The 
+\begin_inset Quotes eld
+\end_inset
+
+in situ
+\begin_inset Quotes erd
+\end_inset
+
+ density is determined as a function of salinity, potential temperature
+ and pressure; the latter is approximated by the hydrostatic relation and
+ constant density.
+ The actual density is normalized on 
+\begin_inset Formula $10^{3}kg/m^{3}$
+\end_inset
+
+.
+ Since in subroutine 
+\family typewriter
+PROFQ
+\family default
+ (sec.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:PROFQ"
+
+\end_inset
+
+) only gradients are needed, the density value used is 
+\family typewriter
+
+\begin_inset Formula $RHO=(\rho-\rho_{0})10^{-3}$
+\end_inset
+
+
+\family default
+ in order to reduce round-off error.
+ Subroutine input 
+\family typewriter
+(T, S, ZZ, H, RHO0) 
+\family default
+and output (
+\family typewriter
+RHO
+\family default
+) are handled by module
+\family typewriter
+ POM
+\family default
+.
+ (sec 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:modulePOM"
+
+\end_inset
+
+).
+ 
+\end_layout
+
+\begin_layout Subsection
+env_forcing_pom_bfm_1d
+\family typewriter
+ 
+\family default
+(
+\family typewriter
+coupling/env_forcing_pom_bfm_1d .F90)
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:env_forcing_pom_bfm_1"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This subroutine is called from 
+\family typewriter
+subroutine pom_bfm_1d
+\family default
+ (sec.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:pom_bfm_1d"
+
+\end_inset
+
+) and handles the calling of all the subroutines that provides BFM with
+ all the needed information about the physical environment: 
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+subroutine pom_to_bfm
+\family default
+ (sec.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:pom_to_bfm"
+
+\end_inset
+
+): Transfers the POM1D state variables into the correspondent BFM's.
+ 
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+subroutine CalcVerticalExtinction
+\family default
+ .
+ It is a BFM subroutine, see 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "BFM-manual"
+literal "true"
+
+\end_inset
+
+.
+ Computes the 
+\begin_inset Formula $z$
+\end_inset
+
+ dependent light vertical extinction coefficients.
+ 
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+subroutine CalcLightDistribution.
+
+\family default
+ It is a BFM subroutine, see 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "BFM-manual"
+literal "true"
+
+\end_inset
+
+.
+ It defines the irradiance vertical profile.
+\end_layout
+
+\begin_layout Subsection
+FORCING_MANAGER
+\family typewriter
+ 
+\family default
+(
+\family typewriter
+coupling/ModuleForcing.F90
 \family default
 )
 \begin_inset CommandInset label
@@ -9614,9 +8687,9 @@ reference "sec:program-MAIN"
  year monthly forcing time series.
  A more general version has to be provided.
  The data currently handled are time series of monthly averaged data (see
- the description of 
+ the description of subroutine
 \family typewriter
-subroutine opendat,
+ opendat,
 \family default
  sec.
  
@@ -10914,13 +9987,13 @@ status open
 \end_layout
 
 \begin_layout Subsection
-
+get_rst
 \family typewriter
-Subroutine get_rst 
+ 
 \family default
 (
 \family typewriter
-$BFMDIR/src/POM/coupling/get_rst.F90
+coupling/get_rst.F90
 \family default
 )
 \begin_inset CommandInset label
@@ -10982,19 +10055,19 @@ reference "sec:program-MAIN"
 
 ).
  Possible problems with the namelist opening and reading are flagged by
- a printed message operated by the BFM 
+ a printed message operated by the BFM subroutine
 \family typewriter
-subroutine error_msg_prn.
+ error_msg_prn.
 \end_layout
 
 \begin_layout Subsection
-
+get_TS_IC
 \family typewriter
-Subroutine Routine get_TS_IC 
+ 
 \family default
 (
 \family typewriter
-$BFMDIR/src/POM/coupling/get_TS_IC.F90
+coupling/get_TS_IC.F90
 \family default
 )
 \begin_inset CommandInset label
@@ -11045,9 +10118,9 @@ cold
 \end_inset
 
 start.
- As for 
+ As for subroutine
 \family typewriter
-subroutine get_rst
+ get_rst
 \family default
  (sec.
  
@@ -11142,13 +10215,13 @@ subroutine error_msg_prn.
 \end_layout
 
 \begin_layout Subsection
-
+LF1D
 \family typewriter
-Subroutine LF1D 
+ 
 \family default
 (
 \family typewriter
-$BFMDIR/src/POM/coupling/LF1D.F90
+coupling/LF1D.F90
 \family default
 )
 \begin_inset CommandInset label
@@ -11161,15 +10234,18 @@ name "subsec; LF1D"
 \end_layout
 
 \begin_layout Standard
-This subroutine is called by 
+This subroutine is called by subroutine
 \family typewriter
-subroutine pom_bfm_1d
+ pom_bfm_1d
 \family default
  (sec.
  
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec; LF1D"
+reference "subsec:pom_bfm_1d"
+plural "false"
+caps "false"
+noprefix "false"
 
 \end_inset
 
@@ -11394,9 +10470,9 @@ status open
 \end_layout
 
 \begin_layout Subsection
-Subroutine opendat (
+opendat (
 \family typewriter
-$BFMDIR/src/POM/phys/opendat.F90
+phys/opendat.F90
 \family default
 )
 \begin_inset CommandInset label
@@ -11445,11 +10521,8 @@ literal "true"
  access mode.
  Oviously this is not mandatory.
  The structure of the input data file is open to user defined changes.
- Users must, however, make sure that the reading of the data in 
-\family typewriter
-subroutine
-\family default
-s 
+ Users must, however, make sure that the reading of the data in subroutines
+ 
 \family typewriter
 FORCING_MANAGER (
 \family default
@@ -11511,9 +10584,9 @@ statement.
 \end_layout
 
 \begin_layout Subsection
-Subroutine pom_bfm_1d (
+pom_bfm_1d (
 \family typewriter
-$BFMDIR/src/POM/coupling/pom_bfm_1d.F90
+coupling/pom_bfm_1d.F90
 \family default
 )
 \begin_inset CommandInset label
@@ -11538,9 +10611,9 @@ program main
 
 \begin_layout Standard
 The passage, from POM1D to BFM, of the information about the physical environmen
-t (
+t (subroutine
 \family typewriter
-subroutine env_forcing_pom_bfm_1d
+ env_forcing_pom_bfm_1d
 \family default
 , sec.
  
@@ -11576,9 +10649,9 @@ literal "true"
 The computation of the physics dependent (vertical diffusion and sinking)
  rate of change for the BFM state variables, and the forward in time integration
  of the pelagic BFM state Variables, with source splitting coupling method
- and leapfrog numerical scheme (
+ and leapfrog numerical scheme (subroutine
 \family typewriter
-subroutine vdiff_SOS
+ vdiff_SOS
 \family default
 , sec.
  
@@ -11593,9 +10666,9 @@ reference "subsec:vdiff_SOS"
 
 \begin_layout Standard
 The forward in time integration of the benthic state variables with a leapfrog
- numerical scheme (
+ numerical scheme (subroutine
 \family typewriter
-subroutine LF1D
+ LF1D
 \family default
 .
  see sec.
@@ -11610,9 +10683,9 @@ reference "subsec; LF1D"
 \end_layout
 
 \begin_layout Standard
-The handling of the model output (
+The handling of the model output (subroutine
 \family typewriter
-subroutine pom_dia_bfm
+ pom_dia_bfm
 \family default
 ., sec.
  
@@ -11627,9 +10700,9 @@ reference "subsec:pom_dia_bfm"
 
 \begin_layout Standard
 The resetting of the BFM state variables trend arrays at the end of each
- time iteration (BFM 
+ time iteration (BFM subroutine
 \family typewriter
-subroutine ResetFluxes.
+ ResetFluxes.
 
 \family default
  
@@ -11644,9 +10717,9 @@ literal "true"
 \end_layout
 
 \begin_layout Standard
-Before the handling of the model output (call to 
+Before the handling of the model output (call to subroutine
 \family typewriter
-subroutine pom_dia_bfm
+ pom_dia_bfm
 \family default
 ) the local variable 
 \family typewriter
@@ -11793,9 +10866,9 @@ status open
 TT
 \family default
  records the time (in days) ellapsed between two adjacent output writings.
- It is passed as dummy argument to 
+ It is passed as dummy argument to subroutine 
 \family typewriter
-subroutine pom_dia_bfm
+pom_dia_bfm
 \family default
  (sec.
  
@@ -11813,9 +10886,9 @@ TT=savef+(DTI/SEC_IN_DAY
 \end_layout
 
 \begin_layout Subsection
-Subroutine pom_dia_bfm 
+pom_dia_bfm 
 \family typewriter
-($BFMDIR/src/POM/coupling/pom_dia_bfm_1d.F90
+(coupling/pom_dia_bfm_1d.F90
 \family default
 )
 \begin_inset CommandInset label
@@ -11828,9 +10901,9 @@ name "subsec:pom_dia_bfm"
 \end_layout
 
 \begin_layout Standard
-This subroutine is called by 
+This subroutine is called by subroutine 
 \family typewriter
-subroutine pom_bfm_1d
+pom_bfm_1d
 \family default
  (sec.
  
@@ -11881,11 +10954,7 @@ reference "subsec:pom_bfm_1d"
 \end_inset
 
 ).
- The subroutines calls the BFM 
-\family typewriter
-subroutine
-\family default
- 
+ The subroutines calls the BFM subroutine 
 \family typewriter
 calcmean_bfm
 \family default
@@ -11901,9 +10970,9 @@ literal "true"
 \end_layout
 
 \begin_layout Subsection
-Subroutine pom_ini_BFM 
+pom_ini_BFM 
 \family typewriter
-($BFMDIR/src/POM/coupling/pom_ini_bfm_1d.F90
+(coupling/pom_ini_bfm_1d.F90
 \family default
 )
 \begin_inset CommandInset label
@@ -12157,11 +11226,7 @@ literal "true"
 
 \end_inset
 
-) 
-\family typewriter
-subroutine
-\family default
-s 
+) subroutines 
 \family typewriter
 set_var_info_bfm
 \family default
@@ -12178,11 +11243,7 @@ init_netcdf_bfm
 \end_layout
 
 \begin_layout Standard
-The BFM 
-\family typewriter
-namelist
-\family default
- 
+The BFM namelist 
 \family typewriter
 bfm_general 
 \family default
@@ -12194,18 +11255,18 @@ literal "true"
 
 \end_inset
 
-) is read by the BFM 
+) is read by the BFM subroutine 
 \family typewriter
-subroutine init_bfm
+init_bfm
 \family default
  that also write information about the setup in the simulation logfile.
  
 \end_layout
 
 \begin_layout Standard
-The 
+The namelist
 \family typewriter
-namelist bfm_general
+ bfm_general
 \family default
  contains also the variable 
 \family typewriter
@@ -12459,9 +11520,9 @@ status open
 
 \begin_layout Standard
 and then the output averaging and writing procedure is initialised trough
- a call to BFM 
+ a call to BFM subroutine 
 \family typewriter
-subroutine calcmean
+calcmean
 \family default
 .
  
@@ -12479,9 +11540,9 @@ literal "true"
 
 \end_inset
 
-) 
+) subroutine
 \family typewriter
-subroutine init_var_bfm
+ init_var_bfm
 \family default
 , where the BFM state variables are initialised at a spatially constant
  value.
@@ -12796,11 +11857,7 @@ Finally, the restart file is initialised and read based on the value of
 \family typewriter
 bfm_init (
 \family default
-calls to the BFM 
-\family typewriter
-subroutine
-\family default
-s
+calls to the BFM subroutines
 \family typewriter
  init_netcdf_rst_bfm 
 \family default
@@ -12810,9 +11867,9 @@ and
 \end_layout
 
 \begin_layout Subsection
-Subroutine pom_to_bfm 
+pom_to_bfm 
 \family typewriter
-($BFMDIR/src/POM/phys/pom_to_bfm.F90
+(phys/pom_to_bfm.F90
 \family default
 )
 \begin_inset CommandInset label
@@ -13450,9 +12507,9 @@ name "tab:Array-to-array"
 \end_layout
 
 \begin_layout Subsection
-Subroutine PROFQ 
+PROFQ 
 \family typewriter
-($BFMDIR/src/POM/phys/profq1D.F90
+(phys/profq1D.F90
 \family default
 )
 \begin_inset Foot
@@ -13502,11 +12559,7 @@ program main
 DTI
 \family default
 .
- The other necessary input and the model output is managed trough
-\family typewriter
- module
-\family default
-s.
+ The other necessary input and the model output is managed trough modules.
 \end_layout
 
 \begin_layout Standard
@@ -13541,9 +12594,9 @@ reference "eq:implicitLF"
 
 \end_inset
 
-) The numerical procedure is the same described for 
+) The numerical procedure is the same described for subroutine 
 \family typewriter
-subroutine PROFTS
+PROFTS
 \family default
  (sec.
  
@@ -13744,9 +12797,9 @@ reference "subsec:DENS"
 \end_layout
 
 \begin_layout Subsection
-Subroutine PROFTS 
+PROFTS 
 \family typewriter
-($BFMDIR/src/POM/phys/profts.F90)
+(phys/profts.F90)
 \begin_inset Foot
 status open
 
@@ -15089,9 +14142,9 @@ reference "eq:OSurflux"
 
 \end_inset
 
-) is computed in 
+) is computed in subroutine
 \family typewriter
-subroutine vdiff_SOS
+ vdiff_SOS
 \family default
  (sec.
  
@@ -15371,9 +14424,9 @@ T_{n+1}^{km-\frac{1}{2}}=\frac{c^{km}-VHP^{km-1}-\widetilde{T}_{n+1}^{km-\frac{1
 \end_layout
 
 \begin_layout Subsection
-Subroutine PROFUV 
+PROFUV 
 \family typewriter
-($BFMDIR/src/POM/phys/profuv.F90)
+(phys/profuv.F90)
 \begin_inset CommandInset label
 LatexCommand label
 name "subsec:PROFUV"
@@ -15398,9 +14451,9 @@ reference "sec:program-MAIN"
 
 ) and computes the vertical profiles of the velocity (zonal and meridional)
  components.
- The solution method applied is the one described for 
+ The solution method applied is the one described for subroutine
 \family typewriter
-subroutine PROFTS
+ PROFTS
 \family default
  (sec.
  
@@ -15465,9 +14518,9 @@ BSTRESS
 \end_layout
 
 \begin_layout Subsection
-Subroutine restart_BFM_inPOM 
+restart_BFM_inPOM 
 \family typewriter
-($BFMDIR/src/POM/coupling/restart_BFM_inPOM.F90)
+(coupling/restart_BFM_inPOM.F90)
 \end_layout
 
 \begin_layout Standard
@@ -15485,9 +14538,9 @@ reference "sec:program-MAIN"
 
 ) after the completion of the time marching loop.
  It handles the writing of the restart file for the BFM.
- The routine simply calls the BFM 
+ The routine simply calls the BFM subroutine
 \family typewriter
-subroutine save_rst_bfm
+ save_rst_bfm
 \family default
  (see 
 \begin_inset CommandInset citation
@@ -15562,9 +14615,9 @@ status open
 \end_layout
 
 \begin_layout Subsection
-Subroutine set_initial_conditions 
+set_initial_conditions 
 \family typewriter
-($BFMDIR/src/POM/coupling/set_initial conditions.F90)
+(coupling/set_initial_conditions.F90)
 \begin_inset CommandInset label
 LatexCommand label
 name "subsec:Subroutine-set_initial_condition"
@@ -15575,9 +14628,9 @@ name "subsec:Subroutine-set_initial_condition"
 \end_layout
 
 \begin_layout Standard
-This routine (called by 
+This routine (called by subroutine
 \family typewriter
-subroutine pom_ini_BFM,
+ pom_ini_BFM,
 \family default
  sec 
 \begin_inset CommandInset ref
@@ -15674,9 +14727,9 @@ literal "true"
 \end_layout
 
 \begin_layout Subsection
-Subroutine vdiff_SOS 
+vdiff_SOS 
 \family typewriter
-($BFMDIR/src/POM/coupling/vdiff_SOS.F90)
+(coupling/vdiff_SOS.F90)
 \begin_inset CommandInset label
 LatexCommand label
 name "subsec:vdiff_SOS"
@@ -16606,479 +15659,477 @@ status open
 
 \end_layout
 
-\begin_layout Chapter
-Installation, configuration and compilation
-\end_layout
-
 \begin_layout Section
-Installation
+BFM-POM1D setup and control namelists 
 \begin_inset CommandInset label
 LatexCommand label
-name "sec:Installation"
+name "sec:pom_bfm_settings-namelist"
 
 \end_inset
 
+
+\end_layout
+
+\begin_layout Standard
+The 
+\family typewriter
+pom_bfm_settings.nml
+\family default
+ file is a container for the two main namelists that control the BFM-POM1D
+ setup (
+\family typewriter
+Params_POMBFM
+\family default
+) and initial conditions and external forcings (
+\family typewriter
+pom_input
+\family default
+).
+\end_layout
+
+\begin_layout Standard
+The namelist 
+\family typewriter
+Params_POMBFM
+\family default
+ is read in the 
+\family typewriter
+MAIN
+\family default
+ program and provides all the values for the variables that define the code
+ setup and control.
+ All of them are stored into 
+\family typewriter
+module POM
+\family default
+ (sec.
  
-\end_layout
-
-\begin_layout Standard
-Both the BFM and POM1D can be downloaded from the BFM distribution sites.
- In the following, it is assumed that the main code of the coupled system
- is found in 
-\family typewriter
-$BFMDIR/src/pom, the
-\family default
- BFM code is found in 
-\family typewriter
-$BFMDIR/src/bfm
-\family default
-, the POM1D code is found in 
-\family typewriter
-$BFMDIR/src/pom/phys
-\family default
- and the code coupling the two systems is found in BFM in 
-\family typewriter
-$BFMDIR/src/pom
-\family default
-/
-\family typewriter
-coupling
-\family default
-.
-\end_layout
-
-\begin_layout Standard
-The default basic configuration of BFM-POM1D can be found in 
-\family typewriter
-${BFMDIR}/build/configurations/BFM_POM
-\family default
- .
-\end_layout
-
-\begin_layout Standard
-In order to successfully install the BFM-POM1D System, the user must initially
- instally the BFM STANDALONE model as described in sections 4.1 of 
-\begin_inset CommandInset citation
-LatexCommand citet
-key "BFM-manual"
-literal "true"
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:modulePOM"
 
 \end_inset
 
-.
-\end_layout
-
-\begin_layout Standard
-The BFM version effectively coupled (and tested) with the one dimensional
- POM version is version 5.1.
-\end_layout
-
-\begin_layout Standard
-The BFM source code version 5.1 has to be downloaded from the BFM web site
- or trough the git repository.
- In the example below it is assumed that the tarball has been downloaded.
- The downloaded file may have a different name based on the version.
- As a final step create the required basic environmental variables pointing
- at the root directories as: 
-\end_layout
-
-\begin_layout Standard
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-
+) or module 
 \family typewriter
-\size tiny
-% mkdir $HOME/BFM 
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-\size tiny
-% cd $HOME/BFM 
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-\size tiny
-% gunzip bfm-release-<??????>.tgz 
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-\size tiny
-% tar xvf bfm-release-<??????>.tar 
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-\size tiny
-% export BFMDIR=$HOME/BFM 
-\end_layout
-
-\begin_layout Standard
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Section
-Configuration
-\begin_inset CommandInset label
-LatexCommand label
-name "sec:Configuration"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-Configuration and deployment of the model is done automatically by the script
+service
+\family default
+ (sec.
  
-\emph on
-bfm_configure.sh
-\emph default
- (see the BFM manual for more information or simply run 
-\family typewriter
-\emph on
-./bfm_configure.sh -h
-\family default
-\emph default
-), located in 
-\shape italic
-${BFMDIR}/build
-\shape default
-/.
-\end_layout
-
-\begin_layout Standard
-An experiment is defined by a model layout structure, namelists, and initial
- input values (see section 4.2 in 
-\begin_inset CommandInset citation
-LatexCommand citet
-key "BFM-manual"
-literal "true"
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:moduleService"
 
 \end_inset
 
 ).
- These definitions put together with compilation and run options is what
- is called a 
-\series bold
-PRESET
-\series default
-.
+ Below the namelist set for the implementation used in Mussap et al.
  
-\end_layout
-
-\begin_layout Standard
-The default BFM_POM configuration is generated, compiled and deployed with
- the command: 
-\end_layout
-
-\begin_layout Standard
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-\emph on
-% cd $BFMDIR/build 
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-\emph on
-% ./bfm_configure.sh -gcd -a -p BFM_POM -m POM1D
-\end_layout
-
-\begin_layout Subsection
-The BFM-POM1D preset
-\end_layout
-
-\begin_layout Standard
-The BFM-POM1D preset is contained in the directory 
-\shape italic
-${BFMDIR}/build/configurations/
-\shape default
-BFM_POM and it is all you need to create a particular experiment.
-\end_layout
-
-\begin_layout Standard
-The BFM-POM1D preset directory contains the following files:
-\end_layout
-
-\begin_layout Standard
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Subsubsection*
-
-\family typewriter
-Configuration
-\family default
-: compilation deployement options 
-\end_layout
-
-\begin_layout Standard
-Below the content of the 
-\family typewriter
-configuration
-\family default
- namelist is shown:
-\end_layout
-
-\begin_layout Standard
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-\size tiny
-&BFM_conf
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-\size tiny
-        MODE    = 'POM1D',
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-\size tiny
-        CPPDEFS = 'BFM_STANDALONE
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-\size tiny
-                   INCLUDE_PELCO2
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-\size tiny
-INCLUDE_DIAG
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-\size tiny
-                   INCLUDE_BEN 
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-\size tiny
-                   INCLUDE_BENCO2
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-\size tiny
-                   BFM_POM
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-\size tiny
-                   BFM_NOPOINTERS',
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-\size tiny
-        ARCH    = 'gfortran.inc',
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-\size tiny
-PROC    = 1,
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-\size tiny
-        EXP     = 'pom_bfm_1d',
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-\size tiny
-BFMEXE  = 'pom.exe'
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-\size tiny
-/
-\end_layout
-
-\begin_layout Standard
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-where:
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-MODE = 'POM1D'
-\family default
- indicates that the BFM core is compiled for an execution coupled with POM1D.
- withe pre-compilerr macros.
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-CPPDEFS
-\family default
-=
-\family typewriter
-'BFM_STANDALONE INCLUDE_PELCO2 INCLUDE_DIAG INCLUDE_BEN INCLUDE_BENCO2 BFM_POM
- BFM_NOPOINTERS
-\family default
-', state the inclusion of the BFM model, (
-\family typewriter
-BFM_STANDALONE
-\family default
-), the inclusion in the simulation of the 
-\begin_inset Formula $CO_{2}$
-\end_inset
-
- dynamics in the pelagic (
-\family typewriter
-INCLUDE_PELCO2
-\family default
-) and in the benthic (
-\family typewriter
-INCLUDE_BENCO2
-\family default
-) domains (within the limitations imposed by the use of the simple benthic
- closure), the no use of pointers (
-\family typewriter
-BFM_NOPOINTER
-\family default
-S) and the possibility to store diagnostic output (
-\family typewriter
-INCLUDE_DIAG
-\family default
-).
- 
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-ARCH
-\family default
-    = 'gfortran.inc' indicate the use of a 
-\family typewriter
-GFORTRAN
-\family default
- compiler.
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-PROC=4
-\family default
- indicate the use of 4 processors for a run utilising a parallel computer.
- However, the lack of the 
-\family typewriter
-CPPDEFS 
-\family default
-key 
-\family typewriter
-BFM_PARALLEL
-\family default
- makes this statement unuseful, since the run will be carried out using
- a single processor (the limited run time for a 1D simulation allow this
- simple computational configuration).
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-EXP
-\family default
-= 'pom_bfm_1d' defines the experiment naming.
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-BFMEXE
-\family default
-  = 'pom.exe' defines the executable file naming.
-\end_layout
-
-\begin_layout Standard
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Subsubsection*
-
-\family typewriter
-Layout:
-\family default
- Memory layout configuration file
-\end_layout
-
-\begin_layout Standard
-This file contains the list of the BFM state variables.
- This is indepent from the coupled configuration and it is therefore fully
- described in the BFM manual 
 \begin_inset CommandInset citation
-LatexCommand citep
-key "BFM-manual"
+LatexCommand citeyearpar
+key "mussap1,mussap3"
+literal "true"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "mussap2"
+literal "true"
+
+\end_inset
+
+ is reported as an example.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=Fortran,basicstyle={\tiny\ttfamily}"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+! NAMELIST params_POMBFM
+\end_layout
+
+\begin_layout Plain Layout
+
+!
+\end_layout
+
+\begin_layout Plain Layout
+
+! H                    [m]       Depth 
+\end_layout
+
+\begin_layout Plain Layout
+
+! DTI                  [s]       Timestep 
+\end_layout
+
+\begin_layout Plain Layout
+
+! ALAT                 [degrees] Latitude 
+\end_layout
+
+\begin_layout Plain Layout
+
+! IDIAGN               [-]       1 = Diagnostic mode 
+\end_layout
+
+\begin_layout Plain Layout
+
+!                                0 = Prognostic mode            
+\end_layout
+
+\begin_layout Plain Layout
+
+! IDAYS                [d]       Length of run  
+\end_layout
+
+\begin_layout Plain Layout
+
+! SMOTH                [-]       Parameter for Hasselin filter  
+\end_layout
+
+\begin_layout Plain Layout
+
+! IHOTST               [-]       1 = Restart reading 
+\end_layout
+
+\begin_layout Plain Layout
+
+!                                0 = Cold start 
+\end_layout
+
+\begin_layout Plain Layout
+
+! KL1 & KL2            [-]       Establish Surface/bottom logarithmic layers
+ distribution 
+\end_layout
+
+\begin_layout Plain Layout
+
+!                      KL1: Surface logarithmic distribution.
+ The numers of layers is KL1-2 
+\end_layout
+
+\begin_layout Plain Layout
+
+!                      KL2: Bottom logarithic distribution.
+ The numers of layers is KB-KL2-1
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+! SAVEF                [hours]       Output averaging and Saving frequency
+ (days) 
+\end_layout
+
+\begin_layout Plain Layout
+
+! NRT                  [m/d]     Relaxation constant for nutrients at surface
+  
+\end_layout
+
+\begin_layout Plain Layout
+
+! NBCT, NBCS, NBCBFM   [-]       Define surface boundary conditions for
+ temperature, salinity & BFM tracers
+\end_layout
+
+\begin_layout Plain Layout
+
+!
+\end_layout
+
+\begin_layout Plain Layout
+
+! NBC = 1: Surf.
+ B.C.
+ is WFSURF.
+ no radiative penetration 
+\end_layout
+
+\begin_layout Plain Layout
+
+! NBC = 2; Surf.
+ B.C.
+ is WFSURF+SWRAD*(1.-TR).
+ with SWRAD*TR penetration      
+\end_layout
+
+\begin_layout Plain Layout
+
+! NBC = 3; Surf.
+ B.C.
+ is TSURF.
+ no SW radiative penetration
+\end_layout
+
+\begin_layout Plain Layout
+
+!  
+\end_layout
+
+\begin_layout Plain Layout
+
+! UMOL                 [m^2/s]   Background diffusion for momentum  
+\end_layout
+
+\begin_layout Plain Layout
+
+! UMOLT, UMOLS,UMOLBFM [m^2/s]   Background diffusion for T,S and BFM tracers
+  
+\end_layout
+
+\begin_layout Plain Layout
+
+! NTP                  [-]       Flag for Jerlov water type
+\end_layout
+
+\begin_layout Plain Layout
+
+!                      NTP =               1      2       3       4    
+   5               
+\end_layout
+
+\begin_layout Plain Layout
+
+!                      JERLOV TYPE   =     I      IA      IB      II   
+   III 
+\end_layout
+
+\begin_layout Plain Layout
+
+! TRT,SRT              [ ]        Relaxation time for t & S lateral advection
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+! upperh               [m]        Depth at which lateral advection starts
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+! SSRT                 [m/d]      Relaxation time for surface salinity flux
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+!  &Params_POMBFM  
+\end_layout
+
+\begin_layout Plain Layout
+
+H       =  16.,  
+\end_layout
+
+\begin_layout Plain Layout
+
+DTI     =  100.,  
+\end_layout
+
+\begin_layout Plain Layout
+
+ALAT    =  45.,  
+\end_layout
+
+\begin_layout Plain Layout
+
+IDIAGN  =  1,  
+\end_layout
+
+\begin_layout Plain Layout
+
+IDAYS   =  1800,  
+\end_layout
+
+\begin_layout Plain Layout
+
+SMOTH   =  0.1,  
+\end_layout
+
+\begin_layout Plain Layout
+
+IHOTST  =  0,  
+\end_layout
+
+\begin_layout Plain Layout
+
+KL1     =  7,  
+\end_layout
+
+\begin_layout Plain Layout
+
+KL2     =  25,  
+\end_layout
+
+\begin_layout Plain Layout
+
+SAVEF   =  1,  
+\end_layout
+
+\begin_layout Plain Layout
+
+NRT     =  0.2,  
+\end_layout
+
+\begin_layout Plain Layout
+
+NBCT    =  2,  
+\end_layout
+
+\begin_layout Plain Layout
+
+NBCS    =  1,  
+\end_layout
+
+\begin_layout Plain Layout
+
+NBCBFM  =  1,  
+\end_layout
+
+\begin_layout Plain Layout
+
+UMOL    =  2.e-5,  
+\end_layout
+
+\begin_layout Plain Layout
+
+UMOLT   =  1.e-5,  
+\end_layout
+
+\begin_layout Plain Layout
+
+UMOLS   =  1.3e-6,  
+\end_layout
+
+\begin_layout Plain Layout
+
+UMOLBFM =  2.e-5,  
+\end_layout
+
+\begin_layout Plain Layout
+
+NTP     =  2,  
+\end_layout
+
+\begin_layout Plain Layout
+
+TRT     =  0,  
+\end_layout
+
+\begin_layout Plain Layout
+
+SRT     =  1,  
+\end_layout
+
+\begin_layout Plain Layout
+
+UPPERH  =  5.0,  
+\end_layout
+
+\begin_layout Plain Layout
+
+SSRT    =  5.68    /  
+\end_layout
+
+\begin_layout Plain Layout
+
+!-=-=-= !END namelist !-=-=-=
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This namelist
+\family typewriter
+ pom_input
+\family default
+ is read three times: in subroutine 
+\family typewriter
+FORCING_MANAGER (
+\family default
+sec.
+
+\family typewriter
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:FORCING_MANAGER"
+
+\end_inset
+
+), 
+\family default
+subroutine
+\family typewriter
+ get_TS_IC 
+\family default
+(sec.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:get-TS-IC"
+
+\end_inset
+
+) and
+\family typewriter
+ 
+\family default
+subroutine
+\family typewriter
+ get_rst
+\family default
+ (sec.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:get_rst"
+
+\end_inset
+
+).
+ It provides the directory paths to all the data files (surface forcing,
+ prescribed 
+\begin_inset Formula $T$
+\end_inset
+
+, 
+\begin_inset Formula $S$
+\end_inset
+
+, inorganic suspended sediment vertical profiles and surface nutrient concentrat
+ion values) to be read by the coupled system.
+ The example below is again taken from the BFM-POM1D implementation of Mussap
+ et.
+ al.
+ 
+\begin_inset CommandInset citation
+LatexCommand citeyearpar
+key "mussap1,mussap3"
+literal "true"
+
+\end_inset
+
+, 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "mussap2"
 literal "true"
 
 \end_inset
@@ -17086,25 +16137,152 @@ literal "true"
 .
 \end_layout
 
-\begin_layout Subsubsection*
-namelists_bfm: template namelist file for BFM with standard values.
+\begin_layout Standard
+\begin_inset listings
+lstparams "language=Fortran,basicstyle={\tiny\ttfamily}"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+! NAMELIST: pom_input
 \end_layout
 
-\begin_layout Standard
-This file contains all the standard values of the namelists used for the
- experiment.
+\begin_layout Plain Layout
+
+! !DESCRIPTION !
 \end_layout
 
-\begin_layout Standard
-In addition to the above files the directory 
-\shape italic
-${BFMDIR}/build/configurations/
-\shape default
-BFM_POM contains all the namelists needed for a run using the benthic submodel.
- However, given that the version used here implies only theuse of the benthic
- return closure, the only relevant namelist is 
-\family typewriter
-BenthicReturn1.nml
+\begin_layout Plain Layout
+
+! -----DEFINE PATH TO DATA FILES-------
+\end_layout
+
+\begin_layout Plain Layout
+
+!
+\end_layout
+
+\begin_layout Plain Layout
+
+! wind_input:      path to the windstress data 
+\end_layout
+
+\begin_layout Plain Layout
+
+! surfaceS_input:  path to the surface salinity data ! radiance_input: 
+ path to the shortwave (solar) radiation data 
+\end_layout
+
+\begin_layout Plain Layout
+
+! ism_input:       path to the suspended sediment data 
+\end_layout
+
+\begin_layout Plain Layout
+
+! Sal_input:       path to the (time varying) salinity vertical profile
+ data 
+\end_layout
+
+\begin_layout Plain Layout
+
+! Temp_input:      path to the (time varying) temperature vertical profile
+ data 
+\end_layout
+
+\begin_layout Plain Layout
+
+! Sprofile_input:  path to the salinity initial conditions data 
+\end_layout
+
+\begin_layout Plain Layout
+
+! Tprofile_input:  path to the temperature initial conditions data 
+\end_layout
+
+\begin_layout Plain Layout
+
+! heat_input:      path to the heat flux loss terms (Qb+Qh+Qe) data 
+\end_layout
+
+\begin_layout Plain Layout
+
+! read_restart:    path to the restart file.
+\end_layout
+
+\begin_layout Plain Layout
+
+!
+\end_layout
+
+\begin_layout Plain Layout
+
+&pom_input 
+\end_layout
+
+\begin_layout Plain Layout
+
+wind_input      =  '/input/windstress_mon_Mussap.da', 
+\end_layout
+
+\begin_layout Plain Layout
+
+surfaceS_input  =  '/input/Ssurf_16m.da', 
+\end_layout
+
+\begin_layout Plain Layout
+
+radiance_input  =  '/input/radiance_daily_Mussap.da', 
+\end_layout
+
+\begin_layout Plain Layout
+
+ism_input       =  '/input/ISM_16m_Mussap.da', 
+\end_layout
+
+\begin_layout Plain Layout
+
+Sal_input       =  '/input/ClimaS_MA21_16m.da', 
+\end_layout
+
+\begin_layout Plain Layout
+
+Temp_input      =  '/input/ClimaT_MA21_16m.da', 
+\end_layout
+
+\begin_layout Plain Layout
+
+Sprofile_input  =  '/input/Sinit_16m.da', 
+\end_layout
+
+\begin_layout Plain Layout
+
+Tprofile_input  =  '/input/Tinit_16m.da', 
+\end_layout
+
+\begin_layout Plain Layout
+
+heat_input      =  '/input/heatflux.da', 
+\end_layout
+
+\begin_layout Plain Layout
+
+surfNut_input   =  '/input/NutrientsARPAOGS.da', 
+\end_layout
+
+\begin_layout Plain Layout
+
+read_restart    =  '/input/fort.70' / 
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Chapter
@@ -17116,7 +16294,7 @@ Description
 \end_layout
 
 \begin_layout Standard
-The BFM_POM1D configuration is based on the work carried out by 
+The BFM-POM1D configuration is based on the work carried out by 
 \begin_inset CommandInset citation
 LatexCommand citet
 key "mussap1"
@@ -17140,31 +16318,58 @@ literal "true"
 
 \end_inset
 
- by implementing the coupled system in the gulf of Trieste.
- The configuration simulates the annual cycle of a water column located
- in the centre of the gulf under climatological forcing conditions.
- Simulations are carried out in diagnostic mode, as detailed in section
- 
+ and it represent the evolution of biogeochemical processes in the middle
+ of the Gulf of Trieste (Italy).
+ The default configuration is a 10 years long simulation of a water column
+ located in the centre of the gulf driven by climatological forcing conditions,
+ with the prescription of sewater temperature and salinity profiles using
+ the diagnostic mode (see details in section 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "subsec:Diagnostic-mode"
 
 \end_inset
 
-.
- The reader is referred to the paper quoted above and to the 
+).
+ All the input files are contained in the configuration folder BFM-POM1D
+ and the reader is referred to the papers quoted above for details, as well
+ for the selected paramterizations and settings.
+\end_layout
+
+\begin_layout Section
+Execute the model
+\end_layout
+
+\begin_layout Standard
+Code compilation and deployment of the model is done automatically by the
+ script 
+\emph on
+bfm_configure.sh
+\emph default
+ (see the BFM core manual for its usage and environment setup) by using
+ the following command
+\end_layout
+
+\begin_layout Standard
+
 \family typewriter
-params_POMBFM
+\emph on
+$> ./bfm_configure.sh -gcd -p BFM_POM
+\end_layout
+
+\begin_layout Standard
+Once that model setup is completed go the run folder (
+\family typewriter
+${BFMDIR}/run/bfm-pom1d
 \family default
- namelist description (sec.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:pom_bfm_settings-namelist"
+) and launch the executable
+\end_layout
 
-\end_inset
+\begin_layout Standard
 
-) for more information about the implementation in the Gulf of Trieste.
+\family typewriter
+\emph on
+$> ./bfm_pom.exe
 \end_layout
 
 \begin_layout Section
@@ -17172,11 +16377,20 @@ Results
 \end_layout
 
 \begin_layout Standard
-The user can replicate some of the results obtained for the gulf of Trieste
- implementation, since the forcing files used to carry out the simulations
- are available trough the BFM web site.
- below we show some of the results to be compared with the results obtained
- by the user.
+As illustrated in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:BFM-POM1D-Trieste"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, the configuration simulates the coupled phisical and biogeochemical dynamics
+ in the gulf of Trieste with a winter peak of phytoplankton that occurs
+ along the entire water column and a progressive deepening of biological
+ activity during the summer stratified conditions.
 \end_layout
 
 \begin_layout Standard
@@ -17221,6 +16435,13 @@ BFM-POM1D implementation in the Gulf of Trieste.
 \end_inset
 
 .
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:BFM-POM1D-Trieste"
+
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -17243,23 +16464,6 @@ BFM-POM1D implementation in the Gulf of Trieste.
 
 \begin_layout Standard
 
-\end_layout
-
-\begin_layout Standard
-
-\end_layout
-
-\begin_layout Chapter
-\noindent
-Acknowledgements
-\end_layout
-
-\begin_layout Standard
-The BFM system team is gratefully endebted with Prof.
- George L.
- Mellor for allowing us to distribute the FORTRAN95 computer code of the
- one-dimensional Princeton Ocean Model that evolved from the original FORTRAN77
- version of the model.
 \end_layout
 
 \begin_layout Standard
@@ -17288,7 +16492,7 @@ twocolumn
 \begin_layout Standard
 \begin_inset CommandInset bibtex
 LatexCommand bibtex
-bibfiles "bfm-pom1D-references"
+bibfiles "bfm-pom-references"
 options "bibtotoc,elsart-harv"
 
 \end_inset

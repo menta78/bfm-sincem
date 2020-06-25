@@ -69,7 +69,16 @@ eqs-within-sections
 \index_command default
 \paperfontsize default
 \spacing single
-\use_hyperref false
+\use_hyperref true
+\pdf_bookmarks true
+\pdf_bookmarksnumbered false
+\pdf_bookmarksopen false
+\pdf_bookmarksopenlevel 1
+\pdf_breaklinks false
+\pdf_pdfborder false
+\pdf_colorlinks false
+\pdf_backref false
+\pdf_pdfusetitle true
 \papersize a4paper
 \use_geometry true
 \use_package amsmath 1
@@ -151,7 +160,7 @@ begin{titlepage}
 \align center
 \begin_inset Graphics
 	filename /Users/lovato/GIT/bfm/doc/logos/BFM-Consortium_members.png
-	lyxscale 25
+	lyxscale 20
 	scale 40
 
 \end_inset
@@ -295,6 +304,7 @@ height "1pt"
 
 \begin_inset Graphics
 	filename /Users/lovato/GIT/bfm/doc/logos/BFM_Full_logo.png
+	lyxscale 40
 	width 50text%
 
 \end_inset
@@ -929,14 +939,14 @@ centerline{
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="23" columns="6">
+<lyxtabular version="3" rows="24" columns="6">
 <features tabularvalignment="middle">
-<column alignment="block" valignment="top" width="1.5cm">
+<column alignment="block" valignment="top" width="1.25cm">
 <column alignment="block" valignment="top" width="2cm">
 <column alignment="block" valignment="top" width="1cm">
-<column alignment="block" valignment="top" width="1.5cm">
-<column alignment="block" valignment="top" width="2.5cm">
-<column alignment="left" valignment="top" width="6cm">
+<column alignment="block" valignment="top" width="1.25cm">
+<column alignment="block" valignment="top" width="3.5cm">
+<column alignment="left" valignment="top" width="5.5cm">
 <row>
 <cell alignment="block" valignment="top" topline="true" bottomline="true" usebox="none">
 \begin_inset Text
@@ -1391,7 +1401,7 @@ Reduction equivalents, HS
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" usebox="none">
+<cell alignment="block" valignment="top" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -1456,7 +1466,7 @@ mol Fe m
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" usebox="none">
+<cell alignment="left" valignment="top" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -1631,7 +1641,7 @@ Dissolved Inorganic Carbon
 \begin_layout Plain Layout
 
 \size footnotesize
-\begin_inset Formula $O^{(5)}$
+\begin_inset Formula $O^{(3)}$
 \end_inset
 
 
@@ -1704,6 +1714,79 @@ Total Alkalinity
 \begin_layout Plain Layout
 
 \size footnotesize
+\begin_inset Formula $O^{(5)}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size footnotesize
+O5c
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size footnotesize
+IO
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="block" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="block" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size footnotesize
+mg C m
+\begin_inset Formula $^{-3}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size footnotesize
+Calcite
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="block" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size footnotesize
 \begin_inset Formula $P_{i}^{(1)}$
 \end_inset
 
@@ -1742,7 +1825,13 @@ LO
 \begin_layout Plain Layout
 
 \size footnotesize
-C N P Si Chl Fe
+C N P 
+\end_layout
+
+\begin_layout Plain Layout
+
+\size footnotesize
+Si Chl Fe
 \end_layout
 
 \end_inset
@@ -1837,7 +1926,13 @@ LO
 \begin_layout Plain Layout
 
 \size footnotesize
-C N P Chl Fe
+C N P
+\end_layout
+
+\begin_layout Plain Layout
+
+\size footnotesize
+Chl Fe
 \end_layout
 
 \end_inset
@@ -1932,7 +2027,13 @@ LO
 \begin_layout Plain Layout
 
 \size footnotesize
-C N P Chl Fe
+C N P
+\end_layout
+
+\begin_layout Plain Layout
+
+\size footnotesize
+Chl Fe
 \end_layout
 
 \end_inset
@@ -2027,7 +2128,13 @@ LO
 \begin_layout Plain Layout
 
 \size footnotesize
-C N P Chl Fe
+C N P
+\end_layout
+
+\begin_layout Plain Layout
+
+\size footnotesize
+Chl Fe
 \end_layout
 
 \end_inset
@@ -2161,7 +2268,7 @@ Pelagic Bacteria
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" usebox="none">
+<cell alignment="block" valignment="top" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -2227,7 +2334,7 @@ mg C m
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" usebox="none">
+<cell alignment="left" valignment="top" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -2641,7 +2748,7 @@ Semi-labile Dissolved Organic Carbon
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" usebox="none">
+<cell alignment="block" valignment="top" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -2703,7 +2810,7 @@ mg C m
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" usebox="none">
+<cell alignment="left" valignment="top" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -3257,7 +3364,7 @@ literal "true"
 \end_layout
 
 \begin_layout Chapter
-The pelagic plankton model
+Pelagic biogeochemical model
 \end_layout
 
 \begin_layout Section
@@ -18168,7 +18275,129 @@ balance
 \end_layout
 
 \begin_layout Chapter
-The sea ice biogeochemical model
+Benthic closure model
+\end_layout
+
+\begin_layout Standard
+add here description
+\end_layout
+
+\begin_layout Section
+The governing equations
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:The-BFMgoverning-equations"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The benthic closure module is here represented by means of a benthic return
+ (add soetaert).
+ Such benthic 
+\begin_inset Quotes eld
+\end_inset
+
+closure
+\begin_inset Quotes erd
+\end_inset
+
+ is a simplified description of the processes defining the so-called 
+\begin_inset Quotes eld
+\end_inset
+
+benthic pelagic coupling
+\begin_inset Quotes erd
+\end_inset
+
+ (the organic matter cycling across the water sediment interface, modulated
+ by sedimentary and diffusive fluxes) and requires the definition of the
+ benthic particulate matter (carbon, phosphorous, nitrogen and silicon content),
+ 
+\begin_inset Formula $Q_{c,n,p,s}^{(6)}$
+\end_inset
+
+, and dissolved (carbon, phosphorous, nitrogen content) labile organic matter,
+ 
+\begin_inset Formula $Q_{c,n,p}^{(1)}$
+\end_inset
+
+, state variables , whose temporal rates of change are defined as:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial Q_{c,n,p}^{(6)}}{\partial t}=-\frac{w_{b}}{H+z_{b}}\left[R_{c,n,p}^{\left(6\right)}+\left(1-\xi_{c,n,p}\right)P_{c,n,p}^{\left(1,4\right)}\right]_{z=z_{b}}-\mu_{Q^{6}\left(c,n,p\right)}Q_{c,n,p}^{(6)}\mid_{z=z_{b}}\label{eq:BPC-ret}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial Q_{c,n,p}^{(1)}}{\partial t}=-\frac{w_{b}}{H+z_{b}}\xi_{c,n,p}P_{c,n,p}^{\left(1,4\right)}\mid_{z=z_{b}}-\mu_{Q_{\left(c,n,p\right)}^{1}}Q_{c,n,p}^{(1)}\mid_{z=z_{b}}\label{eq:BPC-Q1}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial Q_{s}^{(6)}}{\partial t}=-\frac{w_{b}}{H+z_{b}}\left[R_{s}^{\left(6\right)}+P_{s}^{\left(1\right)}\right]_{z=z_{b}}-\mu_{Q_{s}^{6}}Q_{s}^{(6)}\mid_{z=z_{b}}\label{eq:BPC-Si-1}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where 
+\begin_inset Formula $w_{b}$
+\end_inset
+
+is a burial velocity (negative 
+\begin_inset Formula $m/s$
+\end_inset
+
+ and user defined); 
+\begin_inset Formula $0\leq\xi\leq1$
+\end_inset
+
+ is a coefficient partitioning the settling phytoplankton 
+\begin_inset Formula $P_{c,n,p}^{(1,4)}$
+\end_inset
+
+ (diatoms and dinoflagellates carbon, nitrogen and phosphorus content) into
+ benthic particulate and dissolved orgsanic matter.
+ 
+\begin_inset Formula $\mu_{Q_{c,n,p,s}^{(1,6)}}$
+\end_inset
+
+ 
+\begin_inset Formula $\left(s\right)$
+\end_inset
+
+ are a user defined recycling time scales operating the conversion of the
+ benthic organic matter into pelagic dissolved nutrients and effectively
+ defining the bottom boundary condition for the nutrients in the water column.
+\end_layout
+
+\begin_layout Standard
+Add parameters table
+\end_layout
+
+\begin_layout Chapter
+Sea ice biogeochemical model
 \begin_inset CommandInset label
 LatexCommand label
 name "chap:sea-ice"
@@ -23761,6 +23990,16 @@ STANDALONE configuration:
  pelagic and benthic return
 \end_layout
 
+\begin_layout Plain Layout
+4.
+ seaice
+\end_layout
+
+\begin_layout Plain Layout
+5.
+ pelagic-seaice
+\end_layout
+
 \end_inset
 </cell>
 </row>
@@ -24547,7 +24786,7 @@ namelist Param_parameters in BFM_General.nml
 
 Parameters that control model formulation and execution (
 \family typewriter
-Param_paramteres
+Param_parameteres
 \family default
  in 
 \family typewriter
