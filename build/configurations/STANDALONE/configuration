@@ -30,7 +30,7 @@
         ARCH     = 'gfortran.inc',
         PROC     = 4,
         EXP      = 'standalone',
-        EXPFILES = 'CMIP5_Historical_GHG_1765_2005.dat'
+        EXPFILES = 'CMIP6_Historical_GHG_1765_2014.dat'
 /
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 #       CONFIGURATION VARIABLES

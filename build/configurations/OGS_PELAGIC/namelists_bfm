@@ -275,16 +275,15 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
 ! Example of general input structure for the data structure:
 !          ! Read  !   File                               ! NetCDF  !  Var    !
 !          ! Input !   name                               ! Logical !  name   !
-! AtmCO2_N =    0  , 'CMIP5_Historical_GHG_1765_2005.dat' , .FALSE.  , 'CO2'  ,
+! AtmCO2_N =    0  , 'CMIP6_Historical_GHG_1765_2014.dat' , .FALSE.  , 'CO2'  ,
 !          !  RefTime          ! Input      !   Time   !
 !          !  yyyymmdd         ! Frequency  !  interp  !
-!           '1764-07-01 00:00' ,  'yearly'  ,  .TRUE.
+!           '1765-01-01 00:00' ,  'yearly'  ,  .TRUE.
 !
 ! Convention for Input reading : 0 = use constant value (default if struct is not initialized)
 !                                1 = read timeseries file ( e.g. CO2 mixing ratios)
 !                                2 = read 2D fields using NEMO fldread
 !                                3 = field from a coupled model (e.g. atmospheric SLP from OGCM)
-! NOTE: The file "CMIP5_Historical_GHG_1765_2005.dat" is located in "$BFMDIR/tools" folder
 !-----------------------------------------------------------------------------------!
 &CSYS_parameters
     AtmCO20         =  370.0E0
@@ -293,7 +292,7 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
     p_kdca          =  10.9
     p_nomega        =  1
     Co2fluxfac      = 1.0
-    AtmCO2_N        =  0         'CMIP5_Historical_GHG_1765_2005.dat'  .FALSE.  'CO2'     '1764-07-01 00:00'  'yearly'  .TRUE.
+    AtmCO2_N        =  0         'CMIP6_Historical_GHG_1765_2014.dat'  .FALSE.  'CO2'     '1765-01-01 00:00'  'yearly'  .TRUE.
     AtmSLP_N        =  0         'AtmSLP.nc'                           .TRUE.   'AtmSLP'  '1764-07-01 00:00'  'dummy'   .TRUE.
 	filename_nml_conf = 'Carbonate_Dynamics.nml',
 /
