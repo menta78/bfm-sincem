@@ -2942,12 +2942,12 @@ name "tab:model_variables"
 status open
 
 \begin_layout Plain Layout
-BFM reference state variables
+BFM pelagic state variables
 \end_layout
 
 \end_inset
 
-List of the reference state variables for the pelagic model.
+List of the pelagic state variables.
  Type legend: IO = Inorganic; LO = Living organic; NO = Non-living organic.
  The subscript 
 \begin_inset Formula $i$
@@ -18275,18 +18275,492 @@ balance
 \end_layout
 
 \begin_layout Chapter
-Benthic closure model
+Benthic biogeochimical model
 \end_layout
 
 \begin_layout Standard
-add here description
+The benthic component of the model address the response of the marine sediments
+ to the organic matter export from the pelagic ecosystem in term of backward
+ fluxes of inorganic nutrients and carbon dioxide into the water column.
+ The ensemble of processes in sediments and those in the water column is
+ identified as the benthic–pelagic coupling (
+\begin_inset CommandInset citation
+LatexCommand citet
+key "soetaert2000"
+literal "false"
+
+\end_inset
+
+).
+ Once embedded into the sediments, the organic matter constitutes the main
+ energy source for the benthic biota (bacteria and heterotrophic fauna),
+ with the exception of filter feeders that feeds directly on the sinking
+ organic matter.
+ 
+\end_layout
+
+\begin_layout Standard
+Although some applications with increasing complexity of benthic biogeochemical
+ processes, including living functional groups, were proposed (
+\begin_inset CommandInset citation
+LatexCommand citet
+key "mussap2016,mussap2017"
+literal "false"
+
+\end_inset
+
+), the benthic system currently represented in the BFM is a rather simplistic
+ but effective closure in which organic matter entering the sediment is
+ remineralized at time invariant rates (see next section).
+\end_layout
+
+\begin_layout Standard
+The benthic model is activated using the logical flag 
+\family typewriter
+CalcBenthicFlag
+\family default
+ (in 
+\family typewriter
+Param_parameters
+\family default
+) along with the flag 
+\family typewriter
+AssignPelBenFluxesInBFMFlag
+\family default
+ to activate the dynamical exchanges at the water-sediment interface (see
+ also 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "tab:Parameters-Param"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+placement !t
+wide true
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+centerline{
+\end_layout
+
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="6">
+<features tabularvalignment="middle">
+<column alignment="block" valignment="top" width="1.25cm">
+<column alignment="block" valignment="top" width="2cm">
+<column alignment="block" valignment="top" width="1cm">
+<column alignment="block" valignment="top" width="1.25cm">
+<column alignment="block" valignment="top" width="3.5cm">
+<column alignment="left" valignment="top" width="5.5cm">
+<row>
+<cell alignment="block" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+\size footnotesize
+Variable
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="block" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+\size footnotesize
+Code
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+\size footnotesize
+Type
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="block" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+\size footnotesize
+Const.
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="block" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+\size footnotesize
+Units
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+\size footnotesize
+Description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="block" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size footnotesize
+\begin_inset Formula $Q_{i}^{(1)}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="block" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size footnotesize
+Q1[cnp]
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size footnotesize
+NO
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="block" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size footnotesize
+C N P
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="block" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size footnotesize
+mg C m
+\begin_inset Formula $^{-3}$
+\end_inset
+
+, mmol N-P m
+\begin_inset Formula $^{-3}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size footnotesize
+Labile Dissolved Organic Matter
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="block" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size footnotesize
+\begin_inset Formula $Q_{i}^{(6)}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="block" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size footnotesize
+Q6[cnps]
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size footnotesize
+NO
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="block" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size footnotesize
+C N P Si
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="block" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size footnotesize
+mg C m
+\begin_inset Formula $^{-3}$
+\end_inset
+
+, 
+\end_layout
+
+\begin_layout Plain Layout
+
+\size footnotesize
+mmol N-P-Si m
+\begin_inset Formula $^{-3}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size footnotesize
+Particulate Organic Detritus
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="block" valignment="top" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size footnotesize
+\begin_inset Formula $Q_{i}^{(16)}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="block" valignment="top" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size footnotesize
+Q16[cnps]
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size footnotesize
+NO
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="block" valignment="top" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size footnotesize
+C N P Si
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="block" valignment="top" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size footnotesize
+mg C m
+\begin_inset Formula $^{-3}$
+\end_inset
+
+, 
+\end_layout
+
+\begin_layout Plain Layout
+
+\size footnotesize
+mmol N-P-Si m
+\begin_inset Formula $^{-3}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size footnotesize
+Particulate Organic Detritus in deep sediments
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "tab:benthic_model_variables"
+
+\end_inset
+
+
+\begin_inset Argument 1
+status open
+
+\begin_layout Plain Layout
+BFM benthic state variables
+\end_layout
+
+\end_inset
+
+List of the benthic state variables.
+ Type legend: NO = Non-living organic.
+ The subscript 
+\begin_inset Formula $i$
+\end_inset
+
+ indicates the basic components (if any) of the variable, e.g.
+ 
+\begin_inset Formula $Q_{i}^{(6)}\equiv\left(Q_{c}^{(6)},Q_{n}^{(6)},Q_{p}^{(6)},Q_{s}^{(6)}\right)$
+\end_inset
+
+.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section
-The governing equations
+Benthic closure module
 \begin_inset CommandInset label
 LatexCommand label
-name "subsec:The-BFMgoverning-equations"
+name "subsec:benthic-return-equations"
 
 \end_inset
 
@@ -18294,28 +18768,11 @@ name "subsec:The-BFMgoverning-equations"
 \end_layout
 
 \begin_layout Standard
-The benthic closure module is here represented by means of a benthic return
- (add soetaert).
- Such benthic 
-\begin_inset Quotes eld
-\end_inset
-
-closure
-\begin_inset Quotes erd
-\end_inset
-
- is a simplified description of the processes defining the so-called 
-\begin_inset Quotes eld
-\end_inset
-
-benthic pelagic coupling
-\begin_inset Quotes erd
-\end_inset
-
- (the organic matter cycling across the water sediment interface, modulated
- by sedimentary and diffusive fluxes) and requires the definition of the
- benthic particulate matter (carbon, phosphorous, nitrogen and silicon content),
- 
+The benthic closure (or return) module represents the organic matter cycling
+ across the water sediment interface, modulated by sedimentary degradation
+ processes and remineralization fluxes and it requires the definition of
+ the benthic particulate matter (carbon, phosphorous, nitrogen and silicon
+ content), 
 \begin_inset Formula $Q_{c,n,p,s}^{(6)}$
 \end_inset
 
@@ -18324,14 +18781,15 @@ benthic pelagic coupling
 \begin_inset Formula $Q_{c,n,p}^{(1)}$
 \end_inset
 
-, state variables , whose temporal rates of change are defined as:
+, state variables, whose temporal rates of change are defined as:
 \end_layout
 
 \begin_layout Standard
 \begin_inset Formula 
-\begin{equation}
-\frac{\partial Q_{c,n,p}^{(6)}}{\partial t}=-\frac{w_{b}}{H+z_{b}}\left[R_{c,n,p}^{\left(6\right)}+\left(1-\xi_{c,n,p}\right)P_{c,n,p}^{\left(1,4\right)}\right]_{z=z_{b}}-\mu_{Q^{6}\left(c,n,p\right)}Q_{c,n,p}^{(6)}\mid_{z=z_{b}}\label{eq:BPC-ret}
-\end{equation}
+\begin{multline}
+\frac{\partial Q_{c,n,p}^{(6)}}{\partial t}=-\frac{w_{b}}{H+z_{b}}\left[R_{c,n,p}^{\left(6\right)}+\left(1-\xi_{c,n,p}\right)P_{c,n,p}^{\left(1,4\right)}\right]_{z=z_{b}}\\
+-\mu_{Q^{6}\left(c,n,p\right)}Q_{c,n,p}^{(6)}\mid_{z=z_{b}}\label{eq:BPC-ret}
+\end{multline}
 
 \end_inset
 
@@ -18365,11 +18823,11 @@ where
 \begin_inset Formula $w_{b}$
 \end_inset
 
-is a burial velocity (negative 
+is a burial velocity ( 
 \begin_inset Formula $m/s$
 \end_inset
 
- and user defined); 
+, downward); 
 \begin_inset Formula $0\leq\xi\leq1$
 \end_inset
 
@@ -18378,7 +18836,7 @@ is a burial velocity (negative
 \end_inset
 
  (diatoms and dinoflagellates carbon, nitrogen and phosphorus content) into
- benthic particulate and dissolved orgsanic matter.
+ benthic particulate and dissolved organic matter.
  
 \begin_inset Formula $\mu_{Q_{c,n,p,s}^{(1,6)}}$
 \end_inset
@@ -18390,10 +18848,548 @@ is a burial velocity (negative
  are a user defined recycling time scales operating the conversion of the
  benthic organic matter into pelagic dissolved nutrients and effectively
  defining the bottom boundary condition for the nutrients in the water column.
+ Both burial velocities are and benthic remineralization factors are contained
+ in namelist 
+\family typewriter
+Benthic_Environment.nml
+\family default
+, respectively in 
+\family typewriter
+Settling_parameters
+\family default
+ and 
+\family typewriter
+BenthicReturn_parameters
+\family default
+.
 \end_layout
 
 \begin_layout Standard
-Add parameters table
+A deep sediment layer can be also activated (
+\family typewriter
+R6DeepBurial
+\family default
+ in 
+\family typewriter
+Settling_parameters
+\family default
+) to simulate the burial of organic matter in sediment layers below the
+ surface (
+\begin_inset Formula $Q_{c,n,p,s}^{(16)}$
+\end_inset
+
+) using the parameterization described in 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "dunne2007"
+literal "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+wide true
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+centering
+\end_layout
+
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="6" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="4cm">
+<column alignment="left" valignment="top" width="2.5cm">
+<column alignment="left" valignment="top" width="3in">
+<row endhead="true">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+\shape italic
+name
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+\shape italic
+kind
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+\shape italic
+description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+p_burvel_R6
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+real
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Bottom Burial Velocity for detritus
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+p_burvel_O5
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+real
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Bottom Burial Velocity for calcite
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+p_burvel_R2
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+real
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Bottom Burial Velocity for refractory OM
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+p_burvel_PI
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+real
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Bottom Burial Velocity for plankton
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+R6DeepBurial
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+logical
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Detrituts burial to deep sediment layer
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset Argument 1
+status open
+
+\begin_layout Plain Layout
+namelist Settling_parameters in BFM_General.nml
+\end_layout
+
+\end_inset
+
+Parameters that control the settling of pelagic variables into the benthic
+ system (
+\family typewriter
+Settling_parameters
+\family default
+ in 
+\family typewriter
+Benthic_Environment.nml
+\family default
+) 
+\begin_inset CommandInset label
+LatexCommand label
+name "tab:Benthic-settling"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+wide true
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+centering
+\end_layout
+
+\end_inset
+
+
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="4cm">
+<column alignment="left" valignment="top" width="2.5cm">
+<column alignment="left" valignment="top" width="3in">
+<row endhead="true">
+<cell alignment="left" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+\shape italic
+name
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+\shape italic
+kind
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+\shape italic
+description
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+p_rmnQ1c,p_rmnQ1p,
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+p_rmnQ1n
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+real
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Remineralization rate of Dissolved OM constituents
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+p_rmnQ6c,p_rmnQ6p,
+\end_layout
+
+\begin_layout Plain Layout
+
+\family typewriter
+p_rmnQ6n,p_rmnQ6s
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+real
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Remineralization rate of Particulated OM constituents
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+p_pQIN3
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+real
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" bottomline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Partitioning coeff.
+ between NO3 and NH4 of reminelazed Nitrogen
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset Argument 1
+status open
+
+\begin_layout Plain Layout
+namelist Settling_parameters in BFM_General.nml
+\end_layout
+
+\end_inset
+
+Parameters that control the remineralization of benthic organic matter component
+s (
+\family typewriter
+BenthicReturn_parameters
+\family default
+ in 
+\family typewriter
+Benthic_Environment.nml
+\family default
+) 
+\begin_inset CommandInset label
+LatexCommand label
+name "tab:Benthic-return"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Chapter
@@ -18644,7 +19640,7 @@ status open
 \begin_layout Plain Layout
 
 \lang english
-List of the sea ice model state variables
+BFM sea ice state variables
 \end_layout
 
 \end_inset
@@ -23881,7 +24877,7 @@ reference "tab:Parameters-forcings"
 \begin_inset Float table
 wide true
 sideways false
-status open
+status collapsed
 
 \begin_layout Plain Layout
 \begin_inset ERT
