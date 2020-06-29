@@ -246,6 +246,7 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
           'R1c','R1n','R1p',
           'R6c','R6n','R6p','R6s',
           'P1s',
+          'jsurO3c','jsurO2o',
           'ruPPYc','ruZOOc',
           'resPBAc','resZOOc','resPPYc',
           'ruPPYn','ruPPYp','ruPPYs','exPPYc',
