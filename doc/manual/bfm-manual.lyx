@@ -11683,7 +11683,7 @@ reference "box:zooplankton"
  
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:Zooplankton-fixed-quota"
+reference "subsec:layout-fixed-quota"
 
 \end_inset
 
@@ -18272,6 +18272,65 @@ balance
 \end_inset
 
 
+\end_layout
+
+\begin_layout Section
+Fixed stoichiometry for hetereotrophic LFGs
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:fix-stoichiometry"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Pelagic heterotrophic living functional groups, namely bacteria and zooplankton,
+ can be also modelled in terms of the sole carbon constituent and their
+ biogeochecmical dynamics are then driven by fixed stoichiometric quotas
+ (set equal to the optimal quota parameters).
+ This feature is automatically activated when nutrient constituents are
+ removed from the definition of a specific variable in the layout file (see
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "subsec:layout-fixed-quota"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+).
+ For the selected groups, the biogeochecmical process rates are adjusted
+ by release fluxes of C, N, or P to preserve the fixed reference quotas,
+ as in the following 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{flalign*}
+\left.\frac{\partial X_{c}}{\partial t}\right|^{rel} & =max\left(\left.\frac{\partial X_{c}}{\partial t}\right|^{bgc}-\frac{1}{n_{_{X}}^{opt}}\left.\frac{\partial X_{n}}{\partial t}\right|^{bgc},\left.\frac{\partial X_{c}}{\partial t}\right|^{bgc}-\frac{1}{p_{_{X}}^{opt}}\left.\frac{\partial X_{p}}{\partial t}\right|^{bgc},0.\right)\\
+\left.\frac{\partial X_{n}}{\partial t}\right|^{rel} & =max\left(\left.\frac{\partial X_{n}}{\partial t}\right|^{bgc}-n_{_{X}}^{opt}\left.\frac{\partial X_{c}}{\partial t}\right|^{bgc},0.\right)\\
+\left.\frac{\partial X_{p}}{\partial t}\right|^{rel} & =max\left(\left.\frac{\partial X_{p}}{\partial t}\right|^{bgc}-p_{_{X}}^{opt}\left.\frac{\partial X_{c}}{\partial t}\right|^{bgc},0.\right)
+\end{flalign*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where X is the carbon state variable of a heterotrophic LFGs, 
+\shape italic
+bgc
+\shape default
+ is the net flux of the actual process rates and 
+\shape italic
+rel
+\shape default
+ is the release flux from the resulting stoichiometric adjustment.
 \end_layout
 
 \begin_layout Chapter
@@ -31329,7 +31388,7 @@ Example 3.
  Removing components from zooplankton
 \begin_inset CommandInset label
 LatexCommand label
-name "subsec:Zooplankton-fixed-quota"
+name "subsec:layout-fixed-quota"
 
 \end_inset
 
@@ -31342,9 +31401,19 @@ For certain purposes it is not needed to carry out the computation of variable
  case of the new macrozooplankton group added in example 1).
  This can be done to save computational resources in the case of low-resolution
  long-term global ocean simulations or with high-resolution coastal models.
- A possible example is the assumption of a fixed quota in zooplankton which
- allows one to reduce the number of standard components of up to 8 state
- variables.
+ A possible example is the assumption of a fixed quota in zooplankton (see
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:fix-stoichiometry"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+) which allows one to reduce the number of standard components of up to
+ 8 state variables.
  The zooplankton group definitions are equal to the one shown in the code
  of Box 
 \begin_inset CommandInset ref
