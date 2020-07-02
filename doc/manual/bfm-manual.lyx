@@ -17732,7 +17732,7 @@ reference "eq:ammonium_N4n"
 ), the source form equation for TA reads: 
 \begin_inset Formula 
 \begin{eqnarray}
-\left.\frac{dO^{(5)}}{dt}\right|_{bio} & = & \sum_{j=1}^{4}\left.\frac{dP_{n}^{(j)}}{dt}\right|_{N^{(3)}}^{upt}-\sum_{j=1}^{4}\left.\frac{dP_{n}^{(j)}}{dt}\right|_{N^{(4)}}^{upt}+\nonumber \\
+\left.\frac{dO^{(3)}}{dt}\right|_{bio} & = & \sum_{j=1}^{4}\left.\frac{dP_{n}^{(j)}}{dt}\right|_{N^{(3)}}^{upt}-\sum_{j=1}^{4}\left.\frac{dP_{n}^{(j)}}{dt}\right|_{N^{(4)}}^{upt}+\nonumber \\
  &  & -2\left.\frac{dN^{(3)}}{dt}\right|_{N^{(4)}}^{nit}+\left.\frac{dN^{(3)}}{dt}\right|_{sink_{n}}^{denit}
 \end{eqnarray}
 
