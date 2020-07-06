@@ -375,7 +375,7 @@
          if (bfm_lwp) write(LOGUNIT, 158) InitVar(m)
       end do
 #ifdef INCLUDE_PELCO2
-      ! Scale DIC and ALK from umol/kg to mmol/m3 using NEMO initial in situ density
+      ! Scale DIC and ALK from m(g/mol)/kg to m(g/mol)/m3 using NEMO initial in situ density
       if (bfm_lwp) write(LOGUNIT,*)
       if (bfm_lwp) write(LOGUNIT,*) 'trc_ini_bfm: Scale DIC and ALK 3D fields using NEMO in-situ density'
       D3STATE(ppO3c,:) = D3STATE(ppO3c,:) * ERHO(:)
@@ -581,7 +581,7 @@
       END DO
       ! 
       ztraf = SUM(ironsed * spread(e1e2t,3,jpk) * p_rN7fsed * 365. * 1.e-15 * tmask )
-      CALL mpp_sum (ztraf)
+      IF (lk_mpp) CALL mpp_sum (ztraf)
       LEVEL1 '  Total iron load from Sediment [Gmol/y] : ', ztraf
       ! 
       ironsed = ironsed * p_rN7fsed / ( SEC_PER_DAY * fse3t(:,:,:) )

@@ -226,6 +226,17 @@ end
     ELiPPY(PhytoPlankton) : Optimal light in PhytoPlankton : W/m2
     ABIO_eps              : Abiotic Extinction Coefficient : 1/m
     DMS                   : Dimethyl sulfide  : pmol/m3
+   #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+   # Dummy diagnostics
+   #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+   BRUM : Bac gross growth : mgC/m3/d
+   BRUT : Bac OM Uptake : mgC/m3/d
+   BGE : Bac growth efficiency : -
+   TEMP1 : MM limitation : -
+   TEMP2 : Rum (potUpt) : mgC/m3/d
+   TEMP3 : ruR1/rut  : 0-1
+   TEMP4 : rut  : mgC/m3
+   BIOALK : O3h bio rate: mmol/m3
 end
 
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -274,31 +285,37 @@ end
 #                       DIAGNOSTIC RATES
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 3d-flux-pel -if-exist INCLUDE_DIAG INCLUDE_PELCO2
-  ruPPYc=P.c  <- O3c : Gross Primary Production    : mg C/m3/d
-  resPPYc=P.c -> O3c : Phytoplankton Respiration   : mg C/m3/d
+  ruPPYc=P.c  <- O3c  : Gross Primary Production    : mg C/m3/d
+  ruPPYc1=P1c  <- O3c : Diatoms GPP           : mg C/m3/d
+  ruPPYc2=P2c  <- O3c : Flagellates GPP           : mg C/m3/d
+  resPPYc=P.c -> O3c  : Phytoplankton Respiration   : mg C/m3/d
+  resPPYc1=P1c -> O3c : Diatoms Respiration   : mg C/m3/d
+  resPPYc2=P2c -> O3c : Flagellates Respiration   : mg C/m3/d
   resPBAc=B.c -> O3c : Bacterial Respiration       : mg C/m3/d
   resZOOc=Z.c -> O3c : Zooplankton Respiration     : mg C/m3/d
-  ruPPYc1=P1c  <- O3c : Diatoms GPP           : mg C/m3/d
-  resPPYc1=P1c -> O3c : Diatoms Respiration   : mg C/m3/d
-  ruPPYc2=P2c  <- O3c : Flagellates GPP           : mg C/m3/d
-  resPPYc2=P2c -> O3c : Flagellates Respiration   : mg C/m3/d
+  resZOOc4=Z4c -> O3c : Zooplankton Respiration     : mg C/m3/d
+  resZOOc5=Z5c -> O3c : Zooplankton Respiration     : mg C/m3/d
+  prdO5c=O3c -> O5c : Calcite production : mgC/m3/d
 end
 
 3d-flux-pel -if-exist INCLUDE_DIAG
+  exPPYc=(P.c -> R1c+R2c+R3c+R6c) : C excretion from Phytoplankton : mg C/m3/d
+  exPPYc1=(P1c -> R1c+R2c+R3c+R6c) : Diatoms excretion : mg C/m3/d
+  exPPYc2=(P2c -> R1c+R2c+R3c+R6c) : Flagellates excretion : mg C/m3/d
+  ruZOOc=(Z.c<-P.c+B.c+Z.c) : Gross/Net Secondary Production:mg C/m3/d
   ruPZOOc=Z.c <- P.c : Zooplankton Predation on Phytoplankton : mg C/m3/d
   ruBZOOc=Z.c <- B.c : Zooplankton Predation on Bacterioplankton : mg C/m3/d
   ruZZOOc=Z.c <- Z.c : Zooplankton Predation on Zooplankton : mg C/m3/d
   ruPBAc=(B.c <- R1c+R2c+R3c+R6c) : Bacterioplankton uptake from Detritus : mg C/m3/d
+  ruR1PBAc=R1c -> B1c : Bacteria Uptake of DOC : mg C/m3/d
+  ruR6PBAc=R6c -> B1c : Bacteria Uptake of POC : mg C/m3/d
   exPBAc=(B.c -> R1c+R2c+R3c+R6c) : C excretion from Bacterioplankton : mg C/m3/d
-  exPPYc=(P.c -> R1c+R2c+R3c+R6c) : C excretion from Phytoplankton : mg C/m3/d
   exZOOc=(Z.c -> R1c+R2c+R3c+R6c) : C excretion from Zooplankton  : mg C/m3/d
   exPPYp=(P.p -> R1p+R6p) : P excretion from Phytoplankton : mmolP/m3/d
-  exPPYs=(P1s ->R6s) : Si excretion from Phytoplankton : mmolSi/m3/d
-  ruPPYn=P.n <- N3n+N4n: Net Nitrogen Uptake:mmol N/m3/d
+  ruPPYn=(P.n <- N3n+N4n): Net Nitrogen Uptake:mmol N/m3/d
   ruPPYp=P.p <- N1p : Net Phosphate Uptake : mmol P/m3/d
-  ruPPYs=P.s <- N5s : Net Silicate Uptake : mmol Si/m3/d
   ruPPYf=P.f <- N7f : Net Iron Uptake : umol Fe/m3/d
-  exPPYs=(P.s->R6s): biogenic Si loss from phytoplankton :mmol Si/m3/d
-  ruZOOc=(Z.c<-P.c+B.c+Z.c): Gross/Net Secondary Production:mg C/m3/d
-  resPELo=(O2o->*): Pelagic Oxygen Demand : mmol O2/m3/d
+  exPPYs=(P.s -> R6s): biogenic Si loss from phytoplankton :mmol Si/m3/d
+  remR6s=(R6s -> N5s): remineralization of detrital Si: mmol Si/m3/d
+  resPELo=(O2o->*) : Pelagic Oxygen Demand : mmol O2/m3/d
 end

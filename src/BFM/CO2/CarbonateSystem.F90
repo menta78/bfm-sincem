@@ -20,8 +20,8 @@ module mem_CSYS
 !   salt    = practical salinity                   [unitless]
 !   ta      = total alkalinity                     [ueq/kg]
 !   tc      = dissolved inorganic carbon           [umol/kg]
-!   pt      = total dissolved inorganic phosphorus [umol/kg]
-!   sit     = total dissolved inorganic silicon    [umol/kg]
+!   pt      = total dissolved inorganic phosphorus [mmol/m3]
+!   sit     = total dissolved inorganic silicon    [mmol/m3]
 !   Bt      = total dissolved inorganic boron      computed 
 !   St      = total dissolved inorganic sulfur     computed 
 !   Ft      = total dissolved inorganic fluorine   computed 

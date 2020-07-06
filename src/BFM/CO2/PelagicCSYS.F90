@@ -26,7 +26,7 @@
 #else
   use mem, ONLY: iiPel, O3h, O3c, D3STATE, jsurO3c, CO2airflux,    &
                  Depth, flux_vector, DIC, ALK,                     &
-                 Source_D3_vector, ppO5c, ppN3n, ppN4n
+                 Source_D3_vector, ppO5c, ppN3n, ppN4n, BIOALK
   use mem, ONLY: ppO3h, ppO3c, NO_BOXES, NO_BOXES_XY, BoxNumber,   &
     N1p,N5s,CO2, HCO3, CO3, pCO2, pH, ETW, ESW, ERHO, EWIND, EICE, &
     OCalc, OArag, EPR, ppO5c, O5c, EPCO2air
@@ -131,6 +131,7 @@
   if ( CalcBioAlk ) then
      rateN(:) = - Source_D3_vector(ppN3n) + Source_D3_vector(ppN4n)
      call flux_vector( iiPel, ppO3h,ppO3h, rateN)
+     BIOALK(:) = rateN(:)
   endif 
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=

@@ -927,6 +927,7 @@ end subroutine init_netcdf_rst_bfm
 #ifdef INCLUDE_PELCO2
    use mem, only: D3DIAGNOS,pppH
 #endif
+   use mem, only: D2STATE_BEN
 
    implicit none
 !
@@ -949,6 +950,8 @@ end subroutine init_netcdf_rst_bfm
 
    integer,dimension(4)                      :: array_3d_start, array_3d_count, array_3d_end
    real(RLEN),allocatable,dimension(:,:,:,:) :: array_3d
+   integer,dimension(3)                      :: array_2d_start, array_2d_count, array_2d_end
+   real(RLEN),allocatable,dimension(:,:,:) :: array_2d
 
 
    integer :: iniI, iniJ, cntI, cntJ, cntK
@@ -1021,6 +1024,10 @@ end subroutine init_netcdf_rst_bfm
    array_3d_start = (/ iniI       , iniJ       , 1   , 1 /)
    array_3d_count = (/ cntI       , cntJ       , cntk, 1 /)
    array_3d_end   = (/ iniI+cntI-1, iniJ+cntJ-1, cntk, 1 /)
+   allocate( array_2d(cntI,cntJ,1) )
+   array_2d_start = (/ iniI       , iniJ       , 1 /)
+   array_2d_count = (/ cntI       , cntJ       , 1 /)
+   array_2d_end   = (/ iniI+cntI-1, iniJ+cntJ-1, 1 /)
 
    !---------------------------------------------
    ! Initialize 3D Pelagic variables
@@ -1077,8 +1084,30 @@ end subroutine init_netcdf_rst_bfm
    !---------------------------------------------
    ! Initialize 2D Benthic variables
    !---------------------------------------------
-      LEVEL2 "read_rst_bfm_glo: READ 2D benthic initial conditions"
-      stop "STOP in read_rst_bfm_glo: read benthic initial conditions not yet implemented"
+   LEVEL2 "read_rst_bfm_glo: READ 2D benthic initial conditions"
+   do idx_var=stBenStateS, stBenStateE
+      idx_var_array = idx_var - stBenStateS + 1
+      string = var_names(idx_var)
+      iret = NF90_INQ_VARID(ncid_rst_3d, string, vid)
+      if( iret /= NF90_NOERR ) then
+         ! in new BFM version netcdf output remove '(' and ')' 
+         call replace_char(str=string, tar='()', rep='_')
+         iret = NF90_INQ_VARID(ncid_rst_3d, string, vid)
+      end if
+      if( iret == NF90_NOERR ) then
+         call check_err(nf90_get_var(ncid_rst_3d, vid, array_2d, &
+              start=array_2d_start, count=array_2d_count), fname)
+         noce = 0
+         do idx_j=1,cntJ
+            do idx_i=1,cntI
+               if( SEAmask(idx_i,idx_j,1) ) then
+                  noce = noce+1
+                  D2STATE_BEN(idx_var_array,noce) = array_2d(idx_i,idx_j,1)
+               end if
+            end do
+         end do
+      end if
+   end do
 
    call check_err(nf90_close(ncid_rst_3d),fname)
 
