@@ -269,21 +269,14 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
 !-------------------------------------------------------------------------!
 &bfm_save_nml
    var_save = ''
-   ave_save = 'O2o','O3h','DIC','ALK','pCO2','pH',
-          'O5c','OCalc','OArag',
-          'N1p','N3n','N4n','N5s','N7f','N6r',
-          'P1c','P1l','P1f','P2c','P2l',
-          'Z4c','Z5c','B1c',
-          'R1c','R2c','R6c','R6f','Chla','R1n','R1p',
-          'P1n','P2n',
-          'P1p','P2p',
-          'jbotR6c','jsurO2o','jsurO3c',
-          'ruPPYc','ruPPYn','ruPPYp','ruPPYs','ruPPYf','exPPYc',
-          'resPPYc','resPBAc','resZOOc',
-          'ruZOOc','qncOMT_iiR6','qpcOMT_iiR6',
-          'EICE','ETW','EIR','EWIND','xEPS',
-          'R6p','R6n','R6s',
-          'sinkP1c','sinkR6c','Q6c','Q6n','Q6p','Q6s','Q1c','Q1n','Q1p','Q16c'
+   ave_save = 'O2o','O3h','DIC','ALK','pCO2','pH','O5c','OCalc','OArag',
+              'N1p','N3n','N4n','N5s','N7f','N6r',
+              'P1c','P1l','P1n','P1p','P1s','P1f','P2c','P2n','P2p',
+              'Z4c','Z5c','B1c','R1c','R6c','R6n','R6p','R6s','R6f',
+              'Chla','jbotR6c','jbotR6s','jbotN5s','jsurO2o','jsurO3c',
+              'ruPPYc','exPPYp','exPPYs','ruPBAc','ruZOOc','EICE','ETW','EIR','xEPS',
+              'resPELo','sinkP1c','sinkR6c','sinkR6s','sinkO5c',
+              'Q6c','Q6n','Q6p','Q6s','Q1c','Q1n','Q1p','Q16c','Q16n','Q16p','Q16s'
 	filename_nml_conf = 'BFM_General.nml',
 /
 
