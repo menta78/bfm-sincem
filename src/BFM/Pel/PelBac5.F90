@@ -145,6 +145,13 @@
   iN1p = min(ONE, max(ZERO, qpcPBA(bac,:)/p_qpcPBA(bac)))  !Phosphorus
   iN   = min(iN1p, iNIn)
 
+  ! DOC aggregation into POC
+  rugch = ZERO
+  rugch =  MIN(R1c(:), R6c(:) * p_suR3(bac))
+  call flux_vector(iiPel, ppR1c, ppR6c, rugch) 
+  call flux_vector(iiPel, ppR1n, ppR6n, rugch*qncOMT(iiR1,:)) 
+  call flux_vector(iiPel, ppR1p, ppR6p, rugch*qpcOMT(iiR1,:)) 
+
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Potential uptake by bacteria (eq. 50 Vichi et al. 2007)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -158,20 +165,20 @@
   rut   = p_small + ruR1c + ruR6c
 !  rut = p_small + R1c(:) + R6c(:)
   R1rut = ruR1c/rut
-  !BR6rat = p_chuc_lim(bac) + (bacc/(p_small+ruR6c)) * p_sulR1(bac)
-  BR6rat  = p_sulR1(bac)
-  
+
+  BR6rat  = bacc *  (ONE - R1rut * p_suR2(bac))
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Gross carbon uptake
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   TEMP1 = MM_power( ruR1c , p_chuc(bac), 3)
-  TEMP2 = MM_power( ruR6c , BR6rat * (bacc * (ONE - R1rut)), 3)
+
+  TEMP2 = MM_power( ruR6c , p_sulR1(bac) * BR6rat , 3)
 
   ruR1c = rum * MM_power( ruR1c , p_chuc(bac), 3 ) * R1rut
 
   rugch = ZERO
   WHERE(ruR6c > ZERO) &
-     rugch = iN*p_sum(bac)*bacc * deplim * MM_power( ruR6c , BR6rat * (bacc * (ONE - R1rut)), 3) * (ONE - R1rut)
+     rugch = iN*p_sum(bac)*bacc * deplim * MM_power( ruR6c , p_sulR1(bac) * BR6rat , 3) * (ONE - R1rut)
   ruR6c = rugch 
 
   rug = ruR1c + ruR6c
@@ -189,10 +196,7 @@
   !ruR6c = rug*ruR6c/rut
  
   BRUM = rug
-  BRUT = BR6rat * p_sulR1(bac) * (bacc * (ONE - R1rut))
-  ! 17h,i,l 
-  !BRUT = p_sulR1(bac) * bacc
-  !!write(*,*) 'B4: ', rut, rugch, TEMP1 , TEMP3 , TEMP4, rug
+  BRUT =  p_sulR1(bac) * BR6rat
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Organic Carbon uptake
