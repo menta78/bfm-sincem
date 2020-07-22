@@ -159,7 +159,7 @@ begin{titlepage}
 \begin_layout Standard
 \align center
 \begin_inset Graphics
-	filename /Users/lovato/GIT/bfm/doc/logos/BFM-Consortium_members.png
+	filename ../logos/BFM-Consortium_members.png
 	lyxscale 25
 	scale 40
 
@@ -306,7 +306,7 @@ height "1pt"
 
 
 \begin_inset Graphics
-	filename /Users/lovato/GIT/bfm/doc/logos/BFM_Full_logo.png
+	filename ../logos/BFM_Full_logo.png
 	lyxscale 40
 	width 50text%
 
@@ -1440,7 +1440,7 @@ status open
 \noindent
 \align center
 \begin_inset Graphics
-	filename /Users/lovato/GIT/bfm/doc/manual/Figures/memory-variable-mapping.eps
+	filename ../manual/Figures/memory-variable-mapping.eps
 	scale 80
 
 \end_inset
