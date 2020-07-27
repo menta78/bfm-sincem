@@ -390,7 +390,7 @@
       if ( R6DeepBurial ) then
          !
          ! Buried fraction of POC into deep sediment (Dunne et al,2007-GBC)
-         burfrac = (0.013_RLEN + 0.53_RLEN * abs(p_small + jbotR6c(:)/MW_C)**2) /  &
+         burfrac = 0.013_RLEN + (0.53_RLEN * abs(p_small + jbotR6c(:)/MW_C)**2) /  &
                         ( 7.0_RLEN + abs(p_small + jbotR6c(:)/MW_C))**2
          !
          ! Burial od Pelagic Organic Matter
