@@ -4,12 +4,11 @@
 #   BFM Configuration manager
 #
 # AUTHORS
-#   Esteban Gutierrez esteban.gutierrez@cmcc.it
 #   Tomas Lovato tomas.lovato@cmcc.it
 #
 # COPYING
 #  
-#   Copyright (C) 2015 BFM System Team ( bfm_st@lists.cmcc.it )
+#   Copyright (C) 2020 BFM System Team (bfm_st@cmcc.it)
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
