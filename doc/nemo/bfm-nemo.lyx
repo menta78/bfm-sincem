@@ -238,12 +238,10 @@ the NEMO model V3.6
 
 \series bold
 \emph on
-M.
- Vichi, T.
- Lovato, E.
- Gutierrez Mlot and W.
- J.
- McKiver
+T.
+ Lovato, M.
+ Vichi and M.
+ Butenschön
 \end_layout
 
 \begin_layout Standard
@@ -362,7 +360,7 @@ This document should be cited as:
 \begin_inset Newline newline
 \end_inset
 
-Vichi M., Lovato T., Gutierrez Mlot E., McKiver W.
+Lovato T., Vichi M., Butenschön M.
  (2020).
  Coupling BFM with Ocean models: the NEMO model V3.6 (Nucleus for the European
  Modelling of the Ocean).
