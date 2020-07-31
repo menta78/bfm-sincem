@@ -75,6 +75,3 @@ To compile a specific preset use the following
 ```bash
 [$BFMDIR/build]> ./bfm_configure.sh -gcd -p <preset_name> 
 ```
-
-
-```
