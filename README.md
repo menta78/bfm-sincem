@@ -5,7 +5,7 @@ The Biogeochemical Flux Model (BFM) is numerical model to simulate the dynamics 
 The BFM is open source software freely available under the GNU Public License. 
 The model description and documentation is available on the BFM website http://www.bfm-community.eu.
 
-In the `doc/` folder of the repository are also available the manuals in LyX format.
+In the `doc/` folder of the repository are also available the manuals and logos.
 
 
 #### Members of the BFM agreement
