@@ -61,7 +61,7 @@ eqs-within-sections
 \font_sf_scale 100 100
 \font_tt_scale 100 100
 \use_microtype false
-\use_dash_ligatures false
+\use_dash_ligatures true
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -291,7 +291,7 @@ height "1pt"
 
 
 \begin_inset Graphics
-	filename ../doc/logos/BFM_Full_logo.png
+	filename ../logos/BFM_Full_logo.png
 	lyxscale 40
 	width 50text%
 
