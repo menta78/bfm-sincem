@@ -378,12 +378,12 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
           p_sd = 0.05
          p_sd2 = 0.0
        p_suhR1 = 1.0
-       p_sulR1 = 50.0
-        p_suR2 = 0.80
-        p_suR3 = 0.00025
+       p_sulR1 = 100.0
+        p_suR2 = 0.0
+        p_suR3 = 0.002
         p_suR6 = 1.0
         p_chuc = 1000.0
-    p_chuc_lim = 0.00
+    p_chuc_lim = -1.25
          p_sum = 3.0
        p_pu_ra = 0.5
      p_pu_ra_o = 0.1
@@ -391,7 +391,7 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
       p_qncPBA = 1.85E-02
       p_qpcPBA = 9.26E-04
         p_qlnc = 0.0167
-        p_qlpc = 0.0018
+        p_qlpc = 0.0019
          p_qun = 0.0
          p_qup = 0.0
          p_chn = 5.00
@@ -400,6 +400,7 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
         p_ruen = 1.0
         p_ruep = 1.0
     p_pu_ea_R3 = 0.0
+    p_dep      =  400.0
 	filename_nml_conf = 'Pelagic_Ecology.nml',
 /
 
@@ -491,8 +492,8 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
        p_temp = 0.0,    0.0
         p_sum = 2.0,    2.5
         p_srs = 0.01,   0.05
-       p_sdmo = 0.05,   0.1
-       p_thdo = 0.15,   0.3
+       p_sdmo = 0.05,   0.05
+       p_thdo = 0.15,   0.1
         p_seo = 0.0,    0.0
        p_sheo = 0.0,    0.0
       p_pu_ea = 0.05,   0.2
@@ -578,7 +579,7 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
        p_sdo =  0.25
         p_sd =  0.01
         p_pu =  0.5
-     p_pu_ea =  0.3
+     p_pu_ea =  0.4
       p_chro =  0.5
       p_chuc =  20.0
    p_minfood =  20.0
@@ -719,7 +720,7 @@ p_paMEZ(1,:)=   1.0
 !-------------------------------------------------------------------------!
 &PelChem_parameters
   p_q10N4N3 = 2.367
-    p_sN4N3 = 0.05
+    p_sN4N3 = 0.01
     p_clO2o = 10.0
       p_rOS = 0.0
    p_sN3O4n = 0.0
@@ -777,7 +778,7 @@ p_N7fLigand = 0.6
 ! R6DeepBurial    logic          R6 Burial to Deep Sediment (Dunne et al., 2007)
 !-------------------------------------------------------------------------!
 &Settling_parameters
-  p_burvel_R6 = 1.5,
+  p_burvel_R6 = 2.5,
   p_burvel_O5 = 30.0,
   p_burvel_R2 = 0.0,
   p_burvel_PI = 0.1,
@@ -839,12 +840,8 @@ p_N7fLigand = 0.6
 !-------------------------------------------------------------------------!
 &namtrc_run     
    nn_dttrc      =  1  
-   nn_writetrc   =  100      !  time step frequency for sn_tracer outputs
    ln_top_euler  = .true.
    ln_rsttr      = .false.   !  start from a restart file (T) or not (F)
-   nn_rsttr      =   0       !  restart control = 0 initial time step is not compared to the restart file value
-   cn_trcrst_in  = "restart_trc"   !  suffix of pass. sn_tracer restart name (input)
-   cn_trcrst_out = "restart_trc"   !  suffix of pass. sn_tracer restart name (output)
         filename_nml_conf = 'namelist_top_cfg',
 /
 
@@ -911,8 +908,6 @@ p_N7fLigand = 0.6
 !   nn_trczdf_exp    number of sub-timestep for ln_trczdfexp=T
 !-------------------------------------------------------------------------!
 &namtrc_zdf        
-    ln_trczdf_exp  =  .false.
-    nn_trczdf_exp  =  3
         filename_nml_conf = 'namelist_top_cfg',
 /
 
