@@ -116,7 +116,7 @@
   ! Pressure limitation (use formula from Martin,1979)
   deplim = ONE
   if (p_dep(bac)> ZERO ) &
-      deplim = MIN( ONE, (EPR(:)/p_dep(bac))**-1.25 )
+      deplim = MIN( ONE, (EPR(:)/p_dep(bac))**p_chuc_lim(bac))
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Oxygen environment: bacteria are both aerobic and anaerobic
@@ -166,7 +166,7 @@
 !  rut = p_small + R1c(:) + R6c(:)
   R1rut = ruR1c/rut
 
-  BR6rat  = bacc *  (ONE - R1rut * p_suR2(bac))
+  BR6rat  = bacc * (ONE - R1rut)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Gross carbon uptake
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -178,23 +178,13 @@
 
   rugch = ZERO
   WHERE(ruR6c > ZERO) &
-     rugch = iN*p_sum(bac)*bacc * deplim * MM_power( ruR6c , p_sulR1(bac) * BR6rat , 3) * (ONE - R1rut)
+     rugch = iN*p_sum(bac)*bacc * deplim * TEMP2  * (ONE - R1rut)
   ruR6c = rugch 
 
   rug = ruR1c + ruR6c
-  !TEMP1 = MM_power( ruR1c , p_chuc(bac), 3 )
-  !TEMP2 = MM_power( ruR6c , p_sulR1(bac), 3 )
-
-  !TEMP1 = MM_power( rut , rugch, 3 )
-  !TEMP2 = et
   TEMP3 = R1rut
-  TEMP4 = ZERO
-  WHERE(R6c(:) > ZERO) TEMP4 = ruR6c / R6c(:)
+  TEMP4 = bacc * (ONE - R1rut)
 
-  !rug = rum * MM_power( rut , rugch, 3 ) 
-  !ruR1c = rug*ruR1c/rut
-  !ruR6c = rug*ruR6c/rut
- 
   BRUM = rug
   BRUT =  p_sulR1(bac) * BR6rat
 
@@ -221,8 +211,7 @@
   ! Mortality redistributed on substrates proportionally to realized uptake
   ! In absence of substrate, mortality goes toward dissolved matter
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  rdru = rd*ruR1c/rug
-  WHERE (rut .le. p_small) rdru = rd
+  rdru = rd*(ONE-ruR6c/rug)
   call quota_flux(iiPel, ppbacc, ppbacc, ppR1c, rdru              , tfluxC)
   call quota_flux(iiPel, ppbacn, ppbacn, ppR1n, rdru*qncPBA(bac,:), tfluxN)
   call quota_flux(iiPel, ppbacp, ppbacp, ppR1p, rdru*qpcPBA(bac,:), tfluxP)
