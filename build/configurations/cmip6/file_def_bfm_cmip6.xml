@@ -30,6 +30,8 @@
           <field field_ref="O3h"      name="talk"       long_name="Total Alkalinity"                                   unit="mol m-3" > @O3h * 1e-03 </field>
           <field field_ref="pCO2"     name="pco2"       long_name="Aqueous Partial Pressure of CO2"                    unit="Pa"      > @pCO2 * 1e-06 * 101325.0 </field>
           <field field_ref="pH"       name="ph"         long_name="pH"                                                 unit="1"      />
+          <field field_ref="O5c"      name="calc"       long_name="Calcite Concentration"                              unit="mol m-3" > @O5c * (1e-03 / $mwC) </field>
+          <field field_ref="CO3"      name="co3"        long_name="Carbonate Ion Concentration"                        unit="mol m-3" > (@CO3 * @ERHO) * 1e-06 </field>
           <field field_ref="N1p"      name="po4"        long_name="Total Dissolved Inorganic Phosphorus Concentration" unit="mol m-3" > @N1p * 1e-03 </field>
           <field field_ref="N3n"      name="no3"        long_name="Dissolved Nitrate Concentration"                    unit="mol m-3" > @N3n * 1e-03 </field>
           <field field_ref="N4n"      name="nh4"        long_name="Dissolved Ammonium Concentration"                   unit="mol m-3" > @N4n * 1e-03 </field>
@@ -44,6 +46,10 @@
           <field field_ref="B1c"      name="bacc"       long_name="Bacterial Carbon Concentration"                     unit="mol m-3" > @B1c * (1e-03 / $mwC) </field>
           <field field_ref="R1c"      name="dissoc"     long_name="Dissolved Organic Carbon Concentration"             unit="mol m-3" > @R1c * (1e-03 / $mwC) </field>
           <field field_ref="R6c"      name="detoc"      long_name="Detrital Organic Carbon Concentration"              unit="mol m-3" > @R6c * (1e-03 / $mwC) </field>
+          <field field_ref="R6n"      name="pon"      long_name="Particulate Organic Nitrogen Concentration"         unit="mol m-3" > @R6n * 1e-03 </field>
+          <field field_ref="R6p"      name="pop"      long_name="Particulate Organic Phosphorus Concentration"       unit="mol m-3" > @R6p * 1e-03 </field>
+          <field field_ref="R6s"      name="bsi"      long_name="Particulate Biogenic Silica Concentration"          unit="mol m-3" > @R6s * 1e-03 </field>
+          <field field_ref="R6f"      name="bfe"      long_name="Particulate Biogenic Iron Concentration"            unit="mol m-3" > @R6f * 1e-03 </field>
           <field field_ref="jsurO2o"  name="fgo2"       long_name="Surface Downward O2 Flux"                           unit="mol m-2 s-1" > @jsurO2o * ( -1e-03 / 86400.0) </field> 
           <field field_ref="jsurO3c"  name="fgco2"      long_name="Surface Downward CO2 Flux"                          unit="kg m-2 s-1"  > @jsurO3c * ( -1e-06 / 86400.0) </field>
           <field field_ref="sinkR6c"  name="expc"       long_name="Downward Flux of Particulate Organic Carbon"        unit="mol m-2 s-1" > @sinkR6c * (1e-03 / $mwC / 86400.0) </field>
@@ -56,6 +62,18 @@
           <field field_ref="ruPPYc2"  name="ppmisc"     long_name="Other Phytoplankton Carbon Production"              unit="mol m-3 s-1" operation="average" freq_op="1d" > (@ruPPYc2 - @resPPYc2) * (1e-03 / $mwC / 86400.0) </field>
           <field field_ref="ETW"      long_name="Seawater temperature in situ" />
           <field field_ref="EIR"      />
+          <field field_ref="ERHO"      />
+          <field field_ref="ESW"      />
+          <field field_ref="OCalc"    />
+          <field field_ref="OArag"    />
+          <field field_ref="P1n"      />
+          <field field_ref="P1p"      />
+          <field field_ref="P1s"      />
+          <field field_ref="P1f"      />
+          <field field_ref="P2n"      />
+          <field field_ref="P2p"      />
+          <field field_ref="R1n"      />
+          <field field_ref="R1p"      />
           <field field_ref="xEPS"     />
           <field field_ref="Q6c"      />
           <field field_ref="Q6n"      />
@@ -68,6 +86,12 @@
           <field field_ref="Q16n"     />
           <field field_ref="Q16p"     />
           <field field_ref="Q16s"     />
+          <field field_ref="ruZOOc"     />
+          <field field_ref="ruPBAc"     />
+          <field field_ref="resZOOc"     />
+          <field field_ref="resPBAc"     />
+          <field field_ref="resPPYc"     />
+          <field field_ref="exPPYc"     />
         </file>
 
       </file_group>
