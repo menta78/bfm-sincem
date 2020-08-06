@@ -76,6 +76,7 @@
         real(RLEN)            :: MM
 
         MM = x / (x + m)
+        if ( m == ZERO ) MM = ONE 
 
     end function MM
 
@@ -88,6 +89,7 @@
         real(RLEN)            :: MM_POWER
 
         MM_POWER = x**p / ( x**p+ m**p)
+        if ( m == ZERO ) MM_POWER = ONE 
 
     end function MM_POWER
 
