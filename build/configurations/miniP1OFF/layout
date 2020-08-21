@@ -126,8 +126,8 @@ end
     group PelDetritus[cnpsf] (OMT) : mg C/m3 : mmol N/m3: mmol P/m3: mmol Si/m3 : umol Fe/m3
       R1[-s]    : Labile Dissolved Organic Matter
       R6        : Particulate Organic Matter
-      R2[-npsf]  : Semi-labile Dissolved Organic Carbon
       R3[-npsf]  : Semi-refractory Dissolved Organic Carbon
+      R2[-npsf]  : Semi-labile Dissolved Organic Carbon
     end
 
   #	State Variable(s) for Nitrogen Mass Balance
@@ -215,6 +215,7 @@ end
     sediMIZ(MicroZooPlankton) : MicroZooPlankton sedimentation rate:m/d
     sediMEZ(MesoZooPlankton)  : MesoZooPlankton sedimentation rate :m/d
     sediR2                    : Colloidal OMT sedimentation rate   :m/d
+    sediR3                    : Refractory OMT sedimentation rate  :m/d
     sediR6                    : Detritus sedimentation rate        :m/d
     sediO5                    : Calcite sedimentation rate         :m/d
 
@@ -235,7 +236,8 @@ end
    TEMP1 : MM limitation : -
    TEMP2 : Rum (potUpt) : mgC/m3/d
    TEMP3 : ruR1/rut  : 0-1
-   TEMP4 : rut  : mgC/m3
+   TEMP4 : B1 on R6  : mgC/m3
+   TEMP5 : B1 resp exclude : mgC/m3/d
    BIOALK : O3h bio rate: mmol/m3
 end
 
@@ -302,6 +304,8 @@ end
   exPPYc=(P.c -> R1c+R2c+R3c+R6c) : C excretion from Phytoplankton : mg C/m3/d
   exPPYc1=(P1c -> R1c+R2c+R3c+R6c) : Diatoms excretion : mg C/m3/d
   exPPYc2=(P2c -> R1c+R2c+R3c+R6c) : Flagellates excretion : mg C/m3/d
+  exPPYR6c1=(P1c -> R6c) : Diatoms POC excretion : mg C/m3/d
+  exPPYR6c2=(P2c -> R6c) : Flagellates POC excretion : mg C/m3/d
   ruZOOc=(Z.c<-P.c+B.c+Z.c) : Gross/Net Secondary Production:mg C/m3/d
   ruPZOOc=Z.c <- P.c : Zooplankton Predation on Phytoplankton : mg C/m3/d
   ruBZOOc=Z.c <- B.c : Zooplankton Predation on Bacterioplankton : mg C/m3/d
@@ -310,7 +314,10 @@ end
   ruR1PBAc=R1c -> B1c : Bacteria Uptake of DOC : mg C/m3/d
   ruR6PBAc=R6c -> B1c : Bacteria Uptake of POC : mg C/m3/d
   exPBAc=(B.c -> R1c+R2c+R3c+R6c) : C excretion from Bacterioplankton : mg C/m3/d
+  exPBAR6c=(B.c -> R6c) : POC excretion from Bacterioplankton : mg C/m3/d
   exZOOc=(Z.c -> R1c+R2c+R3c+R6c) : C excretion from Zooplankton  : mg C/m3/d
+  exZOOR6c4=(Z4c -> R6c) : POC excretion from MesoZooplankton  : mg C/m3/d
+  exZOOR6c5=(Z5c -> R6c) : POC excretion from MicroZooplankton  : mg C/m3/d
   exPPYp=(P.p -> R1p+R6p) : P excretion from Phytoplankton : mmolP/m3/d
   ruPPYn=(P.n <- N3n+N4n): Net Nitrogen Uptake:mmol N/m3/d
   ruPPYp=P.p <- N1p : Net Phosphate Uptake : mmol P/m3/d
