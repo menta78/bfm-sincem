@@ -62,7 +62,7 @@
   real(RLEN),allocatable,save,dimension(:) :: et,eO2,rd,rrc,rrn,rrt,  &
                                           ruR1c,ruR1n,ruR1p,ruR6c,ruR6p,ruR6n, &
                                           ruR2c, reR2c, ruR3c, reR3c, &
-                                          ren,rep,rut,rugch,rum,run,rug,rdru,chlim,R1rut, R6ch, &
+                                          ren,rep,rut,rugch,rum,run,rug,rdru,R3ex,R1rut, R6ch, &
                                           iN1p,iNIn,iN, eN1p,eN4n, bacc, &
                                           tfluxC, tfluxN, tfluxP, pe_N4n, pe_N1p, pe_R6c,deplim
 #ifndef INCLUDE_PELCO2
@@ -86,7 +86,7 @@
         &       eN1p(NO_BOXES), eN4n(NO_BOXES), bacc(NO_BOXES),       &
         &       tfluxC(NO_BOXES), tfluxN(NO_BOXES), tfluxP(NO_BOXES), &
         &       pe_N4n(NO_BOXES), pe_N1p(NO_BOXES), pe_R6c(NO_BOXES), &
-        &       chlim(NO_BOXES), R1rut(NO_BOXES), R6ch(NO_BOXES),   &
+        &       R3ex(NO_BOXES), R1rut(NO_BOXES), R6ch(NO_BOXES),   &
         &       deplim(NO_BOXES), STAT = AllocStatus )
      IF( AllocStatus /= 0 ) call bfm_error('PelBacDynamics','Error allocating arrays')
      first=1
@@ -114,7 +114,7 @@
   ! Pressure limitation (Tamburini, 2009 work) use exp function
   deplim = ONE
   if (p_dep(bac)> ZERO ) &
-      deplim = MIN( ONE, (EPR(:)/p_dep(bac))**p_chuc_lim(bac))
+      deplim = MIN( ONE, (EPR(:)/p_dep(bac))**p_dep_exp(bac))
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Oxygen environment: bacteria are both aerobic and anaerobic
@@ -145,25 +145,25 @@
 
   ! DOC aggregation into POC
   rugch = ZERO
-  rugch =  MIN(R1c(:), R6c(:) * p_suR3(bac))
+  rugch =  MIN(R1c(:), R6c(:) * p_sulR1(bac))
   call flux_vector(iiPel, ppR1c, ppR6c, rugch) 
   call flux_vector(iiPel, ppR1n, ppR6n, rugch*qncOMT(iiR1,:)) 
   call flux_vector(iiPel, ppR1p, ppR6p, rugch*qpcOMT(iiR1,:)) 
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  ! Potential uptake by bacteria (eq. 50 Vichi et al. 2007)
+  ! Potential uptake by bacteria
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  rum = iN*p_sum(bac)*bacc
+  rum = iN * p_sum(bac) * bacc
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Total substrate from detritus pools
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   rut = p_small + R1c(:) + R6c(:)
-  R1rut = R1c(:)/rut
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Gross carbon uptake
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  R1rut = R1c(:)/rut
   ruR1c = rum * et * MM_power( R1c(:) , p_suhR1(bac), 3 ) * R1rut
 
   R6ch  = p_suR6(bac) *  bacc * (ONE - R1rut)
@@ -171,13 +171,13 @@
 
   rug = ruR1c + ruR6c
 
-  TEMP1 = MM_power( R1c(:) , p_chuc(bac), 3)
-  TEMP2 = MM_power( R6c(:) , p_sulR1(bac) * R6ch , 3)
+  TEMP1 = MM_power( R1c(:) , p_suhR1(bac), 3)
+  TEMP2 = MM_power( R6c(:) , R6ch , 3)
   TEMP3 = R1rut
   TEMP4 = bacc * (ONE - R1rut)
 
   BRUM = rug
-  BRUT =  p_sulR1(bac) * R6ch
+  BRUT = R6ch
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Organic Carbon uptake
@@ -217,7 +217,7 @@
   ! Anaerobic bacteria use NO3 instead of O2, with additional carbon cost.
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Activity + Basal respiration
-  rrc = (p_pu_ra(bac) * rug * p_suR2(bac)) + p_srs(bac)* bacc* et
+  rrc = (p_pu_ra(bac) * rug * p_pu_ea_R3(bac)) + p_srs(bac)* bacc* et
   ! Aerobic consumption of Oxygen
   call flux_vector( iiPel, ppO2o, ppO2o, -eO2*rrc/MW_C )
   ! Anaerobic consumption of Nitrate (denitrification-like)
@@ -228,8 +228,8 @@
   call quota_flux( iiPel, ppbacc, ppbacc, ppO3c, rrt, tfluxC)
 
   ! I suppose is R3
-  TEMP5 = p_pu_ra(bac) * rug * (ONE - p_suR2(bac))
-  call quota_flux( iiPel, ppbacc, ppbacc, ppbacc, -TEMP5, tfluxC)
+  R3ex = p_pu_ra(bac) * rug * (ONE - p_pu_ea_R3(bac))
+  call quota_flux( iiPel, ppbacc, ppbacc, ppR3c, R3ex, tfluxC)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Net Production
