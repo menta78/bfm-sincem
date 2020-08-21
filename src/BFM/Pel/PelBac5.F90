@@ -226,7 +226,7 @@
   ! Anaerobic bacteria use NO3 instead of O2, with additional carbon cost.
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Activity + Basal respiration
-  rrc = (p_pu_ra(bac) * rug) + p_srs(bac)* bacc* et
+  rrc = (p_pu_ra(bac) * rug * p_suR2(bac)) + p_srs(bac)* bacc* et
   ! Aerobic consumption of Oxygen
   call flux_vector( iiPel, ppO2o, ppO2o, -eO2*rrc/MW_C )
   ! Anaerobic consumption of Nitrate (denitrification-like)
@@ -235,6 +235,10 @@
   ! Total Respiration
   rrt = rrc + (ONE-eO2)*rrn
   call quota_flux( iiPel, ppbacc, ppbacc, ppO3c, rrt, tfluxC)
+
+  ! I suppose is R3
+  TEMP5 = p_pu_ra(bac) * rug * (ONE - p_suR2(bac))
+  call quota_flux( iiPel, ppbacc, ppbacc, ppbacc, -TEMP5, tfluxC)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Net Production

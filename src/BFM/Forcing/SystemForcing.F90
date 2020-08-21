@@ -181,7 +181,7 @@
       enddo
       ! Set uniform value : Backward in time 
       if (FData%tbef .EQ. bfmtime%time0 .AND. jday0 > bfmtime%time0) then
-         write(LOGUNIT,*) 'FieldInit: Backward use in time of the last input value as a constant.'
+         write(LOGUNIT,*) 'FieldInit: Backward use in time of the first input value as a constant.'
          FData%nbef = FData%naft
       endif
       ! forward in time
