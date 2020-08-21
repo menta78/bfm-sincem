@@ -62,7 +62,7 @@
   real(RLEN),allocatable,save,dimension(:) :: et,eO2,rd,rrc,rrn,rrt,  &
                                           ruR1c,ruR1n,ruR1p,ruR6c,ruR6p,ruR6n, &
                                           ruR2c, reR2c, ruR3c, reR3c, &
-                                          ren,rep,rut,rugch,rum,run,rug,rdru,chlim,R1rut, BR6rat, &
+                                          ren,rep,rut,rugch,rum,run,rug,rdru,chlim,R1rut, R6ch, &
                                           iN1p,iNIn,iN, eN1p,eN4n, bacc, &
                                           tfluxC, tfluxN, tfluxP, pe_N4n, pe_N1p, pe_R6c,deplim
 #ifndef INCLUDE_PELCO2
@@ -86,7 +86,7 @@
         &       eN1p(NO_BOXES), eN4n(NO_BOXES), bacc(NO_BOXES),       &
         &       tfluxC(NO_BOXES), tfluxN(NO_BOXES), tfluxP(NO_BOXES), &
         &       pe_N4n(NO_BOXES), pe_N1p(NO_BOXES), pe_R6c(NO_BOXES), &
-        &       chlim(NO_BOXES), R1rut(NO_BOXES), BR6rat(NO_BOXES),   &
+        &       chlim(NO_BOXES), R1rut(NO_BOXES), R6ch(NO_BOXES),   &
         &       deplim(NO_BOXES), STAT = AllocStatus )
      IF( AllocStatus /= 0 ) call bfm_error('PelBacDynamics','Error allocating arrays')
      first=1
@@ -104,8 +104,6 @@
   tfluxC = ZERO
   tfluxN = ZERO
   tfluxP = ZERO
-  !BRUM = ZERO 
-  !BRUT = ZERO
   BGE  = ZERO
   
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -113,7 +111,7 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   et = eTq(ETW(:), p_q10(bac))
 
-  ! Pressure limitation (use formula from Martin,1979)
+  ! Pressure limitation (Tamburini, 2009 work) use exp function
   deplim = ONE
   if (p_dep(bac)> ZERO ) &
       deplim = MIN( ONE, (EPR(:)/p_dep(bac))**p_chuc_lim(bac))
@@ -155,38 +153,31 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Potential uptake by bacteria (eq. 50 Vichi et al. 2007)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  rum = iN*et*p_sum(bac)*bacc
+  rum = iN*p_sum(bac)*bacc
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Total substrate from detritus pools
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ruR1c = p_suhR1(bac) * R1c(:)
-  ruR6c = p_suR6(bac)  * R6c(:)
-  rut   = p_small + ruR1c + ruR6c
-!  rut = p_small + R1c(:) + R6c(:)
-  R1rut = ruR1c/rut
+  rut = p_small + R1c(:) + R6c(:)
+  R1rut = R1c(:)/rut
 
-  BR6rat  = bacc * (ONE - R1rut)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Gross carbon uptake
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  TEMP1 = MM_power( ruR1c , p_chuc(bac), 3)
+  ruR1c = rum * et * MM_power( R1c(:) , p_suhR1(bac), 3 ) * R1rut
 
-  TEMP2 = MM_power( ruR6c , p_sulR1(bac) * BR6rat , 3)
-
-  ruR1c = rum * MM_power( ruR1c , p_chuc(bac), 3 ) * R1rut
-
-  rugch = ZERO
-  WHERE(ruR6c > ZERO) &
-     rugch = iN*p_sum(bac)*bacc * deplim * TEMP2  * (ONE - R1rut)
-  ruR6c = rugch 
+  R6ch  = p_suR6(bac) *  bacc * (ONE - R1rut)
+  ruR6c = rum * deplim * MM_power( R6c(:) , R6ch , 3)  * (ONE - R1rut)
 
   rug = ruR1c + ruR6c
+
+  TEMP1 = MM_power( R1c(:) , p_chuc(bac), 3)
+  TEMP2 = MM_power( R6c(:) , p_sulR1(bac) * R6ch , 3)
   TEMP3 = R1rut
   TEMP4 = bacc * (ONE - R1rut)
 
   BRUM = rug
-  BRUT =  p_sulR1(bac) * BR6rat
+  BRUT =  p_sulR1(bac) * R6ch
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Organic Carbon uptake
@@ -260,7 +251,7 @@
   ! This rate is assumed to occur with a timescale p_ruen=1 day
   ! and controlled with a Michaelis-Menten function
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  ren  =  (qncPBA(bac,:) - p_qncPBA(bac))*bacc*p_ruen(bac)
+  ren = (qncPBA(bac,:) - p_qncPBA(bac))*bacc*p_ruen(bac)
 
   ! Fix-quota: actual quota comes from detritus uptake vs. realized growth
   if ( ppbacn == 0 ) & 
@@ -275,7 +266,7 @@
   ! This rate is assumed to occur with a timescale of p_ruep=1 day
   ! and controlled with a Michaelis-Menten function
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  rep  =  (qpcPBA(bac,:) - p_qpcPBA(bac))*bacc*p_ruep(bac)
+  rep = (qpcPBA(bac,:) - p_qpcPBA(bac))*bacc*p_ruep(bac)
 
   ! Fix-quota: actual quota comes from detritus uptake vs. realized growth
   if ( ppbacp == 0 ) &
