@@ -156,7 +156,7 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Gross carbon uptake
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  rugch = p_chuc(bac) * max(p_chuc_lim(bac), (ruR1c/rut) )
+  rugch = p_chuc(bac) * max(p_sulR1(bac), (ruR1c/rut) )
   ! 15d
   !rugch = p_chuc(bac) * max(p_chuc_lim(bac), logit ((ruR1c/rut), 0.6, 7.0) )
   ! 15e

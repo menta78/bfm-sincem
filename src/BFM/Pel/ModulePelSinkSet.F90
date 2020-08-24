@@ -17,7 +17,7 @@
 
   use global_mem
   use mem,       only: NO_D3_BOX_STATES, ppPelDetritus, ppPhytoPlankton,  &
-      & iiPhytoPlankton, iiLastElement, iiR6, sediR2, sediR6,sediPPY
+      & iiPhytoPlankton, iiLastElement, iiR6, iiR3, sediR2, sediR3, sediR6,sediPPY
   use api_bfm,   only: var_names, BOTindices
   use mem_Phyto, only: p_res, p_rPIm
 #if defined INCLUDE_PELCO2
@@ -80,6 +80,7 @@
   ! depth_factor    [m]    depth factor for aggregation method
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   real(RLEN)    :: p_rR6m = 0.0_RLEN
+  real(RLEN)    :: p_rR3m = 0.0_RLEN
   real(RLEN)    :: p_rO5m = 0.0_RLEN
   real(RLEN)    :: KSINK_rPPY = 0.0_RLEN
   logical       :: AggregateSink = .FALSE.
@@ -98,6 +99,7 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   real(RLEN)  :: p_burvel_R6=0.0_RLEN
   real(RLEN)  :: p_burvel_R2=0.0_RLEN
+  real(RLEN)  :: p_burvel_R3=0.0_RLEN
   real(RLEN)  :: p_burvel_PI=0.0_RLEN
   real(RLEN)  :: p_burvel_O5=0.0_RLEN
   logical     :: R6DeepBurial = .FALSE.
@@ -116,12 +118,12 @@
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 #if ! defined INCLUDE_PELCO2
-  namelist /PelGlobal_parameters/ p_rR6m, KSINK_rPPY, AggregateSink, depth_factor
+  namelist /PelGlobal_parameters/ p_rR6m, p_rR3m,  KSINK_rPPY, AggregateSink, depth_factor
 #else   
-  namelist /PelGlobal_parameters/ p_rR6m, p_rO5m, KSINK_rPPY, AggregateSink, &
+  namelist /PelGlobal_parameters/ p_rR6m, p_rR3m, p_rO5m, KSINK_rPPY, AggregateSink, &
                                   depth_factor
 #endif
-  namelist /Settling_parameters/ p_burvel_R6, p_burvel_R2, p_burvel_PI, &
+  namelist /Settling_parameters/ p_burvel_R6, p_burvel_R2, p_burvel_R3, p_burvel_PI, &
                                  p_burvel_O5, R6DeepBurial
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
@@ -158,6 +160,17 @@
          if (ppstate > 0) then 
             SINKD3STATE(ppstate)%dosink = .TRUE.
             SINKD3STATE(ppstate)%sedi => sediR6
+         endif
+     enddo
+  endif
+
+  ! refractory DOC (R3)
+  if ( p_rR3m > 0.0_RLEN) then
+     do n = 1, iiLastElement
+         ppstate = ppPelDetritus(iiR3,n)
+         if (ppstate > 0) then
+            SINKD3STATE(ppstate)%dosink = .TRUE.
+            SINKD3STATE(ppstate)%sedi => sediR3
          endif
      enddo
   endif

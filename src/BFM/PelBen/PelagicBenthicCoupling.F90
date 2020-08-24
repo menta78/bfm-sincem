@@ -39,12 +39,12 @@
            PhytoPlankton, ppPhytoPlankton, iiPhytoPlankton,               &
            MicroZooPlankton, ppMicroZooPlankton, iiMicroZooPlankton,      &
            R1c, R2c, R6c, R1n, R6n, R1p, R6p, R6s,                        &
-           ppR1c, ppR6c, ppR1n, ppR6n, ppR1p, ppR6p, ppR6s, ppR2c,        &
+           ppR1c, ppR6c, ppR1n, ppR6n, ppR1p, ppR6p, ppR6s, ppR2c, ppR3c, &
            ppO2o, ppN1p, ppN3n, ppN4n, ppN5s, ppN6r,                      &
            jbotR6c, jbotR6n, jbotR6p, jbotR6s, jbotR1c, jbotR1n, jbotR1p, &
-           jbotO2o, jbotN1p, jbotN3n, jbotN4n, jbotN5s, jbotN6r,          &
-           sediPPY, sediR2, sediR6,                                       &
-           qpcPPY, qncPPY, qscPPY, qlcPPY, qncMIZ, qpcMIZ,qccPPY,                &
+           jbotO2o, jbotN1p, jbotN3n, jbotN4n, jbotN5s, jbotN6r, jbotR3c, &
+           sediPPY, sediR2, sediR3, sediR6,                               &
+           qpcPPY, qncPPY, qscPPY, qlcPPY, qncMIZ, qpcMIZ,qccPPY,         &
            iiC, iiN, iiP, iiL, iiS, iiLastElement, iiBen, iiPel,          &
            flux, flux_vector
 #ifdef INCLUDE_PELFE
@@ -269,6 +269,13 @@
          jbotR2R1(Box) = - ruQc *    p   
          jbotR2R6(Box) = - ruQc * (ONE-p)
       end if
+
+      ! Refractory OM (R3) fluxes to R6/R16
+      if ( sediR3(kbot) > ZERO) then
+         ruQc = sediR3(kbot) * R3c(kbot)
+         jbotR3c(Box) = jbotR3c(Box) - ruQc
+      end if 
+
       !
 #ifdef INCLUDE_PELCO2
       ! burial rate of PIC (calcite)
@@ -302,6 +309,7 @@
 #endif
       c = jbotR2R6(Box) + jbotR2R1(Box)
       call flux(kbot, iiPel, ppR2c, ppR2c, ( c /Depth(kbot)) )
+      call flux(kbot, iiPel, ppR3c, ppR3c, ( jbotR3c(Box)/Depth(kbot)) )
       !
       ! Detritus (R6,R1,R2,PPY) fluxes to sediment are directed via R6/R1
       ! R6 -> Q6 
@@ -399,10 +407,12 @@
          call flux_vector( iiBen, ppQ16p,ppQ16p, -jbotR6p(:) * burfrac)
          call flux_vector( iiBen, ppQ16s,ppQ16s, -jbotR6s(:) * burfrac)
          call flux_vector( iiBen, ppQ16c,ppQ16c, -jbotO5c(:) )
+         call flux_vector( iiBen, ppQ16c,ppQ16c, -jbotR3c(:) )
       else
          ! Here Divert O5c flux to surface Benthic OM for mass conservation 
          ! TL: it has to be included in benthic CSYS 
          call flux_vector( iiBen, ppQ6c,ppQ6c, -jbotO5c(:) )
+         call flux_vector( iiBen, ppQ6c,ppQ6c, -jbotR3c(:) )
 
       endif
 

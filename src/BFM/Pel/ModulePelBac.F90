@@ -121,8 +121,8 @@
   real(RLEN)  :: p_rec(iiPelBacteria)
   real(RLEN)  :: p_pu_ea_R3(iiPelBacteria)
   real(RLEN)  :: p_chuc(iiPelBacteria)
-  real(RLEN)  :: p_chuc_lim(iiPelBacteria)
   real(RLEN)  :: p_dep(iiPelBacteria)
+  real(RLEN)  :: p_dep_exp(iiPelBacteria)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! SHARED PUBLIC FUNCTIONS (must be explicited below "contains")
@@ -139,7 +139,7 @@
   namelist /PelBacteria_parameters/ p_version, p_q10, p_chdo, p_sd, p_sd2, p_suhR1, &
     p_sulR1, p_suR2, p_suR6, p_sum, p_pu_ra, p_pu_ra_o, p_pu_ea_R3, p_srs, &
     p_suR3, p_qpcPBA, p_qlpc, p_qncPBA, p_qlnc, p_qun, p_qup, p_chn, p_chp, &
-    p_ruen, p_ruep, p_rec, p_chuc, p_chuc_lim, p_dep
+    p_ruen, p_ruep, p_rec, p_chuc, p_dep, p_dep_exp
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   !BEGIN compute
@@ -180,20 +180,18 @@
   ! Check across bacterial groups if R2 and R3 must be kept in transport
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   itrp=maxval(p_version)
-  if ( itrp < 3 ) then
-     D3STATETYPE(ppR3c)=NOTRANSPORT
-     write(LOGUNIT,*) " Disable R3c transport as no bacterial group use it "
-  endif
-  if ( itrp < 2 ) then
-     D3STATETYPE(ppR2c)=NOTRANSPORT
-     write(LOGUNIT,*) " Disable R2c transport as no bacterial group use it "
-  endif
-  if ( itrp > 3 ) then 
-     D3STATETYPE(ppR3c)=NOTRANSPORT
-     D3STATETYPE(ppR2c)=NOTRANSPORT
-     write(LOGUNIT,*) " Disable R2c & R3c transport as no bacterial group use it "
-   endif
-   write(LOGUNIT,*) ""
+  select case (itrp)
+     case ( 1, 4 )
+        D3STATETYPE(ppR3c)=NOTRANSPORT
+        D3STATETYPE(ppR2c)=NOTRANSPORT
+        write(LOGUNIT,*) " Disable R2c & R3c transport as no bacterial group use it "
+     case ( 2, 5 )
+        D3STATETYPE(ppR2c)=NOTRANSPORT
+        write(LOGUNIT,*) " Disable R2c transport as no bacterial group use it "
+     case default
+        write(LOGUNIT,*) " Active R2c & R3c transport"
+  end select
+  write(LOGUNIT,*) ""
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Write parameter list to the log
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
