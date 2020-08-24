@@ -24,7 +24,7 @@
   use mem
 #else
   use mem, ONLY:  R6c, R6n, R6p, R1c, R1n, R1p, R2c, O2o, N6r, BGE, &
-    N4n, N1p, N3n, R3c, iiR1, iiR6, D3STATE , BRUM , TEMP1 , BRUT, TEMP2, TEMP3, TEMP4
+    N4n, N1p, N3n, R3c, iiR1, iiR6, D3STATE
   use mem, ONLY: iiPelBacteria, ppPelBacteria, iiC, iiN, iiP, ppR6c, ppR6n, ppR6p, &
     ppR1c, ppR1n, ppR1p, ppR2c, ppO2o, ppN6r, ppN4n, ppN1p, ppN3n, ppR3c, ETW, &
     qncPBA, qpcPBA, eO2mO2, qpcOMT, qncOMT, NO_BOXES, iiBen, iiPel, flux_vector,quota_flux
@@ -167,17 +167,10 @@
   !rugch = p_chuc(bac) * max(p_chuc_lim(bac), chlim)
  
 
-  TEMP1 = MM_power( rut , rugch, 3 )
-  TEMP2 = et
-  TEMP3 = ruR1c/rut
-  TEMP4 = rut
-
   rug = rum * MM_power( rut , rugch, 3 ) 
   ruR1c = rug*ruR1c/rut
   ruR6c = rug*ruR6c/rut
  
-  BRUM = rug
-  BRUT = rum
   !write(*,*) 'B4: ', rut, rugch, TEMP1 , TEMP3 , TEMP4, rug
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

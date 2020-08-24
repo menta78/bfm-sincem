@@ -24,7 +24,7 @@
   use mem
 #else
   use mem, ONLY:  R6c, R6n, R6p, R1c, R1n, R1p, R2c, O2o, N6r, BGE, &
-    N4n, N1p, N3n, R3c, iiR1, iiR6, D3STATE , BRUM , TEMP1 , BRUT, TEMP2, TEMP3, TEMP4
+    N4n, N1p, N3n, R3c, iiR1, iiR6, D3STATE
   use mem, ONLY: iiPelBacteria, ppPelBacteria, iiC, iiN, iiP, ppR6c, ppR6n, ppR6p, &
     ppR1c, ppR1n, ppR1p, ppR2c, ppO2o, ppN6r, ppN4n, ppN1p, ppN3n, ppR3c, ETW, EPR, &
     qncPBA, qpcPBA, eO2mO2, qpcOMT, qncOMT, NO_BOXES, iiBen, iiPel, flux_vector,quota_flux
@@ -170,14 +170,6 @@
   ruR6c = rum * deplim * MM_power( R6c(:) , R6ch , 3)  * (ONE - R1rut)
 
   rug = ruR1c + ruR6c
-
-  TEMP1 = MM_power( R1c(:) , p_suhR1(bac), 3)
-  TEMP2 = MM_power( R6c(:) , R6ch , 3)
-  TEMP3 = R1rut
-  TEMP4 = bacc * (ONE - R1rut)
-
-  BRUM = rug
-  BRUT = R6ch
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Organic Carbon uptake
