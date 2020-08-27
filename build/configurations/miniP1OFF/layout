@@ -138,6 +138,7 @@ end
 2d-variable-pel -if-exist INCLUDE_PELCO2
   EPCO2air   : Atmospheric CO2 Partial Pressure : uatm
   CO2airflux : Sea-air CO2 Flux : mmol/m2/d
+  dpco2      : Air-Sea pCO2 difference :uatm
 end
 
 3d-variable-pel -if-exist INCLUDE_PELCO2
@@ -239,6 +240,10 @@ end
    TEMP4 : B1 on R6  : mgC/m3
    TEMP5 : B1 resp exclude : mgC/m3/d
    BIOALK : O3h bio rate: mmol/m3
+end
+
+2d-variable-pel
+  dpo2      : Air-Sea pO2 difference :atm
 end
 
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
