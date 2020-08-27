@@ -29,7 +29,7 @@
                  Source_D3_vector, ppO5c, ppN3n, ppN4n, BIOALK
   use mem, ONLY: ppO3h, ppO3c, NO_BOXES, NO_BOXES_XY, BoxNumber,   &
     N1p,N5s,CO2, HCO3, CO3, pCO2, pH, ETW, ESW, ERHO, EWIND, EICE, &
-    OCalc, OArag, EPR, ppO5c, O5c, EPCO2air
+    OCalc, OArag, EPR, ppO5c, O5c, EPCO2air, dpco2
 #endif
   use mem_CO2    
   use mem_CSYS, ONLY : CarbonateSystem
@@ -152,6 +152,7 @@
   ! Computes Atmospheric pCO2 value
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   EPCO2air(:) = AirpGas(AtmCO2%fnow, patm3d(SRFindices), ETW(SRFindices), ESW(SRFindices))
+  dpco2(:) = pCO2(SRFindices) - EPCO2air(:)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Computes air-sea flux (only at surface points)

@@ -138,6 +138,7 @@ end
 2d-variable-pel -if-exist INCLUDE_PELCO2
   EPCO2air   : Atmospheric CO2 Partial Pressure : uatm
   CO2airflux : Sea-air CO2 Flux : mmol/m2/d
+  dpco2      : Sea-air pCO2 difference :uatm
 end
 
 3d-variable-pel -if-exist INCLUDE_PELCO2
