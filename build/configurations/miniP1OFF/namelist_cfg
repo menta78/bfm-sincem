@@ -102,6 +102,21 @@
 !-----------------------------------------------------------------------
 &namtra_ldf    !   lateral diffusion scheme for tracer 
 !-----------------------------------------------------------------------
+   !                       !  Operator type:
+   ln_traldf_lap    =  .true.   !  laplacian operator
+   ln_traldf_bilap  =  .false.  !  bilaplacian operator
+   !                       !  Direction of action:
+   ln_traldf_level  =  .false.  !  iso-level
+   ln_traldf_hor    =  .false.  !  horizontal (geopotential)   (needs "key_ldfslp" when ln_sco=T)
+   ln_traldf_iso    =  .true.   !  iso-neutral                 (needs "key_ldfslp")
+   !                       !  Griffies parameters              (all need "key_ldfslp")
+   ln_traldf_grif   =  .false.  !  griffies skew flux formulation       (require "key_ldfslp")
+   ln_traldf_gdia   =  .false.  !  griffies operator strfn diagnostics  (require "key_ldfslp")
+   ln_triad_iso     =  .false.  !  pure lateral mixing in ML
+   ln_botmix_grif   =  .false.  !  griffies operator with lateral mixing on bottom (require "key_ldfslp")
+   rn_aht_0         =  1000.    !  horizontal eddy diffusivity for tracers [m2/s]
+   rn_aeiv_0        =  1000.    !  eddy induced velocity coefficient [m2/s]    (require "key_traldf_eiv")
+   rn_ahtb_0        =     0.    !  background eddy diffusivity for ldf_iso [m2/s]
 /
 !-----------------------------------------------------------------------
 &namdta_dyn        !   offline dynamics read in files                ("key_offline")
