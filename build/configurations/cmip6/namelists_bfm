@@ -280,7 +280,7 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
           'P1n','P2n',
           'P1p','P2p',
           'jbotR6c','jsurO2o','jsurO3c',
-          'ruPPYc','ruPPYn','ruPPYp','ruPPYf','exPPYc',
+          'ruPPYc','ruPPYn','ruPPYp','ruPPYs','ruPPYf','exPPYc',
           'resPPYc','resPBAc','resZOOc',
           'ruZOOc','qncOMT_iiR6','qpcOMT_iiR6',
           'EICE','ETW','EIR','EWIND','xEPS',
@@ -374,7 +374,7 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
         p_chdo = 15.0
           p_sd = 0.05
          p_sd2 = 0.0
-       p_suhR1 = 100.0
+       p_suhR1 = 1000.0
        p_sulR1 = 0.002
         p_suR2 = 0.0
         p_suR3 = 0.0
@@ -515,7 +515,7 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
      p_qscPPY = 0.0145,   0.0
        p_esNI = 0.1,    0.0
        p_res  = 5.0,    0.0
-     p_caco3r = 0.0,    0.15
+     p_caco3r = 0.0,    0.1
   p_switchChl = 1,      1
       p_sdchl = 0.2,    0.2
   p_alpha_chl = 1.38e-5, 0.46e-5
@@ -576,7 +576,7 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
        p_sdo =  0.25
         p_sd =  0.01
         p_pu =  0.5
-     p_pu_ea =  0.4
+     p_pu_ea =  0.5
       p_chro =  0.5
       p_chuc =  20.0
    p_minfood =  20.0

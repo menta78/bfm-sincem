@@ -72,6 +72,7 @@
           <field field_ref="P1f"      />
           <field field_ref="P2n"      />
           <field field_ref="P2p"      />
+          <field field_ref="P2f"      />
           <field field_ref="R1n"      />
           <field field_ref="R1p"      />
           <field field_ref="xEPS"     />
@@ -131,20 +132,18 @@
           <field field_ref="R6s"      name="bsi"      long_name="Particulate Biogenic Silica Concentration"          unit="mol m-3" > @R6s * 1e-03 </field>
           <field field_ref="R6f"      name="bfe"      long_name="Particulate Biogenic Iron Concentration"            unit="mol m-3" > @R6f * 1e-03 </field>
           <field field_ref="P1l"      name="chl"      long_name="Total Chlorophyll Mass Concentration"               unit="kg m-3"      operation="average" freq_op="1d" > (@P1l + @P2l) * 1e-06 </field>
-          <field field_ref="ruPPYc"   name="pp"       long_name="Primary Carbon Production by Phytoplankton"         unit="mol m-3 s-1" operation="average" freq_op="1d" > (@ruPPYc - @resPPYc)   * (1e-03 / $mwC / 86400.0) </field>
+          <field field_ref="ruPPYc"   name="pp"       long_name="Primary Carbon Production by Phytoplankton"         unit="mol m-3 s-1" operation="average" freq_op="1d" > (@ruPPYc - @resPPYc) * (1e-03 / $mwC / 86400.0) </field>
           <field field_ref="sinkR6c"  name="expc"     long_name="Downward Flux of Particulate Organic Carbon"        unit="mol m-2 s-1" > @sinkR6c * (1e-03 / $mwC / 86400.0) </field>
           <field field_ref="sinkR6s"  name="expsi"    long_name="Sinking Particulate Silica Flux"                    unit="mol m-2 s-1" > @sinkR6s * (1e-03 / 86400.0) </field>
           <field field_ref="sinkO5c"  name="expcalc"  long_name="Downward Flux of Calcite"                           unit="mol m-2 s-1" > @sinkO5c * (1e-03 / $mwC / 86400.0) </field>
-          <field field_ref="R1n"      />
-          <field field_ref="R1p"      />
-          <field field_ref="OCalc"    />
-          <field field_ref="OArag"    /> 
-          <field field_ref="P1n"      />
-          <field field_ref="P1p"      />
-          <field field_ref="P1s"      />
-          <field field_ref="P1f"      />
-          <field field_ref="P2n"      />
-          <field field_ref="P2p"      />
+          <field field_ref="jbotN3n"  />
+          <field field_ref="jbotN4n"  />
+          <field field_ref="jbotN1p"  />
+          <field field_ref="jbotN5s"  />
+          <field field_ref="jbotO3c"  />
+          <field field_ref="jbotR3c"  />
+          <field field_ref="jbotR6c"  />
+          <field field_ref="jbotP1c"  />
         </file>
 
       </file_group>
