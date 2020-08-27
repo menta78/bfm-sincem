@@ -19,7 +19,7 @@
   use mem
 #else
   use mem, ONLY: NO_BOXES_XY, NO_BOXES, iiPel, flux_vector
-  use mem, ONLY: ppO2o, O2o, jsurO2o, cxoO2, eO2mO2, ETW, ESW, EWIND, EICE, Depth
+  use mem, ONLY: ppO2o, O2o, jsurO2o, cxoO2, eO2mO2, ETW, ESW, EWIND, EICE, Depth, dpo2
 # endif
   use api_bfm,    ONLY: SRFindices
   use mem_param,  ONLY: AssignAirPelFluxesInBFMFlag, CalcPelChemistry, p_small
@@ -112,7 +112,8 @@
     po2air = AirpGas(xo2air, patm3d(SRFindices), temp(SRFindices), salt(SRFindices)) 
     ! Sea surface partial pressure [atm] (rearranged from Orr et al, 2017)
     po2sea = O2o(SRFindices) * ( po2air / cxoO2(SRFindices) )
-    
+    ! difference [atm]
+    dpo2(:) = po2air - po2sea
 
     return
   end subroutine PelOxygen
