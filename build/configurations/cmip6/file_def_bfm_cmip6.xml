@@ -61,8 +61,10 @@
           <field field_ref="ruPPYc1"  name="ppdiat"     long_name="Diatom Primary Carbon Production"                   unit="mol m-3 s-1" operation="average" freq_op="1d" > (@ruPPYc1 - @resPPYc1) * (1e-03 / $mwC / 86400.0) </field>
           <field field_ref="ruPPYc2"  name="ppmisc"     long_name="Other Phytoplankton Carbon Production"              unit="mol m-3 s-1" operation="average" freq_op="1d" > (@ruPPYc2 - @resPPYc2) * (1e-03 / $mwC / 86400.0) </field>
           <field field_ref="ETW"      long_name="Seawater temperature in situ" />
+          <field field_ref="dpco2"    />
+          <field field_ref="dpo2"     />
           <field field_ref="EIR"      />
-          <field field_ref="ERHO"      />
+          <field field_ref="ERHO"     />
           <field field_ref="ESW"      />
           <field field_ref="OCalc"    />
           <field field_ref="OArag"    />
@@ -87,12 +89,12 @@
           <field field_ref="Q16n"     />
           <field field_ref="Q16p"     />
           <field field_ref="Q16s"     />
-          <field field_ref="ruZOOc"     />
-          <field field_ref="ruPBAc"     />
-          <field field_ref="resZOOc"     />
-          <field field_ref="resPBAc"     />
-          <field field_ref="resPPYc"     />
-          <field field_ref="exPPYc"     />
+          <field field_ref="ruZOOc"   />
+          <field field_ref="ruPBAc"   />
+          <field field_ref="resZOOc"  />
+          <field field_ref="resPBAc"  />
+          <field field_ref="resPPYc"  />
+          <field field_ref="exPPYc"   />
         </file>
 
       </file_group>
