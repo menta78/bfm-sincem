@@ -485,7 +485,7 @@ if [ ${GEN} ]; then
         cp ${blddir}/*.?90     ${exedir}
         cp ${blddir}/*.h       ${exedir}
         cp ${blddir}/*.nml     ${exedir}
-        cp ${blddir}/*.xml     ${exedir}
+        cp ${presetdir}/*.xml  ${exedir}
         cp ${blddir}/*top_cfg  ${exedir}
     fi
     echo "${PRESET} generation done!"
