@@ -454,7 +454,7 @@
       !  however this generates fake remineralization and it is not implemented
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
       rums  =   p_qus(phyto)* N5s(:)* phytoc  ! max pot uptake based on affinity
-      miss  =   max(ZERO, p_qscPPY(phyto)*phytoc - phytos) ! intracellular missing Si
+      miss  =   sadap*(p_qscPPY(phyto)*phytoc - phytos) ! intracellular missing Si 
       rups  =   run* p_qscPPY(phyto)  ! Si uptake based on net C uptake
       runs  =   min(  rums,  rups+ miss)  ! actual uptake
     end select
