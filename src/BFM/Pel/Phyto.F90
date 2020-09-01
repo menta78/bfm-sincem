@@ -455,7 +455,7 @@
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
       rums  =   p_qus(phyto)* N5s(:)* phytoc  ! max pot uptake based on affinity
       miss  =   max(ZERO, p_qscPPY(phyto)*phytoc - phytos) ! intracellular missing Si
-      rups  =   run* p_qscPPY(phyto)* phytos  ! Si uptake based on net C uptake
+      rups  =   run* p_qscPPY(phyto)  ! Si uptake based on net C uptake
       runs  =   min(  rums,  rups+ miss)  ! actual uptake
     end select
               
