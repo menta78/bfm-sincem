@@ -402,6 +402,22 @@
       ENDDO
    ENDIF
 
+   !---------------------------------------------
+   ! Allocate and initialise additional
+   ! integration arrays
+   ! Initialise prior time step for leap-frog
+   !---------------------------------------------
+   allocate(D3STATEB(NO_D3_BOX_STATES,NO_BOXES))
+   D3STATEB = D3STATE
+
+#ifdef INCLUDE_SEAICE
+   allocate(D2STATEB_ICE(NO_D2_BOX_STATES_ICE,NO_BOXES_XY))
+   D2STATEB_ICE = D2STATE_ICE
+#endif
+
+   allocate(D2STATEB_BEN(NO_D2_BOX_STATES_BEN,NO_BOXES_XY))
+   D2STATEB_BEN = D2STATE_BEN
+
    !-------------------------------------------------------
    ! READ restart file(s) and overwrite previous initialisation
    ! if oceanpoints are availables for this subdomain
@@ -485,21 +501,6 @@
       end if
       call init_save_bfm
    ENDIF
-   !---------------------------------------------
-   ! Allocate and initialise additional
-   ! integration arrays
-   ! Initialise prior time step for leap-frog
-   !---------------------------------------------
-   allocate(D3STATEB(NO_D3_BOX_STATES,NO_BOXES))
-   D3STATEB = D3STATE
-
-#ifdef INCLUDE_SEAICE
-   allocate(D2STATEB_ICE(NO_D2_BOX_STATES_ICE,NO_BOXES_XY))
-   D2STATEB_ICE = D2STATE_ICE
-#endif
-
-   allocate(D2STATEB_BEN(NO_D2_BOX_STATES_BEN,NO_BOXES_XY))
-   D2STATEB_BEN = D2STATE_BEN
 
    ! Initialise the arrays containing external boundary data
    !-------------------------------------------------------
