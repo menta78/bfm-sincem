@@ -142,13 +142,13 @@
    ! in the 1D case only the central column is used by the BFM
    !-------------------------------------------------------
    if (lk_c1d) then
-      where (tmask(2,2,:) > ZERO)         
+      where (tmask(2,2,:) > ZERO)
         SEAmask(2,2,:) = .TRUE.
       elsewhere
         SEAmask(2,2,:) = .FALSE.
       end where
    else
-      where (tmask > ZERO)         
+      where (tmask > ZERO)
         SEAmask = .TRUE.
       elsewhere
         SEAmask = .FALSE.
@@ -277,7 +277,7 @@
    ! Allocate memory and give homogeneous initial values
    !-------------------------------------------------------
    call init_var_bfm(bio_setup)
-   
+
    !---------------------------------------------
    ! Disable BFM coupling if no oceanpoints are
    ! available in the domain (only land!)
@@ -311,14 +311,14 @@
    Depth  = pack(rtmp3Da,SEAmask)
    ! Water column pressure form TEOS-10 [dbar]
    EPR = pack( gsw_p_from_z(-fsdept(:,:,:),SPREAD(gphit,DIM=3,NCOPIES=jpk)) , SEAmask)
-   ! Initial seawater in-situ density 
+   ! Initial seawater in-situ density
    ERHO(:) = pack( (rhd(:,:,:) + 1._RLEN) * rau0, SEAmask)
 
    !-------------------------------------------------------
    ! Initialization from analytical profiles or data
    ! Done if restart is not used
    !-------------------------------------------------------
-   if (bfm_init /= 1) then
+   if (bfm_init == 0) then
       ! this is done for compatibility with NEMO variables
       if (allocated(ln_trc_ini)) deallocate(ln_trc_ini)
       allocate(ln_trc_ini(NO_D3_BOX_STATES))
@@ -363,23 +363,24 @@
             call trc_dta(nit000,sf_trcdta(ll),rf_trfac(ll))
             D3STATE(m,:)  = pack( sf_trcdta(ll)%fnow(:,:,:), SEAmask )
             InitVar(m)%filename=sf_trcdta(ll)%clname
+#ifdef INCLUDE_PELCO2
+            ! Scale DIC and ALK from m(g/mol)/kg to m(g/mol)/m3 using NEMO initial in situ density
+            if (m==ppO3c.or.m==ppO3h) then
+               if (bfm_lwp) write(LOGUNIT,*)
+               if (bfm_lwp) write(LOGUNIT,*) 'trc_ini_bfm: Scale DIC and ALK 3D fields using NEMO in-situ density'
+               D3STATE(m,:) = D3STATE(m,:) * ERHO(:)
+            end if
+#endif
          end select
          Initvar(m)%varname=var_names(m)
          if (bfm_lwp) write(LOGUNIT, 158) InitVar(m)
       end do
-#ifdef INCLUDE_PELCO2
-      ! Scale DIC and ALK from m(g/mol)/kg to m(g/mol)/m3 using NEMO initial in situ density
-      if (bfm_lwp) write(LOGUNIT,*)
-      if (bfm_lwp) write(LOGUNIT,*) 'trc_ini_bfm: Scale DIC and ALK 3D fields using NEMO in-situ density'
-      D3STATE(ppO3c,:) = D3STATE(ppO3c,:) * ERHO(:)
-      D3STATE(ppO3h,:) = D3STATE(ppO3h,:) * ERHO(:)
-#endif
    end if
 
    ! Initialize internal constitutents quota of functional groups
    call ini_organic_quotas()
 
-   if (bfm_lwp) then 
+   if (bfm_lwp) then
          LEVEL1 ' '
          LEVEL1 '         BFM INITIALIZATION ... DONE!          '
          LEVEL1 '-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'
@@ -390,7 +391,7 @@
    deallocate(rtmp3Db)
 
    IF( nb_trcdta > 0 .AND. .NOT. ln_trcdmp ) THEN
-      !==   deallocate data structure   ==! 
+      !==   deallocate data structure   ==!
       !        data used only for initialisation)
       IF(lwp) WRITE(numout,*) 'trc_dta: deallocate data arrays as they are only used to initialize the run'
       DO ll = 1, ntra
@@ -454,7 +455,7 @@
          zmin  = minval( trn(:,:,:,m), mask= ((tmask*SPREAD(tmask_i,DIM=3,NCOPIES=jpk).NE.0.)) )
          zmax  = maxval( trn(:,:,:,m), mask= ((tmask*SPREAD(tmask_i,DIM=3,NCOPIES=jpk).NE.0.)) )
          if (lk_mpp) then
-            call mpp_min( zmin )      ! min over the global domain                                                                
+            call mpp_min( zmin )      ! min over the global domain
             call mpp_max( zmax )      ! max over the global domain
          end if
          zmean  = D3STATE_tot(m) / areatot
@@ -518,8 +519,8 @@
       if (InitVar(m) % sbc) ln_trc_sbc(m) = .true.
       if (InitVar(m) % cbc) ln_trc_cbc(m) = .true.
    end do
- 
-   ! Initialize boundary conditions  
+
+   ! Initialize boundary conditions
    call trc_bc_init(NO_D3_BOX_STATES)
 
 #if defined INCLUDE_PELCO2 && ! defined CCSMCOUPLED
@@ -528,7 +529,7 @@
      LEVEL1 'CO2 data from Nemo not available in surface BC &
           for O3c (check namelist_top and BFM_General).'
      stop
-   endif   
+   endif
    if (AtmSLP%init .eq. 2 .and. .NOT. ln_trc_sbc(ppO3h)) then
      LEVEL1 'Sea Level Pressure data from Nemo not available in surface BC &
           for O3h (check namelist_top and BFM_General).'
@@ -547,13 +548,13 @@
          zexp  = MIN( 8.,( rtmp1D(j) / p_depscale )**(-1.5) )
          zdexp = -0.9543 + 0.7662 * LOG( zexp ) - 0.235 * LOG( zexp )**2
          RETFAC(i) = MIN( 1., EXP( zdexp ) / 0.5 )
-      END DO 
+      END DO
       deallocate(rtmp1D)
    endif
- 
+
 #ifdef INCLUDE_PELFE
    ALLOCATE (ironsed(jpi,jpj,jpk))
-   ironsed = ZERO 
+   ironsed = ZERO
    ! Prepare Iron release from seabed sediments
    if ( p_rN7fsed > 0. ) then
       LEVEL1 ''
@@ -573,11 +574,11 @@
             END DO
          END DO
       END DO
-      ! 
+      !
       ztraf = SUM(ironsed * spread(e1e2t,3,jpk) * p_rN7fsed * 365. * 1.e-15 * tmask )
       IF (lk_mpp) CALL mpp_sum (ztraf)
       LEVEL1 '  Total iron load from Sediment [Gmol/y] : ', ztraf
-      ! 
+      !
       ironsed = ironsed * p_rN7fsed / ( SEC_PER_DAY * fse3t(:,:,:) )
       !
    endif
@@ -606,4 +607,3 @@
 158 FORMAT(i4, 1x, E10.3, 1x, a25, 1x, a3, 1x, E10.3, 1x, E10.3, 1x, E10.3, 1x, E10.3, 3x, L3, 3x, L3, 3x, L3)
    end subroutine trc_ini_bfm
 !EOC
-
