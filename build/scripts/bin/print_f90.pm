@@ -1477,10 +1477,12 @@ sub func_INIT_FUNC_CONST {
 
     foreach my $constNoC (@constNoCList){
 	
-        $line .= "     " . "    if (present(" . $constNoC . ") .and. pp" . $constNoC . ">0) then\n";
-        $line .= "     " . "      where (" . $constNoC . "==ZERO)\n";
-        $line .= "     " . "        " . $constNoC . " = " . $constNoC . "c_ratio*c\n";
-        $line .= "     " . "      end where\n";
+        $line .= "     " . "    if (present(" . $constNoC . ") .and. present(pp" . $constNoC . ")) then\n";
+        $line .= "     " . "      if (pp" . $constNoC . ">0) then\n";
+        $line .= "     " . "        where (" . $constNoC . "==ZERO)\n";
+        $line .= "     " . "          " . $constNoC . " = " . $constNoC . "c_ratio*c\n";
+        $line .= "     " . "        end where\n";
+        $line .= "     " . "      end if\n";
         $line .= "     " . "    end if\n";
     }
 
