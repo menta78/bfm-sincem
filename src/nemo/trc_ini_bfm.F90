@@ -325,7 +325,7 @@
    ! Initialization from analytical profiles or data
    ! Done if restart is not used
    !-------------------------------------------------------
-   if (bfm_init /= 1) then
+   if (bfm_init == 0) then
       ! this is done for compatibility with NEMO variables
       if (allocated(ln_trc_ini)) deallocate(ln_trc_ini)
       allocate(ln_trc_ini(NO_D3_BOX_STATES))
