@@ -50,6 +50,7 @@
           <field field_ref="Chla"      />
           <field field_ref="R1n"      />
           <field field_ref="R1p"      />
+          <field field_ref="R1f"      />
           <field field_ref="P1n"      />
           <field field_ref="P2n"      />
           <field field_ref="P1p"      />
@@ -71,6 +72,7 @@
           <field field_ref="R6s"      />
           <field field_ref="sinkR6c"      />
           <field field_ref="sinkO5c"      />
+          <field field_ref="sinkP1c"      />
           <field field_ref="Q6c"      />
           <field field_ref="Q6n"      />
           <field field_ref="Q6p"      />
@@ -84,6 +86,7 @@
           <field field_ref="ruPPYc1"          name="netPPYc1"      long_name="Diatoms Net Primary Production (GPP-RES)" operation="average" freq_op="1d" > @ruPPYc1 - @resPPYc1 </field>
           <field field_ref="ruPPYc2"          name="netPPYc2"      long_name="Flagellates Net Primary Production (GPP-RES)" operation="average" freq_op="1d" > @ruPPYc2 - @resPPYc2 </field>
           <field field_ref="prdO5c"  />
+          <field field_ref="EPCO2air"  />
         </file>
 
 

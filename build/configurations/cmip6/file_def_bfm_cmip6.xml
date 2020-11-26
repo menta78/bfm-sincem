@@ -77,6 +77,7 @@
           <field field_ref="P2f"      />
           <field field_ref="R1n"      />
           <field field_ref="R1p"      />
+          <field field_ref="R1f"      />
           <field field_ref="xEPS"     />
           <field field_ref="Q6c"      />
           <field field_ref="Q6n"      />
