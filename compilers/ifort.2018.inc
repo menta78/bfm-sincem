@@ -9,7 +9,6 @@
 #AR           Assembler
 #ARFLAGS      Assembler flags
 #OTHERFLAGS   User defined additional flags
-#NOTE: in athena you have to load module: NETCDF/netcdf-4.3
 
   NCDF_DIR=${NETCDF}
   NCDF_LIB= -L${NCDF_DIR}/lib -lnetcdff -lnetcdf
