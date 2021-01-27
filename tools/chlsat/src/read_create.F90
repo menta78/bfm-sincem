@@ -203,8 +203,8 @@ subroutine read_create
      call handle_err (nf90_put_att(ncid, IDtarget, "positive", "down"))
      call handle_err (nf90_put_att(ncid, IDtarget, "axis", "Z"))
      ! copy global attributes
+     write(*,*) "Creating file:",trim(out_fname)//".nc"," containing",ntime,"time frames"
 #ifdef DEBUG
-        write(*,*) "Creating file:",trim(out_fname)//".nc"," containing",ntime,"time frames"
         write(*,*) "Start copying global attributes ..."
 #endif
      do IDatt=1,nGlobalAtts
@@ -217,8 +217,10 @@ subroutine read_create
      allocate(time(ntime))
      call handle_err( nf90_get_var(ncchlid, IDtimetmp, time, start = (/ 1 /), count = (/ ntime /)) )
      call handle_err( nf90_def_var(ncid, TRIM(coorname(4)) , NF90_DOUBLE, (/ IDtime /), IDvartime) )
-     call handle_err( nf90_copy_att(ncchlid, IDtimetmp, "units", ncid, IDvartime) )
-     call handle_err( nf90_copy_att(ncchlid, IDtimetmp, "calendar", ncid, IDvartime) )
+     call handle_err( nf90_copy_att(ncchlid, IDtimetmp, "units", ncid, IDvartime) , errstring='copying time units from source')
+     errst = nf90_inquire_attribute(ncchlid, IDtimetmp,"calendar")
+     if ( errst == nf90_noerr) &
+        call handle_err( nf90_copy_att(ncchlid, IDtimetmp, "calendar", ncid, IDvartime), errstring='missinf calendar attr in time')
 
      if (compute_chlsat) then
      ! define the output variable: chlsat
