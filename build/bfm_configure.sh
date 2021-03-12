@@ -350,7 +350,7 @@ if [ ${GEN} ]; then
             find ${BFMDIR}/src/pom -name "*.?90"  -print >> BFM.lst
             find ${BFMDIR}/src/pom -name "*.[fF]" -print >> BFM.lst
         elif [[ ${MODE} == "OGS" ]]; then
-            find ${BFMDIR}/src/standalone -name "*.?90" -print >> BFM.lst
+           # find ${BFMDIR}/src/standalone -name "*.?90" -print >> BFM.lst
             find ${BFMDIR}/src/ogstm -name "*.?90"  -print >> BFM.lst
         fi
         find ${BFMDIR}/src/share -name "*.?90" -print >> BFM.lst
