@@ -101,7 +101,7 @@
    ! additional check
    if (FName%init == 0 .OR. FName%init == 2 .OR. FName%init == 3 ) then 
       allocate (FData%fnow(NO_BOXES_XY))
-      write(LOGUNIT,*) 'FieldInit Warning ',trim(FName%varname), &
+      LEVEL1 'FieldInit Warning ',trim(FName%varname), &
                        ': Data will not be read, ONLY %fnow memory structure is allocated !'
       return
    endif
@@ -152,8 +152,8 @@
            idend = 1
            hh = 12 
          case default 
-           write(LOGUNIT,*) 'FieldInit: Unrecognized time format for file : ', FName%filename
-           write(LOGUNIT,*) 'FieldInit supports: yearly , monthly , daily'
+           LEVEL1 'FieldInit: Unrecognized time format for file : ', FName%filename
+           LEVEL1 'FieldInit supports: yearly , monthly , daily'
            stop 
       end select
 
@@ -181,12 +181,12 @@
       enddo
       ! Set uniform value : Backward in time 
       if (FData%tbef .EQ. bfmtime%time0 .AND. jday0 > bfmtime%time0) then
-         write(LOGUNIT,*) 'FieldInit: Backward use in time of the last input value as a constant.'
+         LEVEL1 'FieldInit: Backward use in time of the last input value as a constant.'
          FData%nbef = FData%naft
       endif
       ! forward in time
       if (.not. timedone) then
-         write(LOGUNIT,*) 'FieldInit: Forward use in time of the last input value as a constant.'
+         LEVEL1 'FieldInit: Forward use in time of the last input value as a constant.'
          FData%tbef = jdaybef
          FData%nbef = icon         
          FData%taft = bfmtime%timeEnd
@@ -207,7 +207,7 @@
       do 
          ValBef  = ValAft
          read(FData%lun,*,END=901,ERR=902) InpDate,ValAft
-         write(*,*) InpDate,ValAft
+         LEVEL2 InpDate,ValAft
          read (InpDate,'(I4,a1,I2,a1,I2,1x,I2,a1,I2)') yy,c1,mm,c1,dd,hh,c1,nn
          call julian_day(yy,mm,dd,hh,nn,jdayaft)
          if ( jdayaft > bfmtime%time0 ) then
@@ -223,12 +223,12 @@
       enddo
       ! Set uniform value : Backward in time 
       if (FData%tbef .EQ. bfmtime%time0 .AND. jday0 > bfmtime%time0 ) then
-         write(LOGUNIT,*) 'FieldInit: Backward use in time of the last input value as a constant.'
+         LEVEL1 'FieldInit: Backward use in time of the last input value as a constant.'
          FData%fbef = FData%faft
       endif 
       ! forward in time
 901   if (.not. timedone) then 
-         write(LOGUNIT,*) 'FieldInit: Forward use in time of the last input value as a constant.'
+         LEVEL1 'FieldInit: Forward use in time of the last input value as a constant.'
          FData%fbef = ValBef
          FData%faft = ValBef
          FData%taft = bfmtime%timeEnd 
@@ -240,11 +240,11 @@
    return
 
 902 LEVEL1 'FieldInit: Error opening sequential input file:', FName%varname
-   write(LOGUNIT,*) 'FieldInit: Error opening sequential input file:', FName%varname
+   LEVEL1 'FieldInit: Error opening sequential input file:', FName%varname
    stop 
 
 903 LEVEL1 'FieldInit: Error reading namelist RefTime for variable: ', FName%varname
-   write(LOGUNIT,*) 'FieldInit: Error reading namelist RefTime for variable: ', FName%varname
+   LEVEL1 'FieldInit: Error reading namelist RefTime for variable: ', FName%varname
    stop
    end subroutine FieldInit
 !-------------------------------------------------------------------------!
@@ -278,7 +278,7 @@
       ! NETCDF 
       IF (FData%filetype) THEN 
          if (FData%naft == FData%nrec) then
-            write(LOGUNIT,*) 'FieldRead: Forward use in time of the last input value as a constant.'
+            LEVEL1 'FieldRead: Forward use in time of the last input value as a constant.'
             FData%tbef = FData%taft
             FData%nbef = FData%naft
             FData%taft = bfmtime%timeEnd
@@ -327,7 +327,7 @@
                FData%fbef = FData%faft 
                FData%faft = ValAft 
 905            if (.not. readok) then
-                  write(LOGUNIT,*) 'FieldRead: Forward use in time of the last input value as a constant.'
+                  LEVEL1 'FieldRead: Forward use in time of the last input value as a constant.'
                   FData%tbef = FData%taft      
                   FData%fbef = FData%faft
                   FData%taft = bfmtime%timeEnd
@@ -349,7 +349,7 @@
    deallocate(diff)
    return
 
-906 write(LOGUNIT,*) ' FieldRead: Wrong type of input. Only timeseries for sequential file.'
+906 LEVEL1 ' FieldRead: Wrong type of input. Only timeseries for sequential file.'
     stop
    end subroutine FieldRead
 !-------------------------------------------------------------------------!

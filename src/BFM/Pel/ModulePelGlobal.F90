@@ -109,13 +109,13 @@
   !  Open the namelist file(s)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-  write(LOGUNIT,*) "#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
-  write(LOGUNIT,*) "#  Reading PelGlobal parameters.."
+  LEVEL1 "#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+  LEVEL1 "#  Reading PelGlobal parameters.."
   open(NMLUNIT,file='Pelagic_Environment.nml',status='old',action='read',err=100)
   read(NMLUNIT,nml=PelGlobal_parameters,err=101)
   close(NMLUNIT)
-  write(LOGUNIT,*) "#  Namelist is:"
-  write(LOGUNIT,nml=PelGlobal_parameters)
+  LEVEL1 "#  Namelist is:"
+  if (bfm_lwp) write(LOGUNIT,nml=PelGlobal_parameters)
 
   ! Initialize Pelagic variables settling dynamics
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -158,8 +158,8 @@
   enddo
 
   ! write log summary of pelagic states sinking setting
-  if (bfm_lwp) write(LOGUNIT,*) 'SINK setting of pelagic 3D STATES variables'
-  if (bfm_lwp) write(LOGUNIT,*) '  ID   Variable   Group'
+  LEVEL1 'SINK setting of pelagic 3D STATES variables'
+  LEVEL1 '  ID   Variable   Group'
   do n = 1 , NO_D3_BOX_STATES
      if ( bfm_lwp .and. SINKD3STATE(n)%dosink ) then
      if (allocated(var_names)) then

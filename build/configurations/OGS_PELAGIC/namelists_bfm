@@ -54,7 +54,7 @@
    out_title    = 'BFM_STANDALONE_PELAGIC'
    in_rst_fname = 'in_bfm_restart'
    out_delta    = 300  !every 30 days
-   parallel_log = .FALSE.
+   parallel_log = .TRUE.
 	filename_nml_conf = 'BFM_General.nml',
 /
 

@@ -8,7 +8,7 @@
 ! DESCRIPTION
 !   Definition and reading of the parameters for the microzooplankton submodel
 !
-!
+#include "cppdefs.h"
 ! !INTERFACE
   module mem_MicroZoo
 !
@@ -113,13 +113,13 @@
   !  Open the namelist file(s)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-  write(LOGUNIT,*) "#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
-  write(LOGUNIT,*) "#  Reading MicroZoo parameters.."
+  LEVEL1 "#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+  LEVEL1 "#  Reading MicroZoo parameters.."
   open(NMLUNIT,file='Pelagic_Ecology.nml',status='old',action='read',err=100)
   read(NMLUNIT,nml=MicroZoo_parameters,err=101)
   close(NMLUNIT)
-  write(LOGUNIT,*) "#  Namelist is:"
-  write(LOGUNIT,nml=MicroZoo_parameters)
+  LEVEL1 "#  Namelist is:"
+  if (bfm_lwp) write(LOGUNIT,nml=MicroZoo_parameters)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   !END compute
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=

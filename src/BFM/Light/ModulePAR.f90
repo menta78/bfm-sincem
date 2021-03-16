@@ -12,7 +12,7 @@
 !
 ! FILE
 !
-!
+#include "cppdefs.h"
 ! !INTERFACE
   module mem_PAR
 !
@@ -118,18 +118,18 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   !  Open the namelist file(s)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-    write(LOGUNIT,*) "#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
-    write(LOGUNIT,*) "#  Reading PAR parameters.."
+    LEVEL1 "#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+    LEVEL1 "#  Reading PAR parameters.."
     open(NMLUNIT,file='Pelagic_Environment.nml',status='old',action='read',err=100)
     read(NMLUNIT,nml=PAR_parameters,err=101)
     close(NMLUNIT)
-    write(LOGUNIT,*) "#  Namelist is:"
-    write(LOGUNIT,nml=PAR_parameters)
-    write(LOGUNIT,*) "#  PAR specifications:"
-    write(LOGUNIT,*) "#  Chl Attenuation Flag p_ChlAttenFlag =",ChlAttenFlag
+    LEVEL1 "#  Namelist is:"
+    if (bfm_lwp) write(LOGUNIT,nml=PAR_parameters)
+    LEVEL1 "#  PAR specifications:"
+    LEVEL1 "#  Chl Attenuation Flag p_ChlAttenFlag =",ChlAttenFlag
     select case (ChlAttenFlag) 
       case (2) 
-         write(LOGUNIT,*) "#   Use 3 bands tabulated RGB (Lengaigne et al, 2007)"
+         LEVEL1 "#   Use 3 bands tabulated RGB (Lengaigne et al, 2007)"
          ! Initialize the tabulated values and 3-band arrays
          call ChlAttenuation(xepsRGB)
          allocate(B_eps(NO_BOXES),stat=AllocStatus)
@@ -146,7 +146,7 @@
          if (AllocStatus  /= 0) stop "error allocating EIRR"
          p_PARRGB = p_PAR/3._RLEN ! the visible part is divided equally in 3 bands
       case default 
-         write(LOGUNIT,*) "#   Linear Chl-Specific attenuation coefficient"
+         LEVEL1 "#   Linear Chl-Specific attenuation coefficient"
     end select
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   !END compute
