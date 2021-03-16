@@ -131,7 +131,7 @@
 #endif
   close(NMLUNIT)
   LEVEL1 "#  Namelist is:"
-  write(LOGUNIT,nml=PelChem_parameters)
+  if (bfm_lwp) write(LOGUNIT,nml=PelChem_parameters)
 #ifdef INCLUDE_PELFE
   if (bfm_lwp) write(LOGUNIT,nml=PelChem_parameters_iron)
 #endif
