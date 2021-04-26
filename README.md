@@ -10,7 +10,7 @@ In the `doc/` folder of the repository are also available the manuals and logos.
 
 #### Members of the BFM agreement
 
-The development of the BFM is supported by a system team through a formal agreement (see https://cmcc-foundation.github.io/www.bfm-community.eu/bfm-consortium/). 
+The development of the BFM is supported by a system team through a formal agreement (see https://bfm-community.github.io/www.bfm-community.eu/bfm-consortium/). 
 The agreement establishes a program for model development that is discussed and prepared every year by the participants. Model developments are inserted by the system team into the different releases of the model. 
 The agreement is open to entrance of more contributors and more information can be addressed to the **BFM system Team** at bfm_st(at)cmcc.it
 
