@@ -20,7 +20,7 @@
 
   use global_mem
   use mem,  ONLY: iiPhytoPlankton, NO_BOXES
-  use bfm_error_msg
+
 !  
 !
 ! !AUTHORS
@@ -118,19 +118,18 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   !  Open the namelist file(s)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-
-    if (bfm_lwp) write(LOGUNIT,*) "#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
-    if (bfm_lwp) write(LOGUNIT,*) "#  Reading PAR parameters.."
+    LEVEL1 "#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+    LEVEL1 "#  Reading PAR parameters.."
     open(NMLUNIT,file='Pelagic_Environment.nml',status='old',action='read',err=100)
     read(NMLUNIT,nml=PAR_parameters,err=101)
     close(NMLUNIT)
-    if (bfm_lwp) write(LOGUNIT,*) "#  Namelist is:"
+    LEVEL1 "#  Namelist is:"
     if (bfm_lwp) write(LOGUNIT,nml=PAR_parameters)
-    if (bfm_lwp) write(LOGUNIT,*) "#  PAR specifications:"
-    if (bfm_lwp) write(LOGUNIT,*) "#  Chl Attenuation Flag p_ChlAttenFlag =",ChlAttenFlag
+    LEVEL1 "#  PAR specifications:"
+    LEVEL1 "#  Chl Attenuation Flag p_ChlAttenFlag =",ChlAttenFlag
     select case (ChlAttenFlag) 
       case (2) 
-         if (bfm_lwp) write(LOGUNIT,*)  "#   Use 3 bands tabulated RGB (Lengaigne et al, 2007)"
+         LEVEL1 "#   Use 3 bands tabulated RGB (Lengaigne et al, 2007)"
          ! Initialize the tabulated values and 3-band arrays
          call ChlAttenuation(xepsRGB)
          allocate(B_eps(NO_BOXES),stat=AllocStatus)
@@ -147,7 +146,7 @@
          if (AllocStatus  /= 0) stop "error allocating EIRR"
          p_PARRGB = p_PAR/3._RLEN ! the visible part is divided equally in 3 bands
       case default 
-         if (bfm_lwp) write(LOGUNIT,*)  "#   Linear Chl-Specific attenuation coefficient"
+         LEVEL1 "#   Linear Chl-Specific attenuation coefficient"
     end select
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   !END compute
