@@ -17,6 +17,8 @@ MODULE trcnxtbfm
    USE tranxt
    USE trcnam_trp
    USE c1d, only: lk_c1d
+   USE trcbdy          ! BDY open boundaries
+   USE bdy_par, only: lk_bdy
 # if defined key_agrif
    USE agrif_top_interp
 # endif
@@ -86,6 +88,8 @@ CONTAINS
       ! 0. Lateral boundary conditions on tra (T-point, unchanged sign)
       ! ---------------------------------============
       CALL lbc_lnk( tra, 'T', 1. )
+
+      IF( lk_bdy )  CALL trc_bdy( kt )               ! BDY open boundaries
 
       ! Check that the BFM compliant integrations are used
       IF(.NOT.lk_c1d) THEN
