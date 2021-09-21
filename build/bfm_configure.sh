@@ -25,10 +25,10 @@ LOGFILE=logfile_$$.log
 LOGDIR="Logs"
 
 #local paths
-VER=""
-TEMPDIR="build${VER}/tmp"
-CONFDIR="build${VER}/configurations"
-SCRIPTSDIR="build${VER}/scripts"
+VER="4" # NEMO coupling version
+TEMPDIR="build/tmp"
+CONFDIR="build/configurations"
+SCRIPTSDIR="build/scripts"
 SCRIPTS_BIN="${SCRIPTSDIR}/bin"
 SCRIPTS_PROTO="${SCRIPTSDIR}/proto"
 
@@ -71,7 +71,7 @@ QUEUE="poe_short"
 BFMEXE="bfm_standalone.x"
 CLEAN=1
 NETCDF_DEFAULT="/usr"
-MPICMD="mpirun.lsf"
+MPICMD="mpiexec.hydra"
 RUNPROTO="runscript"
 # --------------------------------------------------------------------
 
@@ -220,13 +220,11 @@ if [ $VERBOSE ]; then
     cmd_gmake="${GMAKE}"
     cmd_gen="${GENCONF}.pl -v"
     cmd_gennml="${GENNML}.pl -v"
-    cmd_mknemo="${MKNEMO}"
 else
     cmd_mkmf="${MKMF}"
     cmd_gmake="${GMAKE} -s"
     cmd_gen="${GENCONF}.pl"
     cmd_gennml="${GENNML}.pl"
-    cmd_mknemo="${MKNEMO} -v0"
 fi
 if [ $DEBUG ]; then
     cmd_gen=${cmd_gen}" -d"
@@ -288,8 +286,21 @@ fi
 # Print setting informations
 echo "bfm_configure for preset ${PRESET} with mode ${MODE}"
 echo "BFMDIR is ${BFMDIR}"
+
+# NEMO specific info
 if [[ "$MODE" == "NEMO" ]]; then 
     echo "NEMODIR is ${NEMODIR}"
+    if [ "x${VER}" == "x" ] ; then
+       echo "use NEMO coupling for version 3.6"
+       cmd_mknemo="${NEMODIR}/NEMOGCM/CONFIG/${MKNEMO} -n ${PRESET}"
+       NEMODIRCFG="${NEMODIR}/NEMOGCM/CONFIG/"
+       cfgfile_nemo="cfg.txt"
+    else
+       echo "use NEMO coupling for version ${VER}"
+       cmd_mknemo="${NEMODIR}/${MKNEMO} -r ${PRESET}"
+       NEMODIRCFG="${NEMODIR}/cfgs"
+       cfgfile_nemo="work_cfgs.txt"
+    fi
 fi
 echo ""
 
@@ -421,14 +432,19 @@ if [ ${GEN} ]; then
         fi
 
     elif [[ "$MODE" == "NEMO" || "$MODE" == "NEMO_3DVAR" ]]; then 
-        #Generate NEMO configuration with subdirs
-        if [ ! -d ${NEMODIR}/NEMOGCM/CONFIG/${PRESET} ]; then
+        #Setup new NEMO configuration
+        if [ ! -d ${NEMODIRCFG}/${PRESET} ]; then
             if [ "$NEMOSUB" ] ; then
-                ${NEMODIR}/NEMOGCM/CONFIG/${cmd_mknemo} -j0 -n ${PRESET} -m ${ARCH} -d "${NEMOSUB}"
-	
+                echo "Setup new configuration in ${NEMODIRCFG}/${PRESET}"
                 if [ ! -f "${presetdir}/cpp_${PRESET}.fcm" ]; then
                     echo "ERROR: cpp_${PRESET}.fcm must exist in ${presetdir}" 
                     exit
+                fi
+                mkdir -p ${NEMODIRCFG}/${PRESET}
+                check=`grep ${PRESET} ${NEMODIRCFG}/${cfgfile_nemo}`
+                if [ "x${check}" == "x" ] ; then
+                    echo "add ${PRESET} to ${cfgfile_nemo}"
+                    echo "${PRESET}    ${NEMOSUB}" >> ${NEMODIRCFG}/${cfgfile_nemo}
                 fi
             else
                 echo "ERROR: NEMO configuration not exists. If you want to create a NEMO configuration, you have to specify NEMOSUB option"
@@ -436,15 +452,16 @@ if [ ${GEN} ]; then
                 exit
             fi
         fi
+        NEMOSUB=`grep ${PRESET} ${NEMODIRCFG}/${cfgfile_nemo} | cut -d " " -f3-`
+        echo "NEMOSUBS: ${NEMOSUB}"
 
         #if cpp_PRESET exists in configuration folder => copy to nemo preset folder
         if [ -f "${presetdir}/cpp_${PRESET}.fcm" ]; then 
-            cp "${presetdir}/cpp_${PRESET}.fcm" "${NEMODIR}/NEMOGCM/CONFIG/${PRESET}"
+            cp "${presetdir}/cpp_${PRESET}.fcm" "${NEMODIRCFG}/${PRESET}"
         fi
 
         #substitute BFM/src/nemo path in cpp according to the version
-        [ ${VERBOSE} ] && echo "Changing nemo version to: \"$VER\""
-        sed -ie "s;^\s*inc.*;inc \$BFMDIR/src/nemo${VER}/bfm\.fcm;" ${NEMODIR}/NEMOGCM/CONFIG/${PRESET}/cpp_${PRESET}.fcm
+        sed -ie "s;^\s*inc.*;inc \$BFMDIR/src/nemo${VER}/bfm\.fcm;" ${NEMODIRCFG}/${PRESET}/cpp_${PRESET}.fcm
 
 
         # Generate the specific bfm.fcm include file for makenemo
@@ -527,19 +544,19 @@ if [[ ${CMP} && "$MODE" != "NEMO_CESM" ]]; then
 
         if [ ${CLEAN} == 1 ]; then
             [ ${VERBOSE} ] && echo "Cleaning up ${PRESET}..."
-            [ ${VERBOSE} ] && echo "Command: ${NEMODIR}/NEMOGCM/CONFIG/${cmd_mknemo} -n ${PRESET} -m ${ARCH} clean"
-            ${NEMODIR}/NEMOGCM/CONFIG/${cmd_mknemo} -n ${PRESET} -m ${ARCH} clean
+            [ ${VERBOSE} ] && echo "Command: ${cmd_mknemo} -m ${ARCH} clean"
+            ${cmd_mknemo} -n ${PRESET} -m ${ARCH} clean
         fi
         [ ${VERBOSE} ] && echo "Starting ${PRESET} compilation..."
-        rm -rf ${NEMODIR}/NEMOGCM/CONFIG/${PRESET}/BLD/bin/${NEMOEXE}
-        if [[ "$MODE" == "NEMO" ]]; then 
-            [ ${VERBOSE} ] && echo "Command: ${NEMODIR}/NEMOGCM/CONFIG/${cmd_mknemo} -n ${PRESET} -m ${ARCH} -e ${BFMDIR}/src/nemo${VER} -j ${PROC_CMP}"
-            ${NEMODIR}/NEMOGCM/CONFIG/${cmd_mknemo} -n ${PRESET} -m ${ARCH} -e ${BFMDIR}/src/nemo${VER} -j ${PROC_CMP}
+        rm -rf ${NEMODIRCFG}/${PRESET}/BLD/bin/${NEMOEXE}
+        if [[ "$MODE" == "NEMO" ]]; then
+            [ ${VERBOSE} ] && echo "Command: ${cmd_mknemo} -m ${ARCH} -e ${BFMDIR}/src/nemo${VER} -j ${PROC_CMP}"
+            ${cmd_mknemo} -m ${ARCH} -e ${BFMDIR}/src/nemo${VER} -j ${PROC_CMP}
         else
-            [ ${VERBOSE} ] && echo "Command: ${NEMODIR}/NEMOGCM/CONFIG/${cmd_mknemo} -n ${PRESET} -m ${ARCH} -e \"${BFMDIR}/src/nemo${VER};${NEMODIR}/3DVAR\" -j ${PROC_CMP}"
-            ${NEMODIR}/NEMOGCM/CONFIG/${cmd_mknemo} -n ${PRESET} -m ${ARCH} -e "${BFMDIR}/src/nemo${VER};${NEMODIR}/3DVAR" -j ${PROC_CMP}
+            [ ${VERBOSE} ] && echo "Command: ${cmd_mknemo} -m ${ARCH} -e \"${BFMDIR}/src/nemo${VER};${NEMODIR}/3DVAR\" -j ${PROC_CMP}"
+            ${cmd_mknemo} -m ${ARCH} -e "${BFMDIR}/src/nemo${VER};${NEMODIR}/3DVAR" -j ${PROC_CMP}
         fi
-        if [ ! -f ${NEMODIR}/NEMOGCM/CONFIG/${PRESET}/BLD/bin/${NEMOEXE} ]; then 
+        if [ ! -f ${NEMODIRCFG}/${PRESET}/BLD/bin/${NEMOEXE} ]; then 
             echo "ERROR in ${PRESET} compilation!" ; 
             exit 1; 
         else
@@ -598,10 +615,17 @@ if [[ ${DEP} && "$MODE" != "NEMO_CESM" ]]; then
         fi
 
         #link reference nemo files from the shared directory
-        if [[ "$MODE" == "NEMO" || "$MODE" == "NEMO_3DVAR" ]] && [ -d ${NEMODIR}/NEMOGCM/CONFIG/SHARED ]; then 
-           ln -sf ${NEMODIR}/NEMOGCM/CONFIG/SHARED/*_ref ${exedir}/;
-           ln -sf ${NEMODIR}/NEMOGCM/CONFIG/SHARED/field_def.xml ${exedir}/;
-           ln -sf ${NEMODIR}/NEMOGCM/CONFIG/GYRE_XIOS/EXP00/domain_def.xml ${exedir}/;
+        if [[ "$MODE" == "NEMO" || "$MODE" == "NEMO_3DVAR" ]] && [ -d ${NEMODIRCFG}/SHARED ]; then 
+           if [ "x${VER}" == "x" ] ; then
+               shared_files="namelist_ref namelist_top_ref domain_def.xml field_def.xml"
+               [[ "${NEMOSUB}" == *"LIM_SRC_2"* ]] && ln -sf ${NEMODIRCFG}/SHARED/namelist_ice_lim2_ref namelist_ice_ref
+           else
+               shared_files="namelist_ref namelist_top_ref axis_def_nemo.xml domain_def_nemo.xml grid_def_nemo.xml field_def_nemo-oce.xml"
+               [[ "${NEMOSUB}" == *"ICE"* ]] && shared_files="$shared_files namelist_ice_ref field_def_nemo-ice.xml"
+           fi
+           for ff in ${shared_files} ; do
+               ln -sf ${NEMODIRCFG}/SHARED/${ff} ${exedir}/
+           done
            cp *.xml ${exedir}/
         fi
     else
@@ -617,21 +641,21 @@ if [[ ${DEP} && "$MODE" != "NEMO_CESM" ]]; then
             execmd="${VALGRIND} ./${BFMEXE}"
         fi
     elif [[ "$MODE" == "NEMO" || "$MODE" == "NEMO_3DVAR" ]]; then 
-        ln -sf ${NEMODIR}/NEMOGCM/CONFIG/${PRESET}/BLD/bin/${NEMOEXE} ${exedir}/${NEMOEXE}
+        ln -sf ${NEMODIRCFG}/${PRESET}/BLD/bin/${NEMOEXE} ${exedir}/${NEMOEXE}
         if [ "${EXECMD}" ]; then 
             execmd="${EXECMD} ${VALGRIND} ./${NEMOEXE}"
         else 
             execmd="${MPICMD} ${VALGRIND} ./${NEMOEXE}"
         fi
-    fi
 
-    #change values in runscript
-    sed -e "s,_EXP_,${EXP},g"         \
-        -e "s,_EXE_,${execmd},g"      \
-        -e "s,_VERBOSE_,${VERBOSE},g" \
-        -e "s,_PRESET_,${PRESET},g"   \
-        -e "s,_QUEUE_,${QUEUE},g"     \
-        -e "s,_PROC_,${PROC},g"     ${BFMDIR}/${SCRIPTS_PROTO}/${RUNPROTO} > ${exedir}/${RUNPROTO}_${EXP}
-    printf "Go to ${exedir} and execute command:\n\t./${BFMEXE}\n\tor use the template script ${RUNPROTO}_${EXP}\n"
+        #change values in runscript
+        sed -e "s,_EXP_,${EXP},g"         \
+            -e "s,_EXE_,${execmd},g"      \
+            -e "s,_VERBOSE_,${VERBOSE},g" \
+            -e "s,_PRESET_,${PRESET},g"   \
+            -e "s,_QUEUE_,${QUEUE},g"     \
+            -e "s,_PROC_,${PROC},g"     ${BFMDIR}/${SCRIPTS_PROTO}/${RUNPROTO} > ${exedir}/${RUNPROTO}_${EXP}
+        printf "Go to ${exedir} and execute command:\n\t./${BFMEXE}\n\tor use the template script ${RUNPROTO}_${EXP}\n"
+        fi
 
 fi
