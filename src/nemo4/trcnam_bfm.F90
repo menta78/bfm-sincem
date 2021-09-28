@@ -5,19 +5,19 @@ SUBROUTINE trc_nam_bfm()
    !!======================================================================
 #include "cppdefs.h"
    ! NEMO
-   USE par_trc, ONLY: jp_bgc
+   USE par_trc, ONLY: jp_bgc, jp_bgc_b, jpk_b
    USE trcnam,  ONLY: sn_tracer
    USE in_out_manager, ONLY: lwp, numout, nit000, nitend
-   USE dom_oce, ONLY: rDt, narea, nyear, nmonth, nday, tmask
+   USE dom_oce, ONLY: rn_Dt, narea, nyear, nmonth, nday, tmask
    USE par_oce, ONLY: jpi, jpj, jpk
-   USE trc,     ONLY: tr
-   USE par_my_trc, ONLY: var_map
+   USE trc,     ONLY: tr, ln_trcdta
+   USE par_my_trc, ONLY: var_map, jp_bgc_b, bottom_level, bfm_iomput
    ! BFM
    USE constants,  ONLY: SEC_PER_DAY
    USE global_mem, ONLY: RLEN, ZERO, LOGUNIT, SkipBFMCore, bfm_lwp, ALLTRANSPORT
    USE api_bfm,    ONLY: parallel_rank, bio_setup, SEAmask, init_bfm, stPelStateS, stPelStateE, &
                          save_delta, time_delta, out_delta, update_save_delta, &
-                         var_names, var_long, var_units
+                         InitVar, var_names, var_long, var_units
    USE time,       ONLY: bfmtime, julian_day, calendar_date
    USE mem,        ONLY: D3STATETYPE, NO_BOXES_X, NO_BOXES_Y, NO_BOXES_Z, &
                          NO_BOXES, NO_BOXES_XY, NO_STATES, NO_D3_BOX_STATES, & 
@@ -51,9 +51,9 @@ SUBROUTINE trc_nam_bfm()
    write(bfmtime%date0,'(I4.4,I2.2,I2.2)') nyear,nmonth,nday
    call julian_day(nyear,nmonth,nday,0,0,julianday)
    bfmtime%time0    = julianday
-   bfmtime%timeEnd  = julianday + ( ( REAL(nitend - nit000, RLEN) ) * rdt ) / SEC_PER_DAY
+   bfmtime%timeEnd  = julianday + ( ( REAL(nitend - nit000, RLEN) ) * rn_Dt ) / SEC_PER_DAY
    bfmtime%step0    = nit000 - 1
-   bfmtime%timestep = rdt
+   bfmtime%timestep = rn_Dt
    bfmtime%stepnow  = nit000 - 1
    bfmtime%stepEnd  = nitend
    call calendar_date(bfmtime%timeEnd,yy,mm,dd,hh,nn)
@@ -82,16 +82,20 @@ SUBROUTINE trc_nam_bfm()
         SEAmask = .FALSE.
       end where
    !end if
+   !
+   allocate(bottom_level(jpi,jpj))
+   bottom_level = SUM(tmask, DIM=3)
 
    !---------------------------------------------
    ! Set the dimensions
    !---------------------------------------------
-   NO_BOXES_X  = jpi
-   NO_BOXES_Y  = jpj
+   NO_BOXES_X  = 1 ! jpi
+   NO_BOXES_Y  = 1 ! jpj
    NO_BOXES_Z  = jpk
-   NO_BOXES    = count(SEAmask)
-   NO_BOXES_XY = count(SEAmask(:,:,1))
+   NO_BOXES    = jpk !count(SEAmask)
+   NO_BOXES_XY = 1 !count(SEAmask(:,:,1))
    NO_STATES   = NO_D3_BOX_STATES * NO_BOXES
+
    NO_BOXES_Z_BEN  = 1
    NO_BOXES_BEN = NO_BOXES_XY * NO_BOXES_Z_BEN
    NO_STATES_BEN = NO_BOXES_BEN * NO_D2_BOX_STATES_BEN
@@ -135,8 +139,7 @@ SUBROUTINE trc_nam_bfm()
    ! Set output stepping
    !---------------------------------------------
    save_delta = bfmtime%step0
-   call update_save_delta(out_delta,save_delta,time_delta)
-
+   IF ( .NOT. bfm_iomput ) call update_save_delta(out_delta,save_delta,time_delta)
 
    !---------------------------------------------
    ! Setup NEMO namtrc settings
@@ -148,12 +151,24 @@ SUBROUTINE trc_nam_bfm()
        if (D3STATETYPE(jn-stPelStateS+1) == ALLTRANSPORT) then
            jp_bgc = jp_bgc + 1
            var_map(jn) =  jp_bgc
-           sn_tracer(jn)%clsname = trim(var_names(jn))
-           sn_tracer(jn)%cllname = trim(var_long(jn))
-           sn_tracer(jn)%clunit = trim(var_units(jn))
+           sn_tracer(jp_bgc)%clsname = trim(var_names(jn))
+           sn_tracer(jp_bgc)%cllname = trim(var_long(jn))
+           sn_tracer(jp_bgc)%clunit = trim(var_units(jn))
+           sn_tracer(jp_bgc)%llinit = InitVar(jn)%init == 2
+           sn_tracer(jp_bgc)%llsbc = InitVar(jn)%sbc
+           sn_tracer(jp_bgc)%llcbc = InitVar(jn)%cbc
+           sn_tracer(jp_bgc)%llobc = InitVar(jn)%obc
        endif
    enddo
-   write (LOGUNIT,*) 'map ', var_map
+   ln_trcdta = COUNT(sn_tracer(:)%llinit) > 0
+   !write (LOGUNIT,*) 'map ', var_map
+   ! benthic
+   jp_bgc_b = NO_D2_BOX_STATES_BEN
+   jpk_b = NO_BOXES_Z_BEN
+#ifdef INCLUDE_SEAICE
+   ! seaice
+   jpk_i = NO_BOXES_Z_ICE
+#endif
 
 END SUBROUTINE trc_nam_bfm
 
