@@ -3,14 +3,18 @@ MODULE trcwri_my_trc
    !!                       *** MODULE trcwri ***
    !!     trc_wri_my_trc   :  outputs of concentration fields
    !!======================================================================
+#include "cppdefs.h"
 #if defined key_top && defined key_xios
    !!----------------------------------------------------------------------
    !! History :      !  2007  (C. Ethe, G. Madec)  Original code
    !!                !  2016  (C. Ethe, T. Lovato) Revised architecture
    !!----------------------------------------------------------------------
+   ! NEMO
    USE par_trc         ! passive tracers common variables
    USE trc         ! passive tracers common variables 
    USE iom         ! I/O manager
+   ! BFM
+   USE global_mem, ONLY: LOGUNIT, bfm_lwp
 
    IMPLICIT NONE
    PRIVATE
@@ -41,9 +45,10 @@ CONTAINS
          cltra = TRIM( ctrcnm(jn) )                  ! short title for tracer
          CALL iom_put( cltra, tr(:,:,:,jn,Kmm) )
       END DO
+
       DO jn = 1, jp_bgc_b
          cltra = TRIM( ctrcnm_b(jn) )                  ! short title for tracer
-         CALL iom_put( cltra, tr_b(:,:,:,jn,Kmm) )
+         CALL iom_put( cltra, tr_b(:,:,:,jn) )
       END DO
 
       !

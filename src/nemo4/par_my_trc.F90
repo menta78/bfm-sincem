@@ -31,13 +31,13 @@ MODULE par_my_trc
    INTEGER, PUBLIC ::   jp_bgc_b             !: Number of tracers
    INTEGER, PUBLIC ::   jpk_b                !: Number of vertical levels
    CHARACTER(len=lca), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   ctrcnm_b   !: tracers short name
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:,:,:) ::  tr_b          !: tracers concentration
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:,:) ::  tr_b          !: tracers concentration
 
    !! seaice passive tracers  (input and output)
    !! ------------------------------------------
    INTEGER, PUBLIC ::   jp_bgc_i             !: Number of tracers
    INTEGER, PUBLIC ::   jpk_i                !: Number of vertical levels
    CHARACTER(len=lca), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   ctrcnm_i   !: tracers short name
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:,:,:) ::  tr_i          !: tracers concentration
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:,:) ::  tr_i          !: tracers concentration
    !!======================================================================
 END MODULE par_my_trc

@@ -56,7 +56,7 @@ CONTAINS
       !! ** Method  : - Read the namcfc namelist and check the parameter values
       !!----------------------------------------------------------------------
       INTEGER, INTENT(in) ::   Kmm  ! time level indices
-      INTEGER :: ji, jj, jk, jn, m
+      INTEGER :: ji, jj, jk, jn, jt
       REAL(RLEN) :: ztraf, zexp, zdexp
       !
       IF(lwp) WRITE(numout,*)
@@ -80,28 +80,28 @@ CONTAINS
       !-------------------------------------------------------
       else if (bfm_init == 0) then
          ! PELAGIC
-         do m = 1,NO_D3_BOX_STATES
+         do jn = 1,NO_D3_BOX_STATES
 
-            Initvar(m)%varname=var_names(m)
+            Initvar(jn)%varname=var_names(jn)
 
-            select case (InitVar(m) % init)
+            select case (InitVar(jn) % init)
 
             case (0) ! Homogeneous IC
-               InitVar(m)%unif = minval( D3STATE(m,:) )
+               InitVar(jn)%unif = minval( D3STATE(jn,:) )
 
             case (1) ! Analytical IC
                ! Check consistency of input z1 and z2
-               if ( InitVar(m)%anz2 .ne. ZERO .AND. InitVar(m)%anz2 .lt. InitVar(m)%anz1 ) then
-                  STDERR 'ERROR: z2 < z1 in analytical profile creation for tracer ', TRIM(var_names(m))
+               if ( InitVar(jn)%anz2 .ne. ZERO .AND. InitVar(jn)%anz2 .lt. InitVar(jn)%anz1 ) then
+                  STDERR 'ERROR: z2 < z1 in analytical profile creation for tracer ', TRIM(var_names(jn))
                   STDERR '     Check settings in bfm_init_nml.'
                   stop
                endif
                ! gdept_1d contains the model depth
-               D3STATE(m,:) = analytical_ic( gdept_1d, InitVar(m)%anz1, &
-                       InitVar(m)%anv1, InitVar(m)%anz2, InitVar(m)%anv2 )
+               D3STATE(jn,:) = analytical_ic( gdept_1d, InitVar(jn)%anz1, &
+                       InitVar(jn)%anv1, InitVar(jn)%anz2, InitVar(jn)%anv2 )
 
             case (2) ! IC from file (use nemo trcdta)
-               InitVar(m)%filename='file in namtrc_dta'
+               InitVar(jn)%filename='file in namtrc_dta'
             end select
          end do
 
@@ -114,8 +114,8 @@ CONTAINS
          if (bfm_lwp) then
             write(LOGUNIT,157) 'Init', 'Unif', 'Filename    ', 'Var', 'Anal. Z1', 'Anal. V1', &
                  'Anal. Z2', 'Anal. V2', 'OBC', 'SBC', 'CBC'
-            do m = 1,NO_D3_BOX_STATES
-                 write(LOGUNIT, 158) InitVar(m)
+            do jn = 1,NO_D3_BOX_STATES
+                 write(LOGUNIT, 158) InitVar(jn)
             !     write(LOGUNIT,*) var_names(m), D3STATE(m,:)
             enddo
          endif
@@ -143,14 +143,14 @@ CONTAINS
    ! BENTHIC
    DO jn = 1, NO_D2_BOX_STATES_BEN
       DO jk = 1, jpk_b
-          tr_b(:,:,jk,jn,Kmm) = tmask(:,:,1) * D2STATE_BEN(jn,1)
+          tr_b(:,:,jk,jn) = tmask(:,:,1) * D2STATE_BEN(jn,1)
       ENDDO
       ctrcnm_b(jn) = trim(var_names(jn + stBenStateS - 1))
    END DO
 #ifdef INCLUDE_SEAICE
    DO jn = 1, NO_D2_BOX_STATES_ICE
       DO jk = 1, jpk_i
-          tr_i(:,:,jk,jn,Kmm) = tmask(:,:,1) * D2STATE_ICE(jn,1)
+          tr_i(:,:,jk,jn) = tmask(:,:,1) * D2STATE_ICE(jn,1)
       ENDDO
       ctrcnm_i(jn) = trim(var_names(jn + stIceStateS - 1))
    END DO
@@ -199,9 +199,9 @@ CONTAINS
       LEVEL1 'SEABED IRON FLUX : Read fraction mask from bottom_fraction.nc'
       LEVEL1 '  Apply constant Iron flux : ', p_rN7fsed
       ! read btmfrac mask (vertical seabed fraction) from bottom_fraction.nc
-      CALL iom_open ( 'bottom_fraction.nc', m )
-      CALL iom_get  ( m, 1, 'btmfrac' , ironsed(:,:,:), 1 )
-      CALL iom_close( m )
+      CALL iom_open ( 'bottom_fraction.nc', jn )
+      CALL iom_get  ( jn, 1, 'btmfrac' , ironsed(:,:,:), 1 )
+      CALL iom_close( jn )
       ! iron release dependence on depth (metamodel of Middelburg et al.,1996)
       DO_3D( nn_hls, nn_hls, nn_hls, nn_hls, 1, jpk )
            zexp  = MIN( 8.,( gdept(ji,jj,jk,Kmm) / 500. )**(-1.5) )
@@ -236,9 +236,9 @@ CONTAINS
       !!----------------------------------------------------------------------
       !!              ***  ROUTINE trc_ini_my_trc_alloc  ***
       !!----------------------------------------------------------------------
-      ALLOCATE( tr_b(jpi,jpj,jpk_b,jp_bgc_b,jpt) , ctrcnm_b(jp_bgc_b), &
+      ALLOCATE( tr_b(jpi,jpj,jpk_b,jp_bgc_b) , ctrcnm_b(jp_bgc_b), &
 #ifdef INCLUDE_SEAICE
-                tr_i(jpi,jpj,jpk_i,jp_bgc_i,jpt) , ctrcnm_i(jp_bgc_i), &
+                tr_i(jpi,jpj,jpk_i,jp_bgc_i) , ctrcnm_i(jp_bgc_i), &
 #endif
                STAT = trc_ini_my_trc_alloc)
       !

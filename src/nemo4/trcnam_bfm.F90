@@ -10,7 +10,7 @@ SUBROUTINE trc_nam_bfm()
    USE in_out_manager, ONLY: lwp, numout, nit000, nitend
    USE dom_oce, ONLY: rn_Dt, narea, nyear, nmonth, nday, tmask
    USE par_oce, ONLY: jpi, jpj, jpk
-   USE trc,     ONLY: tr, ln_trcdta
+   USE trc,     ONLY: tr, ln_trcdta, ln_top_euler
    USE par_my_trc, ONLY: var_map, jp_bgc_b, bottom_level, bfm_iomput
    ! BFM
    USE constants,  ONLY: SEC_PER_DAY
