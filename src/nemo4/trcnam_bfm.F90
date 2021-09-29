@@ -62,7 +62,7 @@ SUBROUTINE trc_nam_bfm()
    !-------------------------------------------------------
    ! Force Euler timestepping for the BFM
    !-------------------------------------------------------
-   !ln_top_euler = .TRUE.
+   ln_top_euler = .TRUE.
 
    !---------------------------------------------
    ! Set the dimensions
