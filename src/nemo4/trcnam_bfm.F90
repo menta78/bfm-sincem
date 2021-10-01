@@ -17,7 +17,7 @@ SUBROUTINE trc_nam_bfm()
    USE global_mem, ONLY: RLEN, ZERO, LOGUNIT, SkipBFMCore, bfm_lwp, ALLTRANSPORT
    USE api_bfm,    ONLY: parallel_rank, bio_setup, SEAmask, init_bfm, stPelStateS, stPelStateE, &
                          save_delta, time_delta, out_delta, update_save_delta, &
-                         InitVar, var_names, var_long, var_units
+                         InitVar, var_names, var_long, var_units, SRFindices, BOTindices
    USE time,       ONLY: bfmtime, julian_day, calendar_date
    USE mem,        ONLY: D3STATETYPE, NO_BOXES_X, NO_BOXES_Y, NO_BOXES_Z, &
                          NO_BOXES, NO_BOXES_XY, NO_STATES, NO_D3_BOX_STATES, & 
@@ -85,6 +85,7 @@ SUBROUTINE trc_nam_bfm()
    !
    allocate(bottom_level(jpi,jpj))
    bottom_level = SUM(tmask, DIM=3)
+   ALLOCATE(SRFindices(1), BOTindices(1))
 
    !---------------------------------------------
    ! Set the dimensions

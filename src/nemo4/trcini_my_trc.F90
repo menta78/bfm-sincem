@@ -17,10 +17,11 @@ MODULE trcini_my_trc
    USE trc
    USE par_my_trc
    USE trcnam_my_trc     ! MY_TRC SMS namelist
-   !USE trcsms_my_trc
    USE iom,   ONLY: iom_open,iom_get,iom_close
+   USE sbcapr,     ONLY: apr
    !! BFM
    USE constants,  ONLY: SEC_PER_DAY
+   USE mem_param,  ONLY: p_atm0
    USE mem,        ONLY: D3STATE, NO_D3_BOX_STATES, D2STATE_BEN, NO_D2_BOX_STATES_BEN
    USE global_mem, ONLY: RLEN, ZERO, LOGUNIT, SkipBFMCore, bfm_lwp
    USE api_bfm,    ONLY: bfm_init, in_rst_fname, InitVar, var_names, stBenStateS
@@ -32,6 +33,9 @@ MODULE trcini_my_trc
 #ifdef INCLUDE_SEAICE
    USE api_bfm,    ONLY: stIceStateS
    USE mem,        ONLY: D2STATE_ICE, NO_D2_BOX_STATES_ICE
+#endif
+#ifdef INCLUDE_PELCO2
+   USE mem_CO2,    ONLY: AtmCO20, AtmCO2, AtmSLP
 #endif
 
    IMPLICIT NONE
@@ -148,12 +152,22 @@ CONTAINS
       ctrcnm_b(jn) = trim(var_names(jn + stBenStateS - 1))
    END DO
 #ifdef INCLUDE_SEAICE
+   ! SEAICE
    DO jn = 1, NO_D2_BOX_STATES_ICE
       DO jk = 1, jpk_i
           tr_i(:,:,jk,jn) = tmask(:,:,1) * D2STATE_ICE(jn,1)
       ENDDO
       ctrcnm_i(jn) = trim(var_names(jn + stIceStateS - 1))
    END DO
+#endif
+   !
+   ! Initialize sea level pressure for gas exchange
+   IF ( .NOT. ALLOCATED(apr)) ALLOCATE(apr(jpi,jpj))
+   IF (AtmSLP%init .NE. 3) apr = p_atm0
+#ifdef INCLUDE_PELCO2
+   ! Initialize CO2 air concentration
+   !-------------------------------------------------------
+   IF (AtmCO2%init .NE. 3) atm_co2 = AtmCO20
 #endif
 
    ! Zero out fields if cpu is off
