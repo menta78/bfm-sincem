@@ -17,7 +17,7 @@ MODULE trcini_my_trc
    USE trc
    USE par_my_trc
    USE trcnam_my_trc     ! MY_TRC SMS namelist
-   USE iom,   ONLY: iom_open,iom_get,iom_close
+   USE iom,        ONLY: iom_open,iom_get,iom_close
    USE sbcapr,     ONLY: apr
    !! BFM
    USE constants,  ONLY: SEC_PER_DAY
@@ -42,7 +42,6 @@ MODULE trcini_my_trc
    PRIVATE
 
    PUBLIC   trc_ini_my_trc   ! called by trcini.F90 module
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:) :: ironsed   !: Seabed supply of iron
 
    !!----------------------------------------------------------------------
    !! NEMO/TOP 4.0 , NEMO Consortium (2018)
@@ -135,109 +134,84 @@ CONTAINS
 !      D3STATE(ppO3h,:) = D3STATE(ppO3h,:) * ERHO(:)
 !#endif
 
-   ! Transfer BFM ICs to passive tracers array
-   !-------------------------------------------------------
-   ! PELAGIC
-   DO jn = 1, NO_D3_BOX_STATES
-       DO_2D( nn_hls, nn_hls, nn_hls, nn_hls )
-           tr(ji,jj,:,var_map(jn),Kmm) = D3STATE(jn,:)
-       END_2D
-       tr(:,:,:,var_map(jn),Kmm) = tr(:,:,:,var_map(jn),Kmm) * tmask(:,:,:)
-   END DO
-   ! BENTHIC
-   DO jn = 1, NO_D2_BOX_STATES_BEN
-      DO jk = 1, jpk_b
-          tr_b(:,:,jk,jn) = tmask(:,:,1) * D2STATE_BEN(jn,1)
-      ENDDO
-      ctrcnm_b(jn) = trim(var_names(jn + stBenStateS - 1))
-   END DO
+      ! Transfer BFM ICs to passive tracers array
+      !-------------------------------------------------------
+      ! PELAGIC
+      DO jn = 1, NO_D3_BOX_STATES
+          DO_2D( nn_hls, nn_hls, nn_hls, nn_hls )
+              tr(ji,jj,:,var_map(jn),Kmm) = D3STATE(jn,:)
+          END_2D
+          tr(:,:,:,var_map(jn),Kmm) = tr(:,:,:,var_map(jn),Kmm) * tmask(:,:,:)
+      END DO
+      ! BENTHIC
+      DO jn = 1, NO_D2_BOX_STATES_BEN
+         DO jk = 1, jpk_b
+             tr_b(:,:,jk,jn) = tmask(:,:,1) * D2STATE_BEN(jn,1)
+         ENDDO
+         ctrcnm_b(jn) = trim(var_names(jn + stBenStateS - 1))
+      END DO
 #ifdef INCLUDE_SEAICE
-   ! SEAICE
-   DO jn = 1, NO_D2_BOX_STATES_ICE
-      DO jk = 1, jpk_i
-          tr_i(:,:,jk,jn) = tmask(:,:,1) * D2STATE_ICE(jn,1)
-      ENDDO
-      ctrcnm_i(jn) = trim(var_names(jn + stIceStateS - 1))
-   END DO
+      ! SEAICE
+      DO jn = 1, NO_D2_BOX_STATES_ICE
+         DO jk = 1, jpk_i
+             tr_i(:,:,jk,jn) = tmask(:,:,1) * D2STATE_ICE(jn,1)
+         ENDDO
+         ctrcnm_i(jn) = trim(var_names(jn + stIceStateS - 1))
+      END DO
 #endif
-   !
-   ! Initialize sea level pressure for gas exchange
-   IF ( .NOT. ALLOCATED(apr)) ALLOCATE(apr(jpi,jpj))
-   IF (AtmSLP%init .NE. 3) apr = p_atm0
+      !
+      ! Initialize sea level pressure for gas exchange
+      IF ( .NOT. ALLOCATED(apr)) ALLOCATE(apr(jpi,jpj))
+      IF (AtmSLP%init .NE. 3) apr = p_atm0
 #ifdef INCLUDE_PELCO2
-   ! Initialize CO2 air concentration
-   !-------------------------------------------------------
-   IF (AtmCO2%init .NE. 3) atm_co2 = AtmCO20
+      ! Initialize CO2 air concentration
+      !-------------------------------------------------------
+      IF (AtmCO2%init .NE. 3) atm_co2 = AtmCO20
 #endif
 
-   ! Zero out fields if cpu is off
-   !-------------------------------------------------------
-   IF( SkipBFMCore ) tr(:,:,:,:,Kmm) = ZERO
+      ! Zero out fields if cpu is off
+      !-------------------------------------------------------
+      IF( SkipBFMCore ) tr(:,:,:,:,Kmm) = ZERO
 
 
-   ! Initialise DATA output netcdf file(s)
-   !-------------------------------------------------------
-   IF ( bfm_iomput ) THEN
-      if (lwp) write(LOGUNIT,*) 'BFM uses XIOS output system via NEMO'
-      ! Set var_ids values according to the XIOS file_def is done in trc_dia_bfm
-   ELSE
-      if (lwp) write(LOGUNIT,*) 'BFM output without XIOS to be implemented' 
-      STOP
-   ENDIF 
+      ! Initialise DATA output netcdf file(s)
+      !-------------------------------------------------------
+      IF ( bfm_iomput ) THEN
+         if (lwp) write(LOGUNIT,*) 'BFM uses XIOS output system via NEMO'
+         ! Set var_ids values according to the XIOS file_def is done in trc_dia_bfm
+      ELSE
+         if (lwp) write(LOGUNIT,*) 'BFM output without XIOS to be implemented' 
+         STOP
+      ENDIF 
 
-   ! Time invaring forcing section
-   !-------------------------------------------------------
+      ! Time invaring forcing section
+      !-------------------------------------------------------
 
-   ! Scaling factor for benthic return coefficients !TODO move this into BFM
-   !-------------------------------------------------------
-   ! Depth dependence from Middelburg et al. (1996) metamodel (see par. 3.4)
-   ! if ( p_depscale > ZERO ) then
-   !    allocate(rtmp1D(NO_BOXES))
-   !    rtmp1D = pack(gdept_0,SEAmask)
-   !    DO i = 1, NO_BOXES_XY
-   !       j = BOTindices(i)
-   !       zexp  = MIN( 8.,( rtmp1D(j) / p_depscale )**(-1.5) )
-   !       zdexp = -0.9543 + 0.7662 * LOG( zexp ) - 0.235 * LOG( zexp )**2
-   !       RETFAC(i) = MIN( 1., EXP( zdexp ) / 0.5 )
-   !    END DO
-   !    deallocate(rtmp1D)
-   ! endif
+      ! Scaling factor for benthic return coefficients !TODO move this into BFM
+      !-------------------------------------------------------
+      ! Depth dependence from Middelburg et al. (1996) metamodel (see par. 3.4)
+      ! if ( p_depscale > ZERO ) then
+      !    allocate(rtmp1D(NO_BOXES))
+      !    rtmp1D = pack(gdept_0,SEAmask)
+      !    DO i = 1, NO_BOXES_XY
+      !       j = BOTindices(i)
+      !       zexp  = MIN( 8.,( rtmp1D(j) / p_depscale )**(-1.5) )
+      !       zdexp = -0.9543 + 0.7662 * LOG( zexp ) - 0.235 * LOG( zexp )**2
+      !       RETFAC(i) = MIN( 1., EXP( zdexp ) / 0.5 )
+      !    END DO
+      !    deallocate(rtmp1D)
+      ! endif
 
 #ifdef INCLUDE_PELFE
-   !TODO check this work with glonal configurations
-   ALLOCATE (ironsed(jpi,jpj,jpk))
-   ironsed = ZERO
-   ! Prepare Iron release from seabed sediments
-   if ( p_rN7fsed > 0. ) then
-      LEVEL1 ''
-      LEVEL1 'SEABED IRON FLUX : Read fraction mask from bottom_fraction.nc'
-      LEVEL1 '  Apply constant Iron flux : ', p_rN7fsed
-      ! read btmfrac mask (vertical seabed fraction) from bottom_fraction.nc
-      CALL iom_open ( 'bottom_fraction.nc', jn )
-      CALL iom_get  ( jn, 1, 'btmfrac' , ironsed(:,:,:), 1 )
-      CALL iom_close( jn )
-      ! iron release dependence on depth (metamodel of Middelburg et al.,1996)
-      DO_3D( nn_hls, nn_hls, nn_hls, nn_hls, 1, jpk )
-           zexp  = MIN( 8.,( gdept(ji,jj,jk,Kmm) / 500. )**(-1.5) )
-           zdexp = -0.9543 + 0.7662 * LOG( zexp ) - 0.235 * LOG( zexp )**2
-           ironsed(ji,jj,jk) = ironsed(ji,jj,jk) * MIN( 1., EXP( zdexp ) / 0.5 )
-      END_3D
-      !
-      !ztraf = SUM(ironsed * spread(e1e2t,3,jpk) * p_rN7fsed * 365. * 1.e-15 * tmask )
-      !IF (lk_mpp) CALL mpp_sum (ztraf)
-      !LEVEL1 '  Total iron load from Sediment [Gmol/y] : ', ztraf
-      !
-      ironsed = ironsed * p_rN7fsed / ( SEC_PER_DAY * e3t_0(:,:,:) )
-      !
-   endif
+      CALL iron_ini()
 #endif
 
-   IF (bfm_lwp) THEN
-         LEVEL1 ' '
-         LEVEL1 '         BFM INITIALIZATION ... DONE!          '
-         LEVEL1 '-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'
-         LEVEL1 ' '
-   ENDIF
+      IF (bfm_lwp) THEN
+            LEVEL1 ' '
+            LEVEL1 '         BFM INITIALIZATION ... DONE!          '
+            LEVEL1 '-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'
+            LEVEL1 ' '
+      ENDIF
 
       
 157 FORMAT(a4, 1x, a10  , 1x, a25, 1x, a3, 1x, a10  , 1x, a10  , 1x, a10  , 1x, a10  , 3x, a3, 3x, a3, 3x, a3)
@@ -260,6 +234,68 @@ CONTAINS
       IF( trc_ini_my_trc_alloc /= 0 ) CALL ctl_stop( 'STOP', 'trc_ini_my_trc_alloc : failed to allocate arrays' )
       !
    END FUNCTION trc_ini_my_trc_alloc
+
+
+   SUBROUTINE iron_ini
+      !!----------------------------------------------------------------------
+      !!              ***  ROUTINE iron_ini  ***
+      !!----------------------------------------------------------------------
+      USE lib_mpp,   ONLY: mpp_sum
+      USE fldread,   ONLY: FLD_N, fld_fill
+      !
+      TYPE(FLD_N) :: sn_dust, sn_ironsed  ! open
+      CHARACTER(len=100) ::  cn_dir_dust  ! Root directory for location of input files
+      INTEGER     :: ios                  ! Local integer output status for namelist read
+      INTEGER     :: numfld               ! Local integer for fldread
+      INTEGER     :: ji, jj, jk           ! Local loop indeces
+      REAL(wp)    :: zexp, zdexp, ztraf   ! Local real scalars
+
+      NAMELIST/nambc_iron/ sn_ironsed, sn_dust, rf_dust_iron, cn_dir_dust
+      !
+      IF( lwp ) THEN
+         WRITE(numout,*)
+         WRITE(numout,*) 'trc_bc_ini : Tracers Boundary Conditions (BC)'
+         WRITE(numout,*) '~~~~~~~~~~~ '
+      ENDIF
+      !
+      READ  ( numnat_cfg, nambc_iron, IOSTAT = ios, ERR = 902 )
+902   IF( ios >  0 )   CALL ctl_nam ( ios , 'nambc_iron in configuration namelist' )
+      IF(lwm) WRITE ( numont, nambc_iron )
+
+      ! Iron supply form sediments
+      ALLOCATE (ironsed(jpi,jpj,jpk))
+      ironsed = ZERO
+      IF ( p_rN7fsed > 0. ) THEN
+         CALL iom_open ( TRIM( sn_ironsed%clname ), numfld )
+         CALL iom_get  ( numfld, 1, TRIM( sn_ironsed%clvar ), ironsed(:,:,:), 1 )
+         CALL iom_close( numfld )
+         ! iron release dependence on depth (metamodel of Middelburg et al.,1996)
+         DO_3D( nn_hls, nn_hls, nn_hls, nn_hls, 1, jpk )
+              zexp  = MIN( 8.,( gdept(ji,jj,jk,Kmm) / 500. )**(-1.5) )
+              zdexp = -0.9543 + 0.7662 * LOG( zexp ) - 0.235 * LOG( zexp )**2
+              ironsed(ji,jj,jk) = ironsed(ji,jj,jk) * MIN( 1., EXP( zdexp ) / 0.5 )
+         END_3D
+         ! total supply
+         ztraf = SUM(ironsed * spread(e1e2t,3,jpk) * p_rN7fsed * 365. * 1.e-15 * tmask )
+         IF (lk_mpp) CALL mpp_sum ('ironsed', ztraf)
+         LEVEL1 ''
+         LEVEL1 'SEABED IRON FLUX : Read fraction mask from '//TRIM( sn_ironsed%clname )
+         LEVEL1 '  Apply constant Iron flux : ', p_rN7fsed
+         LEVEL1 '  Total iron load from Sediment [Gmol/y] : ', ztraf
+      ENDIF
+
+      ! Dust deposition
+      ALLOCATE (dustdep(jpi,jpj))
+      dustdep = ZERO
+      ALLOCATE( sf_dust(1), STAT=ios )           !* allocate and fill sf_sst (forcing structure) with sn_sst
+      IF( ios > 0 )   CALL ctl_stop( 'STOP', 'iron_ini: unable to allocate sf_dust structure' )
+      !
+      CALL fld_fill( sf_dust, (/ sn_dust /), cn_dir_dust, 'iron_ini', 'Atmospheric dust deposition', 'nambc_iron' )
+                                ALLOCATE( sf_dust(1)%fnow(jpi,jpj,1)   )
+      IF( sn_dust%ln_tint )     ALLOCATE( sf_dust(1)%fdta(jpi,jpj,1,2) )
+     
+ 
+   END SUBROUTINE iron_ini
 
    !!======================================================================
 END MODULE trcini_my_trc

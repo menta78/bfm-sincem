@@ -10,6 +10,7 @@ MODULE par_my_trc
    !! Software governed by the CeCILL license (see ./LICENSE)
    !!----------------------------------------------------------------------
    USE par_kind, ONLY: wp, lca
+   USE fldread,  ONLY: FLD
 
    IMPLICIT NONE
 
@@ -25,6 +26,11 @@ MODULE par_my_trc
 #endif
    !!
    INTEGER, PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::  bottom_level          !: deepest level of water column
+
+   !! Iron boundary forcings
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:) :: ironsed   ! Seabed supply of iron
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:)   :: dustdep      ! Sea surface dust deposition
+   TYPE(FLD), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:)    :: sf_dust   ! structure of data input for fldread
 
    !! benthic passive tracers  (input and output)
    !! ------------------------------------------

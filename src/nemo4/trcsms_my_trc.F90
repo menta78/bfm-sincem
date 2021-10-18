@@ -20,7 +20,7 @@ MODULE trcsms_my_trc
    USE trdtrc
    USE trcwri_my_trc,  ONLY: mapping_diags
    ! BFM
-   USE global_mem, ONLY: LOGUNIT, bfm_lwp, RLEN
+   USE global_mem, ONLY: LOGUNIT, bfm_lwp, RLEN, ZERO
 
    IMPLICIT NONE
    PRIVATE
@@ -58,6 +58,8 @@ CONTAINS
       IF(lwp) WRITE(numout,*) ' ~~~~~~~~~~~~~~'
      
       IF (kt == nit000) CALL mapping_diags()
+
+      CALL update_bgc_forcings(kt)
 
       ! add here the call to BGC model
       DO_2D( nn_hls, nn_hls, nn_hls, nn_hls )
@@ -117,10 +119,10 @@ CONTAINS
       AtmSLP%fnow = apr(ji,jj)
       ! broadcast surface atm pressure over the water column (NO_BOXES)
       patm3d = AtmSLP%fnow
-      LEVEL1 'patm3d', patm3d(:)
+      !LEVEL1 'patm3d', patm3d(:)
 #ifdef INCLUDE_PELCO2
       AtmCO2%fnow = atm_co2(ji,jj)
-      LEVEL1 'co2', AtmCO2%fnow, 'slp', AtmSLP%fnow
+      !LEVEL1 'co2', AtmCO2%fnow, 'slp', AtmSLP%fnow
 #endif
       ! convert to in-situ temperature and practical salinity
       ! TEOS-10 conversions not yet available
@@ -133,16 +135,28 @@ CONTAINS
 
    SUBROUTINE update_bgc_forcings(kt)
       !
+      USE fldread,       ONLY: fld_read
+      !
+      USE time,          ONLY: bfmtime
+      USE sbcapr,        ONLY: apr
+      USE SystemForcing, ONLY: FieldRead
+      USE mem_CO2,       ONLY: AtmSLP, patm3d
 #ifdef INCLUDE_PELCO2
-      USE sbcapr,     ONLY: apr
-      USE SystemForcing, ONLY : FieldRead
       USE mem,        ONLY: ppO3c, ppO3h, ppN6r
-      USE mem_CO2,    ONLY: AtmCO20, AtmCO2, AtmSLP, patm3d
+      USE mem_CO2,    ONLY: AtmCO20, AtmCO2
       USE trcbc,      ONLY: sf_trcsbc, n_trc_indsbc
+#endif
+#ifdef INCLUDE_PELFE
+      USE mem_PelChem,   ONLY: p_rDust
 #endif
       !
       INTEGER, INTENT(in) :: kt   ! ocean time-step index
+      REAL(wp), DIMENSION(jpi,jpj,jpk) :: irondep
+      REAL(wp)   :: dustsink, dustinp
       ! 
+      ! Update bfm internal time
+      bfmtime%stepnow  = kt
+      !
 #ifdef INCLUDE_PELCO2
       !
       ! CO2 atmospheric mixing ratio
@@ -150,6 +164,7 @@ CONTAINS
         CASE (1) ! Read timeseries in BFM
            call FieldRead(AtmCO2)
            atm_co2(:,:) = AtmCO2%fnow(1)
+        !   LEVEL1 'bfmtime', bfmtime%stepnow, ' co2', AtmCO2%fnow(1)
         !CASE (2) ! Read Boundary Conditions using NEMO fldread (namtrc_bc)
         !   n = n_trc_indsbc(ppO3c)
         !   AtmCO2%fnow = pack( sf_trcsbc(n)%fnow(:,:,1),SRFmask(:,:,1) )
@@ -175,7 +190,17 @@ CONTAINS
       !      ' EIR: ',maxval(EIR)
       !ENDIF
       !
-      ! Iron dust deposition
+#ifdef INCLUDE_PELFE
+      ! Iron dust deposition below the surface
+      irondep = ZERO
+      IF (p_rDust > 0. ) THEN
+         CALL fld_read( kt, 1, sf_dust )
+         ! dust sink length scale (1/m): dust assumed to be 0.01% (1/d) , sink speed p_rDust (m/d)
+         dustsink =  0.0001_wp * 1. / p_rDust
+         ! dust (g/day/m2) - > (umolFe/day/m2)
+         dustinp = 0.035 * 1.e06 / 55.85
+      ENDIF
+#endif
 
 
    END SUBROUTINE update_bgc_forcings
