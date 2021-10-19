@@ -17,6 +17,7 @@ MODULE trcini_my_trc
    USE trc
    USE par_my_trc
    USE trcnam_my_trc     ! MY_TRC SMS namelist
+   USE lib_mpp,    ONLY: mpp_sum
    USE iom,        ONLY: iom_open,iom_get,iom_close
    USE sbcapr,     ONLY: apr
    !! BFM
@@ -59,7 +60,7 @@ CONTAINS
       !! ** Method  : - Read the namcfc namelist and check the parameter values
       !!----------------------------------------------------------------------
       INTEGER, INTENT(in) ::   Kmm  ! time level indices
-      INTEGER :: ji, jj, jk, jn, jt
+      INTEGER :: ji, jj, jk, jn, jt, numfld
       REAL(RLEN) :: ztraf, zexp, zdexp
       !
       IF(lwp) WRITE(numout,*)
@@ -184,8 +185,30 @@ CONTAINS
          STOP
       ENDIF 
 
-      ! Time invaring forcing section
+#ifdef INCLUDE_PELFE
+      ! Iron supply from sediments (see Aumont & Bopp, 2005)
       !-------------------------------------------------------
+      ALLOCATE (ironsed(jpi,jpj,jpk))
+      ironsed = ZERO
+      IF ( p_rN7fsed > 0. ) THEN
+         CALL iom_open ( TRIM( "bottom_fraction.nc" ), numfld )
+         CALL iom_get  ( numfld, 1, TRIM( "btmfrac" ), ironsed(:,:,:), 1 )
+         CALL iom_close( numfld )
+         ! iron release dependence on depth (metamodel of Middelburg et al.,1996)
+         DO_3D( nn_hls, nn_hls, nn_hls, nn_hls, 1, jpk )
+              zexp  = MIN( 8.,( gdept(ji,jj,jk,Kmm) / 500. )**(-1.5) )
+              zdexp = -0.9543 + 0.7662 * LOG( zexp ) - 0.235 * LOG( zexp )**2
+              ironsed(ji,jj,jk) = ironsed(ji,jj,jk) * MIN( 1., EXP( zdexp ) / 0.5 )
+         END_3D
+         ! total supply (TODO this is killing execution .. need to check)
+         !ztraf = SUM(ironsed * spread(e1e2t,3,jpk) * p_rN7fsed * 365. * 1.e-15 * tmask )
+         !IF (lk_mpp) CALL mpp_sum ('ironsed', ztraf)
+         LEVEL1 ''
+         LEVEL1 'trc_ini_my_trc: Read fraction mask from bottom_fraction.nc (varname: btmfrac)'
+         LEVEL1 '  Constant Iron flux from sediments: ', p_rN7fsed
+         !LEVEL1 '  Total iron load from Sediment [Gmol/y] : ', ztraf
+      ENDIF
+#endif
 
       ! Scaling factor for benthic return coefficients !TODO move this into BFM
       !-------------------------------------------------------
@@ -201,10 +224,6 @@ CONTAINS
       !    END DO
       !    deallocate(rtmp1D)
       ! endif
-
-#ifdef INCLUDE_PELFE
-      CALL iron_ini()
-#endif
 
       IF (bfm_lwp) THEN
             LEVEL1 ' '
@@ -234,68 +253,6 @@ CONTAINS
       IF( trc_ini_my_trc_alloc /= 0 ) CALL ctl_stop( 'STOP', 'trc_ini_my_trc_alloc : failed to allocate arrays' )
       !
    END FUNCTION trc_ini_my_trc_alloc
-
-
-   SUBROUTINE iron_ini
-      !!----------------------------------------------------------------------
-      !!              ***  ROUTINE iron_ini  ***
-      !!----------------------------------------------------------------------
-      USE lib_mpp,   ONLY: mpp_sum
-      USE fldread,   ONLY: FLD_N, fld_fill
-      !
-      TYPE(FLD_N) :: sn_dust, sn_ironsed  ! open
-      CHARACTER(len=100) ::  cn_dir_dust  ! Root directory for location of input files
-      INTEGER     :: ios                  ! Local integer output status for namelist read
-      INTEGER     :: numfld               ! Local integer for fldread
-      INTEGER     :: ji, jj, jk           ! Local loop indeces
-      REAL(wp)    :: zexp, zdexp, ztraf   ! Local real scalars
-
-      NAMELIST/nambc_iron/ sn_ironsed, sn_dust, rf_dust_iron, cn_dir_dust
-      !
-      IF( lwp ) THEN
-         WRITE(numout,*)
-         WRITE(numout,*) 'trc_bc_ini : Tracers Boundary Conditions (BC)'
-         WRITE(numout,*) '~~~~~~~~~~~ '
-      ENDIF
-      !
-      READ  ( numnat_cfg, nambc_iron, IOSTAT = ios, ERR = 902 )
-902   IF( ios >  0 )   CALL ctl_nam ( ios , 'nambc_iron in configuration namelist' )
-      IF(lwm) WRITE ( numont, nambc_iron )
-
-      ! Iron supply form sediments
-      ALLOCATE (ironsed(jpi,jpj,jpk))
-      ironsed = ZERO
-      IF ( p_rN7fsed > 0. ) THEN
-         CALL iom_open ( TRIM( sn_ironsed%clname ), numfld )
-         CALL iom_get  ( numfld, 1, TRIM( sn_ironsed%clvar ), ironsed(:,:,:), 1 )
-         CALL iom_close( numfld )
-         ! iron release dependence on depth (metamodel of Middelburg et al.,1996)
-         DO_3D( nn_hls, nn_hls, nn_hls, nn_hls, 1, jpk )
-              zexp  = MIN( 8.,( gdept(ji,jj,jk,Kmm) / 500. )**(-1.5) )
-              zdexp = -0.9543 + 0.7662 * LOG( zexp ) - 0.235 * LOG( zexp )**2
-              ironsed(ji,jj,jk) = ironsed(ji,jj,jk) * MIN( 1., EXP( zdexp ) / 0.5 )
-         END_3D
-         ! total supply
-         ztraf = SUM(ironsed * spread(e1e2t,3,jpk) * p_rN7fsed * 365. * 1.e-15 * tmask )
-         IF (lk_mpp) CALL mpp_sum ('ironsed', ztraf)
-         LEVEL1 ''
-         LEVEL1 'SEABED IRON FLUX : Read fraction mask from '//TRIM( sn_ironsed%clname )
-         LEVEL1 '  Apply constant Iron flux : ', p_rN7fsed
-         LEVEL1 '  Total iron load from Sediment [Gmol/y] : ', ztraf
-      ENDIF
-
-      ! Dust deposition
-      ALLOCATE (dustdep(jpi,jpj))
-      dustdep = ZERO
-      ALLOCATE( sf_dust(1), STAT=ios )           !* allocate and fill sf_sst (forcing structure) with sn_sst
-      IF( ios > 0 )   CALL ctl_stop( 'STOP', 'iron_ini: unable to allocate sf_dust structure' )
-      !
-      CALL fld_fill( sf_dust, (/ sn_dust /), cn_dir_dust, 'iron_ini', 'Atmospheric dust deposition', 'nambc_iron' )
-                                ALLOCATE( sf_dust(1)%fnow(jpi,jpj,1)   )
-      IF( sn_dust%ln_tint )     ALLOCATE( sf_dust(1)%fdta(jpi,jpj,1,2) )
-     
- 
-   END SUBROUTINE iron_ini
 
    !!======================================================================
 END MODULE trcini_my_trc

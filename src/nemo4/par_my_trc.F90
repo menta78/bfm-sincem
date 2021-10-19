@@ -27,10 +27,8 @@ MODULE par_my_trc
    !!
    INTEGER, PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::  bottom_level          !: deepest level of water column
 
-   !! Iron boundary forcings
+   !! boundary forcings
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:) :: ironsed   ! Seabed supply of iron
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:)   :: dustdep      ! Sea surface dust deposition
-   TYPE(FLD), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:)    :: sf_dust   ! structure of data input for fldread
 
    !! benthic passive tracers  (input and output)
    !! ------------------------------------------

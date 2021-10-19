@@ -21,6 +21,7 @@ MODULE trcsms_my_trc
    USE trcwri_my_trc,  ONLY: mapping_diags
    ! BFM
    USE global_mem, ONLY: LOGUNIT, bfm_lwp, RLEN, ZERO
+   USE constants,  ONLY: SEC_PER_DAY
 
    IMPLICIT NONE
    PRIVATE
@@ -59,7 +60,7 @@ CONTAINS
      
       IF (kt == nit000) CALL mapping_diags()
 
-      CALL update_bgc_forcings(kt)
+      CALL update_bgc_forcings(kt, Krhs)
 
       ! add here the call to BGC model
       DO_2D( nn_hls, nn_hls, nn_hls, nn_hls )
@@ -133,16 +134,16 @@ CONTAINS
    END SUBROUTINE environmental_conditions
 
 
-   SUBROUTINE update_bgc_forcings(kt)
-      !
-      USE fldread,       ONLY: fld_read
-      !
+   SUBROUTINE update_bgc_forcings(kt, Krhs)
+      ! NEMO
+      USE trcbc,      ONLY : n_trc_indsbc, sf_trcsbc, rf_trsfac
+      ! BFM
       USE time,          ONLY: bfmtime
       USE sbcapr,        ONLY: apr
       USE SystemForcing, ONLY: FieldRead
       USE mem_CO2,       ONLY: AtmSLP, patm3d
 #ifdef INCLUDE_PELCO2
-      USE mem,        ONLY: ppO3c, ppO3h, ppN6r
+      USE mem,        ONLY: ppO3c, ppO3h, ppN7f
       USE mem_CO2,    ONLY: AtmCO20, AtmCO2
       USE trcbc,      ONLY: sf_trcsbc, n_trc_indsbc
 #endif
@@ -151,8 +152,11 @@ CONTAINS
 #endif
       !
       INTEGER, INTENT(in) :: kt   ! ocean time-step index
+      INTEGER, INTENT(in) :: Krhs ! time level index of right hand side
+      INTEGER             :: jk, jl
       REAL(wp), DIMENSION(jpi,jpj,jpk) :: irondep
-      REAL(wp)   :: dustsink, dustinp
+      REAL(wp), DIMENSION(jpi,jpj)     :: dustinp
+      REAL(wp)   :: dustsink
       ! 
       ! Update bfm internal time
       bfmtime%stepnow  = kt
@@ -183,24 +187,31 @@ CONTAINS
         !CASE (3) should not be needed. maybe for CCSMCOUPLED if still issue with kt < 10 in NEMO coupling
       END SELECT
 
+#ifdef INCLUDE_PELFE
+      ! Iron flux from sediments (time-invariant)
+      tr(:,:,:,ppN7f,Krhs) = tr(:,:,:,ppN7f,Krhs) + ironsed
+
+      ! Iron dust deposition below the surface (surface layer applied in trcbc)
+      IF (p_rDust > 0. ) THEN
+         irondep = ZERO
+         ! surface input (rf_trsfac = Solub(0.01) * FeinDust(0.035) * g->ug (1e6) / Fe g->mol (55.85))
+         jl = n_trc_indsbc(ppN7f)
+         dustinp =  rf_trsfac(jl) * sf_trcsbc(jl)%fnow(:,:,1)
+         ! dust sink length scale (1/m): dust assumed to be 0.01% (1/d) , sink speed p_rDust (m/d)
+         dustsink =  0.01_wp * 1. / p_rDust
+         DO jk = 2, jpkm1
+            irondep(:,:,jk) = dustinp(:,:) * dustsink / SEC_PER_DAY * EXP( -gdept(:,:,jk,Kmm) / 540. )
+            tr(:,:,jk,ppN7f,Krhs) = tr(:,:,jk,ppN7f,Krhs) + irondep(:,:,jk)
+         END DO
+      ENDIF
+#endif
+
       ! print control on received fluxes
       !IF ( (kt-nit000)<20 .OR. MOD(kt,200)==0 .OR. kt==nitend) THEN
       !   write(LOGUNIT,'(a,i14,a,f10.4,a,f10.3,a,f10.3)') 'envforcing_bfm - Step ', kt,  &
       !      '  Air_xCO2: ',maxval(AtmCO2%fnow), '  SLP:', maxval(AtmSLP%fnow),   &
       !      ' EIR: ',maxval(EIR)
       !ENDIF
-      !
-#ifdef INCLUDE_PELFE
-      ! Iron dust deposition below the surface
-      irondep = ZERO
-      IF (p_rDust > 0. ) THEN
-         CALL fld_read( kt, 1, sf_dust )
-         ! dust sink length scale (1/m): dust assumed to be 0.01% (1/d) , sink speed p_rDust (m/d)
-         dustsink =  0.0001_wp * 1. / p_rDust
-         ! dust (g/day/m2) - > (umolFe/day/m2)
-         dustinp = 0.035 * 1.e06 / 55.85
-      ENDIF
-#endif
 
 
    END SUBROUTINE update_bgc_forcings
