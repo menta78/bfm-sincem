@@ -30,6 +30,10 @@ MODULE par_my_trc
    !! boundary forcings
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:) :: ironsed   ! Seabed supply of iron
 
+   !! support arrays
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:) :: chl_a
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:) :: ph
+
    !! benthic passive tracers  (input and output)
    !! ------------------------------------------
    INTEGER, PUBLIC ::   jp_bgc_b             !: Number of tracers

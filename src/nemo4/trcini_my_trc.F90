@@ -20,10 +20,12 @@ MODULE trcini_my_trc
    USE lib_mpp,    ONLY: mpp_sum
    USE iom,        ONLY: iom_open,iom_get,iom_close
    USE sbcapr,     ONLY: apr
+   USE trcopt,     ONLY: trc_opt_alloc, trc_opt_ini, parlux
    !! BFM
    USE constants,  ONLY: SEC_PER_DAY
    USE mem_param,  ONLY: p_atm0
    USE mem,        ONLY: D3STATE, NO_D3_BOX_STATES, D2STATE_BEN, NO_D2_BOX_STATES_BEN
+   USE mem_PAR,    ONLY: p_PAR, ChlAttenFlag, LightLocationFlag
    USE global_mem, ONLY: RLEN, ZERO, LOGUNIT, SkipBFMCore, bfm_lwp
    USE api_bfm,    ONLY: bfm_init, in_rst_fname, InitVar, var_names, stBenStateS
    USE mem_globalfun, ONLY: analytical_ic
@@ -60,8 +62,10 @@ CONTAINS
       !! ** Method  : - Read the namcfc namelist and check the parameter values
       !!----------------------------------------------------------------------
       INTEGER, INTENT(in) ::   Kmm  ! time level indices
-      INTEGER :: ji, jj, jk, jn, jt, numfld
+      INTEGER :: ji, jj, jk, jn, jt, numfld, ierr
       REAL(RLEN) :: ztraf, zexp, zdexp
+      !
+      IF( ln_timing )   CALL timing_start('trc_ini_my_trc')
       !
       IF(lwp) WRITE(numout,*)
       IF(lwp) WRITE(numout,*) 'trc_ini_my_trc : initialize BFM tracers'
@@ -73,6 +77,10 @@ CONTAINS
       LEVEL1 '-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'
       LEVEL1 '              BFM INITIALIZATION               '
       LEVEL1 ' '
+
+      ! zeroing support arrays
+      !-------------------------------------------------------
+      chl_a = ZERO
 
       ! Restart handled by nemo
       !-------------------------------------------------------
@@ -185,6 +193,15 @@ CONTAINS
          STOP
       ENDIF 
 
+      ! Initialize water column optics
+      !-------------------------------------------------------
+      IF ( ChlAttenFlag == 2 ) THEN
+         ierr = trc_opt_alloc()
+         CALL trc_opt_ini
+         parlux = p_PAR
+         LightLocationFlag = 1 ! light is already integrated over the cell
+      ENDIF
+
 #ifdef INCLUDE_PELFE
       ! Iron supply from sediments (see Aumont & Bopp, 2005)
       !-------------------------------------------------------
@@ -231,8 +248,9 @@ CONTAINS
             LEVEL1 '-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'
             LEVEL1 ' '
       ENDIF
-
-      
+      !
+      IF( ln_timing )   CALL timing_stop('trc_sms_my_trc')
+      !
 157 FORMAT(a4, 1x, a10  , 1x, a25, 1x, a3, 1x, a10  , 1x, a10  , 1x, a10  , 1x, a10  , 3x, a3, 3x, a3, 3x, a3)
 158 FORMAT(i4, 1x, E10.3, 1x, a25, 1x, a3, 1x, E10.3, 1x, E10.3, 1x, E10.3, 1x, E10.3, 3x, L3, 3x, L3, 3x, L3)
       !
@@ -244,6 +262,7 @@ CONTAINS
       !!              ***  ROUTINE trc_ini_my_trc_alloc  ***
       !!----------------------------------------------------------------------
       ALLOCATE( tr_b(jpi,jpj,jpk_b,jp_bgc_b) , ctrcnm_b(jp_bgc_b), &
+                chl_a(jpi,jpj,jpk), ph(jpi,jpj,jpk),                &
 #ifdef INCLUDE_SEAICE
                 tr_i(jpi,jpj,jpk_i,jp_bgc_i) , ctrcnm_i(jp_bgc_i), &
 #endif

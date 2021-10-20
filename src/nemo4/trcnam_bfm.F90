@@ -10,7 +10,7 @@ SUBROUTINE trc_nam_bfm()
    USE in_out_manager, ONLY: lwp, numout, nit000, nitend
    USE dom_oce, ONLY: rn_Dt, narea, nyear, nmonth, nday, tmask
    USE par_oce, ONLY: jpi, jpj, jpk
-   USE trc,     ONLY: tr, ln_trcdta, ln_top_euler
+   USE trc,     ONLY: tr, ln_trcdta, ln_trcbc, ln_top_euler
    USE par_my_trc, ONLY: var_map, jp_bgc_b, bottom_level, bfm_iomput
    ! BFM
    USE constants,  ONLY: SEC_PER_DAY
@@ -34,6 +34,7 @@ SUBROUTINE trc_nam_bfm()
 
    INTEGER  :: yy, mm, dd, hh, nn, jn
    REAL(RLEN)  :: julianday
+   LOGICAL  ::  lltrcbc
 
    IF(lwp) WRITE(numout,*)
    IF(lwp) WRITE(numout,*) 'trc_nam_bfm : read BFM tracer namelists'
@@ -162,6 +163,9 @@ SUBROUTINE trc_nam_bfm()
        endif
    enddo
    ln_trcdta = COUNT(sn_tracer(:)%llinit) > 0
+   lltrcbc = ( COUNT(sn_tracer(:)%llsbc) + COUNT(sn_tracer(:)%llobc) + COUNT(sn_tracer(:)%llcbc) ) > 0
+   IF ( ln_trcbc .AND. .NOT.lltrcbc) ln_trcbc = .FALSE.
+   
    !write (LOGUNIT,*) 'map ', var_map
    ! benthic
    jp_bgc_b = NO_D2_BOX_STATES_BEN

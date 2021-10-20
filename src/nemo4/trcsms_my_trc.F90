@@ -19,9 +19,11 @@ MODULE trcsms_my_trc
    USE trd_oce
    USE trdtrc
    USE trcwri_my_trc,  ONLY: mapping_diags
+   USE iom,            ONLY: iom_put
    ! BFM
-   USE global_mem, ONLY: LOGUNIT, bfm_lwp, RLEN, ZERO
+   USE global_mem, ONLY: LOGUNIT, bfm_lwp, RLEN, ZERO, SkipBFMCore
    USE constants,  ONLY: SEC_PER_DAY
+   USE time,       ONLY: bfmtime
 
    IMPLICIT NONE
    PRIVATE
@@ -54,25 +56,45 @@ CONTAINS
       !
       IF( ln_timing )   CALL timing_start('trc_sms_my_trc')
       !
-      IF(lwp) WRITE(numout,*)
-      IF(lwp) WRITE(numout,*) ' trc_sms_my_trc:  BFM ecosystem dynamics'
-      IF(lwp) WRITE(numout,*) ' ~~~~~~~~~~~~~~'
+      IF (kt == nit000) THEN
+         IF(lwp) WRITE(numout,*)
+         IF(lwp) WRITE(numout,*) 'trc_sms_my_trc:  BFM ecosystem dynamics'
+         IF(lwp) WRITE(numout,*) '~~~~~~~~~~~~~~'
+      ENDIF
+
+      ! Skip BFM computation if no ocean points
+      !-------------------------------------------------------
+      IF ( SkipBFMCore ) return
      
+      ! Set diagnostic fields to be saved
+      !-------------------------------------------------------
       IF (kt == nit000) CALL mapping_diags()
 
-      CALL update_bgc_forcings(kt, Krhs)
+      ! Update bfm internal time
+      !-------------------------------------------------------
+      bfmtime%stepnow  = kt
+
+      ! Update forcing for bgc
+      !-------------------------------------------------------
+      CALL update_bgc_forcings(kt, Kbb, Kmm, Krhs)
 
       ! add here the call to BGC model
       DO_2D( nn_hls, nn_hls, nn_hls, nn_hls )
-         !
+
          ! cycle over land points
+         !-------------------------------------------------------
          IF (tmask(ji,jj,1) .EQ. 0) CYCLE 
-         !
-         ! Compose environmental Forcings
+
+         ! BFM environmental conditions
+         !-------------------------------------------------------
          CALL environmental_conditions(kt, Kmm, ji, jj)
-         !
-         ! Get BGC state variables
-         ! call wrapper to execute BFM of functions
+
+         ! Execute BFM
+         !-------------------------------------------------------
+         CALL execute_bfm(kt, Kmm, Krhs, ji, jj)
+
+         ! Vertical Sinking
+         !-------------------------------------------------------
 
       END_2D 
 
@@ -82,8 +104,87 @@ CONTAINS
    END SUBROUTINE trc_sms_my_trc
 
 
-   SUBROUTINE environmental_conditions(kt, Kmm, ji, jj)
+   SUBROUTINE execute_bfm(kt, Kmm, Krhs, ji, jj)
+      !!----------------------------------------------------------------------
+      !!                 ***  environmental_conditions  ***
+      !!
+      !! ** Purpose :  Fill BFM arrays of environmental conditions
+      !!
+      !! ** Method  : -
+      !!----------------------------------------------------------------------
+      ! NEMO
+      ! BFM
+      USE api_bfm,    ONLY: SRFindices, BOTindices
+      USE mem,        ONLY: D3STATE, D3SOURCE, NO_D3_BOX_STATES, D3STATETYPE, & 
+                            D2STATE_BEN, D2SOURCE_BEN, NO_D2_BOX_STATES_BEN
+      USE mem_param,  ONLY: CalcTransportFlag, CalcBenthicFlag, CalcPelagicFlag
+#ifdef INCLUDE_SEAICE
+      USE mem,        ONLY: D2STATE_ICE, D2SOURCE_ICE, NO_D2_BOX_STATES_ICE
+#endif
       !
+      INTEGER, INTENT(in) :: kt         ! ocean time-step index
+      INTEGER, INTENT(in) :: Kmm, Krhs  ! time level indices
+      INTEGER, INTENT(in) :: ji, jj     ! i and j coordinate from 3D arrays
+      INTEGER :: jn, bot
+      REAL(wp) :: delt
+      !!----------------------------------------------------------------------
+
+      bot = BOTindices(1)
+      delt = bfmtime%timestep
+      
+      ! Fill BFM STATE arrays
+      !---------------------------------------------
+      DO jn = 1, NO_D3_BOX_STATES
+         D3STATE(jn,1:bot) = tr(ji,jj,1:bot,var_map(jn),Kmm)
+      END DO
+      DO jn = 1, NO_D2_BOX_STATES_BEN
+         D2STATE_BEN(jn,:) = tr_b(ji,jj,:,jn)
+      END DO
+#ifdef INCLUDE_SEAICE
+      DO jn = 1, NO_D2_BOX_STATES_ICE
+         D2STATE_ICE(jn,1) = tr_i(ji,jj,:,jn)
+      END DO
+#endif
+
+      ! Compute Biogeochemical trends
+      !---------------------------------------------
+      call EcologyDynamics
+
+      ! ODE solver for benthic and not transported pelagic
+      ! & assign trend back main arrays
+      !---------------------------------------------
+      if (CalcPelagicFlag ) then
+         do jn = 1, NO_D3_BOX_STATES
+            if (D3STATETYPE(jn) .eq. 0) then
+               D3STATE(jn,:) = D3STATE(jn,:) + delt*D3SOURCE(jn,:)
+            else
+               tr(ji,jj,1:bot,var_map(jn),Krhs) = D3SOURCE(jn,1:bot)
+            endif
+         end do
+      end if
+      if (CalcBenthicFlag ) then
+         DO jn = 1, NO_D2_BOX_STATES_BEN
+            tr_b(ji,jj,:,jn) = tr_b(ji,jj,:,jn) + delt*D2SOURCE_BEN(jn,:)
+         END DO
+      end if
+#ifdef INCLUDE_SEAICE
+      DO jn = 1, NO_D2_BOX_STATES_ICE
+         tr_i(ji,jj,:,jn) = tr_i(ji,jj,:,jn) + delt*D2SOURCE_ICE(jn,:)
+      END DO
+#endif
+
+
+   END SUBROUTINE execute_bfm
+
+
+   SUBROUTINE environmental_conditions(kt, Kmm, ji, jj)
+      !!----------------------------------------------------------------------
+      !!                 ***  environmental_conditions  ***
+      !!
+      !! ** Purpose :  Fill BFM arrays of environmental conditions
+      !!
+      !! ** Method  : -
+      !!----------------------------------------------------------------------
       ! NEMO
       USE par_my_trc, ONLY: bottom_level
       USE oce_trc,    ONLY: jp_tem, jp_sal, ts, rhd, wndm, fr_i, gdept_0, gphit, tmask
@@ -91,9 +192,11 @@ CONTAINS
       USE phycst,     ONLY: rho0
       USE eosbn2,     ONLY: neos
       USE sbcapr,     ONLY: apr
+      USE trc,        ONLY: etot
+      USE trcopt,     ONLY: zeps
       ! BFM
-      USE mem,        ONLY: xEPS, ESS, ETW, ESW, EWIND,    &
-                            Depth, EIR, ERHO, EICE, EPR, NO_BOXES
+      USE mem,        ONLY: xEPS, EIR, ESS, ETW, ESW, EWIND,    &
+                            Depth, ERHO, EICE, EPR, NO_BOXES
       USE api_bfm,    ONLY: SRFindices, BOTindices
       USE sw_tool,    ONLY: sw_t_from_pt, gsw_p_from_z
 #ifdef INCLUDE_PELCO2
@@ -104,44 +207,68 @@ CONTAINS
       INTEGER, INTENT(in) :: Kmm  ! time level indices
       INTEGER, INTENT(in) :: ji, jj ! i and j coordinate from 3D arrays
       INTEGER :: jk, bot
-      !
+      !!----------------------------------------------------------------------
+
+      ! Mask and indeces
+      !-------------------------------------------------------
       SRFindices(1) = 1
       BOTindices(1) = bottom_level(ji, jj)
       bot = BOTindices(1)
-      !
+
+      ! Depth & pressure
+      !-------------------------------------------------------
       Depth(:) =  gdept(ji,jj,:,Kmm)
       EPR(:)   = gsw_p_from_z(-Depth(:), gphit(ji,jj))
+
       ! Environmental conditions
+      !-------------------------------------------------------
       ETW(:)   =  ts(ji,jj,:,jp_tem,Kmm)
+      ! convert to in-situ temperature and practical salinity (TEOS-10 not available)
+      if ( neos .eq. 0 ) then
+         ETW(1:bot)  = sw_t_from_pt(ESW(1:bot),ETW(1:bot),EPR(1:bot),EPR(1:bot)*0.)
+      endif
       ESW(:)   =  ts(ji,jj,:,jp_sal,Kmm)
       ERHO(:)  =  (rhd(ji,jj,:) + 1._RLEN) * rho0 * tmask(ji,jj,:)
       EWIND(:) =  wndm(ji,jj)
       EICE(:)  =  fr_i(ji,jj)
+
+      ! Water column optics
+      !-------------------------------------------------------
+      EIR(:) = etot(ji,jj,:)
+      xEPS(:) = zeps(ji,jj,:)
+
+      ! Gas exchanges
+      !-------------------------------------------------------
       AtmSLP%fnow = apr(ji,jj)
-      ! broadcast surface atm pressure over the water column (NO_BOXES)
+      ! broadcast surface atm pressure over the water column
       patm3d = AtmSLP%fnow
-      !LEVEL1 'patm3d', patm3d(:)
 #ifdef INCLUDE_PELCO2
       AtmCO2%fnow = atm_co2(ji,jj)
       !LEVEL1 'co2', AtmCO2%fnow, 'slp', AtmSLP%fnow
 #endif
-      ! convert to in-situ temperature and practical salinity
-      ! TEOS-10 conversions not yet available
-      if ( neos .eq. 0 ) then
-         ETW(1:bot)  = sw_t_from_pt(ESW(1:bot),ETW(1:bot),EPR(1:bot),EPR(1:bot)*0.)
-      endif
 
    END SUBROUTINE environmental_conditions
 
 
-   SUBROUTINE update_bgc_forcings(kt, Krhs)
+   SUBROUTINE update_bgc_forcings(kt, Kbb, Kmm, Krhs)
+      !!----------------------------------------------------------------------
+      !!                 ***  update_bgc_forcings  ***
+      !!
+      !! ** Purpose :  Update forcing fields of BGC processes
+      !!
+      !! ** Method  : -
+      !!----------------------------------------------------------------------
       ! NEMO
-      USE trcbc,      ONLY : n_trc_indsbc, sf_trcsbc, rf_trsfac
-      ! BFM
-      USE time,          ONLY: bfmtime
+      USE trcbc,         ONLY: n_trc_indsbc, sf_trcsbc, rf_trsfac
       USE sbcapr,        ONLY: apr
+      USE trcopt,        ONLY: trc_opt
+      ! BFM
       USE SystemForcing, ONLY: FieldRead
       USE mem_CO2,       ONLY: AtmSLP, patm3d
+      USE mem_PAR,       ONLY: ChlAttenFlag
+      USE mem,           ONLY: iiPhytoPlankton, iiC, iiL, ppPhytoPlankton
+      USE mem_Phyto,     ONLY: p_qlcPPY
+      USE constants,     ONLY: E2W
 #ifdef INCLUDE_PELCO2
       USE mem,        ONLY: ppO3c, ppO3h, ppN7f
       USE mem_CO2,    ONLY: AtmCO20, AtmCO2
@@ -152,46 +279,64 @@ CONTAINS
 #endif
       !
       INTEGER, INTENT(in) :: kt   ! ocean time-step index
-      INTEGER, INTENT(in) :: Krhs ! time level index of right hand side
+      INTEGER, INTENT(in) :: Kbb, Kmm, Krhs ! time level indices
       INTEGER             :: jk, jl
       REAL(wp), DIMENSION(jpi,jpj,jpk) :: irondep
       REAL(wp), DIMENSION(jpi,jpj)     :: dustinp
-      REAL(wp)   :: dustsink
-      ! 
-      ! Update bfm internal time
-      bfmtime%stepnow  = kt
-      !
+      REAL(wp), DIMENSION(jpi,jpj,jpk) :: par_r, par_g, par_b
+      REAL(wp)   :: dustsink 
+      REAL(wp) :: r_e2w = 1._RLEN / E2W
+      !!----------------------------------------------------------------------
+
+      ! Total chla
+      !-------------------------------------------------------
+      chl_a = ZERO
+      DO jl = 1 , iiPhytoPlankton
+         IF ( ppPhytoPlankton(jl, iiL) == 0) THEN 
+            chl_a = chl_a + tr(:,:,:,ppPhytoPlankton(jl, iiC), Kmm) * p_qlcPPY(jl)
+         ELSE
+            chl_a = chl_a + tr(:,:,:,ppPhytoPlankton(jl, iiL), Kmm)
+         ENDIF
+      ENDDO
+
+      ! Water column optics
+      !-------------------------------------------------------
+      IF ( ChlAttenFlag == 1 ) THEN
+         CALL trc_opt_2bd(kt, Kmm)
+      ELSEIF ( ChlAttenFlag == 2 ) THEN
+         CALL trc_opt( kt, kt, Kbb, Kmm, chl_a * 1.e-6 , par_b, par_g, par_r)
+      ENDIF
+      ! convert from Watt to Einstein
+      etot = etot * r_e2w
+
+      ! Atmospheric sea level pressure
+      !-------------------------------------------------------
+      SELECT CASE ( AtmSLP%init )
+        CASE (1) ! Read timeseries in BFM
+           call FieldRead(AtmSLP)
+           apr(:,:) = AtmSLP%fnow(1)
+        !CASE (3) should not be needed. maybe for CCSMCOUPLED if still issue with kt < 10 in NEMO coupling
+      END SELECT
+
 #ifdef INCLUDE_PELCO2
-      !
       ! CO2 atmospheric mixing ratio
+      !-------------------------------------------------------
       SELECT CASE ( AtmCO2%init )
         CASE (1) ! Read timeseries in BFM
            call FieldRead(AtmCO2)
            atm_co2(:,:) = AtmCO2%fnow(1)
         !   LEVEL1 'bfmtime', bfmtime%stepnow, ' co2', AtmCO2%fnow(1)
-        !CASE (2) ! Read Boundary Conditions using NEMO fldread (namtrc_bc)
-        !   n = n_trc_indsbc(ppO3c)
-        !   AtmCO2%fnow = pack( sf_trcsbc(n)%fnow(:,:,1),SRFmask(:,:,1) )
         !CASE (3) should not be needed. maybe for CCSMCOUPLED if still issue with kt < 10 in NEMO coupling
       END SELECT
 #endif
-      !
-      ! Atmospheric sea level pressure
-      SELECT CASE ( AtmSLP%init )
-        CASE (1) ! Read timeseries in BFM
-           call FieldRead(AtmSLP)
-           apr(:,:) = AtmSLP%fnow(1)
-        !CASE (2) ! Read Boundary Conditions using NEMO fldread (namtrc_bc)
-        !   n = n_trc_indsbc(ppO3h)
-        !   AtmSLP%fnow = pack( sf_trcsbc(n)%fnow(:,:,1),SRFmask(:,:,1) )
-        !CASE (3) should not be needed. maybe for CCSMCOUPLED if still issue with kt < 10 in NEMO coupling
-      END SELECT
 
 #ifdef INCLUDE_PELFE
       ! Iron flux from sediments (time-invariant)
+      !-------------------------------------------------------
       tr(:,:,:,ppN7f,Krhs) = tr(:,:,:,ppN7f,Krhs) + ironsed
 
       ! Iron dust deposition below the surface (surface layer applied in trcbc)
+      !-------------------------------------------------------
       IF (p_rDust > 0. ) THEN
          irondep = ZERO
          ! surface input (rf_trsfac = Solub(0.01) * FeinDust(0.035) * g->ug (1e6) / Fe g->mol (55.85))
@@ -207,6 +352,7 @@ CONTAINS
 #endif
 
       ! print control on received fluxes
+      !-------------------------------------------------------
       !IF ( (kt-nit000)<20 .OR. MOD(kt,200)==0 .OR. kt==nitend) THEN
       !   write(LOGUNIT,'(a,i14,a,f10.4,a,f10.3,a,f10.3)') 'envforcing_bfm - Step ', kt,  &
       !      '  Air_xCO2: ',maxval(AtmCO2%fnow), '  SLP:', maxval(AtmSLP%fnow),   &
