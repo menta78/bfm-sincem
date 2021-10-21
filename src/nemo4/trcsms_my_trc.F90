@@ -18,7 +18,8 @@ MODULE trcsms_my_trc
    USE trc             ! TOP variables
    USE trd_oce
    USE trdtrc
-   USE trcwri_my_trc,  ONLY: mapping_diags
+   USE trcwri_my_trc,  ONLY: diags_mapping, diags_collect
+   USE trcset,         ONLY: trc_set
    USE iom,            ONLY: iom_put
    ! BFM
    USE global_mem, ONLY: LOGUNIT, bfm_lwp, RLEN, ZERO, SkipBFMCore
@@ -68,7 +69,7 @@ CONTAINS
      
       ! Set diagnostic fields to be saved
       !-------------------------------------------------------
-      IF (kt == nit000) CALL mapping_diags()
+      IF (kt == nit000) CALL diags_mapping()
 
       ! Update bfm internal time
       !-------------------------------------------------------
@@ -93,10 +94,11 @@ CONTAINS
          !-------------------------------------------------------
          CALL execute_bfm(kt, Kmm, Krhs, ji, jj)
 
-         ! Vertical Sinking
-         !-------------------------------------------------------
-
       END_2D 
+
+      ! Vertical Sinking/Settling
+      !-------------------------------------------------------
+      CALL trc_set(kt, Kmm, Krhs)
 
       !
       IF( ln_timing )   CALL timing_stop('trc_sms_my_trc')
@@ -118,6 +120,7 @@ CONTAINS
       USE mem,        ONLY: D3STATE, D3SOURCE, NO_D3_BOX_STATES, D3STATETYPE, & 
                             D2STATE_BEN, D2SOURCE_BEN, NO_D2_BOX_STATES_BEN
       USE mem_param,  ONLY: CalcTransportFlag, CalcBenthicFlag, CalcPelagicFlag
+      USE mem_PelSinkSet, ONLY: sink_var_map, sink_vars, SINKD3STATE
 #ifdef INCLUDE_SEAICE
       USE mem,        ONLY: D2STATE_ICE, D2SOURCE_ICE, NO_D2_BOX_STATES_ICE
 #endif
@@ -173,6 +176,19 @@ CONTAINS
       END DO
 #endif
 
+      ! Sinking & settling rates
+      !---------------------------------------------
+      DO jn = 1 , sink_vars 
+         sink_rates(ji, jj, 1:bot,jn) = SINKD3STATE(sink_var_map(jn))%sedi(1:bot)
+      ENDDO
+
+      ! Diagnostics
+      !---------------------------------------------
+      CALL diags_collect(kt, ji, jj, bot)
+
+      ! Reset flux arrays
+      !---------------------------------------------
+      CALL ResetFluxes
 
    END SUBROUTINE execute_bfm
 
@@ -246,6 +262,8 @@ CONTAINS
       AtmCO2%fnow = atm_co2(ji,jj)
       !LEVEL1 'co2', AtmCO2%fnow, 'slp', AtmSLP%fnow
 #endif
+      !LEVEL1 'ETW ', ETW(1), ', ESW ', ESW(1), ', ERHO ', ERHO(1), &
+      !    ', EWIND ', EWIND(1), ', EICE ', EICE(1)
 
    END SUBROUTINE environmental_conditions
 

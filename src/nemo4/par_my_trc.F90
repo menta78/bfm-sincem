@@ -33,6 +33,7 @@ MODULE par_my_trc
    !! support arrays
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:) :: chl_a
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:) :: ph
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:,:) :: sink_rates
 
    !! benthic passive tracers  (input and output)
    !! ------------------------------------------

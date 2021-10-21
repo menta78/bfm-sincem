@@ -15,7 +15,7 @@ MODULE trcwri_my_trc
    USE iom         ! I/O manager
    ! BFM
    USE global_mem, ONLY: LOGUNIT, bfm_lwp
-   USE api_bfm, ONLY: stStart, stEnd, var_names,                    &
+   USE api_bfm,    ONLY: stStart, stEnd, var_names,                 &
 #if defined INCLUDE_SEAICE
           & stIceStart, stIceEnd, stIceStateS, stIceStateE,         &
           & stIceDiag2dS, stIceDiag2dE, stIceFlux2dS, stIceFlux2dE, &
@@ -33,7 +33,7 @@ MODULE trcwri_my_trc
    INTEGER, ALLOCATABLE, DIMENSION(:) :: id_dia2d ! BFM indexes of 2D diags
    INTEGER, ALLOCATABLE, DIMENSION(:) :: id_dia3d ! BFM indexes of 3D diags
 
-   PUBLIC trc_wri_my_trc, mapping_diags
+   PUBLIC trc_wri_my_trc, diags_mapping, diags_collect
 
    !!----------------------------------------------------------------------
    !! NEMO/TOP 4.0 , NEMO Consortium (2018)
@@ -54,7 +54,7 @@ CONTAINS
       !!---------------------------------------------------------------------
  
       ! write the tracer concentrations in the file
-      ! ---------------------------------------
+      !-------------------------------------------------------
       ! Pelagic
       DO jn = 1, jp_bgc
          cltra = TRIM( ctrcnm(jn) )                  ! short title for tracer
@@ -74,26 +74,107 @@ CONTAINS
 #endif
       ! Diagnostics
       ! 3-D
+      DO jn = 1 , jp_dia3d
+         cltra = TRIM( var_names(id_dia3d(jn)) )
+         CALL iom_put( cltra, trc3d(:,:,:,jn) )
+      ENDDO
       ! 2-D
+      DO jn = 1 , jp_dia2d
+         cltra = TRIM( var_names(id_dia2d(jn)) )
+         CALL iom_put( cltra, trc2d(:,:,jn) )
+      ENDDO
 
 
       !
    END SUBROUTINE trc_wri_my_trc
 
 
-   SUBROUTINE mapping_diags()
-      !!---------------------------------------------------------------------
-      ! Loop over all BFM variables and check if are needed for xios
-      ! Allocate 2D and 3D diagnostics arrays accordingly
-      !!---------------------------------------------------------------------
+   SUBROUTINE diags_collect(kt, ji, jj, bot)
+      !!----------------------------------------------------------------------
+      !!                     ***  diags_mapping  ***
+      !!
+      !! ** Purpose : Fill 2D and 3D diagnostics with data from BFM 
+      !!
+      !! ** Method  : 
+      !!----------------------------------------------------------------------
+      USE api_bfm, ONLY: c1dim
+      USE mem, ONLY: NO_BOXES,D3STATE,D3DIAGNOS,D3FLUX_FUNC,D2DIAGNOS,  &
+            D2STATE_BEN,D2DIAGNOS_BEN,D2DIAGNOS_BEN,D2FLUX_FUNC_BEN
+#if defined INCLUDE_SEAICE
+      USE mem, ONLY: D2STATE_ICE,D2DIAGNOS_ICE,D2DIAGNOS_ICE,D2FLUX_FUNC_ICE
+#endif
+      !
+      INTEGER, INTENT(in) ::   kt   ! ocean time-step index
+      INTEGER, INTENT(in) ::   ji, jj   ! dummy loop index
+      INTEGER, INTENT(in) ::   bot  ! bottom level id
+      INTEGER :: jn, jl, idx
+      !!----------------------------------------------------------------------
+
+      ! 3D diagnostics
+      !---------------------------------------------
+      DO jn = 1 , jp_dia3d
+         jl = id_dia3d(jn)
+         IF ( jl >= stPelDiagS .AND. jl <= stPelDiagE ) THEN
+            idx = jl - stPelDiagS + 1 
+            trc3d(ji, jj, 1:bot, jn) = D3DIAGNOS(idx,1:bot)
+         ENDIF
+         IF ( jl >= stPelFluxS .AND. jl <= stPelFluxE ) then
+            idx = jl - stPelFluxS + 1
+            call correct_flux_output(1,idx,1,NO_BOXES,c1dim)
+            trc3d(ji, jj, 1:bot, jn) = c1dim(1:bot) 
+         endif
+      ENDDO
+
+      ! 2D diagnostics
+      !---------------------------------------------
+      DO jn = 1 , jp_dia2d
+         jl = id_dia2d(jn)
+         IF ( jl >= stPelDiag2dS .AND. jl <= stPelRivE ) THEN
+            idx = jl - stPelDiag2dS + 1
+            trc2d(ji, jj, jn) = D2DIAGNOS(idx,1)
+         ENDIF
+         IF ( jl >= stBenDiag2dS .AND. jl <= stBenDiag2dE ) THEN
+            idx = jl - stBenDiag2dS + 1
+            trc2d(ji, jj, jn) = D2DIAGNOS_BEN(idx,1)
+         ENDIF
+         IF ( jl >= stBenFlux2dS .AND. jl <= stBenFlux2dE ) THEN
+            idx = jl - stBenFlux2dS + 1
+            trc2d(ji, jj, jn) = D2FLUX_FUNC_BEN(idx,1)
+         ENDIF
+#if defined INCLUDE_SEAICE
+         IF ( jl >= stIceDiag2dS .AND. jl <= stIceDiag2dE ) THEN
+            idx = jl - stIceDiag2dS + 1
+            trc2d(ji, jj, jn) = D2DIAGNOS_ICE(idx,1)
+         ENDIF
+         If ( jl >= stIceFlux2dS .AND. jl <= stIceFlux2dE ) THEN
+            idx = jl - stIceFlux2dS + 1
+            trc2d(ji, jj, jn) = D2FLUX_FUNC_ICE(idx,1)
+         ENDIF
+#endif
+      ENDDO
+
+   END SUBROUTINE diags_collect
+
+
+   SUBROUTINE diags_mapping()
+      !!----------------------------------------------------------------------
+      !!                     ***  diags_mapping  ***
+      !!
+      !! ** Purpose : Map 2D and 3D diagnostics based on XIOS I/O list
+      !!
+      !! ** Method  : Loop over BFM diagnostics and check if are needed for xios
+      !!----------------------------------------------------------------------
       USE IOM,     ONLY: iom_use
       !
       INTEGER, ALLOCATABLE, DIMENSION(:) :: id_2d, id_3d
       LOGICAL, DIMENSION(stEnd, 2) :: pp_index
       INTEGER :: jn, j_2d, j_3d
-      !
+      !!----------------------------------------------------------------------
+
       LEVEL1 'Collect 2D & 3D BFM diagnostics'
-      !
+
+      ! Inquire XIOS output list
+      !-------------------------------------------------------
       pp_index(:,:) = .FALSE.
       DO jn = 1, stEnd
          IF (iom_use(TRIM(var_names(jn)))) THEN
@@ -108,8 +189,9 @@ CONTAINS
             END IF
          ENDIF
       END DO
-      !
+
       ! set diagnostics indexes
+      !-------------------------------------------------------
       jp_dia3d = COUNT(pp_index(:,1))
       jp_dia2d = COUNT(pp_index(:,2))
       ALLOCATE(id_dia3d(jp_dia3d), id_dia2d(jp_dia2d))
@@ -128,12 +210,8 @@ CONTAINS
             j_2d = j_2d + 1
          ENDIF
       ENDDO
-      LEVEL1 'dia3d tot: ', jp_dia3d
-      LEVEL1 'ids 3d:', id_dia3d(:)
-      LEVEL1 'dia2d tot: ', jp_dia2d
-      LEVEL1 'ids 2d:', id_dia2d(:)
 
-   END SUBROUTINE mapping_diags
+   END SUBROUTINE diags_mapping
 
 #else
 

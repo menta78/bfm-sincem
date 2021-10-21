@@ -17,19 +17,20 @@ MODULE trcini_my_trc
    USE trc
    USE par_my_trc
    USE trcnam_my_trc     ! MY_TRC SMS namelist
-   USE lib_mpp,    ONLY: mpp_sum
+   USE lib_fortran,    ONLY: glob_sum
    USE iom,        ONLY: iom_open,iom_get,iom_close
    USE sbcapr,     ONLY: apr
    USE trcopt,     ONLY: trc_opt_alloc, trc_opt_ini, parlux
    !! BFM
    USE constants,  ONLY: SEC_PER_DAY
    USE mem_param,  ONLY: p_atm0
-   USE mem,        ONLY: D3STATE, NO_D3_BOX_STATES, D2STATE_BEN, NO_D2_BOX_STATES_BEN
+   USE mem,        ONLY: D3STATE, NO_D3_BOX_STATES, D2STATE_BEN, NO_D2_BOX_STATES_BEN, iiPhytoPlankton
    USE mem_PAR,    ONLY: p_PAR, ChlAttenFlag, LightLocationFlag
    USE global_mem, ONLY: RLEN, ZERO, LOGUNIT, SkipBFMCore, bfm_lwp
    USE api_bfm,    ONLY: bfm_init, in_rst_fname, InitVar, var_names, stBenStateS
    USE mem_globalfun, ONLY: analytical_ic
    USE init_var_bfm_local, ONLY: ini_organic_quotas
+   USE mem_PelSinkSet, ONLY: sink_vars
 #ifdef INCLUDE_PELFE
    USE mem_PelChem,   ONLY: p_rN7fsed
 #endif
@@ -81,6 +82,7 @@ CONTAINS
       ! zeroing support arrays
       !-------------------------------------------------------
       chl_a = ZERO
+      sink_rates = ZERO
 
       ! Restart handled by nemo
       !-------------------------------------------------------
@@ -218,12 +220,11 @@ CONTAINS
               ironsed(ji,jj,jk) = ironsed(ji,jj,jk) * MIN( 1., EXP( zdexp ) / 0.5 )
          END_3D
          ! total supply (TODO this is killing execution .. need to check)
-         !ztraf = SUM(ironsed * spread(e1e2t,3,jpk) * p_rN7fsed * 365. * 1.e-15 * tmask )
-         !IF (lk_mpp) CALL mpp_sum ('ironsed', ztraf)
+         ztraf = glob_sum('ironsed', ironsed * spread(e1e2t,3,jpk) * p_rN7fsed * 365. * 1.e-15 * tmask )
          LEVEL1 ''
          LEVEL1 'trc_ini_my_trc: Read fraction mask from bottom_fraction.nc (varname: btmfrac)'
          LEVEL1 '  Constant Iron flux from sediments: ', p_rN7fsed
-         !LEVEL1 '  Total iron load from Sediment [Gmol/y] : ', ztraf
+         LEVEL1 '  Total iron load from Sediment [Gmol/y] : ', ztraf
       ENDIF
 #endif
 
@@ -262,7 +263,8 @@ CONTAINS
       !!              ***  ROUTINE trc_ini_my_trc_alloc  ***
       !!----------------------------------------------------------------------
       ALLOCATE( tr_b(jpi,jpj,jpk_b,jp_bgc_b) , ctrcnm_b(jp_bgc_b), &
-                chl_a(jpi,jpj,jpk), ph(jpi,jpj,jpk),                &
+                chl_a(jpi,jpj,jpk),   ph(jpi,jpj,jpk),             &
+                sink_rates(jpi,jpj,jpk,sink_vars),                   &
 #ifdef INCLUDE_SEAICE
                 tr_i(jpi,jpj,jpk_i,jp_bgc_i) , ctrcnm_i(jp_bgc_i), &
 #endif
