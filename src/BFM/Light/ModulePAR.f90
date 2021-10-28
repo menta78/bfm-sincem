@@ -129,7 +129,7 @@
     write(LOGUNIT,*) "#  Chl Attenuation Flag p_ChlAttenFlag =",ChlAttenFlag
     select case (ChlAttenFlag) 
       case (2) 
-         write(LOGUNIT,*) "#   Use 3 bands tabulated RGB (Lengaigne et al, 2007)"
+         write(LOGUNIT,*) "#  Use 3 bands tabulated RGB (Lengaigne et al, 2007)"
          ! Initialize the tabulated values and 3-band arrays
          call ChlAttenuation(xepsRGB)
          allocate(B_eps(NO_BOXES),stat=AllocStatus)

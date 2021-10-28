@@ -66,6 +66,8 @@
   end type SinkControl
   
   type(SinkControl), dimension(NO_D3_BOX_STATES) :: SINKD3STATE
+  integer(RLEN), allocatable, dimension(:) :: sink_var_map
+  integer :: sink_vars = 0
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Pelagic sinking PARAMETERS (read from nml)
@@ -200,11 +202,16 @@
   ! write log summary of pelagic states sinking setting
   if (bfm_lwp) write(LOGUNIT,*) 'SINK setting of pelagic 3D STATES variables'
   if (bfm_lwp) write(LOGUNIT,*) '  ID   Variable   Group'
+  sink_vars = COUNT(SINKD3STATE(:)%dosink)
+  ALLOCATE(sink_var_map(sink_vars))
+  m = 0
   do n = 1 , NO_D3_BOX_STATES
-     if ( bfm_lwp .and. SINKD3STATE(n)%dosink ) then
-     if (allocated(var_names)) then
-       write(LOGUNIT,'(i8,a8,i9)') n,trim(var_names(n)),SINKD3STATE(n)%group
-     endif
+     if ( SINKD3STATE(n)%dosink ) then
+        m = m + 1
+        sink_var_map(m) = n  
+        if (allocated(var_names)) then
+          if (bfm_lwp) write(LOGUNIT,'(i8,a8,i9)')  sink_var_map(m),trim(var_names(n)),SINKD3STATE(n)%group
+        endif
      endif
   enddo
   LEVEL1 ''
