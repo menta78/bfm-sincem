@@ -78,10 +78,6 @@
 
   !!----------------------------------------------------------------------
   !
-     write(LOGUNIT,*) '#'
-     write(LOGUNIT,*) '# ChlAttenuation : Initialisation of the optical look-up table'
-     write(LOGUNIT,*) '#'
-  !
   !  Chlorophyll        !     Blue attenuation     !     Green attenuation    !     Red attenuation      !
       zrgb(1, 1) =  0.010   ;   zrgb(2, 1) = 0.01618   ;   zrgb(3, 1) = 0.07464   ;   zrgb(4, 1) = 0.37807
       zrgb(1, 2) =  0.011   ;   zrgb(2, 2) = 0.01654   ;   zrgb(3, 2) = 0.07480   ;   zrgb(4, 2) = 0.37823
@@ -148,14 +144,12 @@
       prgb(:,:) = zrgb(2:4,:)
       !
       r_si2 = ONE / zrgb(2, 1)      ! blue with the smallest chlorophyll concentration)
-      write(LOGUNIT,*) '#     RGB maximum extinction depth   r_si2 = ', r_si2
       !
       DO jc = 1, 61                         ! check
          zchl = zrgb(1,jc)
          irgb = NINT( 41._RLEN + 20._RLEN* LOG10( zchl ) + p_small )
-         write(LOGUNIT,*) '#   jc =', jc, '  Chl = ', zchl, '  irgb = ', irgb
          IF( irgb /= jc ) THEN
-            write(LOGUNIT,*) '#   jc =', jc, '  Chl = ', zchl, '  Chl class = ', irgb
+            LEVEL1 '#   jc =', jc, '  Chl = ', zchl, '  Chl class = ', irgb
             CALL bfm_error( 'ChlAttenuation.F90',' inconsistency in Chl tabulated attenuation coeff.' )
          ENDIF
       END DO
