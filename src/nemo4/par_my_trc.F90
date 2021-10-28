@@ -10,7 +10,6 @@ MODULE par_my_trc
    !! Software governed by the CeCILL license (see ./LICENSE)
    !!----------------------------------------------------------------------
    USE par_kind, ONLY: wp, lca
-   USE fldread,  ONLY: FLD
 
    IMPLICIT NONE
 

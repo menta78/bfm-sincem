@@ -57,7 +57,7 @@ CONTAINS
       !
       IF( ln_timing )   CALL timing_start('trc_sms_my_trc')
       !
-      IF (kt == nit000) THEN
+      IF (kt == nittrc000) THEN
          IF(lwp) WRITE(numout,*)
          IF(lwp) WRITE(numout,*) 'trc_sms_my_trc:  BFM ecosystem dynamics'
          IF(lwp) WRITE(numout,*) '~~~~~~~~~~~~~~'
@@ -69,7 +69,7 @@ CONTAINS
      
       ! Set diagnostic fields to be saved
       !-------------------------------------------------------
-      IF (kt == nit000) CALL diags_mapping()
+      IF (kt == nittrc000) CALL diags_mapping()
 
       ! Update bfm internal time
       !-------------------------------------------------------
@@ -247,6 +247,7 @@ CONTAINS
       ERHO(:)  =  (rhd(ji,jj,:) + 1._RLEN) * rho0 * tmask(ji,jj,:)
       EWIND(:) =  wndm(ji,jj)
       EICE(:)  =  fr_i(ji,jj)
+      !ETAUB missing, require field from nemo (e.g. taubot)
 
       ! Water column optics
       !-------------------------------------------------------
@@ -371,7 +372,7 @@ CONTAINS
 
       ! print control on received fluxes
       !-------------------------------------------------------
-      !IF ( (kt-nit000)<20 .OR. MOD(kt,200)==0 .OR. kt==nitend) THEN
+      !IF ( (kt-nittrc000)<20 .OR. MOD(kt,200)==0 .OR. kt==nitend) THEN
       !   write(LOGUNIT,'(a,i14,a,f10.4,a,f10.3,a,f10.3)') 'envforcing_bfm - Step ', kt,  &
       !      '  Air_xCO2: ',maxval(AtmCO2%fnow), '  SLP:', maxval(AtmSLP%fnow),   &
       !      ' EIR: ',maxval(EIR)

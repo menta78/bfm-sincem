@@ -45,7 +45,7 @@ CONTAINS
 
       IF( ln_timing )   CALL timing_start('trc_set')
       !
-      IF (kt == nit000) THEN
+      IF (kt == nittrc000) THEN
          IF(lwp) WRITE(numout,*)
          IF(lwp) WRITE(numout,*) 'trc_set: Vertical Sinking'
          IF(lwp) WRITE(numout,*) '~~~~~~~~~~~~~~'

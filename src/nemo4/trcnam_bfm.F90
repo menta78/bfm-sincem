@@ -7,10 +7,10 @@ SUBROUTINE trc_nam_bfm()
    ! NEMO
    USE par_trc, ONLY: jp_bgc, jp_bgc_b, jpk_b
    USE trcnam,  ONLY: sn_tracer
-   USE in_out_manager, ONLY: lwp, numout, nit000, nitend
+   USE in_out_manager, ONLY: lwp, numout, nitend
    USE dom_oce, ONLY: rn_Dt, narea, nyear, nmonth, nday, tmask
    USE par_oce, ONLY: jpi, jpj, jpk
-   USE trc,     ONLY: tr, ln_trcdta, ln_trcbc, ln_top_euler
+   USE trc,     ONLY: tr, ln_trcdta, ln_trcbc, ln_top_euler, nittrc000
    USE par_my_trc, ONLY: var_map, jp_bgc_b, bottom_level, bfm_iomput
    ! BFM
    USE constants,  ONLY: SEC_PER_DAY
@@ -52,10 +52,10 @@ SUBROUTINE trc_nam_bfm()
    write(bfmtime%date0,'(I4.4,I2.2,I2.2)') nyear,nmonth,nday
    call julian_day(nyear,nmonth,nday,0,0,julianday)
    bfmtime%time0    = julianday
-   bfmtime%timeEnd  = julianday + ( ( REAL(nitend - nit000, RLEN) ) * rn_Dt ) / SEC_PER_DAY
-   bfmtime%step0    = nit000 - 1
+   bfmtime%timeEnd  = julianday + ( ( REAL(nitend - nittrc000, RLEN) ) * rn_Dt ) / SEC_PER_DAY
+   bfmtime%step0    = nittrc000 - 1
    bfmtime%timestep = rn_Dt
-   bfmtime%stepnow  = nit000 - 1
+   bfmtime%stepnow  = nittrc000 - 1
    bfmtime%stepEnd  = nitend
    call calendar_date(bfmtime%timeEnd,yy,mm,dd,hh,nn)
    write(bfmtime%dateEnd,'(I4.4,I2.2,I2.2)') yy,mm,dd

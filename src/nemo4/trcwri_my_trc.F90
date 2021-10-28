@@ -14,7 +14,8 @@ MODULE trcwri_my_trc
    USE trc         ! passive tracers common variables 
    USE iom         ! I/O manager
    ! BFM
-   USE global_mem, ONLY: LOGUNIT, bfm_lwp
+   USE global_mem, ONLY: LOGUNIT, bfm_lwp, SkipBFMCore
+   USE time,       ONLY: bfmtime
    USE api_bfm,    ONLY: stStart, stEnd, var_names,                 &
 #if defined INCLUDE_SEAICE
           & stIceStart, stIceEnd, stIceStateS, stIceStateE,         &
@@ -26,6 +27,9 @@ MODULE trcwri_my_trc
           & stPelDiagS, stPelDiagE, stPelFluxS, stPelFluxE,         &
           & stPelDiag2dS, stPelDiag2dE, stPelSurS, stPelSurE,       &
           & stPelBotS, stPelRivE
+#ifdef INCLUDE_PELCO2
+   use mem_CO2, ONLY: CloseCO2
+#endif
 
    IMPLICIT NONE
    PRIVATE
@@ -72,7 +76,8 @@ CONTAINS
          CALL iom_put( cltra, tr_i(:,:,:,jn) )
       END DO
 #endif
-      ! Diagnostics
+      ! Write diagnostics
+      !---------------------------------------------
       ! 3-D
       DO jn = 1 , jp_dia3d
          cltra = TRIM( var_names(id_dia3d(jn)) )
@@ -84,7 +89,22 @@ CONTAINS
          CALL iom_put( cltra, trc2d(:,:,jn) )
       ENDDO
 
+      ! Clear BFM memory
+      !---------------------------------------------
+      IF ( bfmtime%stepnow == bfmtime%stepEnd ) THEN
+         !close systemforcings
+#ifdef INCLUDE_PELCO2
+         call CloseCO2()
+#endif
+         ! clear main memory
+         IF ( .NOT. SkipBFMCore ) call ClearMem
 
+         LEVEL1 ' '
+         LEVEL1 '-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'
+         LEVEL1 '             EXPERIMENT FINISHED               '
+         LEVEL1 '-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'
+         LEVEL1 ' '
+      ENDIF
       !
    END SUBROUTINE trc_wri_my_trc
 
