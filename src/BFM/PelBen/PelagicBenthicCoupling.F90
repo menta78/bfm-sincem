@@ -38,7 +38,7 @@
    use mem, ONLY: D3STATE, PELBOTTOM, PhytoPlankton, NO_BOXES_XY, Depth,  &
            PhytoPlankton, ppPhytoPlankton, iiPhytoPlankton,               &
            MicroZooPlankton, ppMicroZooPlankton, iiMicroZooPlankton,      &
-           R1c, R2c, R6c, R1n, R6n, R1p, R6p, R6s,                        &
+           R1c, R2c, R3c, R6c, R1n, R6n, R1p, R6p, R6s,                   &
            ppR1c, ppR6c, ppR1n, ppR6n, ppR1p, ppR6p, ppR6s, ppR2c, ppR3c, &
            ppO2o, ppN1p, ppN3n, ppN4n, ppN5s, ppN6r,                      &
            jbotR6c, jbotR6n, jbotR6p, jbotR6s, jbotR1c, jbotR1n, jbotR1p, &
