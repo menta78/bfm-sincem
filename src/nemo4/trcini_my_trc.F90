@@ -86,38 +86,38 @@ CONTAINS
 
       ! Restart handled by nemo
       !-------------------------------------------------------
-      if (bfm_init == 1) then 
+      IF (bfm_init == 1) THEN
          ln_rsttr = .true.
          cn_trcrst_in = in_rst_fname
 
       ! Initialization 
       !-------------------------------------------------------
-      else if (bfm_init == 0) then
+      ELSEIF (bfm_init == 0) THEN
          ! PELAGIC
-         do jn = 1,NO_D3_BOX_STATES
+         DO jn = 1, NO_D3_BOX_STATES
 
             Initvar(jn)%varname=var_names(jn)
 
-            select case (InitVar(jn) % init)
+            SELECT CASE (InitVar(jn) % init)
 
-            case (0) ! Homogeneous IC
+            CASE (0) ! Homogeneous IC
                InitVar(jn)%unif = minval( D3STATE(jn,:) )
 
-            case (1) ! Analytical IC
+            CASE (1) ! Analytical IC
                ! Check consistency of input z1 and z2
-               if ( InitVar(jn)%anz2 .ne. ZERO .AND. InitVar(jn)%anz2 .lt. InitVar(jn)%anz1 ) then
+               IF ( InitVar(jn)%anz2 .NE. ZERO .AND. InitVar(jn)%anz2 .LT. InitVar(jn)%anz1 ) THEN
                   STDERR 'ERROR: z2 < z1 in analytical profile creation for tracer ', TRIM(var_names(jn))
                   STDERR '     Check settings in bfm_init_nml.'
-                  stop
-               endif
+                  STOP
+               ENDIF
                ! gdept_1d contains the model depth
                D3STATE(jn,:) = analytical_ic( gdept_1d, InitVar(jn)%anz1, &
                        InitVar(jn)%anv1, InitVar(jn)%anz2, InitVar(jn)%anv2 )
 
-            case (2) ! IC from file (use nemo trcdta)
+            CASE (2) ! IC from file (use nemo trcdta)
                InitVar(jn)%filename='file in namtrc_dta'
-            end select
-         end do
+            END SELECT
+         ENDDO
 
          ! Initialize internal constitutents quota of functional groups
          !-------------------------------------------------------
@@ -125,16 +125,16 @@ CONTAINS
 
          ! print initial state settings #TODO move this before stepping (here we miss info from trcdta)
          !-------------------------------------------------------
-         if (bfm_lwp) then
-            write(LOGUNIT,157) 'Init', 'Unif', 'Filename    ', 'Var', 'Anal. Z1', 'Anal. V1', &
+         IF (bfm_lwp) THEN
+            WRITE(LOGUNIT,157) 'Init', 'Unif', 'Filename    ', 'Var', 'Anal. Z1', 'Anal. V1', &
                  'Anal. Z2', 'Anal. V2', 'OBC', 'SBC', 'CBC'
-            do jn = 1,NO_D3_BOX_STATES
-                 write(LOGUNIT, 158) InitVar(jn)
+            DO jn = 1,NO_D3_BOX_STATES
+                 WRITE(LOGUNIT, 158) InitVar(jn)
             !     write(LOGUNIT,*) var_names(m), D3STATE(m,:)
-            enddo
-         endif
+            ENDDO
+         ENDIF
 
-      end if
+      ENDIF
 
 !TODO move this to trcsms
 !#ifdef INCLUDE_PELCO2
@@ -188,10 +188,10 @@ CONTAINS
       ! Initialise DATA output netcdf file(s)
       !-------------------------------------------------------
       IF ( bfm_iomput ) THEN
-         if (lwp) write(LOGUNIT,*) 'BFM uses XIOS output system via NEMO'
+         LEVEL1 'BFM uses XIOS output system via NEMO'
          ! Set var_ids values according to the XIOS file_def is done in trc_dia_bfm
       ELSE
-         if (lwp) write(LOGUNIT,*) 'BFM output without XIOS to be implemented' 
+         LEVEL1 'BFM output without XIOS not implemented' 
          STOP
       ENDIF 
 

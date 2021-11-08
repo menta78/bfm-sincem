@@ -71,6 +71,11 @@ CONTAINS
       !-------------------------------------------------------
       IF (kt == nittrc000) CALL diags_mapping()
 
+      ! Save to BFM log global statistics of tracers
+      !-------------------------------------------------------
+      !IF ( (kt-nit000)<100 .OR. MOD(kt,200)==0 .OR. kt==nitend) &
+      !   call log_bgc_stats(kt, Kmm)
+
       ! Update bfm internal time
       !-------------------------------------------------------
       bfmtime%stepnow  = kt
@@ -332,7 +337,7 @@ CONTAINS
       !-------------------------------------------------------
       SELECT CASE ( AtmSLP%init )
         CASE (1) ! Read timeseries in BFM
-           call FieldRead(AtmSLP)
+           CALL FieldRead(AtmSLP)
            apr(:,:) = AtmSLP%fnow(1)
         !CASE (3) should not be needed. maybe for CCSMCOUPLED if still issue with kt < 10 in NEMO coupling
       END SELECT
@@ -342,7 +347,7 @@ CONTAINS
       !-------------------------------------------------------
       SELECT CASE ( AtmCO2%init )
         CASE (1) ! Read timeseries in BFM
-           call FieldRead(AtmCO2)
+           CALL FieldRead(AtmCO2)
            atm_co2(:,:) = AtmCO2%fnow(1)
         !   LEVEL1 'bfmtime', bfmtime%stepnow, ' co2', AtmCO2%fnow(1)
         !CASE (3) should not be needed. maybe for CCSMCOUPLED if still issue with kt < 10 in NEMO coupling
@@ -378,8 +383,54 @@ CONTAINS
       !      ' EIR: ',maxval(EIR)
       !ENDIF
 
-
    END SUBROUTINE update_bgc_forcings
+
+
+   SUBROUTINE log_bgc_stats(kt, Kmm)
+      !!----------------------------------------------------------------------
+      !!                 ***  log_bgc_stats  ***
+      !!
+      !! ** Purpose :  save to log file summary stats of 3D pelagic BGC fields
+      !!
+      !! ** Method  : -
+      !!----------------------------------------------------------------------
+      USE api_bfm,    ONLY: var_names, stPelStateS, parallel_rank
+      !
+      INTEGER, INTENT(in) :: kt   ! ocean time-step index
+      INTEGER, INTENT(in) :: Kmm  ! time level indices
+      INTEGER :: jn, jk
+      REAL(wp) :: ztraf, zmin, zmax, zmean
+      REAL(wp), DIMENSION(jpi,jpj,jpk) :: zvol
+      !!----------------------------------------------------------------------
+
+      LEVEL1 'Global statistics on tracer at beginning of step: ' , kt
+
+      DO jk = 1, jpk
+         zvol(:,:,jk) = e1e2t(:,:) * e3t(:,:,jk,Krhs) * tmask(:,:,jk)
+      END DO
+
+      DO jn = 1, jp_bgc
+         ztraf = glob_sum( 'log_bgc_stats', tr(:,:,:,jn,Kmm) * zvol(:,:,:) )
+         zmin  = MINVAL( tr(:,:,:,jn,Kmm), mask= ((tmask*SPREAD(tmask_i,DIM=3,NCOPIES=jpk).NE.0.)) )
+         zmax  = MAXVAL( tr(:,:,:,jn,Kmm), mask= ((tmask*SPREAD(tmask_i,DIM=3,NCOPIES=jpk).NE.0.)) )
+         zmin  = MINVAL( tr(:,:,:,jn,Kmm), mask= ((tmask*SPREAD(tmask_i,DIM=3,NCOPIES=jpk).NE.0.)) )
+         zmax  = MAXVAL( tr(:,:,:,jn,Kmm), mask= ((tmask*SPREAD(tmask_i,DIM=3,NCOPIES=jpk).NE.0.)) )
+         IF( lk_mpp ) THEN
+            CALL mpp_min( 'log_bgc_stats', zmin )      ! min over the global domain
+            CALL mpp_max( 'log_bgc_stats', zmax )      ! max over the global domain
+         END IF
+         zmean  = ztraf / areatot
+
+         IF (bfm_lwp) &
+            WRITE(LOGUNIT,9000) jn, trim(var_names(stPelStateS+jn-1)), zmean, zmin, zmax
+      ENDDO
+
+      LEVEL1 ''
+      call FLUSH(LOGUNIT)
+
+9000  FORMAT(' STAT tracer nb :',i2,'    name :',a10,'    mean :',e18.10,'    min :',e18.10, '    max :',e18.10)
+
+   END SUBROUTINE log_bgc_stats
 
    !!======================================================================
 
