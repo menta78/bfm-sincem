@@ -326,7 +326,7 @@ CONTAINS
       ! Water column optics
       !-------------------------------------------------------
       IF ( ChlAttenFlag == 1 ) THEN
-         CALL trc_opt_2bd(kt, Kmm)
+         CALL trc_opt_2bd(Kmm)
       ELSEIF ( ChlAttenFlag == 2 ) THEN
          CALL trc_opt( kt, kt, Kbb, Kmm, chl_a * 1.e-6 , par_b, par_g, par_r)
       ENDIF

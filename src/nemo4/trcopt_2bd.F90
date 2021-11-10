@@ -1,4 +1,4 @@
-SUBROUTINE trc_opt_2bd(kt, Kmm)
+SUBROUTINE trc_opt_2bd(Kmm)
    !!---------------------------------------------------------------------
    !!                    ***  ROUTINE trcopt_2bd  ***
    !!
@@ -20,9 +20,9 @@ SUBROUTINE trc_opt_2bd(kt, Kmm)
    USE mem_Phyto,  ONLY: p_qlcPPY, p_epsChla
    USE constants,  ONLY: E2W
    !
-   INTEGER, INTENT(in) :: kt
+   INTEGER, INTENT(in) :: Kmm
    INTEGER :: ji, jj, jk, jl
-   REAL(wp), DIMENSION(jpi,jpj,jpk) :: zpar, ztotv
+   REAL(wp), DIMENSION(jpi,jpj,jpk) :: ztotv
    REAL(wp) :: r_e2w = 1._RLEN / E2W
    
    !
