@@ -150,7 +150,7 @@ CONTAINS
       END DO
 #ifdef INCLUDE_SEAICE
       DO jn = 1, NO_D2_BOX_STATES_ICE
-         D2STATE_ICE(jn,1) = tr_i(ji,jj,:,jn)
+         D2STATE_ICE(jn,:) = tr_i(ji,jj,:,jn)
       END DO
 #endif
 
@@ -261,11 +261,11 @@ CONTAINS
 
       ! Gas exchanges
       !-------------------------------------------------------
-      AtmSLP%fnow = apr(ji,jj)
+      AtmSLP%fnow(1) = apr(ji,jj)
       ! broadcast surface atm pressure over the water column
-      patm3d = AtmSLP%fnow
+      patm3d = SPREAD(AtmSLP%fnow(1), DIM=1, NCOPIES=SIZE(patm3d))
 #ifdef INCLUDE_PELCO2
-      AtmCO2%fnow = atm_co2(ji,jj)
+      AtmCO2%fnow(1) = atm_co2(ji,jj)
       !LEVEL1 'co2', AtmCO2%fnow, 'slp', AtmSLP%fnow
 #endif
       !LEVEL1 'ETW ', ETW(1), ', ESW ', ESW(1), ', ERHO ', ERHO(1), &
