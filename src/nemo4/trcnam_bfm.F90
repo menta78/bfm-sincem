@@ -31,6 +31,7 @@ SUBROUTINE trc_nam_bfm()
 #endif
    !
    IMPLICIT NONE
+
    INTEGER     :: yy, mm, dd, hh, nn, jn
    REAL(RLEN)  :: julianday
    LOGICAL     ::  lltrcbc
@@ -155,6 +156,7 @@ SUBROUTINE trc_nam_bfm()
    lltrcbc = ( COUNT(sn_tracer(:)%llsbc) + COUNT(sn_tracer(:)%llobc) + COUNT(sn_tracer(:)%llcbc) ) > 0
    IF ( ln_trcbc .AND. .NOT.lltrcbc) ln_trcbc = .FALSE.
    
+   !write (LOGUNIT,*) 'map ', var_map
    ! benthic
    jp_bgc_b = NO_D2_BOX_STATES_BEN
    jpk_b = NO_BOXES_Z_BEN

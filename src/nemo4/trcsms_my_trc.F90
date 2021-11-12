@@ -66,7 +66,7 @@ CONTAINS
       ! Skip BFM computation if no ocean points
       !-------------------------------------------------------
       IF ( SkipBFMCore ) return
-     
+
       ! Set diagnostic fields to be saved
       !-------------------------------------------------------
       IF (kt == nittrc000) CALL diags_mapping()
@@ -84,7 +84,6 @@ CONTAINS
       !-------------------------------------------------------
       CALL update_bgc_forcings(kt, Kbb, Kmm, Krhs)
 
-      ! add here the call to BGC model
       DO_2D( nn_hls, nn_hls, nn_hls, nn_hls )
 
          ! cycle over land points
@@ -139,6 +138,10 @@ CONTAINS
 
       bot = BOTindices(1)
       delt = bfmtime%timestep
+
+      ! Reset flux arrays
+      !---------------------------------------------
+      CALL ResetFluxes
       
       ! Fill BFM STATE arrays
       !---------------------------------------------
@@ -190,10 +193,6 @@ CONTAINS
       ! Diagnostics
       !---------------------------------------------
       CALL diags_collect(kt, ji, jj, bot)
-
-      ! Reset flux arrays
-      !---------------------------------------------
-      CALL ResetFluxes
 
    END SUBROUTINE execute_bfm
 
