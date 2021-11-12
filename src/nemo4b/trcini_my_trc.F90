@@ -172,10 +172,10 @@ CONTAINS
       ! Initialise DATA output netcdf file(s)
       !-------------------------------------------------------
       IF ( bfm_iomput ) THEN
-         if (lwp) write(LOGUNIT,*) 'BFM uses XIOS output system via NEMO'
+         LEVEL1 'BFM uses XIOS output system via NEMO'
          ! Set var_ids values according to the XIOS file_def is done in trc_dia_bfm
       ELSE
-         if (lwp) write(LOGUNIT,*) 'BFM output without XIOS to be implemented' 
+         LEVEL1 'BFM output without XIOS not implemented' 
          STOP
       ENDIF 
 

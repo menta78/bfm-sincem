@@ -15,7 +15,7 @@ SUBROUTINE trc_nam_bfm()
    ! BFM
    USE constants,  ONLY: SEC_PER_DAY
    USE global_mem, ONLY: RLEN, ZERO, LOGUNIT, SkipBFMCore, bfm_lwp, ALLTRANSPORT
-   USE api_bfm,    ONLY: parallel_rank, bio_setup, SEAmask, SRFmask, BOTmask, init_bfm, stPelStateS, stPelStateE, &
+   USE api_bfm,    ONLY: parallel_rank, bio_setup, SEAmask, init_bfm, stPelStateS, stPelStateE, &
                          save_delta, time_delta, out_delta, update_save_delta, ocepoint, &
                          InitVar, var_names, var_long, var_units, SRFindices, BOTindices, ZEROS
    USE time,       ONLY: bfmtime, julian_day, calendar_date
@@ -29,7 +29,7 @@ SUBROUTINE trc_nam_bfm()
 #ifdef CCSMCOUPLED
    USE nemogcm, ONLY: logfile
 #endif
-
+   !
    IMPLICIT NONE
 
    INTEGER     :: yy, mm, dd, hh, nn, jn
@@ -44,32 +44,30 @@ SUBROUTINE trc_nam_bfm()
 
    ! Assign the rank of the process (meaningful only with key_mpp)
    !-------------------------------------------------------
-   parallel_rank = narea-1
+   parallel_rank = narea - 1
 
-   ! Initial time
+   ! Initialize bfm time
    !-------------------------------------------------------
-   write(bfmtime%datestring,'(I4.4,a,I2.2,a,I2.2)') nyear,'-',nmonth,'-',nday
-   write(bfmtime%date0,'(I4.4,I2.2,I2.2)') nyear,nmonth,nday
-   call julian_day(nyear,nmonth,nday,0,0,julianday)
+   WRITE(bfmtime%datestring,'(I4.4,a,I2.2,a,I2.2)') nyear,'-',nmonth,'-',nday
+   WRITE(bfmtime%date0,'(I4.4,I2.2,I2.2)') nyear,nmonth,nday
+   CALL julian_day(nyear,nmonth,nday,0,0,julianday)
    bfmtime%time0    = julianday
    bfmtime%timeEnd  = julianday + ( ( REAL(nitend - nittrc000, RLEN) ) * rn_Dt ) / SEC_PER_DAY
    bfmtime%step0    = nittrc000 - 1
    bfmtime%timestep = rn_Dt
    bfmtime%stepnow  = nittrc000 - 1
    bfmtime%stepEnd  = nitend
-   call calendar_date(bfmtime%timeEnd,yy,mm,dd,hh,nn)
-   write(bfmtime%dateEnd,'(I4.4,I2.2,I2.2)') yy,mm,dd
+   CALL calendar_date(bfmtime%timeEnd,yy,mm,dd,hh,nn)
+   WRITE(bfmtime%dateEnd,'(I4.4,I2.2,I2.2)') yy,mm,dd
 
-   ! Force Euler timestepping for the BFM
+   ! Force Euler timestepping for TOP
    !-------------------------------------------------------
    ln_top_euler = .TRUE.
 
    ! Set ocean mask and bottom level
    !-------------------------------------------------------
-   allocate(SEAmask(jpi,jpj,jpk), SRFmask(jpi,jpj,jpk), BOTmask(jpi,jpj,jpk))
+   ALLOCATE(SEAmask(jpi,jpj,jpk))
    SEAmask = .FALSE.
-   SRFmask = .FALSE.
-   BOTmask = .FALSE. ! not sure it is needed   
    !if (lk_c1d) then !TODO check how 1d works
    !   where (tmask(2,2,:) > ZERO)
    !     SEAmask(2,2,:) = .TRUE.
@@ -77,11 +75,11 @@ SUBROUTINE trc_nam_bfm()
    !     SEAmask(2,2,:) = .FALSE.
    !   end where
    !else
-      where (tmask > ZERO)
+      WHERE (tmask > ZERO)
         SEAmask = .TRUE.
-      elsewhere
+      ELSEWHERE
         SEAmask = .FALSE.
-      end where
+      ENDWHERE
    !end if
    !
    ALLOCATE(bottom_level(jpi,jpj))
@@ -120,7 +118,6 @@ SUBROUTINE trc_nam_bfm()
                IF (jk == 1) THEN
                   jsur = jsur + 1
                   SRFindices(jsur) = joce
-                  SRFmask(ji, jj, jk) = .TRUE.
                ENDIF
                IF (.NOT. SEAmask(ji, jj, jk+1)) THEN
                   jbot = jbot + 1
@@ -131,35 +128,34 @@ SUBROUTINE trc_nam_bfm()
       ENDDO
    ENDDO
 
-   ! Initialise ancillary arrays for output
-   ! (also parallel initialisation is done here)
+   ! Initialise memory arrays and log
    !-------------------------------------------------------
 #ifdef CCSMCOUPLED
-   call init_bfm( TRIM( logfile(4:len(logfile)) ) )
+   CALL init_bfm( TRIM( logfile(4:len(logfile)) ) )
 #else
-   call init_bfm
+   CALL init_bfm
 #endif
 
    ! Initialise state variable names and diagnostics
    !-------------------------------------------------------
-   call set_var_info_bfm
+   CALL set_var_info_bfm
 
    ! Allocate memory and give homogeneous initial values
    !-------------------------------------------------------
-   call init_var_bfm(bio_setup)
+   CALL init_var_bfm(bio_setup)
 
    !LEVEL1 'srf ', SRFindices
    !LEVEL1 'btm ', BOTindices
 
-   ! Disable BFM coupling for no oceanpoints case
+   ! Disable BFM over land domains (no oceanpoints)
    !-------------------------------------------------------
-   if (NO_BOXES == 0 ) then
+   IF (NO_BOXES == 0 ) THEN
      SkipBFMCore = .TRUE.
-     write (LOGUNIT,'(a,1x,i8,1x,a)') 'No ocean point in core :', parallel_rank, &
+     WRITE (LOGUNIT,'(a,1x,i8,1x,a)') 'No ocean point in core :', parallel_rank, &
            '. Disable BFM core computation.'
      ! set to zero nemo passive tracers array
      tr(:,:,:,:,:) = ZERO
-   endif
+   ENDIF
 
    ! Set output stepping
    !-------------------------------------------------------
@@ -168,11 +164,11 @@ SUBROUTINE trc_nam_bfm()
 
    ! Setup NEMO namtrc settings
    !-------------------------------------------------------
-   allocate(var_map(NO_D3_BOX_STATES)) ! mapping transported vars between nemo and bfm
+   ALLOCATE(var_map(NO_D3_BOX_STATES)) ! mapping transported vars between nemo and bfm
    var_map = 0
    jp_bgc = 0
-   do jn = stPelStateS, stPelStateE
-       if (D3STATETYPE(jn-stPelStateS+1) == ALLTRANSPORT) then
+   DO jn = stPelStateS, stPelStateE
+       IF (D3STATETYPE(jn-stPelStateS+1) == ALLTRANSPORT) THEN
            jp_bgc = jp_bgc + 1
            var_map(jn) =  jp_bgc
            sn_tracer(jp_bgc)%clsname = trim(var_names(jn))
@@ -182,8 +178,8 @@ SUBROUTINE trc_nam_bfm()
            sn_tracer(jp_bgc)%llsbc = InitVar(jn)%sbc
            sn_tracer(jp_bgc)%llcbc = InitVar(jn)%cbc
            sn_tracer(jp_bgc)%llobc = InitVar(jn)%obc
-       endif
-   enddo
+       ENDIF
+   ENDDO
    ln_trcdta = COUNT(sn_tracer(:)%llinit) > 0
    lltrcbc = ( COUNT(sn_tracer(:)%llsbc) + COUNT(sn_tracer(:)%llobc) + COUNT(sn_tracer(:)%llcbc) ) > 0
    IF ( ln_trcbc .AND. .NOT.lltrcbc) ln_trcbc = .FALSE.

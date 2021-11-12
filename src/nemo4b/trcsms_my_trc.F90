@@ -62,7 +62,7 @@ CONTAINS
          IF(lwp) WRITE(numout,*) 'trc_sms_my_trc:  BFM ecosystem dynamics'
          IF(lwp) WRITE(numout,*) '~~~~~~~~~~~~~~'
       ENDIF
- 
+
       ! Skip BFM computation if no ocean points
       !-------------------------------------------------------
       IF ( SkipBFMCore ) return
@@ -75,7 +75,7 @@ CONTAINS
       !-------------------------------------------------------
       !IF ( (kt-nit000)<100 .OR. MOD(kt,200)==0 .OR. kt==nitend) &
       !   call log_bgc_stats(kt, Kmm)
-     
+
       ! Update bfm internal time
       !-------------------------------------------------------
       bfmtime%stepnow  = kt
@@ -172,13 +172,6 @@ CONTAINS
          sink_rates(:,:,:,jn) = unpack(SINKD3STATE(sink_var_map(jn))%sedi, SEAmask, ZEROS)
       ENDDO
 
-      ! Diagnostics
-      !---------------------------------------------
-      !CALL diags_collect(kt, ji, jj, bot)
-
-      ! Reset flux arrays
-      !---------------------------------------------
-      !CALL ResetFluxes
 
    END SUBROUTINE execute_bfm
 
@@ -360,7 +353,6 @@ CONTAINS
       !      '  Air_xCO2: ',maxval(AtmCO2%fnow), '  SLP:', maxval(AtmSLP%fnow),   &
       !      ' EIR: ',maxval(EIR)
       !ENDIF
-
 
    END SUBROUTINE update_bgc_forcings
 
