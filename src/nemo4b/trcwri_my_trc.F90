@@ -156,6 +156,8 @@ CONTAINS
       !!----------------------------------------------------------------------
       USE IOM,     ONLY: iom_use
       !
+      USE global_mem, ONLY: ZERO
+      !
       INTEGER, ALLOCATABLE, DIMENSION(:) :: id_2d, id_3d
       LOGICAL, DIMENSION(stEnd, 2) :: pp_index
       INTEGER :: jn, j_2d, j_3d
@@ -186,6 +188,8 @@ CONTAINS
       jp_dia2d = COUNT(pp_index(:,2))
       ALLOCATE(id_dia3d(jp_dia3d), id_dia2d(jp_dia2d))
       ALLOCATE(trc3d(jpi,jpj,jpk,jp_dia3d), trc2d(jpi,jpj,jp_dia2d))
+      trc3d = ZERO
+      trc2d = ZERO
       !
       j_2d = 1
       j_3d = 1
@@ -194,12 +198,12 @@ CONTAINS
          IF (pp_index(jn,1) == .TRUE.) THEN
             id_dia3d(j_3d) = jn
             j_3d = j_3d + 1
-            LEVEL1 'trc ', trim(var_names(jn)), jn
+            !LEVEL1 'trc ', trim(var_names(jn)), jn
          ENDIF
          IF (pp_index(jn,2) == .TRUE.) THEN
             id_dia2d(j_2d) = jn
             j_2d = j_2d + 1
-            LEVEL1 'trc ', trim(var_names(jn)), jn
+            !LEVEL1 'trc ', trim(var_names(jn)), jn
          ENDIF
       ENDDO
 
