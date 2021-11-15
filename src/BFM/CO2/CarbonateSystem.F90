@@ -433,7 +433,7 @@ module mem_CSYS
   ! 3. COMPUTE CARBONATE SYSTEM
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! H+ concentration (mol/kg) at previous step
-  if ( pH < 0._RLEN ) then
+  if ( pH <= 0._RLEN ) then
      Hi = Hini_for_at(ta,tc,bt,K1,K2,Kb)
   else
      Hi = 10.0_RLEN**(-pH)
