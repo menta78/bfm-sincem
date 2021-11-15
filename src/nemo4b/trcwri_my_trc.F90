@@ -15,7 +15,8 @@ MODULE trcwri_my_trc
    USE iom         ! I/O manager
    ! BFM
    USE mem, ONLY: NO_BOXES, D3STATE, D3DIAGNOS, D3FLUX_FUNC,        &
-            D2DIAGNOS, D2STATE_BEN, D2DIAGNOS_BEN, D2FLUX_FUNC_BEN
+            D2DIAGNOS, D2STATE_BEN, D2DIAGNOS_BEN, D2FLUX_FUNC_BEN, &
+            D3STATETYPE
    USE global_mem, ONLY: LOGUNIT, bfm_lwp, SkipBFMCore
    USE time,       ONLY: bfmtime
    USE api_bfm,    ONLY: SEAmask, c1dim, stStart, stEnd, var_names, &
@@ -62,14 +63,13 @@ CONTAINS
  
       ! State variables
       !-------------------------------------------------------
-      ! Pelagic
-      !DO jn = 1, jp_bgc
-      !   cltra = TRIM( ctrcnm(jn) )                  ! short title for tracer
-      !   CALL iom_put( cltra, tr(:,:,:,jn,Kmm) )
-      !END DO
       DO jn = stPelStateS, stPelStateE
          jl = jn - stPelStateS + 1
-         call iom_put ( TRIM(var_names(jn)) , unpack(D3STATE(jl,:),SEAmask,ZEROS) )
+         IF (D3STATETYPE(jn) .EQ. 0) THEN
+            call iom_put ( TRIM(var_names(jn)) , unpack(D3STATE(jl,:),SEAmask,ZEROS) )
+         ELSE
+            call iom_put ( TRIM(var_names(jn)) , tr(:,:,:,var_map(jn),Kmm))
+         ENDIF
       ENDDO
       DO jn = stBenStateS, stBenStateE
          jl = jn - stBenStateS + 1 
