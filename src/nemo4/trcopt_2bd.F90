@@ -15,11 +15,14 @@ SUBROUTINE trc_opt_2bd(Kmm)
    USE trcopt,     ONLY: zeps
    !
    USE global_mem, ONLY: LOGUNIT, bfm_lwp, RLEN, ZERO, ONE
-   USE mem_PAR,    ONLY: p_PAR, p_eps0, p_epsESS, p_epsR6
-   USE mem,        ONLY: ppR6c
+   USE mem_PAR,    ONLY: p_PAR, p_eps0, p_epsESS, p_epsR6, p_epsIR
+   USE mem,        ONLY: ppR6c, iiC, iiL, iiPhytoPlankton, ppPhytoPlankton
+   USE mem_Param,  ONLY: p_small
    USE mem_Phyto,  ONLY: p_qlcPPY, p_epsChla
    USE constants,  ONLY: E2W
    !
+   IMPLICIT NONE
+
    INTEGER, INTENT(in) :: Kmm
    INTEGER :: ji, jj, jk, jl
    REAL(wp), DIMENSION(jpi,jpj,jpk) :: ztotv
@@ -42,7 +45,7 @@ SUBROUTINE trc_opt_2bd(Kmm)
 
    ! Photosynthetically active radiation (Watt/m2)
    !-------------------------------------------------------
-   etot(:,:,1) = p_PAR * (qsr(:,:)+p_small)
+   etot(:,:,1) = p_PAR * (qsr(:,:) + p_small)
    
    DO jk = 1, jpk-1
       DO_2D( nn_hls, nn_hls, nn_hls, nn_hls )
@@ -56,12 +59,12 @@ SUBROUTINE trc_opt_2bd(Kmm)
       DO jk = 1, jpk-1
          DO_2D( nn_hls, nn_hls, nn_hls, nn_hls )
             ! infrared
-            etot3(ji,jj,jk+1) = etot3(ji,jj,jk) * EXP( -p_epsIRi * e3t(ji,jj,jk,Kmm)  )
+            etot3(ji,jj,jk+1) = etot3(ji,jj,jk) * EXP( -p_epsIR * e3t(ji,jj,jk,Kmm)  )
             ! visible
-            ztotv(ji,jj,jk+1) = ztotv(ji,jj,jk) * EXP( -ztotv(ji,jj,jk) * e3t(ji,jj,jk,Kmm)  )
+            ztotv(ji,jj,jk+1) = ztotv(ji,jj,jk) * EXP( -zeps(ji,jj,jk) * e3t(ji,jj,jk,Kmm)  )
          END_2D
       ENDDO
-      etot3 = etot3 + zepsv
+      etot3 = etot3 + ztotv
    ENDIF
 
 END SUBROUTINE trc_opt_2bd

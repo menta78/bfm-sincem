@@ -188,21 +188,12 @@ CONTAINS
       ! Initialise DATA output netcdf file(s)
       !-------------------------------------------------------
       IF ( bfm_iomput ) THEN
-         LEVEL1 'BFM uses XIOS output system via NEMO'
+         LEVEL1 'BFM uses XIOS output system'
          ! Set var_ids values according to the XIOS file_def is done in trc_dia_bfm
       ELSE
          LEVEL1 'BFM output without XIOS not implemented' 
          STOP
       ENDIF 
-
-      ! Initialize water column optics
-      !-------------------------------------------------------
-      IF ( ChlAttenFlag == 2 ) THEN
-         ierr = trc_opt_alloc()
-         CALL trc_opt_ini
-         parlux = p_PAR
-         LightLocationFlag = 1 ! light is already integrated over the cell
-      ENDIF
 
 #ifdef INCLUDE_PELFE
       ! Iron supply from sediments (see Aumont & Bopp, 2005)
