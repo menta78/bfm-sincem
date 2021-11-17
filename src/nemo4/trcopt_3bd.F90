@@ -1,4 +1,4 @@
-SUBROUTINE trc_opt_3bd(Kmm, ezchl)
+SUBROUTINE trc_opt_3bd(Kmm)
    !!---------------------------------------------------------------------
    !!                    ***  ROUTINE trcopt_3bd  ***
    !!
@@ -25,7 +25,6 @@ SUBROUTINE trc_opt_3bd(Kmm, ezchl)
    IMPLICIT NONE
 
    INTEGER, INTENT(in) :: Kmm
-   REAL(wp), DIMENSION(jpi,jpj,jpk), INTENT(in) :: ezchl
    INTEGER :: ji, jj, jk, jl, irgb
    REAL(wp), DIMENSION(jpi,jpj,jpk) :: zchl, ze1, ze2, ze3
    REAL(wp), DIMENSION(jpi,jpj,jpk,3) :: eps_bgr ! 1: Blue, 2: Green, 3: Red

@@ -311,23 +311,12 @@ CONTAINS
       REAL(wp) :: r_e2w = 1._RLEN / E2W
       !!----------------------------------------------------------------------
 
-      ! Total chla
-      !-------------------------------------------------------
-      chl_a = ZERO
-      DO jl = 1 , iiPhytoPlankton
-         IF ( ppPhytoPlankton(jl, iiL) == 0) THEN 
-            chl_a = chl_a + tr(:,:,:,ppPhytoPlankton(jl, iiC), Kmm) * p_qlcPPY(jl)
-         ELSE
-            chl_a = chl_a + tr(:,:,:,ppPhytoPlankton(jl, iiL), Kmm)
-         ENDIF
-      ENDDO
-
       ! Water column optics
       !-------------------------------------------------------
       IF ( ChlAttenFlag == 1 ) THEN
          CALL trc_opt_2bd(Kmm)
       ELSEIF ( ChlAttenFlag == 2 ) THEN
-         CALL trc_opt_3bd(Kmm, chl_a)
+         CALL trc_opt_3bd(Kmm)
       ENDIF
       ! convert from Watt to Einstein
       etot = etot * r_e2w
