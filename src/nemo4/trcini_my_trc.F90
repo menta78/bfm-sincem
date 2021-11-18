@@ -178,6 +178,10 @@ CONTAINS
       ! Initialize CO2 air concentration
       !-------------------------------------------------------
       IF (AtmCO2%init .NE. 3) atm_co2 = AtmCO20
+
+      ! Initial state of pH
+      !-------------------------------------------------------
+      IF( .NOT. ln_rsttr ) ph = ZERO
 #endif
 
       ! Zero out fields if cpu is off

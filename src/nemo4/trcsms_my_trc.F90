@@ -129,6 +129,9 @@ CONTAINS
 #ifdef INCLUDE_SEAICE
       USE mem,        ONLY: D2STATE_ICE, D2SOURCE_ICE, NO_D2_BOX_STATES_ICE
 #endif
+#ifdef INCLUDE_PELCO2
+      USE mem,        ONLY: D3DIAGNOS, pppH
+#endif
       !
       INTEGER, INTENT(in) :: kt         ! ocean time-step index
       INTEGER, INTENT(in) :: Kmm, Krhs  ! time level indices
@@ -157,6 +160,9 @@ CONTAINS
          D2STATE_ICE(jn,:) = tr_i(ji,jj,:,jn)
       END DO
 #endif
+#ifdef INCLUDE_PELCO2
+      D3DIAGNOS(pppH,1:bot) = ph(ji,jj,1:bot)
+#endif
 
       ! Compute Biogeochemical trends
       !---------------------------------------------
@@ -173,6 +179,10 @@ CONTAINS
                tr(ji,jj,1:bot,var_map(jn),Krhs) = D3SOURCE(jn,1:bot)
             endif
          end do
+#ifdef INCLUDE_PELCO2
+         ! ph for next iteration
+         ph(ji,jj,1:bot) = D3DIAGNOS(pppH,1:bot)
+#endif
       end if
       if (CalcBenthicFlag ) then
          DO jn = 1, NO_D2_BOX_STATES_BEN
@@ -180,6 +190,7 @@ CONTAINS
          END DO
       end if
 #ifdef INCLUDE_SEAICE
+      if (
       DO jn = 1, NO_D2_BOX_STATES_ICE
          tr_i(ji,jj,:,jn) = tr_i(ji,jj,:,jn) + delt*D2SOURCE_ICE(jn,:)
       END DO
