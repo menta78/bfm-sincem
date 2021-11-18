@@ -22,6 +22,7 @@ MODULE trcsms_my_trc
    USE trcset,         ONLY: trc_set
    USE iom,            ONLY: iom_put
    ! BFM
+   USE trcopt_bfm, ONLY: trc_opt_2bds, trc_opt_3bds
    USE global_mem, ONLY: LOGUNIT, bfm_lwp, RLEN, ZERO, SkipBFMCore
    USE constants,  ONLY: SEC_PER_DAY
    USE time,       ONLY: bfmtime
@@ -284,7 +285,7 @@ CONTAINS
       ! NEMO
       USE trcbc,         ONLY: n_trc_indsbc, sf_trcsbc, rf_trsfac
       USE sbcapr,        ONLY: apr
-      USE trcopt,        ONLY: trc_opt
+      !USE trcopt,        ONLY: trc_opt
       ! BFM
       USE SystemForcing, ONLY: FieldRead
       USE mem_CO2,       ONLY: AtmSLP, patm3d
@@ -314,9 +315,9 @@ CONTAINS
       ! Water column optics
       !-------------------------------------------------------
       IF ( ChlAttenFlag == 1 ) THEN
-         CALL trc_opt_2bd(Kmm)
+         CALL trc_opt_2bds(Kmm)
       ELSEIF ( ChlAttenFlag == 2 ) THEN
-         CALL trc_opt_3bd(Kmm)
+         CALL trc_opt_3bds(Kmm)
       ENDIF
       ! convert from Watt to Einstein
       etot = etot * r_e2w

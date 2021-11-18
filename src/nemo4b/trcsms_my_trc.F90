@@ -258,6 +258,7 @@ CONTAINS
       USE sbcapr,        ONLY: apr
       USE trcopt,        ONLY: trc_opt
       ! BFM
+      USE trcopt_bfm,    ONLY: trc_opt_2bds, trc_opt_3bds
       USE SystemForcing, ONLY: FieldRead
       USE mem_CO2,       ONLY: AtmSLP, patm3d
       USE mem_PAR,       ONLY: ChlAttenFlag
@@ -286,9 +287,9 @@ CONTAINS
       ! Water column optics
       !-------------------------------------------------------
       IF ( ChlAttenFlag == 1 ) THEN
-         CALL trc_opt_2bd(Kmm)
+         CALL trc_opt_2bds(Kmm)
       ELSEIF ( ChlAttenFlag == 2 ) THEN
-         CALL trc_opt_3bd(Kmm)
+         CALL trc_opt_3bds(Kmm)
       ENDIF
       ! convert from Watt to Einstein
       etot = etot * r_e2w
