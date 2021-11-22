@@ -136,7 +136,8 @@ CONTAINS
       ! Fill BFM pelagic STATE array
       !---------------------------------------------
       DO jn = 1, NO_D3_BOX_STATES
-         D3STATE(jn,:) = pack(tr(:,:,:,var_map(jn),Kmm), SEAmask)
+         if (var_map(jn) > 0) &
+            D3STATE(jn,:) = pack(tr(:,:,:,var_map(jn),Kmm), SEAmask)
       END DO
 
       ! Compute Biogeochemical trends
@@ -215,11 +216,11 @@ CONTAINS
       ! Environmental conditions
       !-------------------------------------------------------
       ETW(:)   =  pack(ts(:,:,:,jp_tem,Kmm), SEAmask)
+      ESW(:)   =  pack(ts(:,:,:,jp_sal,Kmm), SEAmask)
       ! convert to in-situ temperature and practical salinity (TEOS-10 not available)
       if ( neos .eq. 0 ) then
          ETW(:)  = sw_t_from_pt(ESW(:), ETW(:), EPR(:), EPR(:)*0.)
       endif
-      ESW(:)   =  pack(ts(:,:,:,jp_sal,Kmm), SEAmask)
       ERHO(:)  =  pack( (rhd(:,:,:) + 1._RLEN) * rho0, SEAmask)
       EWIND(:) =  pack(wndm(:,:), SEAmask(:,:,1))
       EICE(:)  =  pack(fr_i(:,:), SEAmask(:,:,1))

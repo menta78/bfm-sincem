@@ -77,24 +77,18 @@ CONTAINS
       LEVEL1 ' '
       LEVEL1 '-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'
       LEVEL1 '              BFM INITIALIZATION               '
+      LEVEL1 '                   (Legacy)                    '
       LEVEL1 ' '
 
       ! zeroing support arrays
       !-------------------------------------------------------
       chl_a = ZERO
       sink_rates = ZERO
+      ph = ZERO
 
       Depth(:) =  pack(gdept(:,:,:,Kmm), SEAmask)
 
-      ! Restart handled by nemo
-      !-------------------------------------------------------
-      if (bfm_init == 1) then 
-         ln_rsttr = .true.
-         cn_trcrst_in = in_rst_fname
-
-      ! Initialization 
-      !-------------------------------------------------------
-      else if (bfm_init == 0) then
+      if (bfm_init == 0) then
          ! PELAGIC
          do jn = 1,NO_D3_BOX_STATES
 
@@ -153,7 +147,23 @@ CONTAINS
          tr(:,:,:,var_map(jn),Kmm) = unpack(D3STATE(jn,:), SEAmask, ZEROS)
       ENDDO
 
+      ! Restart handled by nemo
+      !-------------------------------------------------------
+      IF (bfm_init == 1 ) THEN
+         call ini_organic_quotas()
+      ENDIF
 
+      ! Assign variable names arrays
+      !-------------------------------------------------------
+      DO jn = 1, NO_D2_BOX_STATES_BEN
+         ctrcnm_b(jn) = trim(var_names(jn + stBenStateS - 1))
+      END DO
+#ifdef INCLUDE_SEAICE
+      DO jn = 1, NO_D2_BOX_STATES_ICE
+         ctrcnm_i(jn) = trim(var_names(jn + stIceStateS - 1))
+      END DO
+#endif
+         
       ! Initialize sea level pressure for gas exchange
       !-------------------------------------------------------
       IF ( .NOT. ALLOCATED(apr)) ALLOCATE(apr(jpi,jpj))
@@ -172,7 +182,7 @@ CONTAINS
       ! Initialise DATA output netcdf file(s)
       !-------------------------------------------------------
       IF ( bfm_iomput ) THEN
-         LEVEL1 'BFM uses XIOS output system via NEMO'
+         LEVEL1 'BFM uses XIOS output system'
          ! Set var_ids values according to the XIOS file_def is done in trc_dia_bfm
       ELSE
          LEVEL1 'BFM output without XIOS not implemented' 
@@ -225,7 +235,7 @@ CONTAINS
             LEVEL1 ' '
       ENDIF
       !
-      IF( ln_timing )   CALL timing_stop('trc_sms_my_trc')
+      IF( ln_timing )   CALL timing_stop('trc_ini_my_trc')
       !
 157 FORMAT(a4, 1x, a10  , 1x, a25, 1x, a3, 1x, a10  , 1x, a10  , 1x, a10  , 1x, a10  , 3x, a3, 3x, a3, 3x, a3)
 158 FORMAT(i4, 1x, E10.3, 1x, a25, 1x, a3, 1x, E10.3, 1x, E10.3, 1x, E10.3, 1x, E10.3, 3x, L3, 3x, L3, 3x, L3)
