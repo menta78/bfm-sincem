@@ -74,7 +74,7 @@ CONTAINS
 
       ! Save to BFM log global statistics of tracers
       !-------------------------------------------------------
-      !IF ( (kt-nit000)<100 .OR. MOD(kt,200)==0 .OR. kt==nitend) &
+      !IF ( (kt-nit000)<100 .OR. MOD(kt,200)==0 .OR. kt==nitend ) &
       !   call log_bgc_stats(kt, Kmm)
 
       ! Update bfm internal time
@@ -150,7 +150,8 @@ CONTAINS
       ! Fill BFM STATE arrays
       !---------------------------------------------
       DO jn = 1, NO_D3_BOX_STATES
-         D3STATE(jn,1:bot) = tr(ji,jj,1:bot,var_map(jn),Kmm)
+         if (var_map(jn) > 0) &
+            D3STATE(jn,1:bot) = tr(ji,jj,1:bot,var_map(jn),Kmm)
       END DO
       DO jn = 1, NO_D2_BOX_STATES_BEN
          D2STATE_BEN(jn,:) = tr_b(ji,jj,:,jn)
@@ -173,11 +174,8 @@ CONTAINS
       !---------------------------------------------
       if (CalcPelagicFlag ) then
          do jn = 1, NO_D3_BOX_STATES
-            if (D3STATETYPE(jn) .eq. 0) then
-               D3STATE(jn,:) = D3STATE(jn,:) + delt*D3SOURCE(jn,:)
-            else
+            if (var_map(jn) > 0) &
                tr(ji,jj,1:bot,var_map(jn),Krhs) = D3SOURCE(jn,1:bot)
-            endif
          end do
 #ifdef INCLUDE_PELCO2
          ! ph for next iteration
@@ -190,7 +188,6 @@ CONTAINS
          END DO
       end if
 #ifdef INCLUDE_SEAICE
-      if (
       DO jn = 1, NO_D2_BOX_STATES_ICE
          tr_i(ji,jj,:,jn) = tr_i(ji,jj,:,jn) + delt*D2SOURCE_ICE(jn,:)
       END DO
@@ -254,12 +251,12 @@ CONTAINS
 
       ! Environmental conditions
       !-------------------------------------------------------
+      ESW(:)   =  ts(ji,jj,:,jp_sal,Kmm)
       ETW(:)   =  ts(ji,jj,:,jp_tem,Kmm)
       ! convert to in-situ temperature and practical salinity (TEOS-10 not available)
       if ( neos .eq. 0 ) then
-         ETW(1:bot)  = sw_t_from_pt(ESW(1:bot),ETW(1:bot),EPR(1:bot),EPR(1:bot)*0.)
+         ETW(1:bot)  = sw_t_from_pt(ESW(1:bot),ETW(1:bot),EPR(1:bot),EPR(1:bot)*0._RLEN)
       endif
-      ESW(:)   =  ts(ji,jj,:,jp_sal,Kmm)
       ERHO(:)  =  (rhd(ji,jj,:) + 1._RLEN) * rho0 * tmask(ji,jj,:)
       EWIND(:) =  wndm(ji,jj)
       EICE(:)  =  fr_i(ji,jj)
@@ -357,7 +354,8 @@ CONTAINS
 #ifdef INCLUDE_PELFE
       ! Iron flux from sediments (time-invariant)
       !-------------------------------------------------------
-      tr(:,:,:,ppN7f,Krhs) = tr(:,:,:,ppN7f,Krhs) + ironsed
+      jl = var_map(ppN7f)
+      tr(:,:,:,jl,Krhs) = tr(:,:,:,jl,Krhs) + ironsed
 
       ! Iron dust deposition below the surface (surface layer applied in trcbc)
       !-------------------------------------------------------
