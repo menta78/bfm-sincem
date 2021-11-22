@@ -10,14 +10,15 @@ SUBROUTINE trc_nam_bfm()
    USE in_out_manager, ONLY: lwp, numout, nitend
    USE dom_oce, ONLY: rn_Dt, narea, nyear, nmonth, nday, tmask
    USE par_oce, ONLY: jpi, jpj, jpk
-   USE trc,     ONLY: tr, ln_trcdta, ln_trcbc, ln_top_euler, nittrc000
+   USE trc,     ONLY: tr, ln_rsttr, ln_trcdta, ln_trcbc, ln_top_euler, nittrc000, cn_trcrst_in
    USE par_my_trc, ONLY: var_map, jp_bgc_b, bottom_level, bfm_iomput
    ! BFM
    USE constants,  ONLY: SEC_PER_DAY
    USE global_mem, ONLY: RLEN, ZERO, LOGUNIT, SkipBFMCore, bfm_lwp, ALLTRANSPORT
    USE api_bfm,    ONLY: parallel_rank, bio_setup, SEAmask, init_bfm, stPelStateS, stPelStateE, &
                          save_delta, time_delta, out_delta, update_save_delta, &
-                         InitVar, var_names, var_long, var_units, SRFindices, BOTindices
+                         InitVar, var_names, var_long, var_units, SRFindices, BOTindices, &
+                         bfm_init, in_rst_fname
    USE time,       ONLY: bfmtime, julian_day, calendar_date
    USE mem,        ONLY: D3STATETYPE, NO_BOXES_X, NO_BOXES_Y, NO_BOXES_Z, &
                          NO_BOXES, NO_BOXES_XY, NO_STATES, NO_D3_BOX_STATES, & 
@@ -62,6 +63,7 @@ SUBROUTINE trc_nam_bfm()
    ! Force Euler timestepping for TOP
    !-------------------------------------------------------
    ln_top_euler = .TRUE.
+   IF(lwp) WRITE(numout,*) 'trc_nam_bfm : force euler integration (ln_top_euler=T)'
 
    ! Set ocean mask and bottom level
    !-------------------------------------------------------
@@ -110,6 +112,16 @@ SUBROUTINE trc_nam_bfm()
 #else
    CALL init_bfm
 #endif
+
+   ! Force NEMO restart
+   !-------------------------------------------------------
+   IF ( bfm_init == 1 ) THEN
+      ln_rsttr = .TRUE.
+      cn_trcrst_in = TRIM(in_rst_fname)
+      IF(lwp) WRITE(numout,*) 'trc_nam_bfm : force restart of NEMO TOP (ln_rsttr=T)'
+      IF(lwp) WRITE(numout,*) '              Restart file is '//TRIM(cn_trcrst_in)
+      IF(lwp) WRITE(numout,*) ''
+   ENDIF
 
    ! Initialise state variable names and diagnostics
    !-------------------------------------------------------

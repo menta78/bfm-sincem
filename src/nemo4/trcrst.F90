@@ -19,6 +19,7 @@ MODULE trcrst
    !!   trc_rst_wri    : write restart file
    !!----------------------------------------------------------------------
    USE par_trc        ! need jptra, number of passive tracers
+   !USE par_my_trc        ! need jptra, number of passive tracers
    USE oce_trc
    USE trc
    USE iom
@@ -133,9 +134,22 @@ CONTAINS
          CALL iom_get( numrtr, jpdom_auto, 'TRN'//ctrcnm(jn), tr(:,:,:,jn,Kmm) )
       END DO
 
-      DO jn = 1, jptra
-         CALL iom_get( numrtr, jpdom_auto, 'TRB'//ctrcnm(jn), tr(:,:,:,jn,Kbb) )
+      IF ( ln_top_euler ) THEN
+         tr(:,:,:,:,Kbb) = tr(:,:,:,:,Kmm)
+      ELSE
+         DO jn = 1, jptra
+            CALL iom_get( numrtr, jpdom_auto, 'TRB'//ctrcnm(jn), tr(:,:,:,jn,Kbb) )
+         END DO
+      ENDIF
+
+      ! ugly patch for benthic vars
+      DO jn = 1, jp_bgc_b
+         CALL iom_get( numrtr, jpdom_auto, 'TRN'//ctrcnm_b(jn), tr_b(:,:,1,jn) )
       END DO
+
+      ! ph
+      CALL iom_get( numrtr, jpdom_auto, 'ph', ph(:,:,:) )
+
       !
       IF(.NOT.lrxios) CALL iom_delay_rst( 'READ', 'TOP', numrtr )   ! read only TOP delayed global communication variables
    END SUBROUTINE trc_rst_read
@@ -159,9 +173,19 @@ CONTAINS
          CALL iom_rstput( kt, nitrst, numrtw, 'TRN'//ctrcnm(jn), tr(:,:,:,jn,Kmm) )
       END DO
 
-      DO jn = 1, jptra
-         CALL iom_rstput( kt, nitrst, numrtw, 'TRB'//ctrcnm(jn), tr(:,:,:,jn,Kbb) )
+      IF ( .NOT. ln_top_euler ) THEN
+         DO jn = 1, jptra
+            CALL iom_rstput( kt, nitrst, numrtw, 'TRB'//ctrcnm(jn), tr(:,:,:,jn,Kmm) )
+         END DO
+      ENDIF
+
+      ! ugly patch for benthic vars
+      DO jn = 1, jp_bgc_b
+         CALL iom_rstput( kt, nitrst, numrtw, 'TRN'//ctrcnm_b(jn), tr_b(:,:,1,jn) )
       END DO
+
+      ! ph
+      CALL iom_rstput( kt, nitrst, numrtw, 'ph', ph(:,:,:) )
 
       IF( .NOT. lwxios ) CALL iom_delay_rst( 'WRITE', 'TOP', numrtw )   ! save only TOP delayed global communication variables
     

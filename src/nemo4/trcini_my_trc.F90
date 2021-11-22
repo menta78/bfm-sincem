@@ -83,16 +83,11 @@ CONTAINS
       !-------------------------------------------------------
       chl_a = ZERO
       sink_rates = ZERO
+      ph = ZERO
 
-      ! Restart handled by nemo
+      ! Initialization from ICs
       !-------------------------------------------------------
-      IF (bfm_init == 1) THEN
-         ln_rsttr = .true.
-         cn_trcrst_in = in_rst_fname
-
-      ! Initialization 
-      !-------------------------------------------------------
-      ELSEIF (bfm_init == 0) THEN
+      IF (bfm_init == 0) THEN
          ! PELAGIC
          DO jn = 1, NO_D3_BOX_STATES
 
@@ -134,8 +129,6 @@ CONTAINS
             ENDDO
          ENDIF
 
-      ENDIF
-
 !TODO move this to trcsms
 !#ifdef INCLUDE_PELCO2
 !      ! Scale DIC and ALK from m(g/mol)/kg to m(g/mol)/m3 using NEMO initial in situ density
@@ -145,43 +138,56 @@ CONTAINS
 !      D3STATE(ppO3h,:) = D3STATE(ppO3h,:) * ERHO(:)
 !#endif
 
-      ! Transfer BFM ICs to passive tracers array
+         ! Transfer BFM ICs to passive tracer arrays
+         !-------------------------------------------------------
+         ! PELAGIC
+         DO jn = 1, NO_D3_BOX_STATES
+             DO_2D( nn_hls, nn_hls, nn_hls, nn_hls )
+                 tr(ji,jj,:,var_map(jn),Kmm) = D3STATE(jn,:)
+             END_2D
+             tr(:,:,:,var_map(jn),Kmm) = tr(:,:,:,var_map(jn),Kmm) * tmask(:,:,:)
+         END DO
+         ! BENTHIC
+         DO jn = 1, NO_D2_BOX_STATES_BEN
+            DO jk = 1, jpk_b
+                tr_b(:,:,jk,jn) = tmask(:,:,1) * D2STATE_BEN(jn,1)
+            ENDDO
+         END DO
+#ifdef INCLUDE_SEAICE
+         ! SEAICE
+         DO jn = 1, NO_D2_BOX_STATES_ICE
+            DO jk = 1, jpk_i
+                tr_i(:,:,jk,jn) = tmask(:,:,1) * D2STATE_ICE(jn,1)
+            ENDDO
+         END DO
+#endif
+      ENDIF
+
+      ! Restart handled by nemo
       !-------------------------------------------------------
-      ! PELAGIC
-      DO jn = 1, NO_D3_BOX_STATES
-          DO_2D( nn_hls, nn_hls, nn_hls, nn_hls )
-              tr(ji,jj,:,var_map(jn),Kmm) = D3STATE(jn,:)
-          END_2D
-          tr(:,:,:,var_map(jn),Kmm) = tr(:,:,:,var_map(jn),Kmm) * tmask(:,:,:)
-      END DO
-      ! BENTHIC
+      IF (bfm_init == 1 ) THEN
+         call ini_organic_quotas()
+      ENDIF
+
+      ! Assign variable names arrays
+      !-------------------------------------------------------
       DO jn = 1, NO_D2_BOX_STATES_BEN
-         DO jk = 1, jpk_b
-             tr_b(:,:,jk,jn) = tmask(:,:,1) * D2STATE_BEN(jn,1)
-         ENDDO
          ctrcnm_b(jn) = trim(var_names(jn + stBenStateS - 1))
       END DO
 #ifdef INCLUDE_SEAICE
-      ! SEAICE
       DO jn = 1, NO_D2_BOX_STATES_ICE
-         DO jk = 1, jpk_i
-             tr_i(:,:,jk,jn) = tmask(:,:,1) * D2STATE_ICE(jn,1)
-         ENDDO
          ctrcnm_i(jn) = trim(var_names(jn + stIceStateS - 1))
       END DO
 #endif
-      !
+         
       ! Initialize sea level pressure for gas exchange
+      !-------------------------------------------------------
       IF ( .NOT. ALLOCATED(apr)) ALLOCATE(apr(jpi,jpj))
       IF (AtmSLP%init .NE. 3) apr = p_atm0
 #ifdef INCLUDE_PELCO2
       ! Initialize CO2 air concentration
       !-------------------------------------------------------
       IF (AtmCO2%init .NE. 3) atm_co2 = AtmCO20
-
-      ! Initial state of pH
-      !-------------------------------------------------------
-      IF( .NOT. ln_rsttr ) ph = ZERO
 #endif
 
       ! Zero out fields if cpu is off
@@ -245,7 +251,7 @@ CONTAINS
             LEVEL1 ' '
       ENDIF
       !
-      IF( ln_timing )   CALL timing_stop('trc_sms_my_trc')
+      IF( ln_timing )   CALL timing_stop('trc_ini_my_trc')
       !
 157 FORMAT(a4, 1x, a10  , 1x, a25, 1x, a3, 1x, a10  , 1x, a10  , 1x, a10  , 1x, a10  , 3x, a3, 3x, a3, 3x, a3)
 158 FORMAT(i4, 1x, E10.3, 1x, a25, 1x, a3, 1x, E10.3, 1x, E10.3, 1x, E10.3, 1x, E10.3, 3x, L3, 3x, L3, 3x, L3)
