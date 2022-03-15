@@ -75,6 +75,7 @@ end
    N1p	:	Phosphate : mmol P/m3
    N3n	:	Nitrate  : mmol N/m3
    N4n	:	Ammonium : mmol N/m3
+   O4n	:	NitrogenSink : mmol N/m3
    N5s	:	Silicate     : mmol Si/m3
    N6r	:	Reduction Equivalents : mmol S--/m3
 
@@ -92,12 +93,14 @@ end
 	   P1	    : Diatoms
 	   P2[-s]	: Flagellates
 	   P3[-s]	: PicoPhytoplankton
+	   P4[-s]	: Large Phytoplankton
    end
                
   #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   #	State Variable(s) for Mesozooplankton
   #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
    group MesoZooPlankton[cnp] (MEZ) : mg C/m3 : mmol N/m3 : mmol P/m3
+		Z3 	: Carnivorous Mesozooplankton
 		Z4 	: Omnivorous Mesozooplankton
    end
 
@@ -109,6 +112,15 @@ end
 	   Z6	: Heterotrophic Nanoflagellates (HNAN)
    end
 
+  #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  #	State Variable(s) for Detritus (Biogenic Organic Material)
+  #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    group PelDetritus[cnps] (OMT) : mg C/m3 : mmol N/m3: mmol P/m3: mmol Si/m3
+      R1[-s]    : Labile Dissolved Organic Matter
+      R2[-nps]  : Semi-labile Dissolved Organic Carbon
+      R3[-nps]  : Semi-refractory Dissolved Organic Carbon
+      R6        : Particulate Organic Matter 
+    end
 end
 
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -119,20 +131,6 @@ end
      O3     : Dissolved Inorganic Carbon: Alkalinity
      O5[-h] : Calcite
   end
-end
-
-#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-#	State Variable(s) for Detritus (Biogenic Organic Material)
-#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-3d-state-pel
-    group PelDetritus[cnps] (OMT) : mg C/m3 : mmol N/m3: mmol P/m3: mmol Si/m3
-      R1[-s]    : Labile Dissolved Organic Matter
-      R6        : Particulate Organic Matter
-      R2[-nps]  : Semi-labile Dissolved Organic Carbon
-      R3[-nps]  : Semi-refractory Dissolved Organic Carbon
-    end
-
-   O4n  :       NitrogenSink : mmol N/m3
 end
 
 2d-variable-pel -if-exist INCLUDE_PELCO2
@@ -177,9 +175,9 @@ end
     #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     # Water column diagnostic rates
     #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    flPTN6r  : Pelagic Anaerobic Mineralization Rate : mmol O2/m3/d
-    flN3O4n  : Pelagic Denitrification Rate : mmol N/m3/d
-    flN4N3n  : Pelagic Nitrification Rate   : mmol N/m3/d
+    flPTN6r : Pelagic Anaerobic Mineralization Rate : mmol O2/m3/d
+    flN3O4n : Pelagic Denitrification Rate : mmol N/m3/d
+    flN4N3n : Pelagic Nitrification Rate   : mmol N/m3/d
 
     #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     # Variables holding quota of elements in species
@@ -269,6 +267,42 @@ end
   totsyss  : total mass :  g Si
 end
 
+1d-variable -if-exist BFM_OGS
+  #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  # OGS 1d variables
+  #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  SiPToutr  : Sinks variables
+  SiPToutc  : Sinks variable
+  SiPTouto  : Sinks variable
+  SiPToutn  : Sinks variable
+  SiPToutp  : Sinks variable
+  SiPTouti  : Sinks variable
+  SiQIc     : Sinks variable
+  SiQIn     : Sinks variable
+  SiQIp     : Sinks variable
+  SiQIs     : Sinks variable
+  SiBTsinkc : Sinks variable
+  SiBTsinkn : Sinks variable
+  SiBTsinko : Sinks variable
+  SiBTsinkr : Sinks variable
+  SiBTsinkp : Sinks variable
+  SiBTsinks : Sinks variable
+  SiATsinkr : Sinks variable
+  SiATsinks : Sinks variable
+  SiG3c     : Sinks variable
+  SoO2Airo  : Sinks variable
+  SoPTinr   : Sinks variable
+  SoPTinc   : Sinks variable
+  SoPTino   : Sinks variable
+  SoPTinn   : Sinks variable
+  SoPTinp   : Sinks variable
+  SoPTini   : Sinks variable
+  SoRIc     : Sinks variable
+  SoRIn     : Sinks variable
+  SoRIp     : Sinks variable
+  SoRIs     : Sinks variable
+end
+
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 #                       DIAGNOSTIC RATES
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -285,12 +319,26 @@ end
   ruPPYp=P.p <- N1p : Net Phosphate Uptake : mmol P/m3/d
   ruPPYs=P.s <- N5s : Net Silicate Uptake : mmol Si/m3/d
   exPPYc=(P.c->R1c+R2c+R3c+R6c): C excretion from phytoplankton :mg C/m3/d
-  exPPYs=(P.s->R6s): biogenic Si loss from phytoplankton :mmol Si/m3/d
   ruZOOc=(Z.c<-P.c+B.c+Z.c): Gross/Net Secondary Production:mg C/m3/d
   resPELo=(O2o->*): Pelagic Oxygen Demand : mmol O2/m3/d
   remZOOn=(N4n<-B.n+Z.n): Zooplankton N Remineralization : mmol N/m3/d
   remZOOp=(N1p<-B.p+Z.p): Zooplankton P Remineralization : mmol P/m3/d
   remPBAn=(N4n<-B.n): Bacterial N Uptake/Remineralization : mmol N/m3/d
   remPBAp=(N1p<-B.p): bacterial P Uptake/Remineralization : mmol P/m3/d
-  remN5s=(N5s<-R6s): Si Remineralization : mmol Si/m3/d
+end
+
+3d-flux-pel -if-exist INCLUDE_DIAG INCLUDE_PELCO2 BFM_OGS
+  #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  # OGS diagnostic rates
+  #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  resPPY1c=P1c -> O3c : Respiration Diatoms         : mg C/m3/d
+  resPPY2c=P2c -> O3c : Respiration Flagellates     : mg C/m3/d
+  resPPY3c=P3c -> O3c : Respiration Pico            : mg C/m3/d
+  resPPY4c=P4c -> O3c : Respiration Dinaflagellates : mg C/m3/d
+  ruPBAc=B.c <- O3c : Bacterial Production : mg C/m3/d
+  resPBA1c=B1c -> O3c : Aerobic and Anaerobic Bacteria Respiration : mg C/m3/d
+  resMEZ1c=Z3c -> O3c : Carnivorous Zoo Respiration               : mg C/m3/d
+  resMEZ2c=Z4c -> O3c : Omnivorous Zoo Respiration                : mg C/m3/d
+  resMIZ1c=Z5c -> O3c : Microzooplankton Respiration              : mg C/m3/d
+  resMIZ2c=Z6c -> O3c : Heterotrophic Nanoflagellates Respiration : mg C/m3/d
 end
