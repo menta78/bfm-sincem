@@ -45,7 +45,7 @@
    chla_name='Chla'
    dimsname= 'x' 'y' 'deptht' 'time_counter'
    coorname= 'nav_lon' 'nav_lat' 'deptht' 'time_counter'
-   compute_eps=.false.
+   compute_eps=.true.
    p_eps0=0.0435
    p_epsChla=0.03
    eps_fname='bfm_output.nc'

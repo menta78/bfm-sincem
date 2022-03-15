@@ -217,10 +217,10 @@ subroutine read_create
      allocate(time(ntime))
      call handle_err( nf90_get_var(ncchlid, IDtimetmp, time, start = (/ 1 /), count = (/ ntime /)) )
      call handle_err( nf90_def_var(ncid, TRIM(coorname(4)) , NF90_DOUBLE, (/ IDtime /), IDvartime) )
-     call handle_err( nf90_copy_att(ncchlid, IDtimetmp, "units", ncid, IDvartime) , errstring='copying time units from source')
-     errst = nf90_inquire_attribute(ncchlid, IDtimetmp,"calendar")
-     if ( errst == nf90_noerr) &
-        call handle_err( nf90_copy_att(ncchlid, IDtimetmp, "calendar", ncid, IDvartime), errstring='missinf calendar attr in time')
+     call handle_err( nf90_copy_att(ncchlid, IDtimetmp, "units", ncid, IDvartime) , errstring='copying time units from source')
+     errst = nf90_inquire_attribute(ncchlid, IDtimetmp,"calendar")
+     if ( errst == nf90_noerr) &
+        call handle_err( nf90_copy_att(ncchlid, IDtimetmp, "calendar", ncid, IDvartime), errstring='missinf calendar attr in time')
 
      if (compute_chlsat) then
      ! define the output variable: chlsat
