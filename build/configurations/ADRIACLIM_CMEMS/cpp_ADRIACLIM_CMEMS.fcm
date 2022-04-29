@@ -1,0 +1,2 @@
+bld::tool::fppkeys                 key_zdftke key_dynspg_ts key_top key_offline key_my_trc key_iomput key_mpp_mpi key_bdy key_xios2 
+inc $BFMDIR/src/nemo/bfm.fcm
