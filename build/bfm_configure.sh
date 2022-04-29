@@ -353,7 +353,7 @@ if [ ${GEN} ]; then
     if [ ! -d ${blddir} ]; then mkdir ${blddir}; fi
     cd ${blddir}
     rm -rf *
-    cp ${presetdir}/* ${blddir} 2>/dev/null
+    cp -r ${presetdir}/* ${blddir} 2>/dev/null
     
     #add -D to cppdefs
     cppdefs=`echo ${CPPDEFS} | sed -e 's/\([a-zA-Z_0-9]*\)/-D\1/g'`
