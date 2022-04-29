@@ -125,8 +125,8 @@ end
     group PelDetritus[cnps] (OMT) : mg C/m3 : mmol N/m3: mmol P/m3: mmol Si/m3
       R1[-s]    : Labile Dissolved Organic Matter
       R6        : Particulate Organic Matter
-      R2[-npsf]  : Semi-labile Dissolved Organic Carbon
-      R3[-npsf]  : Semi-refractory Dissolved Organic Carbon
+      R2[-nps]  : Semi-labile Dissolved Organic Carbon
+      R3[-nps]  : Semi-refractory Dissolved Organic Carbon
     end
 
   #	State Variable(s) for Nitrogen Mass Balance
