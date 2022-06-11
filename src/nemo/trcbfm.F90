@@ -28,6 +28,7 @@
 #endif 
    use mem_param, only: CalcTransportFlag, CalcBenthicFlag, &
                         CalcPelagicFlag
+   use bfm_param3d,   only: param3d_dyn
    use time,      only: bfmtime
    ! NEMO
    use oce_trc          ! ocean dynamics and active tracers variables
@@ -71,6 +72,9 @@
    ! BFM internal time
    !--------------------------------------------- 
    bfmtime%stepnow  = bfmtime%stepnow + nn_dttrc
+
+   ! updating possible 3d parameters
+   call param3d_dyn(kt)
 
    !---------------------------------------------
    ! Skip BFM computation if no ocean points
