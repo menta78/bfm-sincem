@@ -81,6 +81,9 @@ CONTAINS
         WRITE(numout,*) '   ==>>>   Passive Tracer time step = rn_Dt = ', rn_Dt
       ENDIF
       !
+                            CALL trc_nam_dcy    ! Diurnal Cycle
+
+      !
       IF( l_trdtrc )        CALL trc_nam_trd    ! Passive tracer trends
       !
    END SUBROUTINE trc_nam
@@ -226,6 +229,34 @@ CONTAINS
       !
    END SUBROUTINE trc_nam_trc
 
+   SUBROUTINE trc_nam_dcy
+      !!---------------------------------------------------------------------
+      !!                     ***  ROUTINE trc_nam_dcy  ***
+      !!
+      !! ** Purpose :   read options for the passive tracer diagnostics
+      !!
+      !!---------------------------------------------------------------------
+      INTEGER  ::   ios, ierr                 ! Local integer
+      !!
+      NAMELIST/namtrc_dcy/ ln_trcdc2dm
+      !!---------------------------------------------------------------------
+      !
+      IF(lwp) WRITE(numout,*)
+      IF(lwp) WRITE(numout,*) 'trc_nam_dcy : read the passive tracer diurnal cycle options'
+      IF(lwp) WRITE(numout,*) '~~~~~~~~~~~'
+      !
+      READ  ( numnat_ref, namtrc_dcy, IOSTAT = ios, ERR = 905)
+905   IF( ios /= 0 )   CALL ctl_nam ( ios , 'namtrc_dcy in reference namelist' )
+      READ  ( numnat_cfg, namtrc_dcy, IOSTAT = ios, ERR = 906 )
+906   IF( ios >  0 )   CALL ctl_nam ( ios , 'namtrc_dcy in configuration namelist' )
+      IF(lwm) WRITE( numont, namtrc_dcy )
+
+      IF(lwp) THEN
+         WRITE(numout,*) '   Namelist : namtrc_dcy                    '
+         WRITE(numout,*) '      Diurnal cycle for TOP ln_trcdc2dm    = ', ln_trcdc2dm
+      ENDIF
+
+   END SUBROUTINE trc_nam_dcy
 
    SUBROUTINE trc_nam_trd
       !!---------------------------------------------------------------------

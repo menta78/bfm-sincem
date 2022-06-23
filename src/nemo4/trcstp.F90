@@ -143,12 +143,10 @@ CONTAINS
    SUBROUTINE trc_stp_ctl
       !!----------------------------------------------------------------------
       !!                     ***  ROUTINE trc_stp_ctl  ***
-      !! ** Purpose :        Control  + ocean volume
       !!----------------------------------------------------------------------
       !
       ! Define logical parameter ton control dirunal cycle in TOP
-      l_trcdm2dc = ln_dm2dc .OR. ( ln_cpl .AND. ncpl_qsr_freq /= 1 .AND. ncpl_qsr_freq /= 0 )
-      l_trcdm2dc = l_trcdm2dc .AND. .NOT. l_offline
+      l_trcdm2dc = ( ln_trcdc2dm .AND. .NOT. ln_dm2dc  ) 
       !
       IF( l_trcdm2dc .AND. lwp )   CALL ctl_warn( 'Coupling with passive tracers and used of diurnal cycle.',   &
          &                           'Computation of a daily mean shortwave for some biogeochemical models ' )
@@ -179,13 +177,9 @@ CONTAINS
       IF( ln_timing )   CALL timing_start('trc_mean_qsr')
       !
       IF( kt == nittrc000 ) THEN
-         IF( ln_cpl )  THEN  
-            rdt_sampl = rday / ncpl_qsr_freq
-            nb_rec_per_day = ncpl_qsr_freq
-         ELSE  
-            rdt_sampl = MAX( 3600., rn_Dt )
-            nb_rec_per_day = INT( rday / rdt_sampl )
-         ENDIF
+         !
+         rdt_sampl = REAL( ncpl_qsr_freq )
+         nb_rec_per_day = INT( rday / ncpl_qsr_freq )
          !
          IF(lwp) THEN
             WRITE(numout,*) 
