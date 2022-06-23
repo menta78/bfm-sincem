@@ -45,7 +45,7 @@ MODULE trcini_my_trc
    IMPLICIT NONE
    PRIVATE
 
-   PUBLIC   trc_ini_my_trc   ! called by trcini.F90 module
+   PUBLIC   trc_ini_my_trc, log_bgc_stats   ! called by trcini.F90 module
 
    !!----------------------------------------------------------------------
    !! NEMO/TOP 4.0 , NEMO Consortium (2018)
@@ -275,6 +275,57 @@ CONTAINS
       IF( trc_ini_my_trc_alloc /= 0 ) CALL ctl_stop( 'STOP', 'trc_ini_my_trc_alloc : failed to allocate arrays' )
       !
    END FUNCTION trc_ini_my_trc_alloc
+
+
+   SUBROUTINE log_bgc_stats(kt, Kmm)
+      !!----------------------------------------------------------------------
+      !!                 ***  log_bgc_stats  ***
+      !!
+      !! ** Purpose :  save to log file summary stats of 3D pelagic BGC fields
+      !!
+      !! ** Method  : -
+      !!----------------------------------------------------------------------
+      USE api_bfm,    ONLY: var_names, stPelStateS, parallel_rank, NO_D3_BOX_STATES
+      !
+      INTEGER, INTENT(in) :: kt   ! ocean time-step index
+      INTEGER, INTENT(in) :: Kmm  ! time level indices
+      INTEGER :: jn, jk, jl
+      REAL(wp) :: ztraf, zmin, zmax, zmean
+      REAL(wp), DIMENSION(jpi,jpj,jpk) :: zvol
+      !!----------------------------------------------------------------------
+
+      LEVEL1 'Global statistics on tracer at beginning of step: ' , kt
+
+      DO jk = 1, jpk
+         zvol(:,:,jk) = e1e2t(:,:) * e3t(:,:,jk,Krhs) * tmask(:,:,jk)
+      END DO
+
+      DO jl = 1, NO_D3_BOX_STATES
+         jn = var_map(jl)
+         IF (jn > 0) THEN
+            ztraf = glob_sum( 'log_bgc_stats', tr(:,:,:,jn,Kmm) * zvol(:,:,:) )
+            zmin  = MINVAL( tr(:,:,:,jn,Kmm), mask= ((tmask*SPREAD(tmask_i,DIM=3,NCOPIES=jpk).NE.0.)) )
+            zmax  = MAXVAL( tr(:,:,:,jn,Kmm), mask= ((tmask*SPREAD(tmask_i,DIM=3,NCOPIES=jpk).NE.0.)) )
+            zmin  = MINVAL( tr(:,:,:,jn,Kmm), mask= ((tmask*SPREAD(tmask_i,DIM=3,NCOPIES=jpk).NE.0.)) )
+            zmax  = MAXVAL( tr(:,:,:,jn,Kmm), mask= ((tmask*SPREAD(tmask_i,DIM=3,NCOPIES=jpk).NE.0.)) )
+            IF( lk_mpp ) THEN
+               CALL mpp_min( 'log_bgc_stats', zmin )      ! min over the global domain
+               CALL mpp_max( 'log_bgc_stats', zmax )      ! max over the global domain
+            END IF
+            zmean  = ztraf / areatot
+
+            IF (bfm_lwp) &
+               WRITE(LOGUNIT,9000) jn, trim(var_names(stPelStateS+jl-1)), zmean, zmin, zmax
+         END IF
+      ENDDO
+
+      LEVEL1 ''
+      call FLUSH(LOGUNIT)
+
+9000  FORMAT(' STAT tracer nb :',i2,'    name :',a10,'    mean :',e18.10,'    min :',e18.10, '    max :',e18.10)
+
+   END SUBROUTINE log_bgc_stats
+
 
    !!======================================================================
 END MODULE trcini_my_trc

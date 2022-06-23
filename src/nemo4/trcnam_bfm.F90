@@ -127,7 +127,7 @@ SUBROUTINE trc_nam_bfm()
    !-------------------------------------------------------
    CALL set_var_info_bfm
 
-   ! Allocate memory and give homogeneous initial values
+   ! Allocate memory and read initial & boundary conditions setting
    !-------------------------------------------------------
    CALL init_var_bfm(bio_setup)
 
