@@ -199,6 +199,7 @@ done
 #set bfm path
 if [[ ! ${BFMDIR} ]]; then
     BFMDIR="${BFMDIR_DEFAULT}"
+    export BFMDIR
     [ ${VERBOSE} ] && echo "setting BFM path with default: ${BFMDIR}"
 fi
 
