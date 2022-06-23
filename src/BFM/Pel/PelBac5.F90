@@ -169,7 +169,7 @@
   R6ch  = p_suR6(bac) *  bacc * (ONE - R1rut)
   ruR6c = rum * deplim * MM_power( R6c(:) , R6ch , 3)  * (ONE - R1rut)
 
-  rug = ruR1c + ruR6c
+  rug = ruR1c + ruR6c + p_small
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Organic Carbon uptake
