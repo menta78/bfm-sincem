@@ -58,7 +58,6 @@ end
   EIR   : Irradiance : uE/m2/s
   ESS   : Suspended Sediments : g/m3
   EPR   : Water Pressure : dbar
-  BAC_ACT_FACT : Bacteria activity factor depth dependent
 end
 
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -188,8 +187,6 @@ end
     qlcPPY(PhytoPlankton)	: Quotum Chl/C in Phytoplankton : mg Chl /mg C
     qccPPY(PhytoPlankton)       : Quotum PIC/POC in Phytoplankton : mg C/mg C
 
-    BFM1D_exR2ac(PhytoPlankton) : activity exudation to R2 : mg C/ m3/d
- 
     qpcMEZ(MesoZooPlankton)	: Quotum P/C in Mesozooplankton :mmol P/mg C 
     qncMEZ(MesoZooPlankton)	: Quotum N/C in Mesozooplankton :mmol N/mg C 
 
@@ -226,7 +223,10 @@ end
    # Other diagnostics
    #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     dissO5c : Calcite dissolution: mg C/m3/d
-    ffCO2 : CO2 fugacity   : uatm 
+    ffCO2 : CO2 fugacity   : uatm
+    BFM1D_exR2ac(PhytoPlankton) : activity exudation to R2 : mg C/ m3/d
+    BAC_ACT_FACT : Bacteria activity factor depth dependent
+
 end
 
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
