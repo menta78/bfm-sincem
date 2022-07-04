@@ -27,7 +27,7 @@
   use mem, ONLY: ppR1c, ppR6c, ppO2o, ppR2c, ppN3n, ppN4n, ppN1p, ppR1n, &
     ppR6n, ppR1p, ppR6p, ppN5s, ppR6s, SUNQ, ThereIsLight, ETW, EIR, &
     xEPS, Depth, eiPPY, sediPPY, sunPPY, qpcPPY, qncPPY, qscPPY, qlcPPY, NO_BOXES, &
-    iiBen, iiPel, flux_vector, quota_flux
+    iiBen, iiPel, flux_vector, quota_flux, BFM1D_exR2ac
   use mem, ONLY: ppPhytoPlankton
 #ifdef INCLUDE_PELCO2
   use mem, ONLY: ppO3c, ppO5c, ppO3h, qccPPY
@@ -332,11 +332,15 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   select case (p_switchDOC(phyto))
     case (1)
+       ! All activity excretions are assigned to R1
        rr1c = rr1c + sea*phytoc + seo*phytoc
        flPIR2c = ZERO
     case (2)
+       ! Activity and Nutrient-stress excretions are assigned to R2
        flPIR2c = seo*phytoc + sea*phytoc
+       BFM1D_exR2ac(phyto,:) = sea* phytoc
     case (3)
+       ! Activity excretion is only assigned to R2
        rr1c = rr1c + sea*phytoc
        flPIR2c = seo*phytoc
   end select
@@ -348,7 +352,7 @@
   call quota_flux( iiPel, ppphytoc, ppphytoc,ppO3c, rrc, tfluxC )
   call flux_vector( iiPel, ppO2o,ppO2o,-( rrc/ MW_C) )
   call flux_vector( iiPel, ppO2o,ppO2o, rugc/ MW_C ) 
-!
+
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Potential-Net prim prod. (mgC /m3/d)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -530,7 +534,6 @@
            !  discarded with a p_tochl_relt relaxation.
            rate_Chl = rho_Chl*(sum-seo-sea-sra)*phytoc-(sdo+srs)*phytol - &
                       max(ZERO,(phytol-chl_opt))*p_tochl_relt(phyto)
-
       case (4) ! NIOZ
           ! total synthesis, only when there is net production (run > 0)
           ! The fixed loss rate due to basal respiration is introduced to have 

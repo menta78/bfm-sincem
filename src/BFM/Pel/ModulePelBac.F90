@@ -9,6 +9,7 @@
 !   Module containing the parameters for bacterioplankton and the 
 !   initialization and consistency check
 !
+#include "cppdefs.h"
 ! !INTERFACE
   module mem_PelBac
 !
@@ -143,8 +144,8 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   !  Open the namelist file(s)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  write(LOGUNIT,*) "#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
-  write(LOGUNIT,*) "#  Reading PelBac parameters.."
+  LEVEL1 "#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+  LEVEL1 "#  Reading PelBac parameters.."
   open(NMLUNIT,file='Pelagic_Ecology.nml',status='old',action='read',err=100)
   read(NMLUNIT,nml=PelBacteria_parameters,err=101)
   close(NMLUNIT)
@@ -153,24 +154,24 @@
   ! Check consistency of parameters according to the parametrization
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   do i=1,iiPelBacteria
-     write(LOGUNIT,*) "#  Checking PelBacteria parameters for group:",i
-     write(LOGUNIT,*) "#   Use formulation (p_version) -> ",p_version
+     LEVEL1 "#  Checking PelBacteria parameters for group:",i
+     LEVEL1 "#   Use formulation (p_version) -> ",p_version
      select case ( p_version(i) )
        case ( BACT3 ) ! Polimene et al. (2006)
          p_sulR1(i) = ZERO
-         write(LOGUNIT,*) "#   forcing p_sulR1=0"
+         LEVEL1 "#   forcing p_sulR1=0"
          if (p_pu_ea_R3(i) + p_pu_ra(i) .GT. 0.3_RLEN) then
-           write(LOGUNIT,*)"#  Warning: Bacterial growth efficiency is lower than 0.3!"
-           write(LOGUNIT,*)"#  The release of capsular material is possibly larger than p_pu_ra/4"
+           LEVEL1 "#  Warning: Bacterial growth efficiency is lower than 0.3!"
+           LEVEL1 "#  The release of capsular material is possibly larger than p_pu_ra/4"
          end if
        case ( BACT1 ) ! Vichi et al. 2007
          p_sulR1(i) = ZERO
          p_suR2(i) = ZERO
          p_suR3(i) = ZERO
-         write(LOGUNIT,*) "#   forcing p_sulR1, p_suR2, p_suR3=0"
+         LEVEL1 "#   forcing p_sulR1, p_suR2, p_suR3=0"
        case ( BACT2 ) ! Vichi et al. 2004
          p_suR3(i) = ZERO
-         write(LOGUNIT,*) "#   forcing p_suR3=0"
+         LEVEL1 "#   forcing p_suR3=0"
      end select
   end do
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -179,18 +180,18 @@
   itrp=maxval(p_version)
   if ( itrp < 3 ) then
      D3STATETYPE(ppR3c)=NOTRANSPORT
-     write(LOGUNIT,*) " Disable R3c transport as no bacterial group use it "
+     LEVEL1 " Disable R3c transport as no bacterial group use it "
   endif
   if ( itrp < 2 ) then
      D3STATETYPE(ppR2c)=NOTRANSPORT
-     write(LOGUNIT,*) " Disable R2c transport as no bacterial group use it "
+     LEVEL1 " Disable R2c transport as no bacterial group use it "
   endif
-   write(LOGUNIT,*) ""
+   LEVEL1 ""
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Write parameter list to the log
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  write(LOGUNIT,*) "#  Namelist is:"
-  write(LOGUNIT,nml=PelBacteria_parameters)
+  LEVEL1 "#  Namelist is:"
+  if (bfm_lwp) write(LOGUNIT,nml=PelBacteria_parameters)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   !END compute

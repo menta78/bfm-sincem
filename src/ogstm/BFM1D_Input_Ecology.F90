@@ -19,12 +19,13 @@ subroutine BFM1D_Input_EcologyDynamics(bot,BFM1D_trn,dim_BFM1D_trn,BFM1D_er)
   integer   , intent(in) :: bot
   integer dim_BFM1D_trn
 !  real(RLEN), intent(in) :: BFM1D_trn(dim_BFM1D_trn,NO_BOXES),BFM1D_er(NO_BOXES,10)
-  real(RLEN), intent(in) :: BFM1D_trn(NO_BOXES,dim_BFM1D_trn),BFM1D_er(NO_BOXES,10)
+  real(RLEN), intent(in) :: BFM1D_trn(NO_BOXES,dim_BFM1D_trn),BFM1D_er(NO_BOXES,11)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Local Variables
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   integer i,ib
+  real(RLEN) bottom
 
 
  !      BOTindices(:) = 0
@@ -54,21 +55,28 @@ subroutine BFM1D_Input_EcologyDynamics(bot,BFM1D_trn,dim_BFM1D_trn,BFM1D_er)
 ! LEVEL1 'BFM1D_Input_EcologyDynamics:ESW', ESW
   ERHO(:)   = BFM1D_er(:,3)
 ! LEVEL1 'BFM1D_Input_EcologyDynamics:ERHO', ERHO
-  EICE(:)   = BFM1D_er(:,4)
+  EICE(:)   = BFM1D_er(1,4)
 ! LEVEL1 'BFM1D_Input_EcologyDynamics:EICE', EICE
 #ifdef INCLUDE_PELCO2
-  AtmCO2%fnow(:) = BFM1D_er(:,5)
+  AtmCO2%fnow(:) = BFM1D_er(1,5)
 ! LEVEL1 'BFM1D_Input_EcologyDynamics:EPCO2air', EPCO2air
 #endif
   EIR(:)    = BFM1D_er(:,6)
 ! LEVEL1 'BFM1D_Input_EcologyDynamics:EIR', EIR
-  SUNQ(:)   = BFM1D_er(:,7)
+  SUNQ(:)   = BFM1D_er(1,7)
 ! LEVEL1 'BFM1D_Input_EcologyDynamics:DL', SUNQ
   DEPTH(:)  = BFM1D_er(:,8)
 ! LEVEL1 'BFM1D_Input_EcologyDynamics:DEPTH', DEPTH
-  EWIND(:)  = BFM1D_er(:,9)
+  EWIND(:)  = BFM1D_er(1,9)
 ! LEVEL1 'BFM1D_Input_EcologyDynamics:EWIND,', EWIND
   ph(:)     = BFM1D_er(:,10)
 ! LEVEL1 'BFM1D_Input_EcologyDynamics:PH,', ph
+  BAC_ACT_FACT(:) = BFM1D_er(:,11)
+! LEVEL1 'BFM1D_Input_EcologyDynamics:BAC_ACT_FACT',BAC_ACT_FACT
 
+  bottom=0
+  DO ib=1,NO_BOXES
+     bottom = bottom + DEPTH(ib)
+     EPR(ib) = bottom - DEPTH(ib)/2
+  ENDDO
 end subroutine BFM1D_Input_EcologyDynamics

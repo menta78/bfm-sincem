@@ -5,6 +5,6 @@
 	AR=ar
 	ARFLAGS=-r
 	CPPFLAGS=
-        FFLAGS_DBG=  -O0 -g -traceback -fp-stack-check -check bounds -fpe0
+        FFLAGS_DBG=  -O0 -g -traceback -fp-stack-check -check all -fpe0 
 	FFLAGS= ${FFLAGS_DBG}  -I${NETCDFF_INC}
 	LDFLAGS=${NCLIB}

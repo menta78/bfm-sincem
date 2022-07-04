@@ -15,6 +15,7 @@
 !   F90 code generator written by P. Ruardij.
 !   structure of the code based on ideas of M. Vichi.
 !
+#include "cppdefs.h"
 ! !INTERFACE
   module mem_MesoZoo
 !
@@ -119,13 +120,13 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   !  Open the namelist file(s)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  write(LOGUNIT,*) "#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
-  write(LOGUNIT,*) "#  Reading MesoZoo parameters.."
+  LEVEL1 "#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+  LEVEL1 "#  Reading MesoZoo parameters.."
   open(NMLUNIT,file='Pelagic_Ecology.nml',status='old',action='read',err=100)
   read(NMLUNIT,nml=MesoZoo_parameters,err=101)
   close(NMLUNIT)
-  write(LOGUNIT,*) "#  Namelist is:"
-  write(LOGUNIT,nml=MesoZoo_parameters)
+  LEVEL1 "#  Namelist is:"
+  if (bfm_lwp) write(LOGUNIT,nml=MesoZoo_parameters)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   !END compute

@@ -131,7 +131,7 @@
     open(NMLUNIT,file='Carbonate_Dynamics.nml',status='old',action='read',err=100)
     read(NMLUNIT,nml=CSYS_parameters,err=101)
     close(NMLUNIT)
-    write(LOGUNIT,nml=CSYS_parameters)
+    if (bfm_lwp) write(LOGUNIT,nml=CSYS_parameters)
     LEVEL1 ' '
  
   ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -145,21 +145,21 @@
           ! the following check is needed to avoid allocation of empty arrays with MPI and land domains
           if (NO_BOXES_XY > 0) then
              AtmCO2%fnow = AtmCO20
-             write(LOGUNIT,*) 'Using constant atmospheric CO2 concentration:', AtmCO2%fnow(1)
-             write(LOGUNIT,*) ' '
+             LEVEL1 'Using constant atmospheric CO2 concentration:', AtmCO2%fnow(1)
+             LEVEL1 ' '
           end if
        CASE (1) ! read external 0-D timeseries
           ! the following check is needed to avoid allocation of empty arrays with MPI and land domains
           if (NO_BOXES_XY > 0) then
-             write(LOGUNIT,*) 'BFM Read atmospheric CO2 timeseries. Initial value:', AtmCO2%fnow(1)
-             write(LOGUNIT,*) ' '
+             LEVEL1 'BFM Read atmospheric CO2 timeseries. Initial value:', AtmCO2%fnow(1)
+             LEVEL1 ' '
           end if
        CASE (2) ! read external 2-D fields with NEMO fldread (see envforcing_bfm)
           ! the following check is needed to avoid allocation of empty arrays with MPI and land domains
           if (NO_BOXES_XY > 0) then
              AtmCO2%fnow = AtmCO20
-             write(LOGUNIT,*) 'Read CO2 2D fields with NEMO fldread. Initialize with default uniform value', AtmCO2%fnow(1)
-             write(LOGUNIT,*) ' '
+             LEVEL1 'Read CO2 2D fields with NEMO fldread. Initialize with default uniform value', AtmCO2%fnow(1)
+             LEVEL1 ' '
           end if
     END SELECT
 
@@ -171,19 +171,21 @@
        ! the following check is needed to avoid allocation of empty arrays with MPI and land domains
        if (NO_BOXES_XY > 0) then
           AtmSLP%fnow = p_atm0
-          write(LOGUNIT,*) 'Using constant atmospheric SLP (see p_atm0 in BFM_General.nml): ', AtmSLP%fnow(1)
-          write(LOGUNIT,*) ' '
+          LEVEL1 'Using constant atmospheric SLP (see p_atm0 in BFM_General.nml): ', AtmSLP%fnow(1)
+          LEVEL1 ' '
        end if
     else
-      if (AtmSLP%init .eq. 1 ) &
-         write(LOGUNIT,*) 'BFM reads atmospheric SLP timeseries from file: ', AtmSLP_N%filename
-      if (AtmSLP%init .eq. 2 ) &
-         write(LOGUNIT,*) 'Read SLP 2D fields with NEMO fldread. Initialize with default uniform value', AtmSLP%fnow(1)
-      write(LOGUNIT,*) ' '
+      if (AtmSLP%init .eq. 1 ) then
+         LEVEL1 'BFM reads atmospheric SLP timeseries from file: ', AtmSLP_N%filename
+      endif
+      if (AtmSLP%init .eq. 2 ) then
+         LEVEL1 'Read SLP 2D fields with NEMO fldread. Initialize with default uniform value', AtmSLP%fnow(1)
+      endif
+      LEVEL1 ' '
     endif
 
     ! summary of input parameters
-    write(LOGUNIT,*) ' Model uses PH Total Scale '
+    LEVEL1 ' Model uses PH Total Scale '
  
     ! If cold start, CarbonateSystem computes initial pH
     if (bfm_init == 0 ) pH(:) = -ONE

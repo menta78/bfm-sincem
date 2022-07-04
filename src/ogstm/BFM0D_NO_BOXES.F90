@@ -7,7 +7,7 @@ subroutine BFM0D_NO_BOXES(N,X,Y,Z,XY)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Modules (use of ONLY is strongly encouraged!)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  use global_mem, ONLY:RLEN
+  use global_mem, ONLY:RLEN, bfm_lwp, LOGUNIT
   use mem, ONLY:NO_BOXES,NO_BOXES_X,NO_BOXES_Y,NO_BOXES_Z,NO_BOXES_XY, NO_STATES, &
        NO_D3_BOX_STATES
   use api_bfm, ONLY: SRFindices,BOTindices
@@ -29,18 +29,17 @@ subroutine BFM0D_NO_BOXES(N,X,Y,Z,XY)
   NO_BOXES_Z = Z
   NO_BOXES_XY = XY
   NO_STATES   = NO_D3_BOX_STATES * NO_BOXES
-  write(*,*) 'NO_BOXES_TOT', N
-  write(*,*) 'NO_BOXES_X', X
-  write(*,*) 'NO_BOXES_Y', Y
-  write(*,*) 'NO_BOXES_Z', Z
-  write(*,*) 'NO_BOXES_XY', XY
-  write(*,*) 'allocating NO_BOXES_XY'
+  LEVEL1 'NO_BOXES_TOT', N
+  LEVEL1 'NO_BOXES_X', X
+  LEVEL1 'NO_BOXES_Y', Y
+  LEVEL1 'NO_BOXES_Z', Z
+  LEVEL1 'NO_BOXES_XY', XY
+  LEVEL1 'allocating NO_BOXES_XY'
   allocate(SRFindices(NO_BOXES_XY))
   allocate(BOTindices(NO_BOXES_XY))
   
   
-  write(*,*) 'NO_STATES', NO_STATES
-  
-  write(*,*) 'NO_D3_BOX_STATES',NO_D3_BOX_STATES 
+  LEVEL1 'NO_STATES', NO_STATES  
+  LEVEL1 'NO_D3_BOX_STATES',NO_D3_BOX_STATES 
 
 end subroutine BFM0D_NO_BOXES

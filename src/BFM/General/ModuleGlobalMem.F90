@@ -65,7 +65,7 @@
   real(RLEN), parameter ::BASETEMP= 10.0_RLEN
   !=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Control logical units for files I/O
-  logical               :: bfm_lwp = .TRUE. ! logical writing for proc 0
+  logical               :: bfm_lwp = .FALSE. ! logical writing for proc 0
   integer, parameter    :: bfm_file_FirstUnit = 1000
   integer               :: LOGUNIT
   integer               :: NMLUNIT

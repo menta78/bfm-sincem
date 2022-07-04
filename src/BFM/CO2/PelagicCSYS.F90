@@ -29,7 +29,7 @@
                  Source_D3_vector, ppO5c, ppN3n, ppN4n
   use mem, ONLY: ppO3h, ppO3c, NO_BOXES, NO_BOXES_XY, BoxNumber,   &
     N1p,N5s,CO2, HCO3, CO3, pCO2, pH, ETW, ESW, ERHO, EWIND, EICE, &
-    OCalc, OArag, EPR, ppO5c, O5c, EPCO2air, dissO5c
+    OCalc, OArag, EPR, ppO5c, O5c, EPCO2air, dissO5c, ffCO2
 #endif
   use mem_CO2    
   use mem_CSYS, ONLY : CarbonateSystem
@@ -99,7 +99,7 @@
                N1p(BoxNumber), N5s(BoxNumber), DIC(BoxNumber), ALK(BoxNumber), &
                CO2(BoxNumber) ,HCO3(BoxNumber), CO3(BoxNumber), pH(BoxNumber), &
                pCO2(BoxNumber), patm=patm3d(BoxNumber), pr_in=EPR(BoxNumber), &
-               OmegaC=OCalc(BoxNumber), OmegaA=OArag(BoxNumber))
+               OmegaC=OCalc(BoxNumber), OmegaA=OArag(BoxNumber),fCO2=ffCO2(BoxNumber))
 
 #ifdef DEBUG
        write(LOGUNIT,*) "in PelagicCSYS:"
@@ -111,6 +111,7 @@
        write(LOGUNIT,'(A,'' ='',f12.6)') 'ALK',ALK(BoxNumber)
        write(LOGUNIT,'(A,'' ='',f12.6)') 'OCalc',OCalc(BoxNumber)
        write(LOGUNIT,'(A,'' ='',f12.6)') 'OArag',OArag(BoxNumber)
+       write(LOGUNIT,'(A,'' ='',f12.6)') 'ffCO2',  ffCO2(BoxNumber)
        write(LOGUNIT,'(''layer:'',I4,'' pH='',f12.6)') BoxNumber,pH(BoxNumber)
 #endif
        if ( error > 0 ) then

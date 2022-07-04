@@ -28,7 +28,8 @@
   use mem, ONLY: iiPelBacteria, ppPelBacteria, iiC, iiN, iiP, ppR6c, &
     ppR6n, ppR6p, ppR1c, ppR1n, ppR1p, &
     ppR2c, ppO2o, ppN6r, ppN4n, ppN1p, ppN3n, ppR3c, flPTN6r, Depth, ETW, &
-    qncPBA, qpcPBA, eO2mO2, qpcOMT, qncOMT, NO_BOXES, iiBen, iiPel, flux_vector,quota_flux
+    qncPBA, qpcPBA, eO2mO2, qpcOMT, qncOMT, NO_BOXES, iiBen, iiPel, flux_vector,quota_flux, &
+    BAC_ACT_FACT
 #ifdef INCLUDE_PELCO2
   use mem, ONLY: ppO3c
 #endif
@@ -92,7 +93,8 @@
                                           reR3c,rut,rum,run,sun,rug, &
                                           suR2,cuR6,cuR1,iN1p,iNIn,iN, &
                                           eN1p,eN4n,huln, hulp, bacc, &
-                                          tfluxC, tfluxN, tfluxP, pe_N4n, pe_N1p, pe_R6c
+                                          tfluxC, tfluxN, tfluxP, pe_N4n, &
+                                          pe_N1p, pe_R6c,degR3c
 #ifndef INCLUDE_PELCO2
   integer,parameter :: ppO3c = 0
 #endif
@@ -118,6 +120,7 @@
         &       hulp(NO_BOXES), bacc(NO_BOXES),                       &
         &       tfluxC(NO_BOXES), tfluxN(NO_BOXES), tfluxP(NO_BOXES), &
         &       pe_N4n(NO_BOXES), pe_N1p(NO_BOXES), pe_R6c(NO_BOXES), &
+        &       degR3c(NO_BOXES),                                     &
         &      STAT = AllocStatus )
      IF( AllocStatus /= 0 ) call bfm_error('PelBacDynamics','Error allocating arrays')
      first=1
@@ -410,7 +413,12 @@
       call quota_flux( iiPel, ppbacc, ppbacc, ppR3c, reR3c, tfluxC)
   
   end select
-   
+
+  ! Degradation of R3c ( time scale 100 years)
+  degR3c = 1/(200.0D0*365.D0) * BAC_ACT_FACT * R3c
+  call flux_vector(iiPel, ppR3c,    ppO3c, degR3c)
+  call flux_vector(iiPel, ppO2o,    0    , degR3c/ MW_C)
+
   if ( ppbacn == 0 .or. ppbacp == 0 ) then
 
      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

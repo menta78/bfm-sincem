@@ -19,7 +19,6 @@ subroutine BFM0D_INIT_IO_CHANNELS()
   ! Local Variables
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   
-  LOGUNIT=GetLun()
   NMLUNIT=GetLun()+1
 
 

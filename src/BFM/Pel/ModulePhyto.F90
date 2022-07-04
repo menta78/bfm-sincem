@@ -8,7 +8,7 @@
 ! DESCRIPTION
 !   Parameter values for the phytoplankton groups
 !
-!
+#include "cppdefs.h"
 ! !INTERFACE
   module mem_Phyto
 !
@@ -239,8 +239,8 @@
   !  Open the namelist file(s)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-  write(LOGUNIT,*) "#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
-  write(LOGUNIT,*) "#  Reading Phyto parameters.."
+  LEVEL1 "#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+  LEVEL1 "#  Reading Phyto parameters.."
   open(NMLUNIT,file='Pelagic_Ecology.nml',status='old',action='read',err=100)
   read(NMLUNIT,nml=Phyto_parameters,err=101)
 #ifdef INCLUDE_PELFE
@@ -252,7 +252,7 @@
   ! (loop over the phytoplankton groups and stop
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   do i=1,iiPhytoPlankton
-     write(LOGUNIT,*) "#  Checking Phyto parameters for group:",i
+     LEVEL1 "#  Checking Phyto parameters for group:",i
      select case ( p_switchSi(i) )
        case ( 1 ) ! external limitation
           if (p_chps(i)==ZERO)  &
@@ -267,13 +267,13 @@
      end select
      if (p_netgrowth(i)) then
         p_switchDOC(i) = 2
-        write(LOGUNIT,*) "#  Balanced growth is activated: p_netgrowth=",p_netgrowth(i)
-        write(LOGUNIT,*) "#  forcing p_switchDOC = 2"
+        LEVEL1 "#  Balanced growth is activated: p_netgrowth=",p_netgrowth(i)
+        LEVEL1 "#  forcing p_switchDOC = 2"
      else if (p_switchDOC(i)==2) then
-        write(LOGUNIT,*) "#  Balanced growth is not activated: p_netgrowth=",p_netgrowth(i)
-        write(LOGUNIT,*) "#  do you really want p_switchDOC = 2?"
+        LEVEL1 "#  Balanced growth is not activated: p_netgrowth=",p_netgrowth(i)
+        LEVEL1 "#  do you really want p_switchDOC = 2?"
      end if
-     write(LOGUNIT,*) "#  OK"
+     LEVEL1 "#  OK"
   end do
   ! Check if R2 has to be a transported tracer
   itrp = maxval(p_switchDOC)
@@ -283,8 +283,8 @@
                     "Switch to BACT2 or BACT3 or set p_switchDOC=1.") 
   endif
 
-  write(LOGUNIT,*) "#  Namelist is:"
-  write(LOGUNIT,nml=Phyto_parameters)
+  LEVEL1 "#  Namelist is:"
+  if (bfm_lwp)  write(LOGUNIT,nml=Phyto_parameters)
 #ifdef INCLUDE_PELFE
   write(LOGUNIT,nml=Phyto_parameters_iron)
 #endif

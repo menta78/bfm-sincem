@@ -14,11 +14,12 @@
 !       - iron scavenging and remineralization (INCLUDE_PELFE)
 !
 ! !INTERFACE
+#include "cppdefs.h"
   module mem_PelChem
 !
 ! !USES:
   use global_mem
-  use mem,        only: D3STATETYPE, ppO4n, ppN6r
+  use mem,        only: D3STATETYPE, ppO4n
 !  
 !
 ! !AUTHORS
@@ -121,27 +122,23 @@
   !  Open the namelist file(s)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-  write(LOGUNIT,*) "#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
-  write(LOGUNIT,*) "#  Reading PelChem parameters.."
+  LEVEL1  "#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+  LEVEL1  "#  Reading PelChem parameters.."
   open(NMLUNIT,file='Pelagic_Environment.nml',status='old',action='read',err=100)
   read(NMLUNIT,nml=PelChem_parameters,err=101)
 #ifdef INCLUDE_PELFE
   read(NMLUNIT,nml=PelChem_parameters_iron,err=102)
 #endif
   close(NMLUNIT)
-  write(LOGUNIT,*) "#  Namelist is:"
-  write(LOGUNIT,nml=PelChem_parameters)
+  LEVEL1 "#  Namelist is:"
+  if (bfm_lwp) write(LOGUNIT,nml=PelChem_parameters)
 #ifdef INCLUDE_PELFE
-  write(LOGUNIT,nml=PelChem_parameters_iron)
+  if (bfm_lwp) write(LOGUNIT,nml=PelChem_parameters_iron)
 #endif
   ! Disable the transport of O4n as it is only a sink of nitrogen (NO3 -> N2)
   D3STATETYPE(ppO4n)=NOTRANSPORT
-  write(LOGUNIT,*) " Disable O4n transport as it used only for mass balance"
-  ! Disable the transport of N6r if denitrification is disabled
-  if ( (p_rOS .le. ZERO) .and. (p_sN3O4n .le. ZERO) ) then
-     D3STATETYPE(ppN6r)=NOTRANSPORT
-     write(LOGUNIT,*) " Disable N6r transport as denitrification is not used (p_rOS & p_sN3O4n = ZERO)"
-  endif
+  LEVEL1 " Disable O4n transport as it used only for mass balance"
+
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   !END compute
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
