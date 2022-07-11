@@ -181,11 +181,11 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   itrp=maxval(p_version)
   select case (itrp)
-     case ( 1, 4 )
+     case ( 1 )
         D3STATETYPE(ppR3c)=NOTRANSPORT
         D3STATETYPE(ppR2c)=NOTRANSPORT
         write(LOGUNIT,*) " Disable R2c & R3c transport as no bacterial group use it "
-     case ( 2, 5 )
+     case ( 2, 4 )
         D3STATETYPE(ppR2c)=NOTRANSPORT
         write(LOGUNIT,*) " Disable R2c transport as no bacterial group use it "
      case default

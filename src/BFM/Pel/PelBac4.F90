@@ -6,7 +6,7 @@
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 !BOP
 !
-! !ROUTINE: PelBacDynamics4
+! !ROUTINE: PelBacDynamics5
 !
 ! DESCRIPTION
 !   This process describes the dynamics of bacterioplankton
@@ -26,7 +26,7 @@
   use mem, ONLY:  R6c, R6n, R6p, R1c, R1n, R1p, R2c, O2o, N6r, BGE, &
     N4n, N1p, N3n, R3c, iiR1, iiR6, D3STATE
   use mem, ONLY: iiPelBacteria, ppPelBacteria, iiC, iiN, iiP, ppR6c, ppR6n, ppR6p, &
-    ppR1c, ppR1n, ppR1p, ppR2c, ppO2o, ppN6r, ppN4n, ppN1p, ppN3n, ppR3c, ETW, &
+    ppR1c, ppR1n, ppR1p, ppR2c, ppO2o, ppN6r, ppN4n, ppN1p, ppN3n, ppR3c, ETW, EPR, &
     qncPBA, qpcPBA, eO2mO2, qpcOMT, qncOMT, NO_BOXES, iiBen, iiPel, flux_vector,quota_flux
 #ifdef INCLUDE_PELCO2
   use mem, ONLY: ppO3c
@@ -62,9 +62,9 @@
   real(RLEN),allocatable,save,dimension(:) :: et,eO2,rd,rrc,rrn,rrt,  &
                                           ruR1c,ruR1n,ruR1p,ruR6c,ruR6p,ruR6n, &
                                           ruR2c, reR2c, ruR3c, reR3c, &
-                                          ren,rep,rut,rugch,rum,run,rug,rdru,chlim, &
+                                          ren,rep,rut,rugch,rum,run,rug,rdru,R3ex,R1rut, R6ch, &
                                           iN1p,iNIn,iN, eN1p,eN4n, bacc, &
-                                          tfluxC, tfluxN, tfluxP, pe_N4n, pe_N1p, pe_R6c
+                                          tfluxC, tfluxN, tfluxP, pe_N4n, pe_N1p, pe_R6c,deplim
 #ifndef INCLUDE_PELCO2
   integer,parameter :: ppO3c = 0
 #endif
@@ -86,8 +86,8 @@
         &       eN1p(NO_BOXES), eN4n(NO_BOXES), bacc(NO_BOXES),       &
         &       tfluxC(NO_BOXES), tfluxN(NO_BOXES), tfluxP(NO_BOXES), &
         &       pe_N4n(NO_BOXES), pe_N1p(NO_BOXES), pe_R6c(NO_BOXES), &
-        &       chlim(NO_BOXES),                                      &
-        &      STAT = AllocStatus )
+        &       R3ex(NO_BOXES), R1rut(NO_BOXES), R6ch(NO_BOXES),   &
+        &       deplim(NO_BOXES), STAT = AllocStatus )
      IF( AllocStatus /= 0 ) call bfm_error('PelBacDynamics','Error allocating arrays')
      first=1
   end if
@@ -104,14 +104,17 @@
   tfluxC = ZERO
   tfluxN = ZERO
   tfluxP = ZERO
-  !BRUM = ZERO 
-  !BRUT = ZERO
   BGE  = ZERO
   
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Temperature effect on pelagic bacteria
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   et = eTq(ETW(:), p_q10(bac))
+
+  ! Pressure limitation (Tamburini, 2009 work) use exp function
+  deplim = ONE
+  if (p_dep(bac)> ZERO ) &
+      deplim = MIN( ONE, (EPR(:)/p_dep(bac))**p_dep_exp(bac))
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Oxygen environment: bacteria are both aerobic and anaerobic
@@ -140,38 +143,33 @@
   iN1p = min(ONE, max(ZERO, qpcPBA(bac,:)/p_qpcPBA(bac)))  !Phosphorus
   iN   = min(iN1p, iNIn)
 
+  ! DOC aggregation into POC
+  rugch = ZERO
+  rugch =  MIN(R1c(:), R6c(:) * p_sulR1(bac))
+  call flux_vector(iiPel, ppR1c, ppR6c, rugch) 
+  call flux_vector(iiPel, ppR1n, ppR6n, rugch*qncOMT(iiR1,:)) 
+  call flux_vector(iiPel, ppR1p, ppR6p, rugch*qpcOMT(iiR1,:)) 
+
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  ! Potential uptake by bacteria (eq. 50 Vichi et al. 2007)
+  ! Potential uptake by bacteria
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  rum = iN*et*p_sum(bac)*bacc
+  rum = iN * p_sum(bac) * bacc
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Total substrate from detritus pools
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ruR1c = p_suhR1(bac) * R1c(:)
-  ruR6c = p_suR6(bac)  * R6c(:)
-  rut   = p_small + ruR1c + ruR6c
-!  rut = p_small + R1c(:) + R6c(:)
+  rut = p_small + R1c(:) + R6c(:)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Gross carbon uptake
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  rugch = p_chuc(bac) * max(p_sulR1(bac), (ruR1c/rut) )
-  ! 15d
-  !rugch = p_chuc(bac) * max(p_chuc_lim(bac), logit ((ruR1c/rut), 0.6, 7.0) )
-  ! 15e
-  !chlim = (ruR1c/rut) * min( ONE, (ruR1c/rut)+(ONE - 0.75) ) 
-  !rugch = p_chuc(bac) * max(p_chuc_lim(bac), chlim)
-  ! 15h 
-  !chlim = min( (ruR1c/rut), (ruR1c/rut)*((ruR1c/rut)/0.6)**1.5)
-  !rugch = p_chuc(bac) * max(p_chuc_lim(bac), chlim)
- 
+  R1rut = R1c(:)/rut
+  ruR1c = rum * et * MM_power( R1c(:) , p_suhR1(bac), 3 ) * R1rut
 
-  rug = rum * MM_power( rut , rugch, 3 ) 
-  ruR1c = rug*ruR1c/rut
-  ruR6c = rug*ruR6c/rut
- 
-  !write(*,*) 'B4: ', rut, rugch, TEMP1 , TEMP3 , TEMP4, rug
+  R6ch  = p_suR6(bac) *  bacc * (ONE - R1rut)
+  ruR6c = rum * deplim * MM_power( R6c(:) , R6ch , 3)  * (ONE - R1rut)
+
+  rug = ruR1c + ruR6c + p_small
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Organic Carbon uptake
@@ -196,8 +194,7 @@
   ! Mortality redistributed on substrates proportionally to realized uptake
   ! In absence of substrate, mortality goes toward dissolved matter
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  rdru = rd*ruR1c/rug
-  WHERE (rut .le. p_small) rdru = rd
+  rdru = rd*(ONE-ruR6c/rug)
   call quota_flux(iiPel, ppbacc, ppbacc, ppR1c, rdru              , tfluxC)
   call quota_flux(iiPel, ppbacn, ppbacn, ppR1n, rdru*qncPBA(bac,:), tfluxN)
   call quota_flux(iiPel, ppbacp, ppbacp, ppR1p, rdru*qpcPBA(bac,:), tfluxP)
@@ -212,7 +209,7 @@
   ! Anaerobic bacteria use NO3 instead of O2, with additional carbon cost.
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Activity + Basal respiration
-  rrc = (p_pu_ra(bac) * rug) + p_srs(bac)* bacc* et
+  rrc = (p_pu_ra(bac) * rug * p_pu_ea_R3(bac)) + p_srs(bac)* bacc* et
   ! Aerobic consumption of Oxygen
   call flux_vector( iiPel, ppO2o, ppO2o, -eO2*rrc/MW_C )
   ! Anaerobic consumption of Nitrate (denitrification-like)
@@ -221,6 +218,10 @@
   ! Total Respiration
   rrt = rrc + (ONE-eO2)*rrn
   call quota_flux( iiPel, ppbacc, ppbacc, ppO3c, rrt, tfluxC)
+
+  ! I suppose is R3
+  R3ex = p_pu_ra(bac) * rug * (ONE - p_pu_ea_R3(bac))
+  call quota_flux( iiPel, ppbacc, ppbacc, ppR3c, R3ex, tfluxC)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Net Production
@@ -242,7 +243,7 @@
   ! This rate is assumed to occur with a timescale p_ruen=1 day
   ! and controlled with a Michaelis-Menten function
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  ren  =  (qncPBA(bac,:) - p_qncPBA(bac))*bacc*p_ruen(bac)
+  ren = (qncPBA(bac,:) - p_qncPBA(bac))*bacc*p_ruen(bac)
 
   ! Fix-quota: actual quota comes from detritus uptake vs. realized growth
   if ( ppbacn == 0 ) & 
@@ -257,7 +258,7 @@
   ! This rate is assumed to occur with a timescale of p_ruep=1 day
   ! and controlled with a Michaelis-Menten function
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  rep  =  (qpcPBA(bac,:) - p_qpcPBA(bac))*bacc*p_ruep(bac)
+  rep = (qpcPBA(bac,:) - p_qpcPBA(bac))*bacc*p_ruep(bac)
 
   ! Fix-quota: actual quota comes from detritus uptake vs. realized growth
   if ( ppbacp == 0 ) &

@@ -147,8 +147,6 @@
      if ( CalcPelBacteria(i) ) then
         if ( p_version(i) .eq. 4) then
            call PelBacDynamics4( i )
-        else if ( p_version(i) .eq. 5) then
-           call PelBacDynamics5( i )
         else
            call PelBacDynamics( i )
         endif
