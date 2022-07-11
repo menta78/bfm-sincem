@@ -372,7 +372,7 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
 !-------------------------------------------------------------------------!
 &PelBacteria_parameters
 !                B1
-     p_version = 5
+     p_version = 4
          p_q10 = 2.95
         p_chdo = 15.0
           p_sd = 0.05
