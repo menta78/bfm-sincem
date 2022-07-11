@@ -416,7 +416,7 @@
   call quota_flux( iiPel, ppphyton, ppphyton,ppR1n,tmp, tfluxN)  ! source/sink.n
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  ! Nuttrient dynamics: PHOSPHORUS
+  ! Nutrient dynamics: PHOSPHORUS
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   misp  =   sadap*( p_xqp(phyto)* p_qpcPPY(phyto)* phytoc- phytop)  ! intracellular missing amount of P
   rupp  =   p_xqp(phyto)* run* p_qpcPPY(phyto)  ! P uptake based on C uptake
@@ -567,7 +567,8 @@
   !  - density enhancement
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   if ( p_caco3r(phyto) > ZERO ) then
-     qccPPY(phyto, :) = min(0.8_RLEN,p_caco3r(phyto)*tN*et*MM(phytoc, p_sheo(phyto)))
+     !qccPPY(phyto, :) = min(0.8_RLEN,p_caco3r(phyto)*tN*et*MM(phytoc, p_sheo(phyto)))
+     qccPPY(phyto, :) = min(0.8_RLEN,p_caco3r(phyto))
      qccPPY(phyto, :) = max(0.02_RLEN,qccPPY(phyto, :))
      ! Calcite production represented as a flux between DIC and PIC, impacting ALK
      call flux_vector( iiPel, ppO3c,ppO5c, qccPPY(phyto, :)*rr6c )

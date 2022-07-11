@@ -39,7 +39,7 @@
 #endif
   use mem_Param,  ONLY: p_qon_nitri, p_qro, p_qon_dentri, p_small
   use mem_PelChem
-  use mem_globalfun,   ONLY: MM, eTq, insw
+  use mem_globalfun,   ONLY: MM, eTq, insw, eTa
   use bfm_error_msg,   ONLY: bfm_error
 !  
 !
@@ -132,7 +132,7 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Dissolution of biogenic silicate
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  fR6N5s  =   p_sR6N5* eTq(  ETW(:),  p_q10R6N5)* R6s(:)
+  fR6N5s  =   p_sR6N5* eTa(  ETW(:),  p_q10R6N5)* R6s(:)
   call flux_vector( iiPel, ppR6s,ppN5s, fR6N5s )
 
 #ifdef INCLUDE_PELFE

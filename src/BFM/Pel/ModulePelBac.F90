@@ -93,6 +93,8 @@
   ! p_ruep      [1/d]            Relaxation timescale for P uptake/remin.
   ! p_rec       [1/d]            Relaxation timescale for semi-labile excretion
   ! p_pu_ea_R3  [-]              Excretion of semi-refractory DOC
+  ! p_chuc      [mgC/m3]         Half saturation total carbon uptake from substrate
+  ! p_chuc_lim  [-]              Scaling factor of p_chuc to set minimum value
   integer     :: p_version(iiPelBacteria), itrp
   integer, parameter ::       BACT1=1,BACT2=2,BACT3=3
   real(RLEN)  :: p_q10(iiPelBacteria)
@@ -121,6 +123,9 @@
   real(RLEN)  :: p_ruep(iiPelBacteria)
   real(RLEN)  :: p_rec(iiPelBacteria)
   real(RLEN)  :: p_pu_ea_R3(iiPelBacteria)
+  real(RLEN)  :: p_chuc(iiPelBacteria)
+  real(RLEN)  :: p_dep(iiPelBacteria)
+  real(RLEN)  :: p_dep_exp(iiPelBacteria)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! SHARED PUBLIC FUNCTIONS (must be explicited below "contains")
@@ -137,7 +142,7 @@
   namelist /PelBacteria_parameters/ p_version, p_q10, p_chdo, p_sd, p_sd2, p_suhR1, &
     p_sulR1, p_suR2, p_suR6, p_sum, p_pu_ra, p_pu_ra_o, p_pu_ea_R3, p_srs, &
     p_suR3, p_qpcPBA, p_qlpc, p_qncPBA, p_qlnc, p_qun, p_qup, p_chn, p_chp, &
-    p_ruen, p_ruep, p_rec
+    p_ruen, p_ruep, p_rec, p_qsum, p_chuc, p_dep, p_dep_exp
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   !BEGIN compute
@@ -178,15 +183,18 @@
   ! Check across bacterial groups if R2 and R3 must be kept in transport
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   itrp=maxval(p_version)
-  if ( itrp < 3 ) then
-     D3STATETYPE(ppR3c)=NOTRANSPORT
-     LEVEL1 " Disable R3c transport as no bacterial group use it "
-  endif
-  if ( itrp < 2 ) then
-     D3STATETYPE(ppR2c)=NOTRANSPORT
-     LEVEL1 " Disable R2c transport as no bacterial group use it "
-  endif
-   LEVEL1 ""
+  select case (itrp)
+     case ( 1 )
+        D3STATETYPE(ppR3c)=NOTRANSPORT
+        D3STATETYPE(ppR2c)=NOTRANSPORT
+        LEVEL1 " Disable R2c & R3c transport as no bacterial group use it "
+     case ( 2, 4 )
+        D3STATETYPE(ppR2c)=NOTRANSPORT
+        LEVEL1 " Disable R2c transport as no bacterial group use it "
+     case default
+        LEVEL1 " Active R2c & R3c transport"
+  end select
+  LEVEL1 ""
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Write parameter list to the log
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=

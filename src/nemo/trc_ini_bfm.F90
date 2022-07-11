@@ -78,6 +78,9 @@
    use mem_PelChem,         only: p_rN7fsed
    use trcini, only: ironsed
 #endif
+#ifdef CCSMCOUPLED
+   USE nemogcm, only: logfile
+#endif
 
    IMPLICIT NONE
 !
@@ -266,7 +269,11 @@
    ! Initialise ancillary arrays for output
    ! (also parallel initialisation is done here)
    !---------------------------------------------
+#ifdef CCSMCOUPLED
+   call init_bfm( TRIM( logfile(4:len(logfile)) ) )
+#else
    call init_bfm
+#endif
 
    !---------------------------------------------
    ! Initialise state variable names and diagnostics

@@ -251,7 +251,7 @@ contains
 ! !IROUTINE: Initialise the bfm module
 !
 ! !INTERFACE:
-   subroutine init_bfm
+   subroutine init_bfm(cpllog)
 !
 ! !DESCRIPTION:
 !
@@ -278,6 +278,7 @@ contains
    IMPLICIT NONE
 !
 ! !INPUT PARAMETERS:
+   CHARACTER(len=*),INTENT(IN),OPTIONAL   :: cpllog
 !
 ! !REVISION HISTORY:
 !  Original author(s): Marcello Vichi
@@ -342,6 +343,7 @@ contains
        if (parallel_rank == 0) then
           bfm_lwp = .TRUE.
           logfname = 'bfm.log'
+          if ( PRESENT(cpllog) ) logfname='bfm'//TRIM(cpllog)
        else 
           bfm_lwp = .FALSE.
           logfname = '/dev/null'
@@ -350,6 +352,7 @@ contains
        ! logs are produced for every process
        bfm_lwp = .TRUE.
        logfname = 'bfm_'//str//'.log'
+       if ( PRESENT(cpllog) ) logfname='bfm'//TRIM(cpllog)//'_'//str
     end if
     open(LOGUNIT,file=logfname,action='write',  &
         form='formatted',err=100)
@@ -381,13 +384,6 @@ contains
    ! Set NetCDF compression
    nc_deflate = 0
    if ( nc_defllev > 0) nc_deflate = 1
-   !
-   ! BFM git version and patch
-   LEVEL0 LINE
-#include "git_code_info.h"
-   LEVEL1 ' '
-   LEVEL0 LINE
-   LEVEL1 ' '
    !
    !-------------------------------------------------------
    ! Write to log bfmtime setting

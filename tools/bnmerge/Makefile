@@ -11,7 +11,7 @@ else
 	COMPILER=ifort.inc
 endif
 
-include ${BFMDIR}/compilers/$(COMPILER)
+include ../../compilers/$(COMPILER)
 
 .DEFAULT:
 	-touch $@

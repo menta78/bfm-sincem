@@ -26,10 +26,10 @@
 #else
   use mem, ONLY: iiPel, O3h, O3c, D3STATE, jsurO3c, CO2airflux,    &
                  Depth, flux_vector, DIC, ALK,                     &
-                 Source_D3_vector, ppO5c, ppN3n, ppN4n
+                 Source_D3_vector, ppO5c, ppN3n, ppN4n, BIOALK
   use mem, ONLY: ppO3h, ppO3c, NO_BOXES, NO_BOXES_XY, BoxNumber,   &
     N1p,N5s,CO2, HCO3, CO3, pCO2, pH, ETW, ESW, ERHO, EWIND, EICE, &
-    OCalc, OArag, EPR, ppO5c, O5c, EPCO2air, dissO5c, ffCO2
+    OCalc, OArag, EPR, ppO5c, O5c, EPCO2air, dissO5c, ffCO2, dpco2
 #endif
   use mem_CO2    
   use mem_CSYS, ONLY : CarbonateSystem
@@ -57,7 +57,7 @@
 !
 ! COPYING
 !   
-!   Copyright (C) 2020 BFM System Team (bfm_st@cmcc.it)
+!   Copyright (C) 2017 BFM System Team (bfm_st@lists.cmcc.it)
 !
 !   This program is free software; you can redistribute it and/or modify
 !   it under the terms of the GNU General Public License as published by
@@ -131,6 +131,7 @@
   if ( CalcBioAlk ) then
      rateN(:) = - Source_D3_vector(ppN3n) + Source_D3_vector(ppN4n)
      call flux_vector( iiPel, ppO3h,ppO3h, rateN)
+     BIOALK(:) = rateN(:)
   endif 
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -151,6 +152,7 @@
   ! Computes Atmospheric pCO2 value
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   EPCO2air(:) = AirpGas(AtmCO2%fnow, patm3d(SRFindices), ETW(SRFindices), ESW(SRFindices))
+  dpco2(:) = EPCO2air(:) - pCO2(SRFindices)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Computes air-sea flux (only at surface points)

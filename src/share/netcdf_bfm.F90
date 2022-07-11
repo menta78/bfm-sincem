@@ -172,7 +172,7 @@
    fname = TRIM(out_dir) //'/'// TRIM(title) // '.' // ext
    LEVEL2 'Output NetCDF file is (time unit is set to seconds):'
    LEVEL2 TRIM(fname)
-   call check_err(NF90_CREATE(fname,NF90_NETCDF4,ncid_bfm), fname)
+   call check_err(NF90_CREATE(fname,NF90_64BIT_OFFSET,ncid_bfm), fname)
 
    ncdf_time_unit = time_unit
 
@@ -413,7 +413,7 @@
    fname = './'// TRIM(title) // '.' // ext
    LEVEL2 'Restart NetCDF file is :'
    LEVEL2 TRIM(fname)
-   call check_err(NF90_CREATE(fname,NF90_NETCDF4,ncid_rst), fname)
+   call check_err(NF90_CREATE(fname,NF90_64BIT_OFFSET,ncid_rst), fname)
 
    ncdf_time_unit = time_unit
 

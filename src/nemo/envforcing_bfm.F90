@@ -126,8 +126,9 @@ IMPLICIT NONE
 
    ! print control on received fluxes
    IF ( (kt-nit000)<20 .OR. MOD(kt,200)==0 .OR. kt==nitend) THEN
-      write(LOGUNIT,'(a,i14,a,f10.4,a,f10.3)') 'envforcing_bfm - Step ', kt,  & 
-         '  Air_xCO2: ',maxval(AtmCO2%fnow), '  SLP:', maxval(AtmSLP%fnow) 
+      write(LOGUNIT,'(a,i14,a,f10.4,a,f10.3,a,f10.3)') 'envforcing_bfm - Step ', kt,  & 
+         '  Air_xCO2: ',maxval(AtmCO2%fnow), '  SLP:', maxval(AtmSLP%fnow),   &
+         ' EIR: ',maxval(EIR) 
    ENDIF
 #endif
 
