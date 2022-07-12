@@ -66,7 +66,7 @@ use mem_Settling
 !
 ! COPYING
 !   
-!   Copyright (C) 2020 BFM System Team (bfm_st@cmcc.it)
+!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
 !   Copyright (C) 2006 P. Ruardij, the BFM team
 !   (rua@nioz.nl, vichi@bo.ingv.it)
 !

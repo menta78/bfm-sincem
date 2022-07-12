@@ -734,6 +734,6 @@ contains
  end module api_bfm
 
  !-----------------------------------------------------------------------
- !Copyright (C) 2020 BFM System Team (bfm_st@cmcc.it)
+ !Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
  !Copyright (C) 2006 - Marcello Vichi
 

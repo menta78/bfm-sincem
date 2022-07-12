@@ -47,7 +47,7 @@
 !
 ! COPYING
 !   
-!   Copyright (C) 2020 BFM System Team (bfm_st@cmcc.it)
+!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
 !   Copyright (C) 2007 P. Ruardij  (rua@nioz.nl)
 !
 !   This program is free software; you can redistribute it and/or modify
