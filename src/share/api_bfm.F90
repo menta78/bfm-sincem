@@ -228,8 +228,6 @@
    real(RLEN),allocatable,dimension(:,:,:),public :: rtmp3Db
 #endif
 
-   CHARACTER(len=PATH_MAX) :: git_commit_id
-   CHARACTER(len=PATH_MAX) :: git_branch_name
 !
 ! !REVISION HISTORY:
 !  Author(s): Marcello Vichi and Piet Ruardij
@@ -394,7 +392,6 @@ contains
    LEVEL1 '               BFM System Team                 '
    LEVEL1 ' '
    LEVEL1 ' '
-
    LEVEL1 'Step 1 - INITIALIZATION (init_bfm)'
    LEVEL1 ' '
 #ifdef BFM_PARALLEL

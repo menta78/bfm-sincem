@@ -94,7 +94,7 @@
                                           suR2,cuR6,cuR1,iN1p,iNIn,iN, &
                                           eN1p,eN4n,huln, hulp, bacc, &
                                           tfluxC, tfluxN, tfluxP, pe_N4n, &
-                                          pe_N1p, pe_R6c,degR3c
+                                          pe_N1p, pe_R6c, degR3c
 #ifndef INCLUDE_PELCO2
   integer,parameter :: ppO3c = 0
 #endif
