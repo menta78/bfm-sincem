@@ -29,7 +29,7 @@
                  Source_D3_vector, ppO5c, ppN3n, ppN4n, BIOALK
   use mem, ONLY: ppO3h, ppO3c, NO_BOXES, NO_BOXES_XY, BoxNumber,   &
     N1p,N5s,CO2, HCO3, CO3, pCO2, pH, ETW, ESW, ERHO, EWIND, EICE, &
-    OCalc, OArag, EPR, ppO5c, O5c, EPCO2air, dissO5c, ffCO2, dpco2
+    OCalc, OArag, EPR, ppO5c, O5c, EPCO2air, ffCO2, dpco2
 #endif
   use mem_CO2    
   use mem_CSYS, ONLY : CarbonateSystem
@@ -53,11 +53,11 @@
   integer            :: error=0
   integer,save       :: first=0
   integer            :: AllocStatus
-  real(RLEN),allocatable,save,dimension(:) :: rateN, excess, xflux
+  real(RLEN),allocatable,save,dimension(:) :: rateN, excess, rdiss, xflux
 !
 ! COPYING
 !   
-!   Copyright (C) 2017 BFM System Team (bfm_st@lists.cmcc.it)
+!   Copyright (C) 2020 BFM System Team (bfm_st@cmcc.it)
 !
 !   This program is free software; you can redistribute it and/or modify
 !   it under the terms of the GNU General Public License as published by
@@ -76,7 +76,8 @@
   ! Allocate local memory
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   if (first==0) then
-     ALLOCATE ( rateN(NO_BOXES), excess(NO_BOXES),  xflux(NO_BOXES), &
+     ALLOCATE ( rateN(NO_BOXES), excess(NO_BOXES), rdiss(NO_BOXES),  &
+        &      xflux(NO_BOXES),                                      &
         &      STAT = AllocStatus )
      IF( AllocStatus /= 0 ) call bfm_error('PelagicCSYS','Error allocating arrays')
      first=1
@@ -140,12 +141,12 @@
   ! Compute undersaturation
   excess(:) = max(ZERO,ONE - OCalc(:))
   ! Dissolution rate of C in CaCO3 (mg C/m3/d) from Morse and Berner (1972)
-  dissO5c(:) = p_kdca * excess(:)**p_nomega * O5c(:)
+  rdiss(:) = p_kdca * excess(:)**p_nomega * O5c(:)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Inorganic carbon and alkalinity flux due to PIC changes
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  call flux_vector( iiPel, ppO5c, ppO3c, dissO5c(:) )
-  call flux_vector( iiPel, ppO3h, ppO3h, C2ALK*dissO5c(:) )
+  call flux_vector( iiPel, ppO5c, ppO3c, rdiss(:) )
+  call flux_vector( iiPel, ppO3h, ppO3h, C2ALK*rdiss(:) )
 
   if (SRFindices(1) .eq. 0 ) return
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=

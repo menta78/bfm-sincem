@@ -223,7 +223,6 @@ end
    #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
    # Other diagnostics
    #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    dissO5c : Calcite dissolution: mg C/m3/d
     ffCO2 : CO2 fugacity   : uatm
     BFM1D_exR2ac(PhytoPlankton) : activity exudation to R2 : mg C/ m3/d
     BAC_ACT_FACT : Bacteria activity factor depth dependent
