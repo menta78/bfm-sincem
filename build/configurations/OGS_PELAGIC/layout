@@ -42,7 +42,7 @@ end
 end
 
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-#       PHYSICAL VARIABLES
+#                          PHYSICAL VARIABLES
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 2d-variable-pel
   ThereIsLight : Switch for day/night cycle : -
@@ -61,7 +61,7 @@ end
 end
 
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-#       PELAGIC STATE VARIABLES (volume)
+#                            PELAGIC SYSTEM
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 3d-state-pel
   #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -128,7 +128,7 @@ end
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 3d-state-pel -if-exist INCLUDE_PELCO2
   group Inorganic[ch] (CAR): mg C/m3 : mmol eq/m3
-     O3     : Dissolved Inorganic Carbon: Alkalinity
+     O3     : Dissolved Inorganic Carbon : Alkalinity
      O5[-h] : Calcite
   end
 end
@@ -136,6 +136,8 @@ end
 2d-variable-pel -if-exist INCLUDE_PELCO2
   EPCO2air   : Atmospheric CO2 Partial Pressure : uatm
   CO2airflux : Sea-air CO2 Flux : mmol/m2/d
+  ffCO2      : CO2 fugacity   : uatm
+  dpco2      : Air-Sea pCO2 difference :uatm
 end
 
 3d-variable-pel -if-exist INCLUDE_PELCO2
@@ -151,12 +153,12 @@ end
 end
 
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-#       GENERAL DIAGNOSTICS
+#   Support variables for Pelagic system
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 3d-variable-pel
 
     #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    # Variables to check totmass of C N P Si in pelagic
+    # Variables to check total mass in pelagic
     #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     totpel[cnps]  : Total Mass in Pelagic: g C: g N: g P: g Si
 
@@ -207,6 +209,7 @@ end
     sediMIZ(MicroZooPlankton) : MicroZooPlankton sedimentation rate:m/d
     sediMEZ(MesoZooPlankton)  : MesoZooPlankton sedimentation rate :m/d
     sediR2                    : Colloidal OMT sedimentation rate   :m/d
+    sediR3                    : Refractory OMT sedimentation rate  :m/d
     sediR6                    : Detritus sedimentation rate        :m/d
     sediO5                    : Calcite sedimentation rate         :m/d
 
@@ -222,10 +225,14 @@ end
    #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
    # Other diagnostics
    #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    ffCO2 : CO2 fugacity   : uatm
-    BFM1D_exR2ac(PhytoPlankton) : activity exudation to R2 : mg C/ m3/d
-    BAC_ACT_FACT : Bacteria activity factor depth dependent
+    BGE                      : Bac growth efficiency : -
+    BIOALK                   : O3h biological rate of change: mmol/m3
+    exPPYR2ac(PhytoPlankton) : activity exudation to R2 : mg C/ m3/d
+    BAC_ACT_FACT             : Bacteria activity factor depth dependent
+end
 
+2d-variable-pel
+    dpo2      : Air-Sea pO2 difference :atm
 end
 
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -267,12 +274,6 @@ end
   totsysn  : total mass :  g N
   totsysp  : total mass :  g P
   totsyss  : total mass :  g Si
-end
-
-1d-variable -if-exist BFM_OGS
-  #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  # OGS 1d variables
-  #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 end
 
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
