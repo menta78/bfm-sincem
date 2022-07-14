@@ -10,7 +10,6 @@
 !   !
 !   Define parameters and control for sinking of 3D pelagic variables
 !
-#include "cppdefs.h"
 ! !INTERFACE
   module mem_PelSinkSet
 !

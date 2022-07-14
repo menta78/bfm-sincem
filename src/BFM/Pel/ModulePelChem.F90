@@ -19,7 +19,7 @@
 !
 ! !USES:
   use global_mem
-  use mem,        only: D3STATETYPE, ppO4n
+  use mem,        only: D3STATETYPE, ppO4n, ppN6r
 !  
 !
 ! !AUTHORS
@@ -138,7 +138,11 @@
   ! Disable the transport of O4n as it is only a sink of nitrogen (NO3 -> N2)
   D3STATETYPE(ppO4n)=NOTRANSPORT
   LEVEL1 " Disable O4n transport as it used only for mass balance"
-
+  ! Disable the transport of N6r if denitrification is disabled
+  if ( (p_rOS .le. ZERO) .and. (p_sN3O4n .le. ZERO) ) then
+     D3STATETYPE(ppN6r)=NOTRANSPORT
+     LEVEL1 " Disable N6r transport as denitrification is not used (p_rOS & p_sN3O4n = ZERO)"
+  endif
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   !END compute
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
