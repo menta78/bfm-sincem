@@ -96,7 +96,7 @@
                                           suR2,cuR6,cuR1,iN1p,iNIn,iN, &
                                           eN1p,eN4n,huln, hulp, bacc, &
                                           tfluxC, tfluxN, tfluxP, pe_N4n, &
-                                          pe_N1p, pe_R6c, degR3c
+                                          pe_N1p, pe_R6c
 #ifndef INCLUDE_PELCO2
   integer,parameter :: ppO3c = 0
 #endif
@@ -416,9 +416,9 @@
   end select
 #ifdef BFM_OGS
   ! Degradation of R3c ( time scale 100 years)
-  tfluxC = 1/(200.0D0*365.D0) * BAC_ACT_FACT * R3c
-  call flux_vector(iiPel, ppR3c,    ppO3c, tfluxC)
-  call flux_vector(iiPel, ppO2o,    0    , tfluxC/ MW_C)
+  rrc = 1/(200.0D0*365.D0) * BAC_ACT_FACT * R3c
+  call flux_vector(iiPel, ppR3c,    ppO3c, rrc)
+  call flux_vector(iiPel, ppO2o,    0    , rrc/ MW_C)
 #endif
 
   if ( ppbacn == 0 .or. ppbacp == 0 ) then
