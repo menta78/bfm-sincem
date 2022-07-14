@@ -45,7 +45,7 @@ MODULE trcini_my_trc
    IMPLICIT NONE
    PRIVATE
 
-   PUBLIC   trc_ini_my_trc   ! called by trcini.F90 module
+   PUBLIC   trc_ini_my_trc, log_bgc_stats   ! called by trcini.F90 module
 
    !!----------------------------------------------------------------------
    !! NEMO/TOP 4.0 , NEMO Consortium (2018)
@@ -144,7 +144,8 @@ CONTAINS
       ! Transfer BFM ICs to passive tracers array
       !-------------------------------------------------------
       DO jn = 1, NO_D3_BOX_STATES
-         tr(:,:,:,var_map(jn),Kmm) = unpack(D3STATE(jn,:), SEAmask, ZEROS)
+         if (var_map(jn) > 0) & 
+            tr(:,:,:,var_map(jn),Kmm) = unpack(D3STATE(jn,:), SEAmask, ZEROS)
       ENDDO
 
       ! Restart handled by nemo
@@ -177,7 +178,6 @@ CONTAINS
       ! Zero out fields if cpu is off
       !-------------------------------------------------------
       IF( SkipBFMCore ) tr(:,:,:,:,Kmm) = ZERO
-
 
       ! Initialise DATA output netcdf file(s)
       !-------------------------------------------------------
@@ -260,5 +260,51 @@ CONTAINS
       !
    END FUNCTION trc_ini_my_trc_alloc
 
+
+   SUBROUTINE log_bgc_stats(kt, Kmm)
+      !!----------------------------------------------------------------------
+      !!                 ***  log_bgc_stats  ***
+      !!
+      !! ** Purpose :  save to log file summary stats of 3D pelagic BGC fields
+      !!
+      !! ** Method  : -
+      !!----------------------------------------------------------------------
+      USE api_bfm,    ONLY: var_names, stPelStateS, parallel_rank
+      !
+      INTEGER, INTENT(in) :: kt   ! ocean time-step index
+      INTEGER, INTENT(in) :: Kmm  ! time level indices
+      INTEGER :: jn, jk
+      REAL(wp) :: ztraf, zmin, zmax, zmean
+      REAL(wp), DIMENSION(jpi,jpj,jpk) :: zvol
+      !!----------------------------------------------------------------------
+
+      LEVEL1 'Global statistics on tracer at beginning of step: ' , kt
+
+      DO jk = 1, jpk
+         zvol(:,:,jk) = e1e2t(:,:) * e3t(:,:,jk,Krhs) * tmask(:,:,jk)
+      END DO
+
+      DO jn = 1, jp_bgc
+         ztraf = glob_sum( 'log_bgc_stats', tr(:,:,:,jn,Kmm) * zvol(:,:,:) )
+         zmin  = MINVAL( tr(:,:,:,jn,Kmm), mask= ((tmask*SPREAD(tmask_i,DIM=3,NCOPIES=jpk).NE.0.)) )
+         zmax  = MAXVAL( tr(:,:,:,jn,Kmm), mask= ((tmask*SPREAD(tmask_i,DIM=3,NCOPIES=jpk).NE.0.)) )
+         zmin  = MINVAL( tr(:,:,:,jn,Kmm), mask= ((tmask*SPREAD(tmask_i,DIM=3,NCOPIES=jpk).NE.0.)) )
+         zmax  = MAXVAL( tr(:,:,:,jn,Kmm), mask= ((tmask*SPREAD(tmask_i,DIM=3,NCOPIES=jpk).NE.0.)) )
+         IF( lk_mpp ) THEN
+            CALL mpp_min( 'log_bgc_stats', zmin )      ! min over the global domain
+            CALL mpp_max( 'log_bgc_stats', zmax )      ! max over the global domain
+         END IF
+         zmean  = ztraf / areatot
+
+         IF (bfm_lwp) &
+            WRITE(LOGUNIT,9000) jn, trim(var_names(stPelStateS+jn-1)), zmean, zmin, zmax
+      ENDDO
+
+      LEVEL1 ''
+      call FLUSH(LOGUNIT)
+
+9000  FORMAT(' STAT tracer nb :',i2,'    name :',a10,'    mean :',e18.10,'    min :',e18.10, '    max :',e18.10)
+
+   END SUBROUTINE log_bgc_stats
    !!======================================================================
 END MODULE trcini_my_trc

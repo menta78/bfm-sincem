@@ -10,7 +10,7 @@ MODULE trcset
    USE oce_trc
    USE trc              ! ocean passive tracers variables
    ! BFM
-   USE global_mem, ONLY: LOGUNIT, bfm_lwp, RLEN, ZERO, SkipBFMCore
+   USE global_mem, ONLY: LOGUNIT, bfm_lwp, RLEN, ZERO
    use constants,  ONLY: DAY_PER_SEC, SEC_PER_DAY
    USE time,       ONLY: bfmtime
 

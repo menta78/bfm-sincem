@@ -26,7 +26,7 @@ SUBROUTINE trc_nam_bfm()
 #ifdef INCLUDE_SEAICE
    USE mem,        ONLY: NO_BOXES_Z_ICE, NO_BOXES_ICE, NO_STATES_ICE
 #endif
-   
+   USE bfm_error_msg 
 #ifdef CCSMCOUPLED
    USE nemogcm, ONLY: logfile
 #endif
@@ -162,6 +162,7 @@ SUBROUTINE trc_nam_bfm()
      SkipBFMCore = .TRUE.
      WRITE (LOGUNIT,'(a,1x,i8,1x,a)') 'No ocean point in core :', parallel_rank, &
            '. Disable BFM core computation.'
+     call bfm_error('trcnam_bfm','Coupling not working with land domain included')
      ! set to zero nemo passive tracers array
      tr(:,:,:,:,:) = ZERO
    ENDIF

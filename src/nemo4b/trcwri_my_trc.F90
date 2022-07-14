@@ -60,15 +60,15 @@ CONTAINS
       CHARACTER (len=20)   :: cltra
       INTEGER              :: jn, jl, jx
       !!---------------------------------------------------------------------
- 
+
       ! State variables
       !-------------------------------------------------------
       DO jn = stPelStateS, stPelStateE
          jl = jn - stPelStateS + 1
-         IF (D3STATETYPE(jn) .EQ. 0) THEN
-            call iom_put ( TRIM(var_names(jn)) , unpack(D3STATE(jl,:),SEAmask,ZEROS) )
+         IF (var_map(jl) .EQ. 0) THEN
+            call iom_put ( TRIM(var_names(jl)) , unpack(D3STATE(jl,:),SEAmask,ZEROS) )
          ELSE
-            call iom_put ( TRIM(var_names(jn)) , tr(:,:,:,var_map(jn),Kmm))
+            call iom_put ( TRIM(var_names(jl)) , tr(:,:,:,var_map(jl),Kmm))
          ENDIF
       ENDDO
       DO jn = stBenStateS, stBenStateE

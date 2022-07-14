@@ -19,7 +19,6 @@ MODULE trcrst
    !!   trc_rst_wri    : write restart file
    !!----------------------------------------------------------------------
    USE par_trc        ! need jptra, number of passive tracers
-   !USE par_my_trc        ! need jptra, number of passive tracers
    USE oce_trc
    USE trc
    USE iom

@@ -24,7 +24,7 @@ MODULE trcsms_my_trc
    USE iom,            ONLY: iom_put
    ! BFM
    USE trcopt_bfm, ONLY: trc_opt_2bds, trc_opt_3bds
-   USE global_mem, ONLY: LOGUNIT, bfm_lwp, RLEN, ZERO, SkipBFMCore
+   USE global_mem, ONLY: LOGUNIT, bfm_lwp, RLEN, ZERO
    USE constants,  ONLY: SEC_PER_DAY
    USE time,       ONLY: bfmtime
 
@@ -54,7 +54,6 @@ CONTAINS
       INTEGER, INTENT(in) ::   kt   ! ocean time-step index
       INTEGER, INTENT(in) ::   Kbb, Kmm, Krhs  ! time level indices
       INTEGER ::   ji, jj, jn   ! dummy loop index
-      REAL(wp), ALLOCATABLE, DIMENSION(:,:,:) :: ztrmyt
       !!----------------------------------------------------------------------
       !
       IF( ln_timing )   CALL timing_start('trc_sms_my_trc')
@@ -64,10 +63,6 @@ CONTAINS
          IF(lwp) WRITE(numout,*) 'trc_sms_my_trc:  BFM ecosystem dynamics'
          IF(lwp) WRITE(numout,*) '~~~~~~~~~~~~~~'
       ENDIF
-
-      ! Skip BFM computation if no ocean points
-      !-------------------------------------------------------
-      IF ( SkipBFMCore ) return
 
       ! Set diagnostic fields to be saved
       !-------------------------------------------------------

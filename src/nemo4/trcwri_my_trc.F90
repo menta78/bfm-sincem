@@ -14,7 +14,7 @@ MODULE trcwri_my_trc
    USE trc         ! passive tracers common variables 
    USE iom         ! I/O manager
    ! BFM
-   USE global_mem, ONLY: LOGUNIT, bfm_lwp, SkipBFMCore
+   USE global_mem, ONLY: LOGUNIT, bfm_lwp
    USE time,       ONLY: bfmtime
    USE api_bfm,    ONLY: stStart, stEnd, var_names,                 &
 #if defined INCLUDE_SEAICE
@@ -97,7 +97,7 @@ CONTAINS
          call CloseCO2()
 #endif
          ! clear main memory
-         IF ( .NOT. SkipBFMCore ) call ClearMem
+         call ClearMem
 
          LEVEL1 ' '
          LEVEL1 '-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'

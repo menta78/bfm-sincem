@@ -26,7 +26,7 @@ MODULE trcini_my_trc
    USE mem_param,  ONLY: p_atm0
    USE mem,        ONLY: D3STATE, NO_D3_BOX_STATES, D2STATE_BEN, NO_D2_BOX_STATES_BEN, iiPhytoPlankton
    USE mem_PAR,    ONLY: p_PAR, ChlAttenFlag, LightLocationFlag
-   USE global_mem, ONLY: RLEN, ZERO, LOGUNIT, SkipBFMCore, bfm_lwp
+   USE global_mem, ONLY: RLEN, ZERO, LOGUNIT, bfm_lwp
    USE api_bfm,    ONLY: bfm_init, in_rst_fname, InitVar, var_names, stBenStateS
    USE mem_globalfun, ONLY: analytical_ic
    USE init_var_bfm_local, ONLY: ini_organic_quotas
@@ -189,11 +189,6 @@ CONTAINS
       !-------------------------------------------------------
       IF (AtmCO2%init .NE. 3) atm_co2 = AtmCO20
 #endif
-
-      ! Zero out fields if cpu is off
-      !-------------------------------------------------------
-      IF( SkipBFMCore ) tr(:,:,:,:,Kmm) = ZERO
-
 
       ! Initialise DATA output netcdf file(s)
       !-------------------------------------------------------

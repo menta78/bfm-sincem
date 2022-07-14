@@ -14,7 +14,7 @@ SUBROUTINE trc_nam_bfm()
    USE par_my_trc, ONLY: var_map, jp_bgc_b, bottom_level, bfm_iomput
    ! BFM
    USE constants,  ONLY: SEC_PER_DAY
-   USE global_mem, ONLY: RLEN, ZERO, LOGUNIT, SkipBFMCore, bfm_lwp, ALLTRANSPORT
+   USE global_mem, ONLY: RLEN, ZERO, LOGUNIT, bfm_lwp, ALLTRANSPORT
    USE api_bfm,    ONLY: parallel_rank, bio_setup, SEAmask, init_bfm, stPelStateS, stPelStateE, &
                          save_delta, time_delta, out_delta, update_save_delta, &
                          InitVar, var_names, var_long, var_units, SRFindices, BOTindices, &
@@ -92,8 +92,8 @@ SUBROUTINE trc_nam_bfm()
    NO_BOXES_X  = 1 ! jpi
    NO_BOXES_Y  = 1 ! jpj
    NO_BOXES_Z  = jpk
-   NO_BOXES    = jpk !count(SEAmask)
-   NO_BOXES_XY = 1 !count(SEAmask(:,:,1))
+   NO_BOXES    = jpk
+   NO_BOXES_XY = 1
    NO_STATES   = NO_D3_BOX_STATES * NO_BOXES
 
    NO_BOXES_Z_BEN  = 1
@@ -130,16 +130,6 @@ SUBROUTINE trc_nam_bfm()
    ! Allocate memory and read initial & boundary conditions setting
    !-------------------------------------------------------
    CALL init_var_bfm(bio_setup)
-
-   ! Disable BFM over land domains (no oceanpoints)
-   !-------------------------------------------------------
-   IF (NO_BOXES == 0 ) THEN
-     SkipBFMCore = .TRUE.
-     WRITE (LOGUNIT,'(a,1x,i8,1x,a)') 'No ocean point in core :', parallel_rank, &
-           '. Disable BFM core computation.'
-     ! set to zero nemo passive tracers array
-     tr(:,:,:,:,:) = ZERO
-   ENDIF
 
    ! Set output stepping
    !-------------------------------------------------------
