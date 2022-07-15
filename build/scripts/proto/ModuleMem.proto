@@ -452,9 +452,7 @@
 %2d-groupfunctions-ben
 
 
-#ifdef BFM_ROMS
-#include "FluxFunctions.h"
-#elif defined EXPLICIT_SINK
+#ifdef EXPLICIT_SINK
 #include "FluxFunctions_sourcesink.h90"
 #else
 #include "FluxFunctions.h90"
