@@ -24,7 +24,7 @@ LOGFILE=logfile_$$.log
 LOGDIR="Logs"
 
 #local paths
-VER="4" # NEMO coupling version
+VER="" # NEMO coupling version
 TEMPDIR="build/tmp"
 CONFDIR="build/configurations"
 SCRIPTSDIR="build/scripts"
@@ -290,7 +290,7 @@ echo "BFMDIR is ${BFMDIR}"
 # NEMO specific info
 if [[ "$MODE" == "NEMO" ]]; then 
     echo "NEMODIR is ${NEMODIR}"
-    if [ "x${VER}" == "x" ] ; then
+    if [ "x${VER}" == "x3" ] ; then
        echo "use NEMO coupling for version 3.6"
        cmd_mknemo="${NEMODIR}/NEMOGCM/CONFIG/${MKNEMO} -n ${PRESET}"
        NEMODIRCFG="${NEMODIR}/NEMOGCM/CONFIG/"
