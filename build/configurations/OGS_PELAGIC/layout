@@ -136,7 +136,6 @@ end
 2d-variable-pel -if-exist INCLUDE_PELCO2
   EPCO2air   : Atmospheric CO2 Partial Pressure : uatm
   CO2airflux : Sea-air CO2 Flux : mmol/m2/d
-  ffCO2      : CO2 fugacity   : uatm
   dpco2      : Air-Sea pCO2 difference :uatm
 end
 
@@ -150,6 +149,7 @@ end
     pH         : pH : -
     OCalc      : Saturation state of Calcite : -
     OArag      : Saturation state of Aragonite : -
+    ffCO2      : CO2 fugacity   : uatm
 end
 
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

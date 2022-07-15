@@ -119,7 +119,7 @@ end
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 3d-state-pel -if-exist INCLUDE_PELCO2
   group Inorganic[ch] (CAR): mg C/m3 : mmol eq/m3
-     O3     : Dissolved Inorganic Carbon: Alkalinity
+     O3     : Dissolved Inorganic Carbon : Alkalinity
      O5[-h] : Calcite
   end
 end
@@ -141,6 +141,7 @@ end
 2d-variable-pel -if-exist INCLUDE_PELCO2
   EPCO2air   : Atmospheric CO2 Partial Pressure : uatm
   CO2airflux : Sea-air CO2 Flux : mmol/m2/d
+  dpco2      : Air-Sea pCO2 difference :uatm
 end
 
 3d-variable-pel -if-exist INCLUDE_PELCO2
@@ -153,6 +154,7 @@ end
     pH         : pH : -
     OCalc      : Saturation state of Calcite : -
     OArag      : Saturation state of Aragonite : -
+    ffCO2      : CO2 fugacity   : uatm
 end
 
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -175,7 +177,6 @@ end
     # Diagnostic collective variables 
     #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     Chla : Chlorophyll-a : mg Chl/m3
-    sunPPY(PhytoPlankton) : Specific Net Production of PhytoPlankton : 1/d
 
     #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     # Water column diagnostic rates
@@ -217,12 +218,14 @@ end
     sediMIZ(MicroZooPlankton) : MicroZooPlankton sedimentation rate:m/d
     sediMEZ(MesoZooPlankton)  : MesoZooPlankton sedimentation rate :m/d
     sediR2                    : Colloidal OMT sedimentation rate   :m/d
+    sediR3                    : Refractory OMT sedimentation rate  :m/d
     sediR6                    : Detritus sedimentation rate        :m/d
     sediO5                    : Calcite sedimentation rate         :m/d
 
    #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
    # Light diagnostics
    #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    sunPPY(PhytoPlankton) : Specific Net Production of PhytoPlankton : 1/d
     eiPPY(PhytoPlankton)  : Regulating Factor for Light in PhytoPlankton : -
     xEPS                  : Total Extinction Coefficient : 1/m
     ELiPPY(PhytoPlankton) : Optimal light in PhytoPlankton : W/m2
@@ -231,7 +234,12 @@ end
    #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
    # Other diagnostics
    #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    BGE    : Bac growth efficiency : -
+    BIOALK : O3h biological rate of change: mmol/m3
+end
 
+2d-variable-pel
+    dpo2      : Air-Sea pO2 difference :atm
 end
 
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

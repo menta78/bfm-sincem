@@ -151,8 +151,8 @@ end
     pH         : pH : -
     OCalc      : Saturation state of Calcite : -
     OArag      : Saturation state of Aragonite : -
+    ffCO2      : CO2 fugacity   : uatm
 end
-
 
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 #   Support variables for Pelagic system
@@ -174,7 +174,6 @@ end
     # Diagnostic collective variables 
     #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     Chla : Chlorophyll-a : mg Chl/m3
-    sunPPY(PhytoPlankton) : Specific Net Production of PhytoPlankton : 1/d
 
     #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     # Water column diagnostic rates
@@ -193,7 +192,7 @@ end
     qscPPY(PhytoPlankton)	: Quotum Si/C in Phytoplankton : mmol Si/mg C 
     qlcPPY(PhytoPlankton)	: Quotum Chl/C in Phytoplankton : mg Chl /mg C
     qfcPPY(PhytoPlankton)	: Quotum Fe/C in Phytoplankton : umol Fe/mg C
-    qccPPY(PhytoPlankton)   : Quotum PIC/POC in Phytoplankton : mg C/mg C
+    qccPPY(PhytoPlankton)       : Quotum PIC/POC in Phytoplankton : mg C/mg C
 
     qpcMEZ(MesoZooPlankton)	: Quotum P/C in Mesozooplankton :mmol P/mg C 
     qncMEZ(MesoZooPlankton)	: Quotum N/C in Mesozooplankton :mmol N/mg C 
@@ -205,7 +204,7 @@ end
     qncOMT(PelDetritus)		: Quotum N/C in Organic Matter:mmol P/mg C  
     qscOMT(PelDetritus)		: Quotum Si/C in Organic Matter:mmol Si/mg C
     qfcOMT(PelDetritus)		: Quotum Fe/C in Organic Matter:umol Fe/mg C
- 
+
     qpcPBA(PelBacteria)		: Quotum P/C in Pelagic Bacteria :mmol P/mg C  
     qncPBA(PelBacteria)		: Quotum N/C in Pelagic Bacteria :mmol N/mg C  
 
@@ -223,27 +222,22 @@ end
    #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
    # Light diagnostics
    #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    sunPPY(PhytoPlankton) : Specific Net Production of PhytoPlankton : 1/d
     eiPPY(PhytoPlankton)  : Regulating Factor for Light in PhytoPlankton : -
     xEPS                  : Total Extinction Coefficient : 1/m
     ELiPPY(PhytoPlankton) : Optimal light in PhytoPlankton : W/m2
     ABIO_eps              : Abiotic Extinction Coefficient : 1/m
-    DMS                   : Dimethyl sulfide  : pmol/m3
+
    #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-   # Dummy diagnostics
+   # Other diagnostics
    #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-   BRUM : Bac gross growth : mgC/m3/d
-   BRUT : Bac OM Uptake : mgC/m3/d
-   BGE : Bac growth efficiency : -
-   TEMP1 : MM limitation : -
-   TEMP2 : Rum (potUpt) : mgC/m3/d
-   TEMP3 : ruR1/rut  : 0-1
-   TEMP4 : B1 on R6  : mgC/m3
-   TEMP5 : B1 resp exclude : mgC/m3/d
-   BIOALK : O3h bio rate: mmol/m3
+    BGE    : Bac growth efficiency : -
+    BIOALK : O3h biological rate of change: mmol/m3
+    DMS    : Dimethyl sulfide  : pmol/m3
 end
 
 2d-variable-pel
-  dpo2      : Air-Sea pO2 difference :atm
+    dpo2      : Air-Sea pO2 difference :atm
 end
 
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
