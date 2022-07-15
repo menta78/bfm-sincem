@@ -1,6 +1,6 @@
 # GYRE_BFM: the standard BFM-NEMO coupling
 
-This version requires NEMO release 3.6 and above
+This version requires NEMO 4.2  and above
 It contains the following NEMO files in addition to the BFM files
 - namelist_cfg
 - namelist_top_cfg
