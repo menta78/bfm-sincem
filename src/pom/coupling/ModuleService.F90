@@ -66,9 +66,9 @@
 !
       IMPLICIT NONE
 ! 
-!     -----SURFACE NUTRIENTS-----
+!     -----SURFACE NUTRIENTS AND RUNOFF (ONLY USED IF NUTBC_MODE == 'SURFLUX')-----
 !
-      real(RLEN)                        :: PO4SURF,NO3SURF,NH4SURF,SIO4SURF
+      real(RLEN)                        :: PO4SURF,NO3SURF,NH4SURF,SIO4SURF,DISSURF
 !
 !     -----SUSPENDED INORGANIC MATTER PROFILE-----
 !

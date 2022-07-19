@@ -99,7 +99,7 @@
                    jbotN1p,jbotN4n,jbotN3n,                               &
                    jbotO2o,jbotO3c
 !
-     use POM, ONLY:SMOTH,KB,H,DTI,DZR,NRT,NBCBFM,UMOLBFM,NTP,GRAV,RHO
+     use POM, ONLY:SMOTH,KB,H,DTI,DZR,NRT,NBCBFM,UMOLBFM,NTP,GRAV,RHO,NUTSBC_MODE
 
 !     -----IMPLICIT TYPING IS NEVER ALLOWED-----
 !
@@ -148,8 +148,8 @@
 !
 !         -----LOAD BFM STATE VAR.-----
 !
-          fbio(:)  = D3STATE(m,:)
-          fbbio(:) = D3STATEB(m,:)
+          fbio(1:KB-1)  = D3STATE(m,:)
+          fbbio(1:KB-1) = D3STATEB(m,:)
 !
 !         -----ZEROING SINKING VELOCITY-----
 ! 
@@ -184,15 +184,26 @@
 !
                  case (ppN1p)
 !
-                      surflux = -(PO4SURF-n1p(1))*vrelax
+                      SELECT CASE (NUTSBC_MODE)
+                           CASE (1)
+                              surflux = -DISSURF/1000*PO4SURF    ! units: mmol/s/m^2
+                           CASE DEFAULT
+                              surflux = -(PO4SURF-n1p(1))*vrelax ! units: mmol/s/m^2
+                      END SELECT 
+
 !
-                      botflux = jbotN1p(1)/SEC_PER_DAY
+                      botflux = jbotN1p(1)/SEC_PER_DAY   
 !
 !                -----NITRATE-----
 !
                  case (ppN3n)
 !
-                      surflux = -(NO3SURF-n3n(1))*vrelax
+                      SELECT CASE (NUTSBC_MODE)
+                           CASE (1)
+                              surflux = -DISSURF/1000*NO3SURF    ! units: mmol/s/m^2
+                           CASE DEFAULT
+                              surflux = -(NO3SURF-n3n(1))*vrelax ! units: mmol/s/m^2
+                      END SELECT 
 
                       botflux = jbotN3n(1)/SEC_PER_DAY
 !
@@ -200,7 +211,12 @@
 !
                  case (ppN4n)
 !
-                      surflux = -(NH4SURF-n4n(1))*vrelax
+                      SELECT CASE (NUTSBC_MODE)
+                           CASE (1)
+                              surflux = -DISSURF/1000*NH4SURF    ! units: mmol/s/m^2
+                           CASE DEFAULT
+                              surflux = -(NH4SURF-n4n(1))*vrelax ! units: mmol/s/m^2
+                      END SELECT 
 !
                       botflux = jbotN4n(1)/SEC_PER_DAY
 !
@@ -208,7 +224,12 @@
 !
                  case (ppN5s)
 !
-                      surflux = -(SIO4SURF-n5s(1))*vrelax
+                      SELECT CASE (NUTSBC_MODE)
+                           CASE (1)
+                              surflux = -DISSURF/1000*SIO4SURF    ! units: mmol/s/m^2
+                           CASE DEFAULT
+                              surflux = -(SIO4SURF-n5s(1))*vrelax ! units: mmol/s/m^2
+                      END SELECT 
 !
 !               ***************************************************
 !               ***************************************************

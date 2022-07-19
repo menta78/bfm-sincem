@@ -57,7 +57,7 @@
 !
 ! -----MODULES (USE OF ONLY IS STRONGLY ENCOURAGED)-----
 !
-  use POM,ONLY: KB, ilong
+  use POM,ONLY: KB, ilong, NUTSBC_MODE
 !
   use global_mem, ONLY:RLEN
 !
@@ -125,6 +125,10 @@
 !     -----MONTHLY SURFACE SILICATE-----
 !
       REAL (RLEN),SAVE                       :: SIO4_1,SIO4_2
+!
+!     -----MONTHLY SURFACE DISCHARGE, used only if NUTSBC_MODE == 1 -----
+!     -------- units: kg/m2/s, as in nemo
+      REAL (RLEN),SAVE                       :: DIS_1,DIS_2
 !
 !     -----VERTICAL PROFILES OF INORGANIC SUSPENDED MATTER DATA-----
 !
@@ -228,7 +232,7 @@ contains
                      ilong,                                               &
                      RHO0
 !
-      use Service,ONLY: ISM,PO4SURF,NO3SURF,NH4SURF,SIO4SURF
+      use Service,ONLY: ISM,PO4SURF,NO3SURF,NH4SURF,SIO4SURF,DISSURF
 !
 ! -----IMPLICIT TYPING IS NEVER ALLOWED-----
 !
@@ -260,6 +264,8 @@ contains
         NH4_2        =ZERO
         SIO4_1       =ZERO
         SIO4_2       =ZERO
+        DIS_1        =ZERO
+        DIS_2        =ZERO
         TCLIM1(:)    =ZERO
         TCLIM2(:)    =ZERO
         SCLIM1(:)    =ZERO
@@ -377,14 +383,22 @@ contains
 !
 !         -----SURFACE NUTRIENTS-----
 !
-          READ(18,REC=ICOUNTF)   NO3_1,NH4_1,PO4_1,SIO4_1
-          READ(18,REC=ICOUNTF+1) NO3_2,NH4_2,PO4_2,SIO4_2
+          SELECT CASE (NUTSBC_MODE)
+             CASE (1)
+                  ! reading the surface concentration and the discharge
+                  READ(18,REC=ICOUNTF)   NO3_1,NH4_1,PO4_1,SIO4_1,DIS_1
+                  READ(18,REC=ICOUNTF+1) NO3_2,NH4_2,PO4_2,SIO4_2,DIS_2
+             CASE DEFAULT
+                  ! reading the surface concentration
+                  READ(18,REC=ICOUNTF)   NO3_1,NH4_1,PO4_1,SIO4_1
+                  READ(18,REC=ICOUNTF+1) NO3_2,NH4_2,PO4_2,SIO4_2
+          END SELECT
 #ifdef SAVEFORCING
-          write(400,'(1i8, 8e18.8)') ICOUNTF, WSU1,WSV1,SWRAD1,NO3_1,NH4_1,PO4_1,SIO4_1
+          write(400,'(1i8, 8e18.8)') ICOUNTF, WSU1,WSV1,SWRAD1,NO3_1,NH4_1,PO4_1,SIO4_1,DIS_1
           write(401,'(1i8,40e18.8)') ICOUNTF, ISM1
           write(402,'(1i8,40e18.8)') ICOUNTF, SCLIM1
           write(403,'(1i8,40e18.8)') ICOUNTF, TCLIM1
-          write(400,'(1i8, 8e18.8)') ICOUNTF+1, WSU2,WSV2,SWRAD2,NO3_2,NH4_2,PO4_2,SIO4_2
+          write(400,'(1i8, 8e18.8)') ICOUNTF+1, WSU2,WSV2,SWRAD2,NO3_2,NH4_2,PO4_2,SIO4_2,DIS_2
           write(401,'(1i8,40e18.8)') ICOUNTF+1, ISM2
           write(402,'(1i8,40e18.8)') ICOUNTF+1, SCLIM2
           write(403,'(1i8,40e18.8)') ICOUNTF+1, TCLIM2
@@ -480,6 +494,7 @@ contains
       NH4SURF  = NH4_1  + RATIOF * (NH4_2-NH4_1)
       PO4SURF  = PO4_1  + RATIOF * (PO4_2-PO4_1)
       SIO4SURF = SIO4_1 + RATIOF * (SIO4_2-SIO4_1)
+      DISSURF  = DIS_1  + RATIOF * (DIS_2-DIS_1)
 !
 !     -----END OF INTERPOLATION SECTION-----
 !
@@ -508,6 +523,7 @@ contains
          NH4_1      = NH4_2
          PO4_1      = PO4_2
          SIO4_1     = SIO4_2
+         DIS_1      = DIS_2
          ISM1(:)    = ISM2(:)
          TCLIM1(:)  = TCLIM2(:)
          SCLIM1(:)  = SCLIM2(:)
@@ -547,7 +563,14 @@ contains
 !
              SWRAD1=SWRAD1*(-ONE)/rcp
 !
-             READ(18,REC=1) NO3_1,NH4_1,PO4_1,SIO4_1
+             SELECT CASE (NUTSBC_MODE)
+                CASE (1)
+                     ! reading the surface concentration and the discharge
+                     READ(18,REC=1) NO3_1,NH4_1,PO4_1,SIO4_1, DIS_1
+                CASE DEFAULT
+                     ! reading the surface concentration
+                     READ(18,REC=1) NO3_1,NH4_1,PO4_1,SIO4_1
+             END SELECT
 !
              DO K = 1,KB
                 READ (20,REC=K) SCLIM1(K)
