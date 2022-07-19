@@ -82,14 +82,14 @@
                         ism_input,      & ! Inorganic suspended matter Initial Conditions
                         read_restart      ! Model restart file
 !
-     use pom, ONLY :    TB, SB, ZZ, H
+     use pom, ONLY :    TB, SB, ZZ, H, NUTSBC_MODE
 !
      use forcing, ONLY: WSU1,WSV1,                 &
                         ISM1,                      &
                         SCLIM1,                    &
                         TCLIM1,                    &
                         SWRAD1, WTSURF1,           &
-                        NO3_1,NH4_1,PO4_1, SIO4_1, &
+                        NO3_1,NH4_1,PO4_1, SIO4_1, DIS_1, &
                         QCORR1                     ! NO MORE IN USE!!!!!
 !
 !    -----IMPLICIT TYPING IS NEVER ALLOWED----
@@ -160,7 +160,12 @@
 !
 !    -----OPEN INORGANIC SUSPENDED MATTER FILE-----
 !
-     inquire(IOLENGTH=rlength) NO3_1,NH4_1,PO4_1,SIO4_1
+     SELECT CASE (NUTSBC_MODE)
+        CASE (1)
+           inquire(IOLENGTH=rlength) NO3_1,NH4_1,PO4_1,SIO4_1,DIS_1
+        CASE DEFAULT
+           inquire(IOLENGTH=rlength) NO3_1,NH4_1,PO4_1,SIO4_1
+     END SELECT
      open(18, file=surfNut_input, form='unformatted',access='direct',recl=rlength)
      write(6,*) 'open 18 done'
 
