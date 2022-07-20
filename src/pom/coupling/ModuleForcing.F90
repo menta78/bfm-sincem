@@ -585,7 +585,14 @@ contains
 !
 !        -----READ FOLLOWING MONTH-----
 !
-         READ(18,REC=ICOUNTF) NO3_2,NH4_2,PO4_2,SIO4_2
+         SELECT CASE (NUTSBC_MODE)
+            CASE (1)
+                 ! reading the surface concentration and the discharge
+                 READ(18,REC=ICOUNTF) NO3_2,NH4_2,PO4_2,SIO4_2, DIS_2
+            CASE DEFAULT
+                 ! reading the surface concentration
+                 READ(18,REC=ICOUNTF) NO3_2,NH4_2,PO4_2,SIO4_2
+         END SELECT
 !
          READ (11,REC=ICOUNTF) WSU2,WSV2
 !
@@ -606,7 +613,7 @@ contains
         end select
 !
 #ifdef SAVEFORCING
-          write(400,'(1i8, 8e18.8)') ICOUNTF, WSU2,WSV2,SWRAD2,NO3_2,NH4_2,PO4_2,SIO4_2
+          write(400,'(1i8, 8e18.8)') ICOUNTF, WSU2,WSV2,SWRAD2,NO3_2,NH4_2,PO4_2,SIO4_2,DIS_2
           flush(400)
 #endif
 !       -----POM UNITS-----
