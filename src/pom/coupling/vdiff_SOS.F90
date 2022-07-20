@@ -383,8 +383,12 @@
       do k=1, KB-1
 !
             ffbio(k)=max(p_small,ffbio(k))
-!
       end do
+
+      IF (NUTSBC_MODE .EQ. 1) THEN
+            ! removing laterally from the column an amount of constituent correspoinding to a flux of water equal to DISSURF
+            CALL SUBTRACT_LATERAL_FLUX(ffbio)
+      END IF
 !
 !     ---MIX SOLUTIONS AND RESTORE TIME SEQUENCE-----
 !
