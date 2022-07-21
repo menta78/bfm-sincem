@@ -360,6 +360,10 @@ real(RLEN)               :: CBC
 !
       real(RLEN), dimension(KB):: WTADV, WSADV
 !
+!
+!
+      CHARACTER(LEN=20)        :: NC_OUT_STARTTIME = '01-01-0000'
+!
       end module POM
 
 ! EOC

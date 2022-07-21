@@ -71,7 +71,8 @@
                   ihotst,  &
                   ALAT,    &
                   ZZ,      &
-                  DZZ
+                  DZZ,     &
+                  NC_OUT_STARTTIME
 !
    use global_mem, ONLY:ZERO, &
                         RLEN
@@ -266,7 +267,7 @@
 !  -----INITIALISE NETCDF OUTPUT-----
 !
    call init_netcdf_bfm(title=out_title,                      &
-                        start_time='01-01-0000',              &
+                        start_time=TRIM(NC_OUT_STARTTIME),              &
                         expinfo="BFM_POM",                    &
                         time_unit=0,                          &
                         lat=alat,                             &
@@ -323,7 +324,7 @@ if (bfm_init == 1) call read_rst_bfm(in_rst_fname)
 !      -----INITIALISE BFM RESTART FILE-----
 !
        call init_netcdf_rst_bfm(out_rst_fname,                            &
-                                start_time='01-01-0000',              &
+                                start_time=TRIM(NC_OUT_STARTTIME),              &
                                 time_unit=0,                          &
                                 lat=alat,                             &
                                 lon=alon,                             &

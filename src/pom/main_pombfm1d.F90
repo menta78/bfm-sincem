@@ -107,7 +107,8 @@
                      NRT,                                                 &
                      Z0B, CBCMIN, CBC,                                    &
                      D, DT,                                               &
-                     vonkarmann
+                     vonkarmann,                                          &
+                     NC_OUT_STARTTIME
 !
       use Service,ONLY: ilong, savef
 !
@@ -156,7 +157,7 @@
       NAMELIST /Params_POMBFM/ H,DTI,ALAT,IDIAGN,IDAYS,SMOTH,&
                                ihotst,UMOL,KL1,KL2,savef,NRT,NBCT,NBCS,NBCBFM,&
                                UMOL,UMOLT,UMOLS,UMOLBFM,NTP,TRT,SRT,UPPERH,SSRT, &
-                               CBCMIN,Z0B,NUTSBC_MODE
+                               CBCMIN,Z0B,NUTSBC_MODE,NC_OUT_STARTTIME
 !
       OPEN(namlst,file='pom_bfm_settings.nml',status='old',action='read')
       READ(namlst,nml=Params_POMBFM)
