@@ -6,7 +6,7 @@
 #BSUB -q _QUEUE_    # queue
 #BSUB -n _PROC_            # Number of CPUs
 #BSUB -P R000
-#BSUB -R "span[ptile=16]"
+#BSUB -R "span[ptile=36]"
 
 if [ _VERBOSE_ ]; then set -exv; fi
 
