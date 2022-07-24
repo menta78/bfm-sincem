@@ -77,10 +77,12 @@
                         Temp_input,     & ! Temperature Initial Conditions
                         Sprofile_input, & ! Time varying (monthly) salinity profiles
                         Tprofile_input, & ! Time varying (monthly) temperature profiles
+                        Cprofile_input, & ! Time varying (monthly) horizontal currents profiles (needed if NUTSBC_MODE == 1)
                         heat_input,     & ! Time varying (monthly) surface heat flux
                         surfNut_input,  & ! Time varying (monthly) surface nutrient
                         ism_input,      & ! Inorganic suspended matter Initial Conditions
-                        read_restart      ! Model restart file
+                        read_restart,   & ! Model restart file
+                        Cprofile_input_exist
 !
      use pom, ONLY :    TB, SB, ZZ, H, NUTSBC_MODE
 !
@@ -89,7 +91,8 @@
                         SCLIM1,                    &
                         TCLIM1,                    &
                         SWRAD1, WTSURF1,           &
-                        NO3_1,NH4_1,PO4_1, SIO4_1, DIS_1, &
+                        NO3_1,NH4_1,PO4_1, SIO4_1, & 
+                        DIS_1, CUR_1,              &
                         QCORR1                     ! NO MORE IN USE!!!!!
 !
 !    -----IMPLICIT TYPING IS NEVER ALLOWED----
@@ -112,6 +115,7 @@
                           Temp_input,     &
                           Sprofile_input, &
                           Tprofile_input, &
+                          Cprofile_input, &
                           heat_input,     &
                           surfNut_input,  &
                           read_restart
@@ -158,7 +162,7 @@
      open(21, file=heat_input, form='unformatted', access='direct', recl=rlength)
      write(6,*) 'open 21 done'
 !
-!    -----OPEN INORGANIC SUSPENDED MATTER FILE-----
+!    -----OPEN NUTRIENTS FILE-----
 !
      SELECT CASE (NUTSBC_MODE)
         CASE (1)
@@ -168,6 +172,20 @@
      END SELECT
      open(18, file=surfNut_input, form='unformatted',access='direct',recl=rlength)
      write(6,*) 'open 18 done'
+!
+!    -----OPEN CURRENTS SPEED PROFILE----
+!    ------(only if NUTSBC_MODE==1)
+     IF (NUTSBC_MODE .EQ. 1) THEN
+         inquire(file=Cprofile_input, exist=Cprofile_input_exist)
+         IF (Cprofile_input_exist) THEN
+             inquire(IOLENGTH=rlength) CUR_1(1)
+             open(35, file=Cprofile_input, form='unformatted',access='direct',recl=rlength)  
+             write(6,*) 'open 35 done'
+         ELSE
+             write(6,*) 'FILE "',Cprofile_input,'" NOT FOUND. ASSUMING A CONSTANT PROFILE FOR CURRENTS SPEED'
+         ENDIF
+     ENDIF
+!
 
       write(6,*) 'open units done'
 !

@@ -66,9 +66,12 @@
 !
       IMPLICIT NONE
 ! 
-!     -----SURFACE NUTRIENTS AND RUNOFF (ONLY USED IF NUTBC_MODE == 'SURFLUX')-----
+!     -----SURFACE NUTRIENTS AND RUNOFF (ONLY USED IF NUTBC_MODE == 1)-----
 !
       real(RLEN)                        :: PO4SURF,NO3SURF,NH4SURF,SIO4SURF,DISSURF
+!
+!     ----- Profiles of currens speed (ONLY USED IF NUTBC_MODE == 1)----
+      real(RLEN)                        :: CURRENTS_SPEED_PROF(KB-1) = 1 ! by default using a constant profile
 !
 !     -----SUSPENDED INORGANIC MATTER PROFILE-----
 !
@@ -86,9 +89,11 @@
                                            Temp_input,      &
                                            Sprofile_input,  &
                                            Tprofile_input,  &
+                                           Cprofile_input,  & ! file with horizontal currents speed profile, needed if NUTSBC_MODE == 1
                                            heat_input,      &
                                            surfNut_input,   &
                                            read_restart
+     logical      :: Cprofile_input_exist
 !
  end module Service
 !

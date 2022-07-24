@@ -71,6 +71,7 @@
                          Temp_input,     &
                          Sprofile_input, &
                          Tprofile_input, &
+                         Cprofile_input, &
                          heat_input,     &
                          surfNut_input,  &
                          read_restart
@@ -101,6 +102,7 @@
                             Temp_input,     &
                             Sprofile_input, &
                             Tprofile_input, &
+                            Cprofile_input, &
                             heat_input,     &
                             surfNut_input,  &
                             read_restart

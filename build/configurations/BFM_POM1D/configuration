@@ -29,7 +29,7 @@
         MODE    = 'POM1D',
         CPPDEFS = 'BFM_STANDALONE INCLUDE_PELCO2 INCLUDE_DIAG BFM_POM BFM_NOPOINTERS',
         ARCH    = 'gfortran.inc',
-        PROC    = 4,
+        PROC    = 8,
         EXP     = 'bfm_pom1d',
         BFMEXE  = 'bfm_pom.exe',
         EXPDIR  = 'MA21'
