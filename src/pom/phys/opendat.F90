@@ -81,8 +81,7 @@
                         heat_input,     & ! Time varying (monthly) surface heat flux
                         surfNut_input,  & ! Time varying (monthly) surface nutrient
                         ism_input,      & ! Inorganic suspended matter Initial Conditions
-                        read_restart,   & ! Model restart file
-                        Cprofile_input_exist
+                        read_restart      ! Model restart file
 !
      use pom, ONLY :    TB, SB, ZZ, H, NUTSBC_MODE
 !
@@ -176,14 +175,9 @@
 !    -----OPEN CURRENTS SPEED PROFILE----
 !    ------(only if NUTSBC_MODE==1)
      IF (NUTSBC_MODE .EQ. 1) THEN
-         inquire(file=Cprofile_input, exist=Cprofile_input_exist)
-         IF (Cprofile_input_exist) THEN
-             inquire(IOLENGTH=rlength) CUR_1(1)
-             open(35, file=Cprofile_input, form='unformatted',access='direct',recl=rlength)  
-             write(6,*) 'open 35 done'
-         ELSE
-             write(6,*) 'FILE "',Cprofile_input,'" NOT FOUND. ASSUMING A CONSTANT PROFILE FOR CURRENTS SPEED'
-         ENDIF
+        inquire(IOLENGTH=rlength) CUR_1(1)
+        open(35, file=Cprofile_input, form='unformatted',access='direct',recl=rlength)  
+        write(6,*) 'open 35 done'
      ENDIF
 !
 

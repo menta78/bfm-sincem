@@ -6,25 +6,22 @@
 ! For now a constant profile of lateral flux is assumed
       SUBROUTINE SUBTRACT_LATERAL_FLUX(CONC)
               USE GLOBAL_MEM, ONLY: RLEN, ZERO
-              USE POM, ONLY: DTI, KB, H
-              USE SERVICE, ONLY: DISSURF, CURRENTS_SPEED_PROF
+              USE POM, ONLY: DTI, KB, LENGTH_SCALE
+              USE SERVICE, ONLY: DISSURF, CURRENTS_SPEED
               IMPLICIT NONE
 
               ! CONC: concentration of a constituent
               REAL(RLEN), INTENT(INOUT) :: CONC(KB)  
-              REAL(RLEN) :: WT_LFLUX_BY_METER, CNST_LFLUX_BY_METER
+              REAL(RLEN) :: CNST_LFLUX
               INTEGER :: IK
 
-              WT_LFLUX_BY_METER = DISSURF/H ! water lateral flux by meter. Kg/m3/s
               DO IK = 1,KB-1
-                 CNST_LFLUX_BY_METER = WT_LFLUX_BY_METER/1000*CONC(IK) !constituent lateral flux by depth meter. mmol/m3/s
-                 ! adjusting by the vertical profile of currents speed
-                 CNST_LFLUX_BY_METER = CNST_LFLUX_BY_METER*CURRENTS_SPEED_PROF(IK) 
-                 !Units are divided by m2 as the 1d model is by surface unit
-                 ! If we multiply CNST_LFLUX_BY_METER by time, we can compare it immediately with CONC
+                 CNST_LFLUX = CURRENTS_SPEED(IK)*CONC(IK) !constituent lateral flux by depth meter. mmol/m2/s
+                 ! getting the rate of change in desnity by dividing by a length scale
+                 CNST_LFLUX = CNST_LFLUX/LENGTH_SCALE ! rate of change in density, mmol/m3/s
 
-                 ! Applying a forward updstream scheme, assuming CNST_LFLUX_BY_METER is small
-                 CONC(IK) = MAX(CONC(IK) - CNST_LFLUX_BY_METER*DTI, ZERO)
+                 ! Applying a forward updstream scheme, assuming CNST_LFLUX is small
+                 CONC(IK) = MAX(CONC(IK) - CNST_LFLUX*DTI, ZERO)
               END DO
       END SUBROUTINE
 

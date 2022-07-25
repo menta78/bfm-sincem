@@ -132,7 +132,6 @@
 !
 !     -----MONTHLY PROFILES OF CURRENTS SPEED, used only if NUTSBC_MODE == 1
       REAL (RLEN), DIMENSION(KB-1)             :: CUR_1,CUR_2
-      REAL (RLEN)                              :: CUR_MEAN
 !
 !     -----VERTICAL PROFILES OF INORGANIC SUSPENDED MATTER DATA-----
 !
@@ -236,7 +235,7 @@ contains
                      ilong,                                               &
                      RHO0
 !
-      use Service,ONLY: ISM,PO4SURF,NO3SURF,NH4SURF,SIO4SURF,DISSURF,CURRENTS_SPEED_PROF,Cprofile_input_exist
+      use Service,ONLY: ISM,PO4SURF,NO3SURF,NH4SURF,SIO4SURF,DISSURF,CURRENTS_SPEED
 !
 ! -----IMPLICIT TYPING IS NEVER ALLOWED-----
 !
@@ -400,7 +399,7 @@ contains
 !
 !         -----PROFILES OF CURRENTS SPEED----
 !
-          IF ((NUTSBC_MODE .EQ. 1) .AND. Cprofile_input_exist) THEN
+          IF (NUTSBC_MODE .EQ. 1) THEN
              DO K = 1,KB-1
                 READ (35,REC=(ICOUNTF-1)*(KB-1)+K) CUR_1(K)
                 READ (35,REC=ICOUNTF*(KB-1)+K)     CUR_2(K)
@@ -409,11 +408,6 @@ contains
                    STOP 999
                 END IF
              END DO
-             ! normalizing to 1
-             CUR_MEAN = SUM(CUR_1*DZ(:KB-1))/SUM(DZ(:KB-1)) ! mean weighted on DZ
-             CUR_1 = CUR_1/CUR_MEAN
-             CUR_MEAN = SUM(CUR_2*DZ(:KB-1))/SUM(DZ(:KB-1)) ! mean weighted on DZ
-             CUR_2 = CUR_2/CUR_MEAN
           ELSE
              CUR_1 = 1
              CUR_2 = 1
@@ -521,7 +515,7 @@ contains
       PO4SURF  = PO4_1  + RATIOF * (PO4_2-PO4_1)
       SIO4SURF = SIO4_1 + RATIOF * (SIO4_2-SIO4_1)
       DISSURF  = DIS_1  + RATIOF * (DIS_2-DIS_1)
-      CURRENTS_SPEED_PROF = CUR_1 + RATIOF * (CUR_2-CUR_1)
+      CURRENTS_SPEED = CUR_1 + RATIOF * (CUR_2-CUR_1)
 !
 !     -----END OF INTERPOLATION SECTION-----
 !
@@ -609,7 +603,7 @@ contains
                 READ (19,REC=K) ISM1(K)
              END DO
 
-             IF ((NUTSBC_MODE .EQ. 1) .AND. Cprofile_input_exist) THEN
+             IF (NUTSBC_MODE .EQ. 1) THEN
                 DO K = 1,KB-1
                    READ (35,REC=K) CUR_1(K)
                    IF (CUR_1(K) .LT. ZERO) THEN
@@ -617,9 +611,6 @@ contains
                       STOP 999
                    END IF
                 END DO
-                ! normalizing to 1
-                CUR_MEAN = SUM(CUR_1*DZ(:KB-1))/SUM(DZ(:KB-1)) ! mean weighted on DZ
-                CUR_1 = CUR_1/CUR_MEAN
              ELSE
                 CUR_1 = 1
              END IF
@@ -655,7 +646,7 @@ contains
 !
         end select
 !
-         IF ((NUTSBC_MODE .EQ. 1) .AND. Cprofile_input_exist) THEN
+         IF (NUTSBC_MODE .EQ. 1) THEN
             DO K = 1,KB-1
                READ (35,REC=(ICOUNTF-1)*(KB-1)+K)     CUR_2(K)
                IF (CUR_2(K) .LT. ZERO) THEN
@@ -663,8 +654,6 @@ contains
                   STOP 999
                END IF
             END DO
-            CUR_MEAN = SUM(CUR_2*DZ(:KB-1))/SUM(DZ(:KB-1)) ! mean weighted on DZ
-            CUR_2 = CUR_2/CUR_MEAN
          ELSE
             CUR_1 = 1
          END IF

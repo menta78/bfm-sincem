@@ -71,7 +71,7 @@
       real(RLEN)                        :: PO4SURF,NO3SURF,NH4SURF,SIO4SURF,DISSURF
 !
 !     ----- Profiles of currens speed (ONLY USED IF NUTBC_MODE == 1)----
-      real(RLEN)                        :: CURRENTS_SPEED_PROF(KB-1) = 1 ! by default using a constant profile
+      real(RLEN)                        :: CURRENTS_SPEED(KB-1) = 1 ! by default using a constant profile
 !
 !     -----SUSPENDED INORGANIC MATTER PROFILE-----
 !
@@ -93,7 +93,6 @@
                                            heat_input,      &
                                            surfNut_input,   &
                                            read_restart
-     logical      :: Cprofile_input_exist
 !
  end module Service
 !

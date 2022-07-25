@@ -104,6 +104,7 @@
                      WSSURF,                                              &
                      WTADV, WSADV,                                        &
                      NUTSBC_MODE,                                         &
+                     LENGTH_SCALE,                                           &
                      NRT,                                                 &
                      Z0B, CBCMIN, CBC,                                    &
                      D, DT,                                               &
@@ -157,7 +158,7 @@
       NAMELIST /Params_POMBFM/ H,DTI,ALAT,IDIAGN,IDAYS,SMOTH,&
                                ihotst,UMOL,KL1,KL2,savef,NRT,NBCT,NBCS,NBCBFM,&
                                UMOL,UMOLT,UMOLS,UMOLBFM,NTP,TRT,SRT,UPPERH,SSRT, &
-                               CBCMIN,Z0B,NUTSBC_MODE,NC_OUT_STARTTIME
+                               CBCMIN,Z0B,NUTSBC_MODE,LENGTH_SCALE,NC_OUT_STARTTIME
 !
       OPEN(namlst,file='pom_bfm_settings.nml',status='old',action='read')
       READ(namlst,nml=Params_POMBFM)
