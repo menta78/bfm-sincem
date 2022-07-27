@@ -385,7 +385,7 @@
             ffbio(k)=max(p_small,ffbio(k))
       end do
 
-      IF (NUTSBC_MODE .EQ. 1) THEN
+      IF ((NUTSBC_MODE .EQ. 1) .AND. (m .NE. ppO2o)) THEN
             ! removing laterally from the column an amount of constituent correspoinding to a flux of water equal to DISSURF
             CALL SUBTRACT_LATERAL_FLUX(ffbio)
       END IF
