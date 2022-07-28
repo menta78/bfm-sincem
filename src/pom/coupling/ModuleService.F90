@@ -71,7 +71,16 @@
       real(RLEN)                        :: PO4SURF,NO3SURF,NH4SURF,SIO4SURF,DISSURF
 !
 !     ----- Profiles of currens speed (ONLY USED IF NUTBC_MODE == 1)----
+!
       real(RLEN)                        :: CURRENTS_SPEED(KB-1) = 1 ! by default using a constant profile
+!
+!     ----- USE_O2_TNDC if an O2 profile file was provided
+!
+      logical                           :: USE_O2_TNDC   ! boolean stating if a tendency O2 profile is given. Used if NUTSBC_MODE == 1
+!
+!     ----- Profiles of oxygen (ONLY USED IF NUTBC_MODE == 1)----
+!
+      real(RLEN)                        :: O2_TNDC(KB-1) ! tendency O2 profile. Used if NUTSBC_MODE == 1
 !
 !     -----SUSPENDED INORGANIC MATTER PROFILE-----
 !
@@ -90,6 +99,7 @@
                                            Sprofile_input,  &
                                            Tprofile_input,  &
                                            Cprofile_input,  & ! file with horizontal currents speed profile, needed if NUTSBC_MODE == 1
+                                           Oprofile_input,  & ! file with O2 profile, used if NUTSBC_MODE == 1
                                            heat_input,      &
                                            surfNut_input,   &
                                            read_restart

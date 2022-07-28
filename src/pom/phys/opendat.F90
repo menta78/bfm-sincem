@@ -78,6 +78,8 @@
                         Sprofile_input, & ! Time varying (monthly) salinity profiles
                         Tprofile_input, & ! Time varying (monthly) temperature profiles
                         Cprofile_input, & ! Time varying (monthly) horizontal currents profiles (needed if NUTSBC_MODE == 1)
+                        USE_O2_TNDC,    & ! true if a file with oxygen profiles was provided
+                        Oprofile_input, & ! Time varying (monthly) oxygen file
                         heat_input,     & ! Time varying (monthly) surface heat flux
                         surfNut_input,  & ! Time varying (monthly) surface nutrient
                         ism_input,      & ! Inorganic suspended matter Initial Conditions
@@ -91,7 +93,7 @@
                         TCLIM1,                    &
                         SWRAD1, WTSURF1,           &
                         NO3_1,NH4_1,PO4_1, SIO4_1, & 
-                        DIS_1, CUR_1,              &
+                        DIS_1, CUR_1, O2_1,        &
                         QCORR1                     ! NO MORE IN USE!!!!!
 !
 !    -----IMPLICIT TYPING IS NEVER ALLOWED----
@@ -115,6 +117,7 @@
                           Sprofile_input, &
                           Tprofile_input, &
                           Cprofile_input, &
+                          Oprofile_input, &
                           heat_input,     &
                           surfNut_input,  &
                           read_restart
@@ -146,6 +149,7 @@
      inquire(IOLENGTH=rlength) TCLIM1(1)
      open(15, file=Temp_input, form='unformatted', access='direct', recl=rlength)
      write(6,*) 'open 15 done'
+
 !
 !    -----OPEN HEAT FLUX FILE-----
 !
@@ -172,14 +176,23 @@
      open(18, file=surfNut_input, form='unformatted',access='direct',recl=rlength)
      write(6,*) 'open 18 done'
 !
-!    -----OPEN CURRENTS SPEED PROFILE----
+!    -----OPEN CURRENTS SPEED AND O2 PROFILE----
 !    ------(only if NUTSBC_MODE==1)
      IF (NUTSBC_MODE .EQ. 1) THEN
         inquire(IOLENGTH=rlength) CUR_1(1)
         open(35, file=Cprofile_input, form='unformatted',access='direct',recl=rlength)  
         write(6,*) 'open 35 done'
-     ENDIF
 !
+        inquire(FILE=Oprofile_input, EXIST=USE_O2_TNDC)
+        IF (USE_O2_TNDC) THEN
+            inquire(IOLENGTH=rlength) O2_1(1)
+            write(6,*) 'O2 profile file exists, opening it :',Oprofile_input
+            open(36, file=Oprofile_input, form='unformatted',access='direct',recl=rlength)
+            write(6,*) 'open 36 done'
+        ELSE
+            write(6,*) 'O2 profile file ',Oprofile_input,' does not exist, USE_O2_TNDC==.FALSE.'
+        END IF
+     END IF
 
       write(6,*) 'open units done'
 !

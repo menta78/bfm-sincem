@@ -385,9 +385,14 @@
             ffbio(k)=max(p_small,ffbio(k))
       end do
 
-      IF ((NUTSBC_MODE .EQ. 1) .AND. (m .NE. ppO2o)) THEN
-            ! removing laterally from the column an amount of constituent correspoinding to a flux of water equal to DISSURF
-            CALL SUBTRACT_LATERAL_FLUX(ffbio)
+      IF (NUTSBC_MODE .EQ. 1) THEN 
+            IF (m .NE. ppO2o) THEN
+                  ! removing laterally from the column an amount of constituent correspoinding to a flux of water equal to DISSURF
+                  CALL SUBTRACT_LATERAL_FLUX(ffbio)
+            ELSE IF (USE_O2_TNDC) THEN
+                  ! relaxing towards a given profile of oxygen
+                  CALL SUBTRACT_LATERAL_FLUX2(ffbio, O2_TNDC)
+            END IF
       END IF
 !
 !     ---MIX SOLUTIONS AND RESTORE TIME SEQUENCE-----
