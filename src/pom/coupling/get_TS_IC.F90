@@ -73,8 +73,11 @@
                          Tprofile_input, &
                          Cprofile_input, &
                          Oprofile_input, &
+                         Kprofile_input, &
                          heat_input,     &
                          surfNut_input,  &
+                         NUTSBC_MODE,    &
+                         SWR_FILE_STEP,  &
                          read_restart
 !    
       use pom, ONLY: KB,T,TB,S,SB
@@ -105,8 +108,11 @@
                             Tprofile_input, &
                             Cprofile_input, &
                             Oprofile_input, &
+                            Kprofile_input, &
                             heat_input,     &
                             surfNut_input,  &
+                            NUTSBC_MODE,    &
+                            SWR_FILE_STEP,  &
                             read_restart
 !
        open(namlst,file='pom_bfm_settings.nml',status='old',action='read',err=100)

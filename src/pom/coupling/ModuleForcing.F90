@@ -57,7 +57,7 @@
 !
 ! -----MODULES (USE OF ONLY IS STRONGLY ENCOURAGED)-----
 !
-  use POM,ONLY: KB, ilong, NUTSBC_MODE, DZ
+  use POM,ONLY: KB, ilong, DZ
 !
   use global_mem, ONLY:RLEN
 !
@@ -144,6 +144,9 @@
 !
       real(RLEN),public,dimension(KB),SAVE :: TCLIM1,TCLIM2
       real(RLEN),public,dimension(KB),SAVE :: SCLIM1,SCLIM2
+!
+!     -----MONTHLY PROFILES OF KH, used only if provided, otherwise POM will do the job
+      REAL (RLEN), DIMENSION(KB-1)             :: KH_1,KH_2 = 0
 
 !
 !     -----INTERPOLATORS AND COUNTERS-----
@@ -239,7 +242,9 @@ contains
                      RHO0
 !
       use Service,ONLY: ISM,PO4SURF,NO3SURF,NH4SURF,SIO4SURF,&
-              DISSURF,CURRENTS_SPEED,USE_O2_TNDC,O2_TNDC
+              DISSURF,CURRENTS_SPEED,&
+              USE_O2_TNDC,O2_TNDC,USE_KH_EXT,KH_EXT,NUTSBC_MODE,&
+              SWR_FILE_STEP
 !
 ! -----IMPLICIT TYPING IS NEVER ALLOWED-----
 !
@@ -247,7 +252,7 @@ contains
 !
 !     -----LOOP COUNTER-----
 !
-      integer(ilong)               :: K
+      integer(ilong)               :: K, IHOUR
 !
 !     -------INITIALISATION AND FIRST FORCING READING-----
 !
@@ -273,6 +278,10 @@ contains
         SIO4_2       =ZERO
         DIS_1        =ZERO
         DIS_2        =ZERO
+        O2_1         =ZERO
+        O2_2         =ZERO
+        KH_1         =ZERO
+        KH_2         =ZERO
         TCLIM1(:)    =ZERO
         TCLIM2(:)    =ZERO
         SCLIM1(:)    =ZERO
@@ -331,19 +340,21 @@ contains
 !         **************************************************
 !         **************************************************
 !
-          select case (IDIAGN)
+          IF (SWR_FILE_STEP .EQ. 0) THEN
+             select case (IDIAGN)
 !
-                 case(0)
+                    case(0)
 !
-                    READ(21,REC=ICOUNTF)   SWRAD1,WTSURF1
-                    READ(21,REC=ICOUNTF+1) SWRAD2,WTSURF2
+                       READ(21,REC=ICOUNTF)   SWRAD1,WTSURF1
+                       READ(21,REC=ICOUNTF+1) SWRAD2,WTSURF2
 !
-                 case(1)
+                    case(1)
 !
-                    READ (21,REC=ICOUNTF)   SWRAD1
-                    READ (21,REC=ICOUNTF+1) SWRAD2
+                       READ (21,REC=ICOUNTF)   SWRAD1
+                       READ (21,REC=ICOUNTF+1) SWRAD2
 !
-           end select
+             end select
+          END IF
 !
 !         ***********************************************************
 !         ***********************************************************
@@ -400,6 +411,19 @@ contains
                   READ(18,REC=ICOUNTF)   NO3_1,NH4_1,PO4_1,SIO4_1
                   READ(18,REC=ICOUNTF+1) NO3_2,NH4_2,PO4_2,SIO4_2
           END SELECT
+
+
+!
+!            -----PROFILES OF KH IF NEEDED
+!
+          IF (USE_KH_EXT) THEN
+             DO K = 1,KB-1
+                 READ (34,REC=(ICOUNTF-1)*(KB-1)+K) KH_1(K)
+                 READ (34,REC=ICOUNTF*(KB-1)+K)     KH_2(K)
+             END DO
+          END IF
+
+
           IF (NUTSBC_MODE .EQ. 1) THEN
              DO K = 1,KB-1
 !
@@ -472,22 +496,31 @@ contains
       WUSURF = WSU1 + RATIOF * (WSU2-WSU1)
       WVSURF = WSV1 + RATIOF * (WSV2-WSV1)
 !
-      select case (IDIAGN)
+      SELECT CASE (SWR_FILE_STEP)
+         CASE (1)
+            ! loading hourly data
+            IHOUR = MOD(FLOOR(INTT*DTI/3600), 365*24) + 1
+            READ (21,REC=IHOUR) SWRAD
+!         -----HEAT FLUX CONVERTED TO POM UNITS(W/m2-->deg.C*m/s)-----
+            SWRAD  = SWRAD*(-ONE)/rcp
+         CASE DEFAULT
+            select case (IDIAGN)
 !
-             case (INT(ZERO))
+                   case (INT(ZERO))
 !
-!                 -----PROGNOSTIC RUN: INTERPOLATE TOTAL HEAT FLUX-----
+!                       -----PROGNOSTIC RUN: INTERPOLATE TOTAL HEAT FLUX-----
 !
-                  WTSURF = WTSURF1 + RATIOF * (WTSURF2-WTSURF1)
-                  SWRAD  = SWRAD1  + RATIOF * (SWRAD2-SWRAD1)
+                        WTSURF = WTSURF1 + RATIOF * (WTSURF2-WTSURF1)
+                        SWRAD  = SWRAD1  + RATIOF * (SWRAD2-SWRAD1)
 !
-             case (INT(ONE))
+                   case (INT(ONE))
 !
-!                  -----DIAGNOSTIC RUN: INTERPOLATE SOLAR RADIATION ONLY-----
+!                        -----DIAGNOSTIC RUN: INTERPOLATE SOLAR RADIATION ONLY-----
 !
-                  SWRAD  = SWRAD1  + RATIOF * (SWRAD2-SWRAD1)
+                        SWRAD  = SWRAD1  + RATIOF * (SWRAD2-SWRAD1)
 !
-      end select
+            end select
+      END SELECT
 !
 !     -----INTERPOLATE T&S PROFILES-----
 !
@@ -525,6 +558,7 @@ contains
       DISSURF  = DIS_1  + RATIOF * (DIS_2-DIS_1)
       CURRENTS_SPEED = CUR_1 + RATIOF * (CUR_2-CUR_1)
       O2_TNDC  = O2_1 + RATIOF * (O2_2 - O2_1)
+      KH_EXT   = KH_1 + RATIOF * (KH_2 - KH_1)
 !
 !     -----END OF INTERPOLATION SECTION-----
 !
@@ -556,6 +590,7 @@ contains
          DIS_1      = DIS_2
          CUR_1      = CUR_2      
          O2_1       = O2_2
+         KH_1       = KH_2
          ISM1(:)    = ISM2(:)
          TCLIM1(:)  = TCLIM2(:)
          SCLIM1(:)  = SCLIM2(:)
@@ -613,6 +648,12 @@ contains
                 READ (19,REC=K) ISM1(K)
              END DO
 
+             IF (USE_KH_EXT) THEN
+                DO K = 1,KB-1
+                   READ (34,REC=K) KH_1(K)
+                END DO
+             END IF
+
              IF (NUTSBC_MODE .EQ. 1) THEN
                 DO K = 1,KB-1
                    READ (35,REC=K) CUR_1(K)
@@ -655,8 +696,14 @@ contains
 !
                      READ (21,REC=ICOUNTF) SWRAD2
 !
-        end select
+         end select
 !
+         IF (USE_KH_EXT) THEN
+            DO K = 1,KB-1
+                READ (34,REC=(ICOUNTF-1)*(KB-1)+K) KH_2(K)
+            END DO
+         END IF
+
          IF (NUTSBC_MODE .EQ. 1) THEN
             DO K = 1,KB-1
                READ (35,REC=(ICOUNTF-1)*(KB-1)+K) CUR_2(K)

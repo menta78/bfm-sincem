@@ -99,7 +99,7 @@
                    jbotN1p,jbotN4n,jbotN3n,                               &
                    jbotO2o,jbotO3c
 !
-     use POM, ONLY:SMOTH,KB,H,DTI,DZR,NRT,NBCBFM,UMOLBFM,NTP,GRAV,RHO,NUTSBC_MODE
+     use POM, ONLY:SMOTH,KB,H,DTI,DZR,NRT,KH,NBCBFM,UMOLBFM,NTP,GRAV,RHO
 
 !     -----IMPLICIT TYPING IS NEVER ALLOWED-----
 !
@@ -366,6 +366,11 @@
         ffbio(k)=fbbio(k)+DTI2*((ffbio(k)/H)+D3SOURCE(m,k))
 !
       end do
+
+      IF (USE_KH_EXT) THEN
+          KH(:KB-1) = KH_EXT
+      END IF
+
 !
 !     *******************************************************************
 !     *******************************************************************
@@ -376,7 +381,7 @@
 !     *******************************************************************
 !     *******************************************************************
 !
-       CALL PROFTS(ffbio,surflux,botflux,ZERO,ZERO,NBCBFM,DTI2,NTP,UMOLBFM)
+      CALL PROFTS(ffbio,surflux,botflux,ZERO,ZERO,NBCBFM,DTI2,NTP,UMOLBFM)
 !
 !     -----CLIPPING......IF NEEDED-----
 !

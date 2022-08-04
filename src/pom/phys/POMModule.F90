@@ -168,12 +168,6 @@
 !
       REAL(RLEN)               :: UMOLT,UMOLS,UMOLBFM
 !
-!     -----NUTRIENT SURFACE BOUNDARY CONDITIONS MODE:
-!     -----    0: surface flux is computed applying the relaxation time NRT (default)
-!     -----    1: surface flux is computed applying the nutrient concentration to a river runoff
-!    
-      INTEGER                  :: NUTSBC_MODE=0
-!
 !     ----- lateral flux scaling factor. Used only if NUTSBC_MODE == 1
 !
       REAL(RLEN)               :: LENGTH_SCALE=1

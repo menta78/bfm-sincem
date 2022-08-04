@@ -78,14 +78,18 @@
                         Sprofile_input, & ! Time varying (monthly) salinity profiles
                         Tprofile_input, & ! Time varying (monthly) temperature profiles
                         Cprofile_input, & ! Time varying (monthly) horizontal currents profiles (needed if NUTSBC_MODE == 1)
-                        USE_O2_TNDC,    & ! true if a file with oxygen profiles was provided
-                        Oprofile_input, & ! Time varying (monthly) oxygen file
+                        Oprofile_input, & ! Time varying (monthly) oxygen profiles
+                        Kprofile_input, & ! Time varying (monthly) vertical profiles
                         heat_input,     & ! Time varying (monthly) surface heat flux
                         surfNut_input,  & ! Time varying (monthly) surface nutrient
                         ism_input,      & ! Inorganic suspended matter Initial Conditions
+                        USE_O2_TNDC,    & ! true if a file with oxygen profiles was provided
+                        USE_KH_EXT,     & ! true if KH is loaded from an external source
+                        NUTSBC_MODE,    & ! NUTRIENT SURFACE BOUNDARY CONDITIONS: 0 (default): concentrations. 1: fluxes
+                        SWR_FILE_STEP,  & ! if 1 shortwave radiation is loaded hourly if 0 monthly
                         read_restart      ! Model restart file
 !
-     use pom, ONLY :    TB, SB, ZZ, H, NUTSBC_MODE
+     use pom, ONLY :    TB, SB, ZZ, H
 !
      use forcing, ONLY: WSU1,WSV1,                 &
                         ISM1,                      &
@@ -93,6 +97,7 @@
                         TCLIM1,                    &
                         SWRAD1, WTSURF1,           &
                         NO3_1,NH4_1,PO4_1, SIO4_1, & 
+                        KH_1,                      &
                         DIS_1, CUR_1, O2_1,        &
                         QCORR1                     ! NO MORE IN USE!!!!!
 !
@@ -118,8 +123,11 @@
                           Tprofile_input, &
                           Cprofile_input, &
                           Oprofile_input, &
+                          Kprofile_input, &
                           heat_input,     &
                           surfNut_input,  &
+                          NUTSBC_MODE,    &
+                          SWR_FILE_STEP,  &
                           read_restart
 !
      open(namlst,file='pom_bfm_settings.nml',status='old',action='read',err=100)
@@ -161,9 +169,16 @@
 !    ****************************************
 !    ****************************************
 !
-     inquire(IOLENGTH=rlength) SWRAD1,WTSURF1,QCORR1
-     open(21, file=heat_input, form='unformatted', access='direct', recl=rlength)
-     write(6,*) 'open 21 done'
+     SELECT CASE (SWR_FILE_STEP)
+        CASE (1) ! the file contains hourly data
+           inquire(IOLENGTH=rlength) SWRAD1
+           open(21, file=heat_input, form='unformatted', access='direct', recl=rlength)
+           write(6,*) 'open 21 done'
+        CASE DEFAULT ! the file contains monthly means
+           inquire(IOLENGTH=rlength) SWRAD1,WTSURF1,QCORR1
+           open(21, file=heat_input, form='unformatted', access='direct', recl=rlength)
+           write(6,*) 'open 21 done'
+     END SELECT
 !
 !    -----OPEN NUTRIENTS FILE-----
 !
@@ -175,6 +190,18 @@
      END SELECT
      open(18, file=surfNut_input, form='unformatted',access='direct',recl=rlength)
      write(6,*) 'open 18 done'
+!
+!    -----OPEN KH PROFILES, IF PROVIDED---
+!
+     inquire(FILE=Kprofile_input, EXIST=USE_KH_EXT)
+     IF (USE_KH_EXT) THEN
+         inquire(IOLENGTH=rlength) KH_1(1)
+         write(6,*) 'KH profile file exists, opening it :',Oprofile_input
+         open(34, file=Kprofile_input, form='unformatted',access='direct',recl=rlength)
+         write(6,*) 'open 34 done'
+     ELSE
+         write(6,*) 'KH profile file ',Kprofile_input,' does not exist, setting USE_KH_EXT=.FALSE.'
+     END IF
 !
 !    -----OPEN CURRENTS SPEED AND O2 PROFILE----
 !    ------(only if NUTSBC_MODE==1)
@@ -190,7 +217,7 @@
             open(36, file=Oprofile_input, form='unformatted',access='direct',recl=rlength)
             write(6,*) 'open 36 done'
         ELSE
-            write(6,*) 'O2 profile file ',Oprofile_input,' does not exist, USE_O2_TNDC==.FALSE.'
+            write(6,*) 'O2 profile file ',Oprofile_input,' does not exist, setting USE_O2_TNDC=.FALSE.'
         END IF
      END IF
 

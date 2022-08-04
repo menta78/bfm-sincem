@@ -66,17 +66,25 @@
 !
       IMPLICIT NONE
 ! 
-!     -----SURFACE NUTRIENTS AND RUNOFF (ONLY USED IF NUTBC_MODE == 1)-----
+!     -----SURFACE NUTRIENTS AND RUNOFF (ONLY USED IF NUTSBC_MODE == 1)-----
 !
       real(RLEN)                        :: PO4SURF,NO3SURF,NH4SURF,SIO4SURF,DISSURF
+!
+!     -----USE_KH_EXT==.TRUE. if the vertical diffusion coefficient is loaded from an external file
+!
+      logical                           :: USE_KH_EXT = .FALSE.
+!
+!     -----vertical diffusion coefficient from an external source
+!
+      real(RLEN)                        :: KH_EXT(KB-1) = 0
 !
 !     ----- Profiles of currens speed (ONLY USED IF NUTBC_MODE == 1)----
 !
       real(RLEN)                        :: CURRENTS_SPEED(KB-1) = 1 ! by default using a constant profile
 !
-!     ----- USE_O2_TNDC if an O2 profile file was provided
+!     ----- USE_O2_TNDC==.TRUE. if an O2 profile file was provided
 !
-      logical                           :: USE_O2_TNDC   ! boolean stating if a tendency O2 profile is given. Used if NUTSBC_MODE == 1
+      logical                           :: USE_O2_TNDC = .FALSE.
 !
 !     ----- Profiles of oxygen (ONLY USED IF NUTBC_MODE == 1)----
 !
@@ -85,6 +93,17 @@
 !     -----SUSPENDED INORGANIC MATTER PROFILE-----
 !
       real(RLEN),public,dimension(KB-1) :: ISM
+!
+!     -----NUTRIENT SURFACE BOUNDARY CONDITIONS MODE:
+!     -----    0: surface flux is computed applying the relaxation time NRT (default)
+!     -----    1: surface flux is computed applying the nutrient concentration to a river runoff
+!
+      INTEGER                  :: NUTSBC_MODE=0
+!
+!     ! short wave radiation stepping: if 1 shortwave radiation is loaded hourly if 0 monthly
+!
+      INTEGER                  :: SWR_FILE_STEP=0
+
 !
 !     ------FREQUENCY OF OUTPUT AVERAGING (IN HOURS)-----
 !
@@ -100,6 +119,7 @@
                                            Tprofile_input,  &
                                            Cprofile_input,  & ! file with horizontal currents speed profile, needed if NUTSBC_MODE == 1
                                            Oprofile_input,  & ! file with O2 profile, used if NUTSBC_MODE == 1
+                                           Kprofile_input,  & ! file with vertical diffusion coeff. profile, if available
                                            heat_input,      &
                                            surfNut_input,   &
                                            read_restart
