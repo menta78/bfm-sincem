@@ -85,6 +85,11 @@
                         USE_O2_TNDC,    & ! true if a file with oxygen profiles was provided
                         USE_KH_EXT,     & ! true if KH is loaded from an external source
                         NUTSBC_MODE,    & ! NUTRIENT SURFACE BOUNDARY CONDITIONS: 0 (default): concentrations. 1: fluxes
+                        L_PO4,          &
+                        L_NO3,          &
+                        L_SIO4,         &
+                        L_O2,           &
+                        L_X,            &
                         SWR_FILE_STEP,  & ! if 1 shortwave radiation is loaded hourly if 0 monthly
                         read_restart      ! Model restart file
 !
@@ -125,6 +130,11 @@
                           heat_input,     &
                           surfNut_input,  &
                           NUTSBC_MODE,    &
+                          L_PO4,          &
+                          L_NO3,          &
+                          L_SIO4,         &
+                          L_O2,           &
+                          L_X,            &
                           SWR_FILE_STEP,  &
                           read_restart
 !

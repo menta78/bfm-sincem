@@ -76,6 +76,11 @@
                          heat_input,     &
                          surfNut_input,  &
                          NUTSBC_MODE,    &
+                         L_PO4,          &
+                         L_NO3,          &
+                         L_SIO4,         &
+                         L_O2,           &
+                         L_X,            &
                          SWR_FILE_STEP,  &
                          read_restart
 !    
@@ -110,6 +115,11 @@
                             heat_input,     &
                             surfNut_input,  &
                             NUTSBC_MODE,    &
+                            L_PO4,          &
+                            L_NO3,          &
+                            L_SIO4,         &
+                            L_O2,           &
+                            L_X,            &
                             SWR_FILE_STEP,  &
                             read_restart
 !

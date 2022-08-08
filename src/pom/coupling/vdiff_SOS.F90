@@ -134,6 +134,10 @@
 !
  real(RLEN)               :: dti2  
 !
+!-----lateral relaxation
+!
+ real(RLEN)               :: LAMBDA
+!
 !
     dti2 = DTI*2.
 
@@ -391,12 +395,24 @@
       end do
 
       IF (NUTSBC_MODE .EQ. 1) THEN 
+            SELECT CASE (m)
+               CASE (ppN1p)
+                  LAMBDA = L_PO4
+               CASE (ppN3n)
+                  LAMBDA = L_NO3
+               CASE (ppN5s)
+                  LAMBDA = L_SIO4
+               CASE (ppO2o)
+                  LAMBDA = L_O2
+               CASE DEFAULT
+                  LAMBDA = L_X
+            END SELECT
             IF (m .NE. ppO2o) THEN
                   ! removing laterally from the column an amount of constituent correspoinding to a flux of water equal to DISSURF
-                  CALL SUBTRACT_LATERAL_FLUX(ffbio)
+                  CALL SUBTRACT_LATERAL_FLUX(ffbio, LAMBDA)
             ELSE IF (USE_O2_TNDC) THEN
                   ! relaxing towards a given profile of oxygen
-                  CALL SUBTRACT_LATERAL_FLUX2(ffbio, O2_TNDC)
+                  CALL SUBTRACT_LATERAL_FLUX2(ffbio, O2_TNDC, LAMBDA)
             END IF
       END IF
 !

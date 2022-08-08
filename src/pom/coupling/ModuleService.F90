@@ -90,6 +90,10 @@
 !
       real(RLEN),public,dimension(KB-1) :: ISM
 !
+!     ----- relaxation coefficients for: PO4, NO3, SiO4, O2, anything else
+!
+      real(RLEN)                        :: L_PO4, L_NO3, L_SIO4, L_O2, L_X
+!
 !     -----NUTRIENT SURFACE BOUNDARY CONDITIONS MODE:
 !     -----    0: surface flux is computed applying the relaxation time NRT (default)
 !     -----    1: surface flux is computed applying the nutrient concentration to a river runoff
