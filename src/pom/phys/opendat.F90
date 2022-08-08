@@ -77,7 +77,6 @@
                         Temp_input,     & ! Temperature Initial Conditions
                         Sprofile_input, & ! Time varying (monthly) salinity profiles
                         Tprofile_input, & ! Time varying (monthly) temperature profiles
-                        Cprofile_input, & ! Time varying (monthly) horizontal currents profiles (needed if NUTSBC_MODE == 1)
                         Oprofile_input, & ! Time varying (monthly) oxygen profiles
                         Kprofile_input, & ! Time varying (monthly) vertical profiles
                         heat_input,     & ! Time varying (monthly) surface heat flux
@@ -98,7 +97,7 @@
                         SWRAD1, WTSURF1,           &
                         NO3_1,NH4_1,PO4_1, SIO4_1, & 
                         KH_1,                      &
-                        DIS_1, CUR_1, O2_1,        &
+                        DIS_1, O2_1,        &
                         QCORR1                     ! NO MORE IN USE!!!!!
 !
 !    -----IMPLICIT TYPING IS NEVER ALLOWED----
@@ -121,7 +120,6 @@
                           Temp_input,     &
                           Sprofile_input, &
                           Tprofile_input, &
-                          Cprofile_input, &
                           Oprofile_input, &
                           Kprofile_input, &
                           heat_input,     &
@@ -203,13 +201,9 @@
          write(6,*) 'KH profile file ',Kprofile_input,' does not exist, setting USE_KH_EXT=.FALSE.'
      END IF
 !
-!    -----OPEN CURRENTS SPEED AND O2 PROFILE----
+!    -----OPEN O2 PROFILE----
 !    ------(only if NUTSBC_MODE==1)
      IF (NUTSBC_MODE .EQ. 1) THEN
-        inquire(IOLENGTH=rlength) CUR_1(1)
-        open(35, file=Cprofile_input, form='unformatted',access='direct',recl=rlength)  
-        write(6,*) 'open 35 done'
-!
         inquire(FILE=Oprofile_input, EXIST=USE_O2_TNDC)
         IF (USE_O2_TNDC) THEN
             inquire(IOLENGTH=rlength) O2_1(1)

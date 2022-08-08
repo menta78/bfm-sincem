@@ -71,7 +71,6 @@
                          Temp_input,     &
                          Sprofile_input, &
                          Tprofile_input, &
-                         Cprofile_input, &
                          Oprofile_input, &
                          Kprofile_input, &
                          heat_input,     &
@@ -106,7 +105,6 @@
                             Temp_input,     &
                             Sprofile_input, &
                             Tprofile_input, &
-                            Cprofile_input, &
                             Oprofile_input, &
                             Kprofile_input, &
                             heat_input,     &

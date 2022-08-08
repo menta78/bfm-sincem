@@ -78,10 +78,6 @@
 !
       real(RLEN)                        :: KH_EXT(KB-1) = 0
 !
-!     ----- Profiles of currens speed (ONLY USED IF NUTBC_MODE == 1)----
-!
-      real(RLEN)                        :: CURRENTS_SPEED(KB-1) = 1 ! by default using a constant profile
-!
 !     ----- USE_O2_TNDC==.TRUE. if an O2 profile file was provided
 !
       logical                           :: USE_O2_TNDC = .FALSE.
@@ -117,7 +113,6 @@
                                            Temp_input,      &
                                            Sprofile_input,  &
                                            Tprofile_input,  &
-                                           Cprofile_input,  & ! file with horizontal currents speed profile, needed if NUTSBC_MODE == 1
                                            Oprofile_input,  & ! file with O2 profile, used if NUTSBC_MODE == 1
                                            Kprofile_input,  & ! file with vertical diffusion coeff. profile, if available
                                            heat_input,      &

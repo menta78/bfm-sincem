@@ -130,9 +130,6 @@
 !     -------- units: kg/m2/s, as in nemo
       REAL (RLEN),SAVE                       :: DIS_1,DIS_2
 !
-!     -----MONTHLY PROFILES OF CURRENTS SPEED, used only if NUTSBC_MODE == 1
-      REAL (RLEN), DIMENSION(KB-1)             :: CUR_1,CUR_2 = 1
-!
 !     -----MONTHLY PROFILES OF O2, used only if NUTSBC_MODE == 1 and if file is present
       REAL (RLEN), DIMENSION(KB-1)             :: O2_1,O2_2 = 0
 !
@@ -242,7 +239,7 @@ contains
                      RHO0
 !
       use Service,ONLY: ISM,PO4SURF,NO3SURF,NH4SURF,SIO4SURF,&
-              DISSURF,CURRENTS_SPEED,&
+              DISSURF,&
               USE_O2_TNDC,O2_TNDC,USE_KH_EXT,KH_EXT,NUTSBC_MODE,&
               SWR_FILE_STEP
 !
@@ -426,15 +423,6 @@ contains
 
           IF (NUTSBC_MODE .EQ. 1) THEN
              DO K = 1,KB-1
-!
-!               -----PROFILES OF CURRENTS SPEED----
-!
-                READ (35,REC=(ICOUNTF-1)*(KB-1)+K) CUR_1(K)
-                READ (35,REC=ICOUNTF*(KB-1)+K)     CUR_2(K)
-                IF ((CUR_1(K) .LT. ZERO) .OR. (CUR_2(K) .LT. ZERO)) THEN
-                   WRITE(6,*) 'FATAL ERROR!!!! THE FILE WITH CURRENTS SPEED SHOULD ONLY CONTAIN POSITIVE VALUES!!!'
-                   STOP 999
-                END IF
                 IF (USE_O2_TNDC) THEN
 !
 !                  -----PROFILES OF OXYGEN
@@ -556,7 +544,6 @@ contains
       PO4SURF  = PO4_1  + RATIOF * (PO4_2-PO4_1)
       SIO4SURF = SIO4_1 + RATIOF * (SIO4_2-SIO4_1)
       DISSURF  = DIS_1  + RATIOF * (DIS_2-DIS_1)
-      CURRENTS_SPEED = CUR_1 + RATIOF * (CUR_2-CUR_1)
       O2_TNDC  = O2_1 + RATIOF * (O2_2 - O2_1)
       KH_EXT   = KH_1 + RATIOF * (KH_2 - KH_1)
 !
@@ -588,7 +575,6 @@ contains
          PO4_1      = PO4_2
          SIO4_1     = SIO4_2
          DIS_1      = DIS_2
-         CUR_1      = CUR_2      
          O2_1       = O2_2
          KH_1       = KH_2
          ISM1(:)    = ISM2(:)
@@ -656,11 +642,6 @@ contains
 
              IF (NUTSBC_MODE .EQ. 1) THEN
                 DO K = 1,KB-1
-                   READ (35,REC=K) CUR_1(K)
-                   IF (CUR_1(K) .LT. ZERO) THEN
-                      WRITE(6,*) 'FATAL ERROR!!!! THE FILE WITH CURRENTS SPEED SHOULD ONLY CONTAIN POSITIVE VALUES!!!'
-                      STOP 999
-                   END IF
                    IF (USE_O2_TNDC) THEN
                       READ (36,REC=K) O2_1(K)
                    END IF
@@ -706,11 +687,6 @@ contains
 
          IF (NUTSBC_MODE .EQ. 1) THEN
             DO K = 1,KB-1
-               READ (35,REC=(ICOUNTF-1)*(KB-1)+K) CUR_2(K)
-               IF (CUR_2(K) .LT. ZERO) THEN
-                  WRITE(6,*) 'FATAL ERROR!!!! THE FILE WITH CURRENTS SPEED SHOULD ONLY CONTAIN POSITIVE VALUES!!!'
-                  STOP 999
-               END IF
                IF (USE_O2_TNDC) THEN
                   READ (36,REC=(ICOUNTF-1)*(KB-1)+K) O2_2(K)
                END IF
