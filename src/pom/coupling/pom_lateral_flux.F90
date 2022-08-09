@@ -6,7 +6,7 @@
 ! For now a constant profile of lateral flux is assumed
       SUBROUTINE SUBTRACT_LATERAL_FLUX(CONC, LAMBDA)
               USE GLOBAL_MEM, ONLY: RLEN, ZERO
-              USE POM, ONLY: DTI, KB, LENGTH_SCALE
+              USE POM, ONLY: DTI, KB
               IMPLICIT NONE
 
               ! CONC: concentration of a constituent
@@ -27,7 +27,7 @@
 ! Like SUBTRACT_LATERAL_FLUX, but with a tendency profile to converge to
       SUBROUTINE SUBTRACT_LATERAL_FLUX2(CONC, TND_CONC, LAMBDA)
               USE GLOBAL_MEM, ONLY: RLEN, ZERO
-              USE POM, ONLY: DTI, KB, LENGTH_SCALE
+              USE POM, ONLY: DTI, KB
               IMPLICIT NONE
 
               ! CONC: concentration of a constituent

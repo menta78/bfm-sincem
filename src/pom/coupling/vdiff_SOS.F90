@@ -407,10 +407,10 @@
                CASE DEFAULT
                   LAMBDA = L_X
             END SELECT
-            IF (m .NE. ppO2o) THEN
+            IF (m .NE. ppO2o .OR. (.NOT. USE_O2_TNDC)) THEN
                   ! removing laterally from the column an amount of constituent correspoinding to a flux of water equal to DISSURF
                   CALL SUBTRACT_LATERAL_FLUX(ffbio, LAMBDA)
-            ELSE IF (USE_O2_TNDC) THEN
+            ELSE
                   ! relaxing towards a given profile of oxygen
                   CALL SUBTRACT_LATERAL_FLUX2(ffbio, O2_TNDC, LAMBDA)
             END IF

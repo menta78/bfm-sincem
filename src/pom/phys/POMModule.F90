@@ -168,10 +168,6 @@
 !
       REAL(RLEN)               :: UMOLT,UMOLS,UMOLBFM
 !
-!     ----- lateral flux scaling factor. Used only if NUTSBC_MODE == 1
-!
-      REAL(RLEN)               :: LENGTH_SCALE=1
-!
 !     -----NUTRIENT RELAXATION TIME-----
 !    
       REAL(RLEN)               :: NRT
