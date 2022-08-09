@@ -361,7 +361,7 @@
 !                 *******************************************************
 !                 *******************************************************
 !
-                  call adverte(fbio,ffbio,sink)
+                  call adverte(fbbio,fbio,ffbio,sink)
 !
 !                 -----SOURCE SPLITTING LEAPFROG INTEGRATION-----
 !
@@ -484,7 +484,7 @@
 !
 ! !INTERFACE
 !
-  SUBROUTINE adverte(F,FDWDT,W)
+  SUBROUTINE adverte(FB,F,FF,W)
 !
 !DESCRIPTION
 !
@@ -508,27 +508,27 @@
 !    -----IMPLICIT TYPING IS NEVER ALLOWED----
 !
      IMPLICIT NONE
-!
-!    -----DUMMY ARGUMENTS-----
-!
-     real(RLEN) :: F(KB),    &  !STATE VAR. AT TIME=t
-                   FDWDT(KB)    !SINKING RATE
-!
-     real(RLEN) :: W(KB)     ! SINKING VELOCITY
-!
-!    -----LOOP COUNTER-----
-!
+
+     real(RLEN) :: FB(KB),F(KB),FF(KB)
+     real(RLEN) :: W(KB)
+     real(RLEN) :: DTI2
      integer :: k
 !
-!    -----VERTICAL ADVECTION: UPSTREAM SCHEME-----
+     F(KB)=F(KB-1)
+     FB(KB)=FB(KB-1)
 !
-     FDWDT(1)=DZR(1)*F(1)*W(2)
+! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=
+! Calculate vertical advection. Mind downward velocities are negative!
+! Upwind scheme:
+! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=
+!
+      FF(1)=DZR(1)*F(1)*W(2)
 
-     do K=2,KB-1
+      do K=2,KB-1
 !
-        FDWDT(K)=DZR(K)*(F(K)*W(K+1)-F(K-1)*W(K))
+         FF(K)=DZR(K)*(F(K)*W(K+1)-F(K-1)*W(K))
 !
-     end do
+      end do
 !
       return
 !
