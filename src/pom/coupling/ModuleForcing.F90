@@ -239,7 +239,7 @@ contains
                      RHO0
 !
       use Service,ONLY: ISM,PO4SURF,NO3SURF,NH4SURF,SIO4SURF,&
-              DISSURF,&
+              DISSURF, USE_W_PROFILE, W_PROFILE,&
               USE_O2_TNDC,O2_TNDC,USE_KH_EXT,KH_EXT,NUTSBC_MODE,&
               SWR_FILE_STEP
 !
@@ -249,7 +249,7 @@ contains
 !
 !     -----LOOP COUNTER-----
 !
-      integer(ilong)               :: K, IHOUR
+      integer(ilong)               :: K, IHOUR, IDAY
 !
 !     -------INITIALISATION AND FIRST FORCING READING-----
 !
@@ -509,6 +509,11 @@ contains
 !
             end select
       END SELECT
+
+      IF (USE_W_PROFILE) THEN
+         IDAY = MOD(FLOOR(INTT*DTI/86400), 365) + 1
+         READ (35,REC=IDAY) W_PROFILE(:)
+      END IF
 !
 !     -----INTERPOLATE T&S PROFILES-----
 !

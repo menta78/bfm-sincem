@@ -361,6 +361,9 @@
 !                 *******************************************************
 !                 *******************************************************
 !
+                  IF (USE_W_PROFILE) THEN
+                     sink = sink + W_PROFILE
+                  END IF
                   call adverte(fbbio,fbio,ffbio,sink)
 !
 !                 -----SOURCE SPLITTING LEAPFROG INTEGRATION-----

@@ -73,6 +73,7 @@
                          Tprofile_input, &
                          Oprofile_input, &
                          Kprofile_input, &
+                         Wprofile_input, &
                          heat_input,     &
                          surfNut_input,  &
                          NUTSBC_MODE,    &
@@ -112,6 +113,7 @@
                             Tprofile_input, &
                             Oprofile_input, &
                             Kprofile_input, &
+                            Wprofile_input, &
                             heat_input,     &
                             surfNut_input,  &
                             NUTSBC_MODE,    &

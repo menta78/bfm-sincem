@@ -86,6 +86,14 @@
 !
       real(RLEN)                        :: O2_TNDC(KB-1) ! tendency O2 profile. Used if NUTSBC_MODE == 1
 !
+!     ----- USE_W_PROFILE == .TRUE. if daily profiles of W are provided ----
+!
+      logical                           :: USE_W_PROFILE = .FALSE.
+!
+!     ----- vertical profiles of W -----
+!
+      real(RLEN)                        :: W_PROFILE(KB)
+!
 !     -----SUSPENDED INORGANIC MATTER PROFILE-----
 !
       real(RLEN),public,dimension(KB-1) :: ISM
@@ -119,6 +127,7 @@
                                            Tprofile_input,  &
                                            Oprofile_input,  & ! file with O2 profile, used if NUTSBC_MODE == 1
                                            Kprofile_input,  & ! file with vertical diffusion coeff. profile, if available
+                                           Wprofile_input,  & ! file with daily profile of W, if available
                                            heat_input,      &
                                            surfNut_input,   &
                                            read_restart

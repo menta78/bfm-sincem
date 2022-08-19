@@ -78,12 +78,14 @@
                         Sprofile_input, & ! Time varying (monthly) salinity profiles
                         Tprofile_input, & ! Time varying (monthly) temperature profiles
                         Oprofile_input, & ! Time varying (monthly) oxygen profiles
-                        Kprofile_input, & ! Time varying (monthly) vertical profiles
+                        Kprofile_input, & ! Time varying (monthly) KH profiles
+                        Wprofile_input, & ! Time varying (monthly) vertical velocity profiles
                         heat_input,     & ! Time varying (monthly) surface heat flux
                         surfNut_input,  & ! Time varying (monthly) surface nutrient
                         ism_input,      & ! Inorganic suspended matter Initial Conditions
                         USE_O2_TNDC,    & ! true if a file with oxygen profiles was provided
                         USE_KH_EXT,     & ! true if KH is loaded from an external source
+                        USE_W_PROFILE,  &
                         NUTSBC_MODE,    & ! NUTRIENT SURFACE BOUNDARY CONDITIONS: 0 (default): concentrations. 1: fluxes
                         L_PO4,          &
                         L_NO3,          &
@@ -210,6 +212,19 @@
      ELSE
          write(6,*) 'KH profile file ',Kprofile_input,' does not exist, setting USE_KH_EXT=.FALSE.'
      END IF
+!
+!    -----OPEN W PROFILE, IF PROVIDED----
+!
+     inquire(FILE=Wprofile_input, EXIST=USE_W_PROFILE)
+     IF (USE_W_PROFILE) THEN
+         inquire(IOLENGTH=rlength) KH_1(1)
+         write(6,*) 'W profile file exists, opening it :',Wprofile_input
+         open(35, file=Wprofile_input, form='unformatted',access='direct',recl=rlength)
+         write(6,*) 'open 35 done'
+     ELSE
+         write(6,*) 'W profile file ',Wprofile_input,' does not exist, setting USE_W_PROFILE=.FALSE.'
+     END IF
+     
 !
 !    -----OPEN O2 PROFILE----
 !    ------(only if NUTSBC_MODE==1)
