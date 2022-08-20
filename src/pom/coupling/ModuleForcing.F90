@@ -139,11 +139,14 @@
 !
 !     -----VERTICAL PROFILES OF T & S-----
 !
-      real(RLEN),public,dimension(KB),SAVE :: TCLIM1,TCLIM2
-      real(RLEN),public,dimension(KB),SAVE :: SCLIM1,SCLIM2
+      real(RLEN),public,dimension(KB-1),SAVE :: TCLIM1,TCLIM2
+      real(RLEN),public,dimension(KB-1),SAVE :: SCLIM1,SCLIM2
 !
 !     -----MONTHLY PROFILES OF KH, used only if provided, otherwise POM will do the job
       REAL (RLEN), DIMENSION(KB-1)             :: KH_1,KH_2 = 0
+!
+!     -----MONTHLY PROFILES OF W mean and variance
+      REAL (RLEN), DIMENSION(KB)             :: WMN1,WMN2,WVR1,WVR2,W_MEAN_PR,W_VRNC_PR = 0
 
 !
 !     -----INTERPOLATORS AND COUNTERS-----
@@ -238,10 +241,11 @@ contains
                      ilong,                                               &
                      RHO0
 !
+      USE MONTECARLO
       use Service,ONLY: ISM,PO4SURF,NO3SURF,NH4SURF,SIO4SURF,&
               DISSURF, USE_W_PROFILE, W_PROFILE,&
               USE_O2_TNDC,O2_TNDC,USE_KH_EXT,KH_EXT,NUTSBC_MODE,&
-              SWR_FILE_STEP
+              SWR_FILE_STEP, DAY_OF_SIMULATION
 !
 ! -----IMPLICIT TYPING IS NEVER ALLOWED-----
 !
@@ -383,10 +387,6 @@ contains
 !         ***********************************************************
 !
           DO K = 1,KB
-             READ (20,REC=(ICOUNTF-1)*KB+K) SCLIM1(K)
-             READ (15,REC=(ICOUNTF-1)*KB+K) TCLIM1(K)
-             READ (20,REC=ICOUNTF*KB+K)     SCLIM2(K)
-             READ (15,REC=ICOUNTF*KB+K)     TCLIM2(K)
           END DO
 !
 !         -----SUSPENDED INORGANIC MATTER PROFILES-----
@@ -394,6 +394,14 @@ contains
           DO K = 1,KB-1
              READ (19,REC=(ICOUNTF-1)*(KB-1)+K) ISM1(K)
              READ (19,REC=ICOUNTF*(KB-1)+K)     ISM2(K)
+             READ (20,REC=(ICOUNTF-1)*(KB-1)+K) SCLIM1(K)
+             READ (15,REC=(ICOUNTF-1)*(KB-1)+K) TCLIM1(K)
+             READ (20,REC=ICOUNTF*(KB-1)+K)     SCLIM2(K)
+             READ (15,REC=ICOUNTF*(KB-1)+K)     TCLIM2(K)
+             IF (USE_W_PROFILE) THEN
+                READ (35, REC=(ICOUNTF-1)*(KB-1)+K) WMN1(K),WVR1(K)
+                READ (35, REC=(ICOUNTF)*(KB-1)+K) WMN2(K),WVR2(K)
+             END IF
           END DO
 !
 !         -----SURFACE NUTRIENTS-----
@@ -509,16 +517,24 @@ contains
 !
             end select
       END SELECT
-
-      IF (USE_W_PROFILE) THEN
-         IDAY = MOD(FLOOR(INTT*DTI/86400), 365) + 1
-         READ (35,REC=IDAY) W_PROFILE(:)
-      END IF
 !
 !     -----INTERPOLATE T&S PROFILES-----
 !
-      TSTAR(:) = TCLIM1(:) + RATIOF * (TCLIM2(:)-TCLIM1(:))
-      SSTAR(:) = SCLIM1(:) + RATIOF * (SCLIM2(:)-SCLIM1(:))
+      TSTAR(:KB-1) = TCLIM1(:) + RATIOF * (TCLIM2(:)-TCLIM1(:))
+      TSTAR(KB) = TSTAR(KB-1)
+      SSTAR(:KB-1) = SCLIM1(:) + RATIOF * (SCLIM2(:)-SCLIM1(:))
+      SSTAR(KB) = SSTAR(KB-1)
+
+      IF (USE_W_PROFILE) THEN
+         IDAY = MOD(FLOOR(INTT*DTI/86400), 365) + 1
+         IF (IDAY .NE. DAY_OF_SIMULATION) THEN
+            ! montecarlo for w on a daily basis
+            W_MEAN_PR = WMN1 + RATIOF * (WMN2-WMN1)
+            W_VRNC_PR = WVR1 + RATIOF * (WVR2-WVR1)
+            CALL PROFILE_MONTECARLO_NORMAL(W_MEAN_PR, W_VRNC_PR, W_PROFILE)
+            DAY_OF_SIMULATION = IDAY
+         END IF
+      END IF
 !
       select case (IDIAGN)
 !
@@ -585,6 +601,9 @@ contains
          ISM1(:)    = ISM2(:)
          TCLIM1(:)  = TCLIM2(:)
          SCLIM1(:)  = SCLIM2(:)
+         WMN1       = WMN2
+         WVR1       = WVR2
+
 !
 !            -----IF 12 MONTHS HAVE GONE.... -----
 !
@@ -630,13 +649,13 @@ contains
                      READ(18,REC=1) NO3_1,NH4_1,PO4_1,SIO4_1
              END SELECT
 !
-             DO K = 1,KB
-                READ (20,REC=K) SCLIM1(K)
-                READ (15,REC=K) TCLIM1(K)
-             END DO
-!
              DO K = 1, KB-1
                 READ (19,REC=K) ISM1(K)
+                READ (20,REC=K) SCLIM1(K)
+                READ (15,REC=K) TCLIM1(K)
+                IF (USE_W_PROFILE) THEN
+                   READ (35,REC=K) WMN1(K),WVR1(K)
+                END IF
              END DO
 
              IF (USE_KH_EXT) THEN
@@ -707,14 +726,14 @@ contains
         WSU2 = WSU2*(-ONE)/RHO0
         WSV2 = WSV2*(-ONE)/RHO0
         SWRAD2=SWRAD2*(-ONE)/rcp
-!
-         DO K = 1,KB
-             READ (20,REC=(ICOUNTF-1)*KB+K) SCLIM2(K)
-             READ (15,REC=(ICOUNTF-1)*KB+K) TCLIM2(K)
-         END DO
 
          DO K = 1,KB-1
              READ (19,REC=(ICOUNTF-1)*(KB-1)+K) ISM2(K)
+             READ (20,REC=(ICOUNTF-1)*(KB-1)+K) SCLIM2(K)
+             READ (15,REC=(ICOUNTF-1)*(KB-1)+K) TCLIM2(K)
+             IF (USE_W_PROFILE) THEN
+                READ (35,REC=(ICOUNTF-1)*(KB-1)+K) WMN2(K),WVR2(K)
+             END IF
          END DO
 !
 #ifdef SAVEFORCING

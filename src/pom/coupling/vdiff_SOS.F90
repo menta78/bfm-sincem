@@ -148,6 +148,11 @@
 !
 !-----LOOP OVER BFM STATE VAR'S-----
 !
+
+  IF (USE_KH_EXT) THEN
+      KH(:KB-1) = KH_EXT
+  END IF
+
   do m = 1 , NO_D3_BOX_STATES
 !
 !         -----LOAD BFM STATE VAR.-----
@@ -374,10 +379,6 @@
 !
       end do
 
-      IF (USE_KH_EXT) THEN
-          KH(:KB-1) = KH_EXT
-      END IF
-
 !
 !     *******************************************************************
 !     *******************************************************************
@@ -525,12 +526,19 @@
 ! Upwind scheme:
 ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=
 !
-      FF(1)=DZR(1)*F(1)*W(2)
+!      FF(1)=DZR(1)*F(1)*W(2)
+!
+!      do K=2,KB-1
+!!
+!         FF(K)=DZR(K)*(F(K)*W(K+1)-F(K-1)*W(K))
+!!
+!      end do
 
+! scheme: Gordon & Stern 1982
+
+      FF(1) = DZR(1)*F(1)*W(2)
       do K=2,KB-1
-!
-         FF(K)=DZR(K)*(F(K)*W(K+1)-F(K-1)*W(K))
-!
+         FF(K)= 0.5*( DZR(K)*W(K)*(F(K-1)-F(K)) + DZR(K+1)*W(K+1)*(F(K)-F(K+1)) )
       end do
 !
       return

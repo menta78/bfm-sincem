@@ -92,6 +92,8 @@
 !
 !     ----- vertical profiles of W -----
 !
+      real(RLEN)                        :: W_MEAN_PR(KB) ! vert. prof. of w mean
+      real(RLEN)                        :: W_VRNC_PR(KB) ! vert. prof. of w variance
       real(RLEN)                        :: W_PROFILE(KB)
 !
 !     -----SUSPENDED INORGANIC MATTER PROFILE-----
@@ -116,6 +118,8 @@
 !     ------FREQUENCY OF OUTPUT AVERAGING (IN HOURS)-----
 !
       integer(ilong)                    :: savef
+
+      integer(ilong)                    :: DAY_OF_SIMULATION = -999999
 !
 !     -----THESE ARE THE PATHWAYS FOR THE IC, RESTART AND FORCING FILES (READ TROUGH NML)-----
 !

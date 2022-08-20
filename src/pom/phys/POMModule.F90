@@ -74,7 +74,7 @@
 !
 !     -----VERTICAL LAYERS-----
 !
-      integer(ilong),parameter :: KB=31
+      integer(ilong),parameter :: KB=16
 !
 !     -----SWITCH FOR PROGNOSTIC/DIAGNOSTIC SIMULATION-----
 !

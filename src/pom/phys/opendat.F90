@@ -105,6 +105,7 @@
                         NO3_1,NH4_1,PO4_1, SIO4_1, & 
                         KH_1,                      &
                         DIS_1, O2_1,        &
+                        WMN1, WVR1,         &
                         QCORR1                     ! NO MORE IN USE!!!!!
 !
 !    -----IMPLICIT TYPING IS NEVER ALLOWED----
@@ -129,6 +130,7 @@
                           Tprofile_input, &
                           Oprofile_input, &
                           Kprofile_input, &
+                          Wprofile_input, &
                           heat_input,     &
                           surfNut_input,  &
                           NUTSBC_MODE,    &
@@ -217,7 +219,7 @@
 !
      inquire(FILE=Wprofile_input, EXIST=USE_W_PROFILE)
      IF (USE_W_PROFILE) THEN
-         inquire(IOLENGTH=rlength) KH_1(1)
+         inquire(IOLENGTH=rlength) WMN1(1),WVR1(1)
          write(6,*) 'W profile file exists, opening it :',Wprofile_input
          open(35, file=Wprofile_input, form='unformatted',access='direct',recl=rlength)
          write(6,*) 'open 35 done'
