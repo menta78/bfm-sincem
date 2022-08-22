@@ -99,7 +99,7 @@
                    jbotN1p,jbotN4n,jbotN3n,                               &
                    jbotO2o,jbotO3c
 !
-     use POM, ONLY:SMOTH,KB,H,DTI,DZR,NRT,KH,NBCBFM,UMOLBFM,NTP,GRAV,RHO
+     use POM, ONLY:SMOTH,KB,H,DTI,DZ,DZR,NRT,KH,NBCBFM,UMOLBFM,NTP,GRAV,RHO
 
 !     -----IMPLICIT TYPING IS NEVER ALLOWED-----
 !
@@ -134,9 +134,9 @@
 !
  real(RLEN)               :: dti2  
 !
-!-----lateral relaxation
+!-----lateral relaxation and flux
 !
- real(RLEN)               :: LAMBDA
+ real(RLEN)               :: LAMBDA, LFLUX(KB)
 !
 !
     dti2 = DTI*2.
@@ -150,7 +150,7 @@
 !
 
   IF (USE_KH_EXT) THEN
-      KH(:KB-1) = KH_EXT
+      KH(:KB-1) = KH_EXT*KH_FACTOR
   END IF
 
   do m = 1 , NO_D3_BOX_STATES
@@ -373,11 +373,26 @@
 !
 !                 -----SOURCE SPLITTING LEAPFROG INTEGRATION-----
 !
-      do K=1,KB-1
-!
-        ffbio(k)=fbbio(k)+DTI2*((ffbio(k)/H)+D3SOURCE(m,k))
-!
-      end do
+
+                  SELECT CASE (m)
+                     CASE (ppN1p)
+                        LAMBDA = L_PO4
+                     CASE (ppN3n)
+                        LAMBDA = L_NO3
+                     CASE (ppN5s)
+                        LAMBDA = L_SIO4
+                     CASE (ppO2o)
+                        LAMBDA = L_O2
+                     CASE DEFAULT
+                        LAMBDA = L_X
+                  END SELECT
+                  LFLUX = LAMBDA*fbbio ! estimating the lateral flux
+                  do K=1,KB-1
+!            
+                   !ffbio(k)=fbbio(k)+DTI2*((ffbio(k)/H)+D3SOURCE(m,k))
+                    ffbio(k)=fbbio(k)+DTI2*(ffbio(k)+D3SOURCE(m,k)+LFLUX(K))
+!            
+                  end do
 
 !
 !     *******************************************************************
@@ -397,28 +412,6 @@
 !
             ffbio(k)=max(p_small,ffbio(k))
       end do
-
-      IF (NUTSBC_MODE .EQ. 1) THEN 
-            SELECT CASE (m)
-               CASE (ppN1p)
-                  LAMBDA = L_PO4
-               CASE (ppN3n)
-                  LAMBDA = L_NO3
-               CASE (ppN5s)
-                  LAMBDA = L_SIO4
-               CASE (ppO2o)
-                  LAMBDA = L_O2
-               CASE DEFAULT
-                  LAMBDA = L_X
-            END SELECT
-            IF (m .NE. ppO2o .OR. (.NOT. USE_O2_TNDC)) THEN
-                  ! removing laterally from the column an amount of constituent correspoinding to a flux of water equal to DISSURF
-                  CALL SUBTRACT_LATERAL_FLUX(ffbio, LAMBDA)
-            ELSE
-                  ! relaxing towards a given profile of oxygen
-                  CALL SUBTRACT_LATERAL_FLUX2(ffbio, O2_TNDC, LAMBDA)
-            END IF
-      END IF
 !
 !     ---MIX SOLUTIONS AND RESTORE TIME SEQUENCE-----
 !
@@ -526,19 +519,19 @@
 ! Upwind scheme:
 ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=
 !
-!      FF(1)=DZR(1)*F(1)*W(2)
+!     FF(1)=DZR(1)*F(1)*W(2)
+
+!     do K=2,KB-1
 !
-!      do K=2,KB-1
-!!
-!         FF(K)=DZR(K)*(F(K)*W(K+1)-F(K-1)*W(K))
-!!
-!      end do
+!        FF(K)=DZR(K)*(F(K)*W(K+1)-F(K-1)*W(K))
+!
+!     end do
 
 ! scheme: Gordon & Stern 1982
 
-      FF(1) = DZR(1)*F(1)*W(2)
+      FF(1) = DZR(1)/H*(F(1)+F(2))/2*W(2)
       do K=2,KB-1
-         FF(K)= 0.5*( DZR(K)*W(K)*(F(K-1)-F(K)) + DZR(K+1)*W(K+1)*(F(K)-F(K+1)) )
+         FF(K)= 0.5/H*( DZR(K)*W(K)*(F(K-1)-F(K)) + DZR(K+1)*W(K+1)*(F(K)-F(K+1)) )
       end do
 !
       return

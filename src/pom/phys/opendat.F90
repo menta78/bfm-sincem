@@ -85,6 +85,8 @@
                         ism_input,      & ! Inorganic suspended matter Initial Conditions
                         USE_O2_TNDC,    & ! true if a file with oxygen profiles was provided
                         USE_KH_EXT,     & ! true if KH is loaded from an external source
+                        KH_FACTOR,      & ! scaling factor for KH_EXT
+                        W_FACTOR,       &
                         USE_W_PROFILE,  &
                         NUTSBC_MODE,    & ! NUTRIENT SURFACE BOUNDARY CONDITIONS: 0 (default): concentrations. 1: fluxes
                         L_PO4,          &
@@ -134,6 +136,8 @@
                           heat_input,     &
                           surfNut_input,  &
                           NUTSBC_MODE,    &
+                          KH_FACTOR,      &
+                          W_FACTOR,      &
                           L_PO4,          &
                           L_NO3,          &
                           L_SIO4,         &

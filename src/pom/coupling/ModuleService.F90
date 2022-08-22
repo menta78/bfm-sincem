@@ -74,9 +74,10 @@
 !
       logical                           :: USE_KH_EXT = .FALSE.
 !
-!     -----vertical diffusion coefficient from an external source
+!     -----vertical diffusion coefficient from an external source and scaling constat
 !
       real(RLEN)                        :: KH_EXT(KB-1) = 0
+      real(RLEN)                        :: KH_FACTOR = 1
 !
 !     ----- USE_O2_TNDC==.TRUE. if an O2 profile file was provided
 !
@@ -95,6 +96,7 @@
       real(RLEN)                        :: W_MEAN_PR(KB) ! vert. prof. of w mean
       real(RLEN)                        :: W_VRNC_PR(KB) ! vert. prof. of w variance
       real(RLEN)                        :: W_PROFILE(KB)
+      real(RLEN)                        :: W_FACTOR = 1
 !
 !     -----SUSPENDED INORGANIC MATTER PROFILE-----
 !
