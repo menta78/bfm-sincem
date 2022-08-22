@@ -83,7 +83,6 @@
                          L_O2,           &
                          L_X,            &
                          KH_FACTOR,      &
-                         W_FACTOR,      &
                          SWR_FILE_STEP,  &
                          read_restart
 !    
@@ -125,7 +124,6 @@
                             L_O2,           &
                             L_X,            &
                             KH_FACTOR,      &
-                            W_FACTOR,      &
                             SWR_FILE_STEP,  &
                             read_restart
 !

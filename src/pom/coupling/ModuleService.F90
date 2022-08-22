@@ -96,7 +96,6 @@
       real(RLEN)                        :: W_MEAN_PR(KB) ! vert. prof. of w mean
       real(RLEN)                        :: W_VRNC_PR(KB) ! vert. prof. of w variance
       real(RLEN)                        :: W_PROFILE(KB)
-      real(RLEN)                        :: W_FACTOR = 1
 !
 !     -----SUSPENDED INORGANIC MATTER PROFILE-----
 !
