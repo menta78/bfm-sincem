@@ -112,7 +112,7 @@
 !
 !-----BFM STATE VAR. @ time t,  t+DTI, T-DTI RESPECTIVELY-----
 !
- real(RLEN)               :: fbio(KB), ffbio(KB), fbbio(KB) 
+ real(RLEN)               :: fbio(KB), ffbio(KB), fbbio(KB), advtnd(KB) 
 !
 !-----SURFACE FLUX STORAGE-----
 !
@@ -369,7 +369,7 @@
                   IF (USE_W_PROFILE) THEN
                      sink = sink + W_PROFILE
                   END IF
-                  call adverte(fbbio,fbio,ffbio,sink)
+                  call adverte(fbbio,fbio,advtnd,sink)
 !
 !                 -----SOURCE SPLITTING LEAPFROG INTEGRATION-----
 !
@@ -390,7 +390,7 @@
                   do K=1,KB-1
 !            
                    !ffbio(k)=fbbio(k)+DTI2*((ffbio(k)/H)+D3SOURCE(m,k))
-                    ffbio(k)=fbbio(k)+DTI2*(ffbio(k)+D3SOURCE(m,k)+LFLUX(K))
+                    ffbio(k)=fbbio(k)+DTI2*(advtnd(k)+D3SOURCE(m,k)+LFLUX(K))
 !            
                   end do
 
