@@ -369,7 +369,7 @@
                   IF (USE_W_PROFILE) THEN
                      sink = sink + W_PROFILE
                   END IF
-                  call adverte(fbbio,fbio,advtnd,sink)
+                  call adverte(fbio,advtnd,sink) ! computing the advection tendency on the central time step
 !
 !                 -----SOURCE SPLITTING LEAPFROG INTEGRATION-----
 !
@@ -386,7 +386,7 @@
                      CASE DEFAULT
                         LAMBDA = L_X
                   END SELECT
-                  LFLUX = LAMBDA*fbbio ! estimating the lateral flux
+                  LFLUX = LAMBDA*fbio ! estimating the lateral flux. Do it at the central time step!
                   do K=1,KB-1
 !            
                    !ffbio(k)=fbbio(k)+DTI2*((ffbio(k)/H)+D3SOURCE(m,k))
@@ -481,7 +481,7 @@
 !
 ! !INTERFACE
 !
-  SUBROUTINE adverte(FB,F,FF,W)
+  SUBROUTINE adverte(F,ADVTND,W)
 !
 !DESCRIPTION
 !
@@ -506,13 +506,12 @@
 !
      IMPLICIT NONE
 
-     real(RLEN) :: FB(KB),F(KB),FF(KB)
+     real(RLEN) :: F(KB),ADVTND(KB)
      real(RLEN) :: W(KB)
      real(RLEN) :: DTI2
      integer :: k
 !
      F(KB)=F(KB-1)
-     FB(KB)=FB(KB-1)
 !
 ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=
 ! Calculate vertical advection. Mind downward velocities are negative!
@@ -529,9 +528,9 @@
 
 ! scheme: Gordon & Stern 1982
 
-      FF(1) = DZR(1)/H*(F(1)+F(2))/2*W(2)
+      ADVTND(1) = DZR(1)/H*(F(1)+F(2))/2*W(2)
       do K=2,KB-1
-         FF(K)= 0.5/H*( DZR(K)*W(K)*(F(K-1)-F(K)) + DZR(K+1)*W(K+1)*(F(K)-F(K+1)) )
+         ADVTND(K)= 0.5/H*( DZR(K)*W(K)*(F(K-1)-F(K)) + DZR(K+1)*W(K+1)*(F(K)-F(K+1)) )
       end do
 !
       return
