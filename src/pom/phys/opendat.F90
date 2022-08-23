@@ -93,6 +93,10 @@
                         L_SIO4,         &
                         L_O2,           &
                         L_X,            &
+                        ASURF_PO4,      &
+                        ASURF_NO3,      &
+                        ASURF_NH4,      &
+                        ASURF_SIO4,     &
                         SWR_FILE_STEP,  & ! if 1 shortwave radiation is loaded hourly if 0 monthly
                         read_restart      ! Model restart file
 !
@@ -105,8 +109,8 @@
                         SWRAD1, WTSURF1,           &
                         NO3_1,NH4_1,PO4_1, SIO4_1, & 
                         KH_1,                      &
-                        DIS_1, O2_1,        &
-                        WMN1, WVR1,         &
+                        O2_1,                      &
+                        WMN1, WVR1,                &
                         QCORR1                     ! NO MORE IN USE!!!!!
 !
 !    -----IMPLICIT TYPING IS NEVER ALLOWED----
@@ -141,6 +145,10 @@
                           L_SIO4,         &
                           L_O2,           &
                           L_X,            &
+                          ASURF_PO4,      &
+                          ASURF_NO3,      &
+                          ASURF_NH4,      &
+                          ASURF_SIO4,     &
                           SWR_FILE_STEP,  &
                           read_restart
 !
@@ -196,12 +204,7 @@
 !
 !    -----OPEN NUTRIENTS FILE-----
 !
-     SELECT CASE (NUTSBC_MODE)
-        CASE (1)
-           inquire(IOLENGTH=rlength) NO3_1,NH4_1,PO4_1,SIO4_1,DIS_1
-        CASE DEFAULT
-           inquire(IOLENGTH=rlength) NO3_1,NH4_1,PO4_1,SIO4_1
-     END SELECT
+     inquire(IOLENGTH=rlength) NO3_1,NH4_1,PO4_1,SIO4_1
      open(18, file=surfNut_input, form='unformatted',access='direct',recl=rlength)
      write(6,*) 'open 18 done'
 !

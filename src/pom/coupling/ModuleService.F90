@@ -68,7 +68,7 @@
 ! 
 !     -----SURFACE NUTRIENTS AND RUNOFF (ONLY USED IF NUTSBC_MODE == 1)-----
 !
-      real(RLEN)                        :: PO4SURF,NO3SURF,NH4SURF,SIO4SURF,DISSURF
+      real(RLEN)                        :: PO4SURF,NO3SURF,NH4SURF,SIO4SURF
 !
 !     -----USE_KH_EXT==.TRUE. if the vertical diffusion coefficient is loaded from an external file
 !
@@ -103,13 +103,15 @@
 !
 !     ----- relaxation coefficients for: PO4, NO3, SiO4, O2, anything else
 !
-      real(RLEN)                        :: L_PO4, L_NO3, L_SIO4, L_O2, L_X
+      real(RLEN)                        :: L_PO4, L_NO3, L_SIO4, L_O2, L_X = 0
 !
 !     -----NUTRIENT SURFACE BOUNDARY CONDITIONS MODE:
 !     -----    0: surface flux is computed applying the relaxation time NRT (default)
 !     -----    1: surface flux is computed applying the nutrient concentration to a river runoff
 !
       INTEGER                  :: NUTSBC_MODE=0
+!     -----SCALING FACTOR FOR SURFACE FLUXES IF NUTSBC_MODE == 1
+      real(RLEN)                        :: ASURF_PO4=1, ASURF_NO3=1, ASURF_NH4=1, ASURF_SIO4=1
 !
 !     ! short wave radiation stepping: if 1 shortwave radiation is loaded hourly if 0 monthly
 !

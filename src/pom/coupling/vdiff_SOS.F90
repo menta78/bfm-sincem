@@ -195,7 +195,7 @@
 !
                       SELECT CASE (NUTSBC_MODE)
                            CASE (1)
-                              surflux = -DISSURF/1000*PO4SURF    ! units: mmol/s/m^2
+                              surflux = -PO4SURF*ASURF_PO4    ! the input file provides the fluxes. units: mmol/s/m^2
                            CASE DEFAULT
                               surflux = -(PO4SURF-n1p(1))*vrelax ! units: mmol/s/m^2
                       END SELECT 
@@ -209,7 +209,7 @@
 !
                       SELECT CASE (NUTSBC_MODE)
                            CASE (1)
-                              surflux = -DISSURF/1000*NO3SURF    ! units: mmol/s/m^2
+                              surflux = -NO3SURF*ASURF_NO3    ! the input file provides the fluxes. units: mmol/s/m^2
                            CASE DEFAULT
                               surflux = -(NO3SURF-n3n(1))*vrelax ! units: mmol/s/m^2
                       END SELECT 
@@ -222,7 +222,7 @@
 !
                       SELECT CASE (NUTSBC_MODE)
                            CASE (1)
-                              surflux = -DISSURF/1000*NH4SURF    ! units: mmol/s/m^2
+                              surflux = -NH4SURF*ASURF_NH4    ! the input file provides the fluxes. units: mmol/s/m^2
                            CASE DEFAULT
                               surflux = -(NH4SURF-n4n(1))*vrelax ! units: mmol/s/m^2
                       END SELECT 
@@ -235,7 +235,7 @@
 !
                       SELECT CASE (NUTSBC_MODE)
                            CASE (1)
-                              surflux = -DISSURF/1000*SIO4SURF    ! units: mmol/s/m^2
+                              surflux = -SIO4SURF*ASURF_SIO4    ! the input file provides the fluxes. units: mmol/s/m^2
                            CASE DEFAULT
                               surflux = -(SIO4SURF-n5s(1))*vrelax ! units: mmol/s/m^2
                       END SELECT 

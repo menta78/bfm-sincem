@@ -82,6 +82,10 @@
                          L_SIO4,         &
                          L_O2,           &
                          L_X,            &
+                         ASURF_PO4,      &
+                         ASURF_NO3,      &
+                         ASURF_NH4,      &
+                         ASURF_SIO4,     &
                          KH_FACTOR,      &
                          SWR_FILE_STEP,  &
                          read_restart
@@ -123,6 +127,10 @@
                             L_SIO4,         &
                             L_O2,           &
                             L_X,            &
+                            ASURF_PO4,      &
+                            ASURF_NO3,      &
+                            ASURF_NH4,      &
+                            ASURF_SIO4,     &
                             KH_FACTOR,      &
                             SWR_FILE_STEP,  &
                             read_restart

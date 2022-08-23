@@ -126,10 +126,6 @@
 !
       REAL (RLEN),SAVE                       :: SIO4_1,SIO4_2
 !
-!     -----MONTHLY SURFACE DISCHARGE, used only if NUTSBC_MODE == 1 -----
-!     -------- units: kg/m2/s, as in nemo
-      REAL (RLEN),SAVE                       :: DIS_1,DIS_2
-!
 !     -----MONTHLY PROFILES OF O2, used only if NUTSBC_MODE == 1 and if file is present
       REAL (RLEN), DIMENSION(KB-1)             :: O2_1,O2_2 = 0
 !
@@ -243,7 +239,7 @@ contains
 !
       USE MONTECARLO
       use Service,ONLY: ISM,PO4SURF,NO3SURF,NH4SURF,SIO4SURF,&
-              DISSURF, USE_W_PROFILE, W_PROFILE, &
+              USE_W_PROFILE, W_PROFILE, &
               USE_O2_TNDC,O2_TNDC,USE_KH_EXT,KH_EXT,NUTSBC_MODE,&
               SWR_FILE_STEP, DAY_OF_SIMULATION
 !
@@ -277,8 +273,6 @@ contains
         NH4_2        =ZERO
         SIO4_1       =ZERO
         SIO4_2       =ZERO
-        DIS_1        =ZERO
-        DIS_2        =ZERO
         O2_1         =ZERO
         O2_2         =ZERO
         KH_1         =ZERO
@@ -406,16 +400,9 @@ contains
 !
 !         -----SURFACE NUTRIENTS-----
 !
-          SELECT CASE (NUTSBC_MODE)
-             CASE (1)
-                  ! reading the surface concentration and the discharge
-                  READ(18,REC=ICOUNTF)   NO3_1,NH4_1,PO4_1,SIO4_1,DIS_1
-                  READ(18,REC=ICOUNTF+1) NO3_2,NH4_2,PO4_2,SIO4_2,DIS_2
-             CASE DEFAULT
-                  ! reading the surface concentration
-                  READ(18,REC=ICOUNTF)   NO3_1,NH4_1,PO4_1,SIO4_1
-                  READ(18,REC=ICOUNTF+1) NO3_2,NH4_2,PO4_2,SIO4_2
-          END SELECT
+          ! reading the surface concentration
+          READ(18,REC=ICOUNTF)   NO3_1,NH4_1,PO4_1,SIO4_1
+          READ(18,REC=ICOUNTF+1) NO3_2,NH4_2,PO4_2,SIO4_2
 
 
 !
@@ -442,11 +429,11 @@ contains
           END IF
 
 #ifdef SAVEFORCING
-          write(400,'(1i8, 8e18.8)') ICOUNTF, WSU1,WSV1,SWRAD1,NO3_1,NH4_1,PO4_1,SIO4_1,DIS_1
+          write(400,'(1i8, 8e18.8)') ICOUNTF, WSU1,WSV1,SWRAD1,NO3_1,NH4_1,PO4_1,SIO4_1
           write(401,'(1i8,40e18.8)') ICOUNTF, ISM1
           write(402,'(1i8,40e18.8)') ICOUNTF, SCLIM1
           write(403,'(1i8,40e18.8)') ICOUNTF, TCLIM1
-          write(400,'(1i8, 8e18.8)') ICOUNTF+1, WSU2,WSV2,SWRAD2,NO3_2,NH4_2,PO4_2,SIO4_2,DIS_2
+          write(400,'(1i8, 8e18.8)') ICOUNTF+1, WSU2,WSV2,SWRAD2,NO3_2,NH4_2,PO4_2,SIO4_2
           write(401,'(1i8,40e18.8)') ICOUNTF+1, ISM2
           write(402,'(1i8,40e18.8)') ICOUNTF+1, SCLIM2
           write(403,'(1i8,40e18.8)') ICOUNTF+1, TCLIM2
@@ -565,7 +552,6 @@ contains
       NH4SURF  = NH4_1  + RATIOF * (NH4_2-NH4_1)
       PO4SURF  = PO4_1  + RATIOF * (PO4_2-PO4_1)
       SIO4SURF = SIO4_1 + RATIOF * (SIO4_2-SIO4_1)
-      DISSURF  = DIS_1  + RATIOF * (DIS_2-DIS_1)
       O2_TNDC  = O2_1 + RATIOF * (O2_2 - O2_1)
       KH_EXT   = KH_1 + RATIOF * (KH_2 - KH_1)
 !
@@ -596,7 +582,6 @@ contains
          NH4_1      = NH4_2
          PO4_1      = PO4_2
          SIO4_1     = SIO4_2
-         DIS_1      = DIS_2
          O2_1       = O2_2
          KH_1       = KH_2
          ISM1(:)    = ISM2(:)
@@ -641,14 +626,8 @@ contains
 !
              SWRAD1=SWRAD1*(-ONE)/rcp
 !
-             SELECT CASE (NUTSBC_MODE)
-                CASE (1)
-                     ! reading the surface concentration and the discharge
-                     READ(18,REC=1) NO3_1,NH4_1,PO4_1,SIO4_1, DIS_1
-                CASE DEFAULT
-                     ! reading the surface concentration
-                     READ(18,REC=1) NO3_1,NH4_1,PO4_1,SIO4_1
-             END SELECT
+             ! reading the surface concentration
+             READ(18,REC=1) NO3_1,NH4_1,PO4_1,SIO4_1
 !
              DO K = 1, KB-1
                 READ (19,REC=K) ISM1(K)
@@ -677,14 +656,7 @@ contains
 !
 !        -----READ FOLLOWING MONTH-----
 !
-         SELECT CASE (NUTSBC_MODE)
-            CASE (1)
-                 ! reading the surface concentration and the discharge
-                 READ(18,REC=ICOUNTF) NO3_2,NH4_2,PO4_2,SIO4_2, DIS_2
-            CASE DEFAULT
-                 ! reading the surface concentration
-                 READ(18,REC=ICOUNTF) NO3_2,NH4_2,PO4_2,SIO4_2
-         END SELECT
+         READ(18,REC=ICOUNTF) NO3_2,NH4_2,PO4_2,SIO4_2
 
          READ (11,REC=ICOUNTF) WSU2,WSV2
 !
@@ -719,7 +691,7 @@ contains
          END IF
 !
 #ifdef SAVEFORCING
-          write(400,'(1i8, 8e18.8)') ICOUNTF, WSU2,WSV2,SWRAD2,NO3_2,NH4_2,PO4_2,SIO4_2,DIS_2
+          write(400,'(1i8, 8e18.8)') ICOUNTF, WSU2,WSV2,SWRAD2,NO3_2,NH4_2,PO4_2,SIO4_2
           flush(400)
 #endif
 !       -----POM UNITS-----
