@@ -376,15 +376,15 @@
 
                   SELECT CASE (m)
                      CASE (ppN1p)
-                        LAMBDA = L_PO4
+                        LAMBDA = L_PO4(MONTH_OF_SIMULATION)
                      CASE (ppN3n)
-                        LAMBDA = L_NO3
+                        LAMBDA = L_NO3(MONTH_OF_SIMULATION)
                      CASE (ppN5s)
-                        LAMBDA = L_SIO4
+                        LAMBDA = L_SIO4(MONTH_OF_SIMULATION)
                      CASE (ppO2o)
-                        LAMBDA = L_O2
+                        LAMBDA = L_O2(MONTH_OF_SIMULATION)
                      CASE DEFAULT
-                        LAMBDA = L_X
+                        LAMBDA = L_X(MONTH_OF_SIMULATION)
                   END SELECT
                   LFLUX = LAMBDA*fbio ! estimating the lateral flux. Do it at the central time step!
                   do K=1,KB-1

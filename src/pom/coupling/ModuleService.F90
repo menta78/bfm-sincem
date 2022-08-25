@@ -103,7 +103,8 @@
 !
 !     ----- relaxation coefficients for: PO4, NO3, SiO4, O2, anything else
 !
-      real(RLEN)                        :: L_PO4, L_NO3, L_SIO4, L_O2, L_X = 0
+      INTEGER, PARAMETER                :: N_MONTHS = 12
+      real(RLEN), DIMENSION(N_MONTHS)   :: L_PO4=0, L_NO3=0, L_SIO4=0, L_O2=0, L_X=0
 !
 !     -----NUTRIENT SURFACE BOUNDARY CONDITIONS MODE:
 !     -----    0: surface flux is computed applying the relaxation time NRT (default)
@@ -123,6 +124,7 @@
       integer(ilong)                    :: savef
 
       integer(ilong)                    :: DAY_OF_SIMULATION = -999999
+      integer(ilong)                    :: MONTH_OF_SIMULATION = -999999
 !
 !     -----THESE ARE THE PATHWAYS FOR THE IC, RESTART AND FORCING FILES (READ TROUGH NML)-----
 !

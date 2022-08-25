@@ -241,7 +241,7 @@ contains
       use Service,ONLY: ISM,PO4SURF,NO3SURF,NH4SURF,SIO4SURF,&
               USE_W_PROFILE, W_PROFILE, &
               USE_O2_TNDC,O2_TNDC,USE_KH_EXT,KH_EXT,NUTSBC_MODE,&
-              SWR_FILE_STEP, DAY_OF_SIMULATION
+              SWR_FILE_STEP, DAY_OF_SIMULATION, MONTH_OF_SIMULATION
 !
 ! -----IMPLICIT TYPING IS NEVER ALLOWED-----
 !
@@ -482,7 +482,7 @@ contains
       SELECT CASE (SWR_FILE_STEP)
          CASE (1)
             ! loading hourly data
-            IHOUR = MOD(FLOOR(INTT*DTI/3600), 365*24) + 1
+            IHOUR = MOD(FLOOR(INTT*DTI/3600), 360*24) + 1
             READ (21,REC=IHOUR) SWRAD
 !         -----HEAT FLUX CONVERTED TO POM UNITS(W/m2-->deg.C*m/s)-----
             SWRAD  = SWRAD*(-ONE)/rcp
@@ -512,15 +512,15 @@ contains
       SSTAR(:KB-1) = SCLIM1(:) + RATIOF * (SCLIM2(:)-SCLIM1(:))
       SSTAR(KB) = SSTAR(KB-1)
 
-      IF (USE_W_PROFILE) THEN
-         IDAY = MOD(FLOOR(INTT*DTI/86400), 365) + 1
-         IF (IDAY .NE. DAY_OF_SIMULATION) THEN
+      IDAY = MOD(FLOOR(INTT*DTI/86400), 360) + 1
+      IF (IDAY .NE. DAY_OF_SIMULATION) THEN
+         DAY_OF_SIMULATION = IDAY
+         MONTH_OF_SIMULATION = MIN(FLOOR(DAY_OF_SIMULATION/30.0) + 1, 12)
+         IF (USE_W_PROFILE) THEN
             ! montecarlo for w on a daily basis
             W_MEAN_PR = WMN1 + RATIOF * (WMN2-WMN1)
             W_VRNC_PR = WVR1 + RATIOF * (WVR2-WVR1)
             CALL PROFILE_MONTECARLO_NORMAL(W_MEAN_PR, W_VRNC_PR, W_PROFILE)
-            W_PROFILE = W_PROFILE
-            DAY_OF_SIMULATION = IDAY
          END IF
       END IF
 !
@@ -567,6 +567,7 @@ contains
 !
          ICOUNTF = ICOUNTF + 1
          PRINT *, 'ICOUNTF', ICOUNTF
+         PRINT *, '    MONTH_OF_SIMULATION, DAY_OF_SIMULATION', MONTH_OF_SIMULATION, DAY_OF_SIMULATION
 !
 !        -----....RESET INTERPOLATION COUNTER....-----
 !
