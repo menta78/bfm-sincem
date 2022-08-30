@@ -399,6 +399,7 @@
    use netcdf_bfm, only: save_bfm
    use mem
    use api_bfm, only: out_delta, save_delta , time_delta, update_save_delta
+   use global_mem, only: RLEN, bfm_lwp, LOGUNIT
 #ifdef DEBUG
    use api_bfm, only: printDEBUG
 #endif
@@ -493,6 +494,7 @@ real(RLEN) :: localtime
 ! !USES:
    use time
    use netcdf_bfm, only: close_ncdf, ncid_bfm, save_rst_bfm, ncid_rst
+   use global_mem, only: RLEN, bfm_lwp, LOGUNIT
    use api_bfm, only: time_delta
    IMPLICIT NONE
 ! !INPUT PARAMETERS:

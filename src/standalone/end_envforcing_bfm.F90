@@ -14,6 +14,7 @@
 !
 ! !USES:
    use envforcing
+   use global_mem, only: RLEN, bfm_lwp, LOGUNIT
 
    IMPLICIT NONE
 !
