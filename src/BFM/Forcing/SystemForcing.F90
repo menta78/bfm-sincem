@@ -207,7 +207,7 @@
       do 
          ValBef  = ValAft
          read(FData%lun,*,END=901,ERR=902) InpDate,ValAft
-         LEVEL2 InpDate,ValAft
+         !LEVEL2 InpDate,ValAft
          read (InpDate,'(I4,a1,I2,a1,I2,1x,I2,a1,I2)') yy,c1,mm,c1,dd,hh,c1,nn
          call julian_day(yy,mm,dd,hh,nn,jdayaft)
          if ( jdayaft > bfmtime%time0 ) then
