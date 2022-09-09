@@ -1,35 +1,39 @@
-#include "cppdefs.h"
-#include "DEBUG.h"
-#include "INCLUDE.h"
-
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-!BOP
 !
-! !ROUTINE: ChlAttenuation
+! ROUTINE: ChlAttenuation
 !
 ! DESCRIPTION
+!   ** Purpose :   Initialization of the Chl attenuation optical scheme
+!   ** Method  :   Set a look up table for the optical coefficients
+!                  i.e. the attenuation coefficient for R-G-B light
+!                  tabulated in Chlorophyll class (from JM Andre)
+!   ** Action  :   prgb(3,61) tabulated R-G-B attenuation coef.
+!   Reference  : Lengaigne et al. 2007, Clim. Dyn., V28, 5, 503-516.
 !
-! ** Purpose :   Initialization of the Chl attenuation optical scheme
+! COPYING
 !
-! ** Method  :   Set a look up table for the optical coefficients
-!                i.e. the attenuation coefficient for R-G-B light
-!                tabulated in Chlorophyll class (from JM Andre)
+!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
 !
-! ** Action  :   prgb(3,61) tabulated R-G-B attenuation coef.
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU General Public License for more details.
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 !
-! Reference  : Lengaigne et al. 2007, Clim. Dyn., V28, 5, 503-516.
-!   
+! INCLUDE
+#include "cppdefs.h"
+#include "DEBUG.h"
+#include "INCLUDE.h"
 !
-! !INTERFACE
+! INTERFACE
   SUBROUTINE ChlAttenuation( prgb )
 !
-! !USES:
-
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! Modules (use of ONLY is strongly encouraged!)
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+! USES
   use global_mem, ONLY:RLEN,ONE,ZERO,LOGUNIT
   use bfm_error_msg
   use mem_Param,  ONLY: p_small
@@ -39,34 +43,10 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   IMPLICIT NONE
 
-! !INPUT/OUTPUT:
+  ! INPUT/OUTPUT
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   REAL(RLEN), DIMENSION(3,61), INTENT(out) ::   prgb   ! tabulated attenuation coefficient
-!
-! !AUTHORS
-! 2004-03  (C. Ethe)  Original code
-! M. Vichi (UCT) modified for integration with the BFM
-!
-! !REVISION_HISTORY
-!
-! COPYING
-!   
-!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
-!   Copyright (C) 2004-2014 NEMO System Team 
-!
-!   This program is free software; you can redistribute it and/or modify
-!   it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation;
-!   This program is distributed in the hope that it will be useful,
-!   but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-!   GNU General Public License for more details.
-!
-!EOP
-!-------------------------------------------------------------------------!
-!BOC
-!
-!
+
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Local Variables
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -75,8 +55,7 @@
   REAL(RLEN) ::   zchl   ! temporary scalar
   REAL(RLEN), DIMENSION(4,61) :: zrgb   ! tabulated attenuation coefficient 
   REAL(RLEN)                  :: r_si2  ! maximum attenuation depth
-
-  !!----------------------------------------------------------------------
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   !
   !  Chlorophyll        !     Blue attenuation     !     Green attenuation    !     Red attenuation      !
       zrgb(1, 1) =  0.010   ;   zrgb(2, 1) = 0.01618   ;   zrgb(3, 1) = 0.07464   ;   zrgb(4, 1) = 0.37807
@@ -153,9 +132,9 @@
             CALL bfm_error( 'ChlAttenuation.F90',' inconsistency in Chl tabulated attenuation coeff.' )
          ENDIF
       END DO
-      !
+
    END SUBROUTINE ChlAttenuation
-!EOC
+
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
