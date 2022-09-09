@@ -629,7 +629,7 @@ if [[ ${DEP} && "$MODE" != "NEMO_CESM" ]]; then
            cp *.xml ${exedir}/
         fi
     else
-        echo "WARNING: directory ${exedir} exists (not overwriting namelists)"
+        echo "WARNING: directory ${exedir} exists (not overwriting namelists)\n"
     fi
 
     #Copy executable and insert exe and valgrind commands
@@ -647,15 +647,15 @@ if [[ ${DEP} && "$MODE" != "NEMO_CESM" ]]; then
         else 
             execmd="${MPICMD} ${VALGRIND} ./${NEMOEXE}"
         fi
+    fi
 
-        #change values in runscript
-        sed -e "s,_EXP_,${EXP},g"         \
-            -e "s,_EXE_,${execmd},g"      \
-            -e "s,_VERBOSE_,${VERBOSE},g" \
-            -e "s,_PRESET_,${PRESET},g"   \
-            -e "s,_QUEUE_,${QUEUE},g"     \
-            -e "s,_PROC_,${PROC},g"     ${BFMDIR}/${SCRIPTS_PROTO}/${RUNPROTO} > ${exedir}/${RUNPROTO}_${EXP}
-        printf "Go to ${exedir} and execute command:\n\t./${BFMEXE}\n\tor use the template script ${RUNPROTO}_${EXP}\n"
-        fi
+    #change values in runscript
+    sed -e "s,_EXP_,${EXP},g"         \
+        -e "s,_EXE_,${execmd},g"      \
+        -e "s,_VERBOSE_,${VERBOSE},g" \
+        -e "s,_PRESET_,${PRESET},g"   \
+        -e "s,_QUEUE_,${QUEUE},g"     \
+        -e "s,_PROC_,${PROC},g"     ${BFMDIR}/${SCRIPTS_PROTO}/${RUNPROTO} > ${exedir}/${RUNPROTO}_${EXP}
+    printf "Go to ${exedir} and execute command:\n\t./${BFMEXE}\n\tor use the template script ${RUNPROTO}_${EXP}\n"
 
 fi
