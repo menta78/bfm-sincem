@@ -3,20 +3,17 @@
 # DESCRIPTION
 #   BFM Configuration manager
 #
-# AUTHORS
-#   Tomas Lovato tomas.lovato@cmcc.it
-#
 # COPYING
-#  
+#
 #   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
 #
-#   This program is free software; you can redistribute it and/or modify
+#   This program is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
-#   the Free Software Foundation;
+#   the Free Software Foundation.
 #   This program is distributed in the hope that it will be useful,
 #   but WITHOUT ANY WARRANTY; without even the implied warranty of
-#   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#   GNU General Public License for more details.
+#   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+#   See the GNU General Public License for more details.
 # -----------------------------------------------------
 
 #logging configuration
@@ -130,7 +127,7 @@ DESCRIPTION
                   Necessary forcings to execute the model. To specify several files, separate them by colon ';' and surround all by quotes '"'.
                   (If the path is relative, the ROOT will be ${BFMDIR})
        -D EXPDIR
-                  Input dir where are files to copy to experiment directory (Default: "${TEMPDIR}/${PRESET}")
+                  Input dir where are files to copy to experiment directory (Default: configurations/${PRESET}")
        -e EXECMD
                   Executable command to insert in runscript (Default for NEMO: "${MPICMD}", empty for others)
        -V VALGRIND
@@ -184,7 +181,7 @@ while getopts "hvgcdPp:m:k:N:S:a:fx:F:i:D:e:V:r:q:o:R:" opt; do
       x ) [ ${VERBOSE} ] && echo "experiment $OPTARG"       ; exp_usr=$OPTARG      ;;
       F ) [ ${VERBOSE} ] && echo "experiment files $OPTARG" ; expfiles_usr=$OPTARG ;;
       i ) [ ${VERBOSE} ] && echo "forcing files $OPTARG"    ; forcing_usr=$OPTARG  ;;
-      D ) [ ${VERBOSE} ] && echo "namelist dir $OPTARG"     ; expdir_usr=$OPTARG   ;;
+      D ) [ ${VERBOSE} ] && echo "inputdata dir $OPTARG"    ; expdir_usr=$OPTARG   ;;
       e ) [ ${VERBOSE} ] && echo "exe command $OPTARG"      ; execmd_usr=$OPTARG   ;;
       V ) [ ${VERBOSE} ] && echo "valgrind command $OPTARG" ; valgrind_usr=$OPTARG ;;
       r ) [ ${VERBOSE} ] && echo "n. procs $OPTARG"         ; proc_usr=$OPTARG     ;;
@@ -243,6 +240,7 @@ for option in "${OPTIONS[@]}"; do
     if [ "${value}" ]; then 
         [ ${VERBOSE} ] && echo "- replacing ${option}=${value}"
         eval ${option}=\"\${value}\"
+    if [ "${option}" == "EXPDIR" ] ; then EXPDIR=${BFMDIR}/${CONFDIR}/${PRESET}/${value} ; fi
     fi
 done
 
@@ -598,7 +596,7 @@ if [[ ${DEP} && "$MODE" != "NEMO_CESM" ]]; then
         cp *.nml ${exedir}/
         if [ "$MODE" == "OGS" ] ; then cp namelist* ${exedir}/; fi
         if [ "${EXPFILES}" ]; then cp ${EXPFILES} ${exedir}/; fi
-        if [ "${EXPDIR}"   ]; then cp ${EXPDIR}/* ${exedir}/; fi
+        if [ "${EXPDIR}"   ]; then cp -R ${EXPDIR} ${exedir}/; fi
 
         #link forcing files to exedir
         if [ "${FORCING}" ]; then

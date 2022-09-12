@@ -1,43 +1,29 @@
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-! MODEL
-!	   BFM - Biogeochemical Flux Model
-!
-! MODULE
-!   set_var_info_bfm
-!
-! FILE
-!   set_var_info_bfm
-!
-! DESCRIPTION
-!  This subroutine provides information on the variables. To be used
-!  when storing data in NetCDF files.
-!  This file is produced by a procedure from a file which include all
-!  definitions of global variables and state variables  and a proto-file 
-!
-!
-! AUTHORS
-!    Piet Ruardij
-!
-! CHANGE_LOG
-!   ---
-!
-! COPYING
-!   
-!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
-!   Copyright (C) 2006 P. Ruardij  (rua@nioz.nl)
-!
-!   This program is free software; you can redistribute it and/or modify
-!   it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation;
-!   This program is distributed in the hope that it will be useful,
-!   but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-!   GNU General Public License for more details.
-!
+! MODEL  BFM - Biogeochemical Flux Model
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 !
+! MODULE: set_var_info_bfm
 !
+! DESCRIPTION
+!   This subroutine provides information on the variables. To be used
+!   when storing data in NetCDF files.
+!   This file is produced by a procedure from a file which include all
+!   definitions of global variables and state variables  and a proto-file 
 !
+! COPYING
+!
+!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU General Public License for more details.
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! INCLUDE
 
 subroutine set_var_info_bfm
 
@@ -131,3 +117,7 @@ subroutine set_var_info_bfm
 %startend-string-index
 
 end subroutine set_var_info_bfm
+
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

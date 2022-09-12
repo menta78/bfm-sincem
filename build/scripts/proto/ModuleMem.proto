@@ -1,16 +1,11 @@
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-! MODEL
-!	   BFM - Biogeochemical Flux Model
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 !
-! MODULE
-!   ModuleMem
-!
-! FILE
-!   ModuleMem
+! MODULE: ModuleMem
 !
 ! DESCRIPTION
 !   Definition of Global Shared Memory
-!  
 !   This module contains all the structural definitions of the BFM
 !   and sets up the memory layout.
 !   It is automatically generated from the prototype file 
@@ -19,40 +14,27 @@
 !   Do not directly edit this code because changes will be lost at
 !   any new compilation.
 !
-! AUTHORS
-!   Piet Ruardij & Marcello Vichi
-!
-! CHANGE_LOG
-!   ---
-!
-! COPYING
-!   
-!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
-!   Copyright (C) 2006 P. Ruardij, M. Vichi
-!   (rua@nioz.nl, vichi@bo.ingv.it)
-!
-!   This program is free software; you can redistribute it and/or modify
-!   it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation;
-!   This program is distributed in the hope that it will be useful,
-!   but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-!   GNU General Public License for more details.
-!
-!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-!
-!
-!
 !! IMPORTANT NOTE:
 !! Do not change the lines starting with two comment characters "!" 
 !! These lines are used by the parser to generate the final module file
-
 !
-
+! COPYING
+!
+!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU General Public License for more details.
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! INCLUDE
 #include"cppdefs.h"
-
 #include "DEBUG.h"
-
+!
       module mem
         !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
         ! Modules can optionally use (import) other modules
@@ -464,3 +446,6 @@
 
   end module mem
 
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
