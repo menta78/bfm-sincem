@@ -1,51 +1,42 @@
-#include "DEBUG.h"
-#include "cppdefs.h"
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-!BOP
 !
-! !ROUTINE: Seaicealgae
+! ROUTINE: Seaicealgae
 !
 ! DESCRIPTION
 !   Parameter values for the sea ice algae group
-!
-! !INTERFACE
-  module mem_SeaicetoPel
-!
-! !USES:
-
-  use global_mem
-  use mem, only: iiSeaiceAlgae,iiSeaiceDetritus,iiSeaiceBacteria,iiSeaiceZoo
-  use mem, only: iiP1,iiP2,iiZ5,iiB1,iiR1,iiR6
-!
-!
-! !AUTHORS
-!   Letizia Tedesco and Marcello Vichi
 !
 ! COPYING
 !
 !   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
 !
-!   This program is free software; you can redistribute it and/or modify
+!   This program is free software: you can redistribute it and/or modify
 !   it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation;
+!   the Free Software Foundation.
 !   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-!   GNU General Public License for more details.
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU General Public License for more details.
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 !
-!EOP
-!-------------------------------------------------------------------------!
-!BOC
+! INCLUDE
+#include "DEBUG.h"
+#include "cppdefs.h"
+!
+! INTERFACE
+  module mem_SeaicetoPel
+!
+! USES
+  use global_mem
+  use mem, only: iiSeaiceAlgae,iiSeaiceDetritus,iiSeaiceBacteria,iiSeaiceZoo
+  use mem, only: iiP1,iiP2,iiZ5,iiB1,iiR1,iiR6
+
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Implicit typing is never allowed
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   IMPLICIT NONE
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! Default all is not public
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! public
+
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Sea ice - pelagic coupling PARAMETERS (read from nml)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -75,13 +66,13 @@
   integer,dimension(iiSeaiceDetritus):: DET
   integer,dimension(iiSeaiceZoo)     :: ZOO
   integer,dimension(iiSeaiceBacteria):: BAC
+
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! SHARED PUBLIC FUNCTIONS (must be explicited below "contains")
-
   public InitSeaicetoPel, SeaicetoPelCoup
+
   contains
 
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   subroutine InitSeaicetoPel()
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -90,7 +81,7 @@
     CalcSeaiceFloodFlux, p_floN1, p_floN3, p_floN4, p_floN5, &
     CalcSeaiceAddPelFlux, p_pelN1, p_relaxN1
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  !BEGIN compute
+
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     ! set default values
     p_epsIce = 1.5_RLEN
@@ -123,9 +114,7 @@
     close(NMLUNIT)
     write(LOGUNIT,*) "#  Namelist is:"
     write(LOGUNIT,nml=Seaicecoup_parameters)
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  !END compute
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
   return
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Local Error Messages
@@ -133,24 +122,14 @@
 100 call error_msg_prn(NML_OPEN,"SeaicetopelCoup.F90","Seaice_Coupling.nml")
 101 call error_msg_prn(NML_READ,"SeaicetopelCoup.F90","Seaicecoup_parameters")
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
   end  subroutine InitSeaicetoPel
 
-!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-!BOP
-!
-! !ROUTINE: SeaicetoPelCoup
-!
-! DESCRIPTION
-!
-! !INTERFACE
+! -----------------------------------------------------------------------------
+
   subroutine SeaicetoPelCoup
 !
-! !USES:
-
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! Modules (use of ONLY is strongly encouraged!)
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-
+! USES
    use global_mem, only: RLEN,ZERO,ONE
    use mem_PAR,    only: p_PAR, p_epsR6
    use mem_Param,  only: CalcSeaiceAlgae,CalcSeaiceZoo,CalcSeaiceBacteria 
@@ -164,6 +143,10 @@
   ! Implicit typing is never allowed
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    IMPLICIT NONE
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Local Variables
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    real(RLEN), dimension(NO_BOXES_XY) :: flux_pel_ice_N1,flux_pel_ice_N3
    real(RLEN), dimension(NO_BOXES_XY) :: flux_pel_ice_N4,flux_pel_ice_N5
    real(RLEN), dimension(NO_BOXES_XY) :: flux_pel_ice_O2,flux_pel_ice_O3
@@ -177,17 +160,13 @@
    real(RLEN), dimension(NO_BOXES_XY) :: I1p_star,I3n_star,I4n_star,I5s_star
    real(RLEN), dimension(NO_BOXES_XY) :: F2o_star,F3c_star
    real(RLEN), dimension(NO_BOXES_XY) :: EICE1D,epsIce,EIRsrf
-
+   !
    integer                            :: i,j,p
    real(RLEN), dimension(:), pointer  :: lcl_PelagicVar,lcl_SeaiceVar
    real(RLEN)                         :: tmpflux(NO_BOXES)
    real(RLEN)                         :: delta
    real(RLEN), external               :: GetDelta
-!
-!EOP
-!-------------------------------------------------------------------------!
-!BOC
-!
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
     delta = GetDelta()
 
@@ -465,7 +444,6 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Other Seaice diagnostics
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-
 #ifdef DEBUG
    LEVEL2 'F3 flux ',flux_pel_ice_O3
    LEVEL2 'flux_pel_ice_N1',flux_pel_ice_N1
@@ -475,13 +453,10 @@
    LEVEL2 'EHB=',EHB
 #endif
  
-!EOC
+  end subroutine SeaicetoPelCoup
 
-end subroutine SeaicetoPelCoup
-!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  end module mem_SeaicetoPel
 
-end module mem_SeaicetoPel
-!EOC
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model 
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
