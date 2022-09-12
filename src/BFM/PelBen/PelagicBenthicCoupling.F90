@@ -1,11 +1,8 @@
-#include "DEBUG.h"
-#include "INCLUDE.h"
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-!BOP
 !
-! !ROUTINE: PelagicBenthicCoupling
+! ROUTINE: PelagicBenthicCoupling
 !
 ! DESCRIPTION
 !   This routine solve the exchanges of OMT and Inorganic Nutrients 
@@ -22,15 +19,27 @@
 !  2) Burial velocity is defined in ModuleSettling.F90, which controls 
 !     the inflow rate of OMT and phytoplankton from the pelagic to benthic
 !
-! !INTERFACE
+! COPYING
+!
+!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU General Public License for more details.
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! INCLUDE
+#include "DEBUG.h"
+#include "INCLUDE.h"
+!
+! INTERFACE
    subroutine PelagicBenthicCoupling
 !
-! !USES:
-
-   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-   ! Modules (use of ONLY is strongly encouraged!)
-   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-
+! USES
    use global_mem, ONLY:RLEN,ZERO,ONE
 #ifdef NOPOINTERS
    use mem
@@ -75,28 +84,7 @@
 #else
  use api_bfm, ONLY: BOTindices
 #endif
-   !
-   !
-   ! !AUTHORS
-   !   2018 : T. Lovato
-   !
-   ! COPYING
-   !
-   !   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
-   !
-   !   This program is free software; you can redistribute it and/or modify
-   !   it under the terms of the GNU General Public License as published by
-   !   the Free Software Foundation;
-   !   This program is distributed in the hope that it will be useful,
-   !   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   !   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   !   GNU General Public License for more details.
-   !
-   !EOP
-   !-------------------------------------------------------------------------!
-   !BOC
-   !
-   !
+
    !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    ! Implicit typing is never allowed
    !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -116,6 +104,7 @@
    real(RLEN) :: sedi, c, p, s, uptake, ruQc, ruQn, ruQp, ruQs, ruQf, ruQl, Delta
    real(RLEN), external  :: GetDelta
    !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
    allocate(jbotR1PPY(iiLastElement,NO_BOXES_XY), jbotR2R1(NO_BOXES_XY),   &
             jbotR6PPY(iiLastElement,NO_BOXES_XY), jbotR2R6(NO_BOXES_XY) )
    !
@@ -455,3 +444,6 @@
 
 end subroutine PelagicBenthicCoupling
 
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
