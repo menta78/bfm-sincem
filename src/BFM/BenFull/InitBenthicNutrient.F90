@@ -24,7 +24,6 @@
   ! Modules (use of ONLY is strongly encouraged!)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-  use bfm_error_msg, ONLY: set_warning_for_getm
   use global_mem, ONLY:RLEN,LOGUNIT,ZERO,ONE
 #ifdef NOPOINTERS
   use mem
