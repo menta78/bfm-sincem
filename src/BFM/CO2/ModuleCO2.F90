@@ -1,50 +1,48 @@
-#include "cppdefs.h"
-
-#if defined INCLUDE_PELCO2 || defined INCLUDE_BENCO2
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model 
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-!BOP
 !
-! !ROUTINE: ModulePelCO2
+! ROUTINE: ModulePelCO2
 !
 ! DESCRIPTION
-! Module to simulate the Carbonate system dynamics in Pelagic compartment
-!
-! !INTERFACE
-  module mem_CO2
-!
-! !USES:
-  use global_mem
-  use SystemForcing, only :ForcingName, ForcingField, FieldInit, FieldClose
-  IMPLICIT NONE
-!  
-!
-! !AUTHORS
-!   T. Lovato (CMCC) 2017
-!
-! !REVISION_HISTORY
+!   Module to simulate the Carbonate system dynamics in Pelagic compartment
 !
 ! COPYING
-!   
+!
 !   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
 !
-!   This program is free software; you can redistribute it and/or modify
+!   This program is free software: you can redistribute it and/or modify
 !   it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation;
+!   the Free Software Foundation.
 !   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-!   GNU General Public License for more details.
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU General Public License for more details.
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 !
-!EOP
-!-------------------------------------------------------------------------!
-!BOC
+! INCLUDE
+#include "cppdefs.h"
+
+#if defined INCLUDE_PELCO2 || defined INCLUDE_BENCO2
+
+!
+! INTERFACE
+  module mem_CO2
+!
+! USES
+  use global_mem
+  use SystemForcing, only :ForcingName, ForcingField, FieldInit, FieldClose
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Implicit typing is never allowed
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  IMPLICIT NONE
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Default all is public
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   public
+
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   !NAMELIST PelCO2_parameters
   !-------------------------------------------------------------------------!
@@ -91,9 +89,9 @@
 
   contains
 
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   subroutine InitCO2()
 
+  ! USES
 #ifdef NOPOINTERS
   use mem
 #else
@@ -108,102 +106,103 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   integer            ::error=0
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
   allocate (patm3d(NO_BOXES))
   patm3d = p_atm0
   !---------------------------------------------------------------------------
   ! Initialize the structured array that defines if a variable is initialized  
   ! with external data.
   !---------------------------------------------------------------------------
-                        ! Read  !   File     ! Netcdf  !  Var   ! File    ! Input      !   Time   !
-                        ! Input !   name     ! Logical !  name  ! RefTime ! Frequency  !  interp  !
-    AtmCO2_N = ForcingName( 0  , "dummy.nc" , .TRUE.  ,"AtmCO2" , "dummy" ,  "dummy"   ,  .TRUE.  )
-    AtmSLP_N = ForcingName( 0  , "dummy.nc" , .TRUE.  ,"AtmSLP" , "dummy" ,  "dummy"   ,  .TRUE.  )
+                      ! Read  !   File     ! Netcdf  !  Var   ! File    ! Input      !   Time   !
+                      ! Input !   name     ! Logical !  name  ! RefTime ! Frequency  !  interp  !
+  AtmCO2_N = ForcingName( 0  , "dummy.nc" , .TRUE.  ,"AtmCO2" , "dummy" ,  "dummy"   ,  .TRUE.  )
+  AtmSLP_N = ForcingName( 0  , "dummy.nc" , .TRUE.  ,"AtmSLP" , "dummy" ,  "dummy"   ,  .TRUE.  )
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   !  Open the namelist file(s)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-
-    LEVEL1 '-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'
-    LEVEL1 ' '
-    LEVEL1 '     INITIALIZE PELAGIC CARBONATE SYSTEM       ' 
-    LEVEL1 ' '
-    LEVEL2 'Namelist content:'
-    open(NMLUNIT,file='Carbonate_Dynamics.nml',status='old',action='read',err=100)
-    read(NMLUNIT,nml=CSYS_parameters,err=101)
-    close(NMLUNIT)
-    if (bfm_lwp) write(LOGUNIT,nml=CSYS_parameters)
-    LEVEL1 ' '
+  LEVEL1 '-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'
+  LEVEL1 ' '
+  LEVEL1 '     INITIALIZE PELAGIC CARBONATE SYSTEM       ' 
+  LEVEL1 ' '
+  LEVEL2 'Namelist content:'
+  open(NMLUNIT,file='Carbonate_Dynamics.nml',status='old',action='read',err=100)
+  read(NMLUNIT,nml=CSYS_parameters,err=101)
+  close(NMLUNIT)
+  if (bfm_lwp) write(LOGUNIT,nml=CSYS_parameters)
+  LEVEL1 ' '
  
   ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Set initial conditions
   ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-    ! Atmospheric CO2 concentration
-    AtmCO2%init = AtmCO2_N%init 
-    CALL FieldInit(AtmCO2_N, AtmCO2)
-    SELECT CASE ( AtmCO2%init )
-       CASE (0) ! Costant
-          ! the following check is needed to avoid allocation of empty arrays with MPI and land domains
-          if (NO_BOXES_XY > 0) then
-             AtmCO2%fnow = AtmCO20
-             LEVEL1 'Using constant atmospheric CO2 concentration:', AtmCO2%fnow(1)
-             LEVEL1 ' '
-          end if
-       CASE (1) ! read external 0-D timeseries
-          ! the following check is needed to avoid allocation of empty arrays with MPI and land domains
-          if (NO_BOXES_XY > 0) then
-             LEVEL1 'BFM Read atmospheric CO2 timeseries. Initial value:', AtmCO2%fnow(1)
-             LEVEL1 ' '
-          end if
-       CASE (2) ! read external 2-D fields with NEMO fldread (see envforcing_bfm)
-          ! the following check is needed to avoid allocation of empty arrays with MPI and land domains
-          if (NO_BOXES_XY > 0) then
-             AtmCO2%fnow = AtmCO20
-             LEVEL1 'Read CO2 2D fields with NEMO fldread. Initialize with default uniform value', AtmCO2%fnow(1)
-             LEVEL1 ' '
-          end if
-    END SELECT
+  ! Atmospheric CO2 concentration
+  AtmCO2%init = AtmCO2_N%init 
+  CALL FieldInit(AtmCO2_N, AtmCO2)
+  SELECT CASE ( AtmCO2%init )
+     CASE (0) ! Costant
+        ! the following check is needed to avoid allocation of empty arrays with MPI and land domains
+        if (NO_BOXES_XY > 0) then
+           AtmCO2%fnow = AtmCO20
+           LEVEL1 'Using constant atmospheric CO2 concentration:', AtmCO2%fnow(1)
+           LEVEL1 ' '
+        end if
+     CASE (1) ! read external 0-D timeseries
+        ! the following check is needed to avoid allocation of empty arrays with MPI and land domains
+        if (NO_BOXES_XY > 0) then
+           LEVEL1 'BFM Read atmospheric CO2 timeseries. Initial value:', AtmCO2%fnow(1)
+           LEVEL1 ' '
+        end if
+     CASE (2) ! read external 2-D fields with NEMO fldread (see envforcing_bfm)
+        ! the following check is needed to avoid allocation of empty arrays with MPI and land domains
+        if (NO_BOXES_XY > 0) then
+           AtmCO2%fnow = AtmCO20
+           LEVEL1 'Read CO2 2D fields with NEMO fldread. Initialize with default uniform value', AtmCO2%fnow(1)
+           LEVEL1 ' '
+        end if
+  END SELECT
 
-    ! Atmospheric Sea Level Pressure
-    AtmSLP%init = AtmSLP_N%init
-    CALL FieldInit(AtmSLP_N, AtmSLP)
-    if (AtmSLP%init == 0) then
-       ! Use constant
-       ! the following check is needed to avoid allocation of empty arrays with MPI and land domains
-       if (NO_BOXES_XY > 0) then
-          AtmSLP%fnow = p_atm0
-          LEVEL1 'Using constant atmospheric SLP (see p_atm0 in BFM_General.nml): ', AtmSLP%fnow(1)
-          LEVEL1 ' '
-       end if
-    else
-      if (AtmSLP%init .eq. 1 ) then
-         LEVEL1 'BFM reads atmospheric SLP timeseries from file: ', AtmSLP_N%filename
-      endif
-      if (AtmSLP%init .eq. 2 ) then
-         LEVEL1 'Read SLP 2D fields with NEMO fldread. Initialize with default uniform value', AtmSLP%fnow(1)
-      endif
-      LEVEL1 ' '
+  ! Atmospheric Sea Level Pressure
+  AtmSLP%init = AtmSLP_N%init
+  CALL FieldInit(AtmSLP_N, AtmSLP)
+  if (AtmSLP%init == 0) then
+     ! Use constant
+     ! the following check is needed to avoid allocation of empty arrays with MPI and land domains
+     if (NO_BOXES_XY > 0) then
+        AtmSLP%fnow = p_atm0
+        LEVEL1 'Using constant atmospheric SLP (see p_atm0 in BFM_General.nml): ', AtmSLP%fnow(1)
+        LEVEL1 ' '
+     end if
+  else
+    if (AtmSLP%init .eq. 1 ) then
+       LEVEL1 'BFM reads atmospheric SLP timeseries from file: ', AtmSLP_N%filename
     endif
-
-    ! summary of input parameters
-    LEVEL1 ' Model uses PH Total Scale '
- 
-    ! If cold start, CarbonateSystem computes initial pH
-    if (bfm_init == 0 ) pH(:) = -ONE
-
-    LEVEL1 '-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'
+    if (AtmSLP%init .eq. 2 ) then
+       LEVEL1 'Read SLP 2D fields with NEMO fldread. Initialize with default uniform value', AtmSLP%fnow(1)
+    endif
     LEVEL1 ' '
+  endif
 
-    FLUSH(LOGUNIT)
-    return
+  ! summary of input parameters
+  LEVEL1 ' Model uses PH Total Scale '
+ 
+  ! If cold start, CarbonateSystem computes initial pH
+  if (bfm_init == 0 ) pH(:) = -ONE
+
+  LEVEL1 '-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'
+  LEVEL1 ' '
+  FLUSH(LOGUNIT)
+
+  return
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Local Error Messages
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 100 call error_msg_prn(NML_OPEN,"ModuleCO2.f90","Carbonate_system.nml")
 101 call error_msg_prn(NML_READ,"ModuleCO2.f90","CSYS_parameters")
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  end  subroutine InitCO2
+  end subroutine InitCO2
 
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+! -----------------------------------------------------------------------------
+
   subroutine CloseCO2()
     implicit none
     
@@ -213,11 +212,10 @@
     end if
   end subroutine CloseCO2
 
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   end module mem_CO2
 
-!EOC
+#endif
+
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model 
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-#endif
