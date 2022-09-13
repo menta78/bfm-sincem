@@ -91,7 +91,7 @@ sub check_directive{
     trim($include);
     my @includes = split(/\s+/, $include);
     my $hasOR = 0 ; my $check = 0 ;
-    if ( "||" =~ @includes ) { $hasOR = 1 ; };
+    if ( "||" ~~ @includes ) { $hasOR = 1 ; };
     #print join("<>",@includes) . "\n";
     foreach my $inc (@includes){
         if ($inc eq "||") { next;};
