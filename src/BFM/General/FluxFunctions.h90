@@ -4,7 +4,7 @@
 !
 ! ROUTINE: Global helper functions for source/sink fluxes
 !
-! DESCRIPTION:
+! DESCRIPTION
 !  This file contains the helper routines for the assignment
 !  and retrieval of rates from the main source/sink term arrays
 !
@@ -36,10 +36,8 @@
             use constants, only: RLEN, ZERO,  SEC_PER_DAY, DAY_PER_SEC
             use global_mem, only: LOGUNIT
 
-            !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-            ! Implicit typing is never allowed
-            !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
             implicit none
+
             integer,intent(IN)       :: iiSub, iiorigin, iidestination
             real(RLEN),dimension(:)  :: flux !is going to be restored at the end if modified
 
@@ -326,10 +324,9 @@
         !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
           use constants, only: RLEN, ZERO
           use global_mem, only: LOGUNIT
-          !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-          ! Implicit typing is never allowed
-          !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
           implicit none
+
           integer,intent(IN)    :: grid_nr
           integer,intent(IN)    :: origin
           integer,intent(IN)    :: iiSub
@@ -351,10 +348,9 @@
       subroutine quota_flux(iiSub,which,origin,destination,flux,collect)
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
       use constants, only: RLEN
-      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-      ! Implicit typing is never allowed
-      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
       implicit none
+
       integer,intent(IN) :: iiSub
       integer,intent(IN) :: which                      ! pointer to Zoo carbon
       integer,intent(IN) :: origin
