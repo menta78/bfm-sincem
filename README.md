@@ -75,3 +75,6 @@ To compile a specific preset use the following
 ```bash
 [$BFMDIR/build]> ./bfm_configure.sh -gcd -p <preset_name> 
 ```
+
+## Acknowledgment
+BFM System Team gratefully acknowledge the work of the development team of the original ERSEM versions I and II under the lead of J. W. Baretta providing the ancestor model that the original version of the BFM has emerged from.
