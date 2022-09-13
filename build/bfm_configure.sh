@@ -391,10 +391,10 @@ if [ ${GEN} ]; then
 
         #set netcdf path in compiler file
         if [ ${NETCDF} ]; then
-            [ ${VERBOSE} ] && echo "setting netcd path with environment variable: ${NETCDF}"
+            [ ${VERBOSE} ] && echo "setting netcdf path with environment variable: ${NETCDF}"
             sed -e "s,\${NETCDF},${NETCDF}," ${BFMDIR}/compilers/${ARCH} > ${blddir}/${ARCH}
         else
-            [ ${VERBOSE} ] && echo "setting netcd path with default: ${NETCDF_DEFAULT}"
+            [ ${VERBOSE} ] && echo "setting netcdf path with default: ${NETCDF_DEFAULT}"
             sed -e "s,\${NETCDF},${NETCDF_DEFAULT}," ${BFMDIR}/compilers/${ARCH} > ${blddir}/${ARCH}
         fi
 
