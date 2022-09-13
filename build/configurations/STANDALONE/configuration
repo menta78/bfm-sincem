@@ -22,7 +22,6 @@
 #  INCLUDE_PELFE    : add Iron component to the pelagic system
 #  INCLUDE_PELCO2   : activate Pelagic Carbonate System and CO2 dynamics 
 #  BENTHIC_BIO      : use Intermediate complexity Benthic system
-#  EXPLICIT_SINK    : use of D3SOURCE and D3SINK
 
 &BFM_conf
         MODE     = 'STANDALONE',

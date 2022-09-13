@@ -94,14 +94,6 @@ subroutine ClearMem
 #ifndef NOT_STANDALONE
      deallocate(D3STATE)
      deallocate(D3SOURCE)
-#ifdef EXPLICIT_SINK
-     deallocate(D3SINK)
-#if defined INCLUDE_SEAICE
-     deallocate(D2SINK_ICE)
-#endif
-     deallocate(D2SINK_BEN)
-#endif
-
      deallocate(D3STATETYPE)
      deallocate(D3DIAGNOS)
      deallocate(D2DIAGNOS)

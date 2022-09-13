@@ -25,7 +25,6 @@
 #  BENTHIC_BIO      : use Intermediate complexity Benthic system
 #  BENTHIC_FULL     : use High-level complexity Benthic system
 #  INCLUDE_BENCO2   : activate Benthic Carbonate System and CO2 dynamics 
-#  EXPLICIT_SINK    : use of D3SOURCE and D3SINK
 #  INCLUDE_BENPROFILES : Compute vertical proiles of benthic states
 
 &BFM_conf

@@ -70,10 +70,6 @@
 !
     use Pom, ONLY: smoth,dti, ilong
 !
-#ifdef EXPLICIT_SINK
- use Mem, Only: D2SINK_BEN
-#endif
-!
     use Mem, ONLY:D2STATE_BEN,NO_D2_BOX_STATES_BEN,D2SOURCE_BEN,NO_BOXES_BEN
 !
     use api_bfm, ONLY:D2STATEB_BEN
@@ -105,11 +101,7 @@
 !    -----COMPUTE SOURCE/SINKS TREND-----
 !
      do n = 1, NO_D2_BOX_STATES_BEN
-#ifndef EXPLICIT_SINK
         tempo(n) = tempo(n) + D2SOURCE_BEN(n,1)
-#else
-        tempo(n) = tempo(n) + (D2SOURCE_BEN(n,:,1)-D2SINK_BEN(n,:,1))
-#endif
      end do 
 !
 !-----LEAP FROG INTEGRATION-----

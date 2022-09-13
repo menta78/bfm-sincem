@@ -18,14 +18,8 @@
    use constants,  only: SEC_PER_DAY
    use mem, only: D3STATE,D3SOURCE,NO_D3_BOX_STATES, &
                   D3STATETYPE,NO_BOXES
-#ifdef EXPLICIT_SINK
-   use mem, only: D3SINK
-#endif 
    use mem, only: D2STATE_BEN,D2SOURCE_BEN,NO_D2_BOX_STATES_BEN, &
                   D2STATETYPE_BEN
-#ifdef EXPLICIT_SINK
-   use mem, only: D2SINK_BEN
-#endif 
    use mem_param, only: CalcTransportFlag, CalcBenthicFlag, &
                         CalcPelagicFlag
    use time,      only: bfmtime
@@ -94,22 +88,14 @@
    if (CalcPelagicFlag ) then
       do j=1,NO_D3_BOX_STATES
          if (D3STATETYPE(j) .eq. 0) then
-#ifndef EXPLICIT_SINK
             D3State(j,:) = D3STATE(j,:) + delt*D3SOURCE(j,:)
-#else
-            D3State(j,:) = D3STATE(j,:) + delt*sum(D3SOURCE(j,:,:)-D3SINK(j,:,:),1)
-#endif
          end if
       end do
    end if
    if (CalcBenthicFlag ) then
       do j=1,NO_D2_BOX_STATES_BEN
          if (D2STATETYPE_BEN(j) .ge. 0) then
-#ifndef EXPLICIT_SINK
             D2STATE_BEN(j,:) = D2STATE_BEN(j,:) + delt*D2SOURCE_BEN(j,:)
-#else
-            D2STATE_BEN(j,:) = D2STATE_BEN(j,:) + delt*sum(D2SOURCE_BEN(j,:,:)-D2SINK_BEN(j,:,:),1)
-#endif
          end if
       end do
    end if

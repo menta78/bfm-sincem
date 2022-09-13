@@ -76,12 +76,7 @@
         
         real(RLEN),public,pointer,dimension(:,:) :: D3STATE
 
-#ifndef EXPLICIT_SINK
         real(RLEN),public,pointer,dimension(:,:)   :: D3SOURCE
-#else
-        real(RLEN),public,pointer,dimension(:,:,:) :: D3SOURCE
-        real(RLEN),public,pointer,dimension(:,:,:) :: D3SINK
-#endif
 
         integer,public,pointer,dimension(:) :: D3STATETYPE
 #ifdef BFM_NEMO
@@ -106,12 +101,7 @@
 #ifdef INCLUDE_SEAICE
         real(RLEN),public,pointer,dimension(:,:) :: D2STATE_ICE
 
-#ifndef EXPLICIT_SINK
         real(RLEN),public,pointer,dimension(:,:)   :: D2SOURCE_ICE
-#else
-        real(RLEN),public,pointer,dimension(:,:,:) :: D2SOURCE_ICE
-        real(RLEN),public,pointer,dimension(:,:,:) :: D2SINK_ICE
-#endif
 
         integer,public,pointer,dimension(:) :: D2STATETYPE_ICE
 #ifdef BFM_NEMO
@@ -128,12 +118,7 @@
 
         real(RLEN),public,pointer,dimension(:,:) :: D2STATE_BEN
 
-#ifndef EXPLICIT_SINK
         real(RLEN),public,pointer,dimension(:,:)   :: D2SOURCE_BEN
-#else
-        real(RLEN),public,pointer,dimension(:,:,:) :: D2SOURCE_BEN
-        real(RLEN),public,pointer,dimension(:,:,:) :: D2SINK_BEN
-#endif
 
         integer,public,pointer,dimension(:) :: D2STATETYPE_BEN
 #ifdef BFM_NEMO
@@ -434,11 +419,7 @@
 %2d-groupfunctions-ben
 
 
-#ifdef EXPLICIT_SINK
-#include "FluxFunctions_sourcesink.h90"
-#else
 #include "FluxFunctions.h90"
-#endif
 
     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     ! end of contain section

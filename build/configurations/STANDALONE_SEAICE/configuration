@@ -23,7 +23,6 @@
 #  INCLUDE_PELCO2   : activate Carbonate System and CO2 dynamics 
 #  INCLUDE_SEAICE   : activate sea ice 2D layer
 #  BENTHIC_BIO      : use Intermediate complexity Benthic system
-#  EXPLICIT_SINK    : use of D3SOURCE and D3SINK
 
 &BFM_conf
         MODE    = 'STANDALONE',

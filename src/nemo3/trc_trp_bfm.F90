@@ -40,9 +40,6 @@ SUBROUTINE trc_trp_bfm( kstp )
    USE global_mem
    USE mem,       ONLY: NO_D3_BOX_STATES,D3STATETYPE, &
                         D3SOURCE,D3STATE,NO_BOXES
-#ifdef EXPLICIT_SINK
-   USE mem,       ONLY: D3SINK
-#endif
    use mem, only: ppO3c
    USE mem_param, ONLY: CalcTransportFlag, CalcConservationFlag, p_small
    USE api_bfm
@@ -100,15 +97,8 @@ SUBROUTINE trc_trp_bfm( kstp )
 
             dummy(:) = ZERO
             ! sum all the rates
-#ifndef EXPLICIT_SINK
             dummy(:) = D3SOURCE(m,:)
-#else 
-            do k=1,NO_D3_BOX_STATES
-               do n=1,NO_BOXES
-                  dummy(n) = dummy(n) + D3SOURCE(m,k,n) - D3SINK(m,k,n)
-               end do
-            end do
-#endif
+
             ! Get biogeochemical trends for every variable
             tra(:,:,:,m) = unpack(dummy,SEAmask,ZEROS)
 #ifdef DEBUG
