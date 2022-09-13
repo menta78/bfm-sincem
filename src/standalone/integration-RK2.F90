@@ -1,15 +1,32 @@
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! ROUTINE: Runge-Kutta 2nd-order time-integration
+!
+! DESCRIPTION
+!   Runge-Kutta 2nd-order integration with time step adjustment
+!
+! COPYING
+!
+!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU General Public License for more details.
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! INCLUDE
 #include "cppdefs.h"
-!-----------------------------------------------------------------------
-!BOP
 !
-! !ROUTINE: Runge-Kutta 2nd-order time-integration
-!
-! !INTERFACE
+! INTERFACE
    SUBROUTINE integrationRK2
 !
-! !DESCRIPTION
-!  Runge-Kutta 2nd-order integration with time step adjustment
-! !USES
+! USES
    use global_mem, ONLY:RLEN,ONE
    use mem, ONLY: NO_D3_BOX_STATES,NO_BOXES,D3SOURCE,D3STATE, &
                   D3STATETYPE
@@ -32,29 +49,12 @@
 #endif
    use standalone
    use api_bfm
+
    implicit none
-!
-! !INPUT PARAMETERS:
-!
-! !OUTPUT PARAMETERS:
-!
-! !REVISION HISTORY:
-!  Original author(s): Momme Butenschoen (UNIBO)
-!
-!
-! COPYING
-!
-!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
-!
-!   This program is free software; you can redistribute it and/or modify
-!   it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation;
-!   This program is distributed in the hope that it will be useful,
-!   but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-!   GNU General Public License for more details.
-!
-! !LOCAL VARIABLES:
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Local Variables
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    real(RLEN),parameter    :: eps=0.0_RLEN
    real(RLEN)              :: min3D,min2D
    logical                 :: cut,cut_pel
@@ -68,10 +68,8 @@
    real(RLEN)              :: min2D_ben
    integer,dimension(2,2)  :: blccc_ben
    logical                 :: cut_ben
-!
-! !EOP
-!-----------------------------------------------------------------------
-!BOC
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
 #ifdef DEBUG
    LEVEL1 'integration RK: starting delt = ',delt
 #endif
@@ -334,5 +332,7 @@
 #endif
 
    END SUBROUTINE integrationRK2
-!EOC
-!-----------------------------------------------------------------------
+
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

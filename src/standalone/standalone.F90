@@ -1,20 +1,36 @@
 #include "cppdefs.h"
-!-----------------------------------------------------------------------
-!BOP
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 !
-! !MODULE: standalone
+! MODULE: standalone
 !
-! !INTERFACE:
+! DESCRIPTION
+!   This module contains all the routines for the standard BFM
+!   simulation in standalone version, i.e. with a 0.5D setup
+!   (pelagic and benthic).
+!   It also contains all the ancillary functions for forcing functions.
+!
+! COPYING
+!
+!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU General Public License for more details.
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! INCLUDE
+#include "cppdefs.h"
+!
+! INTERFACE
    module standalone
 !
-! !DESCRIPTION:
-! This module contains all the routines for the standard BFM
-! simulation in standalone version, i.e. with a 0.5D setup
-! (pelagic and benthic).
-! It also contains all the ancillary functions for forcing functions.
-!
-! !USES:
-!  default: all is private.
+! USES
    use global_mem, only:RLEN,ONE,PI
    use constants,  only:SEC_PER_DAY
    use init_var_bfm_local
@@ -22,6 +38,7 @@
    use mem_CO2, ONLY: CloseCO2
 #endif   
    use sw_tool,    only: gsw_p_from_z
+
    private
 !
 ! !PUBLIC MEMBER FUNCTIONS:
@@ -73,43 +90,18 @@
 ! !PRIVATE DATA MEMBERS:
    real(RLEN),parameter :: RFACTOR=PI/180._RLEN
 
-!
-! !REVISION HISTORY:
-!  Original author(s): Marcello Vichi (INGV), Momme Buthenschoen (UNIBO)
-!
-!
-! COPYING
-!
-!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
-!
-!   This program is free software; you can redistribute it and/or modify
-!   it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation;
-!   This program is distributed in the hope that it will be useful,
-!   but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-!   GNU General Public License for more details.
-!
-!EOP
 !-----------------------------------------------------------------------
 
    contains
 
-!-----------------------------------------------------------------------
-!BOP
-!
-! !IROUTINE: Initialise the standalone BFM
-!
-! !INTERFACE:
    subroutine init_standalone()
 !
-! !DESCRIPTION:
-!  Main communication of array dimensions between
-!  BFM and the standalone setup
-!  Read also integration limits
+! DESCRIPTION:
+!   Initialise the standalone BFM
+!   Main communication of array dimensions between
+!   BFM and the standalone setup
 !
-!
-! !USES:
+! USES
    use constants, only: E2W
    use mem,   only: NO_D3_BOX_STATES, NO_BOXES,          &
                   NO_BOXES_X, NO_BOXES_Y, NO_BOXES_Z,  &
@@ -132,24 +124,19 @@
                   NO_STATES_BEN
 
    IMPLICIT NONE
-!
-! !INPUT PARAMETERS:
-!
-! !REVISION HISTORY:
-!  Original author(s): Marcello Vichi
-!
-! !LOCAL VARIABLES:
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Local Variables
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    namelist /standalone_nml/ nboxes,indepth,maxdelt,    &
             mindelt,method,latitude,longitude
    namelist /time_nml/ timefmt,MaxN,start,stop,simdays
-!
-! !LOCAL VARIABLES:
+   !
    real(RLEN) :: tt
    integer    :: dtm1,i
    character(LEN=8)  :: datestr
-!EOP
-!-----------------------------------------------------------------------
-!BOC
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
    call Date_And_Time(datestr,timestr)
    STDERR ' '
    STDERR LINE
@@ -381,20 +368,15 @@
 103   call error_msg_prn(NML_READ,"standalone.f90","time_nml")
 
    end subroutine init_standalone
-!EOC
 
 !-----------------------------------------------------------------------
-!BOP
+
+   subroutine timestepping()
 !
-! !IROUTINE:
+! DESCRIPTION
+!   Standalaone time marching execution
 !
-! !INTERFACE:
-   SUBROUTINE timestepping()
-!
-! !DESCRIPTION:
-!
-!
-! !USES:
+! USES
    use global_mem, only:RLEN
    use netcdf_bfm, only: save_bfm
    use mem
@@ -404,21 +386,15 @@
    use api_bfm, only: printDEBUG
 #endif
    use time
+
    IMPLICIT NONE
-! !INPUT PARAMETERS:
-! !INPUT/OUTPUT PARAMETERS:
-!
-! !OUTPUT PARAMETERS:
-! !REVISION HISTORY:
-!  Author(s): Momme Butenschoen (UNIBO)
-!
-! !LOCAL VARIABLES:
-!
-!EOP
-!-----------------------------------------------------------------------
-!BOC
-integer    :: i
-real(RLEN) :: localtime
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Local Variables
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+   integer    :: i
+   real(RLEN) :: localtime
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
    LEVEL1 'timestepping'
    do while (ntime.le.nendtim)
@@ -476,41 +452,30 @@ real(RLEN) :: localtime
 #endif
    end do
 
-   END SUBROUTINE timestepping
-!EOC
+   end subroutine timestepping
 
 !-----------------------------------------------------------------------
-!BOP
-!
-! !IROUTINE: Finalise the standalone BFM
-!
-! !INTERFACE:
+
    subroutine end_standalone()
 !
-! !DESCRIPTION:
-!  Terminates the standalone simulation.
+! DESCRIPTION
+!   Finalise the BFM standalone simulation.
 !
-!
-! !USES:
+! USES
    use time
    use netcdf_bfm, only: close_ncdf, ncid_bfm, save_rst_bfm, ncid_rst
    use global_mem, only: RLEN, bfm_lwp, LOGUNIT
    use api_bfm, only: time_delta
+
    IMPLICIT NONE
-! !INPUT PARAMETERS:
-! !INPUT/OUTPUT PARAMETERS:
-!
-! !OUTPUT PARAMETERS:
-! !REVISION HISTORY:
-!  Author(s): Karsten Bolding and Hans Burchard
-!
-! !LOCAL VARIABLES:
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Local Variables
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    character(LEN=8)          :: datestr
    real(RLEN)       :: localtime
-!
-!EOP
-!-----------------------------------------------------------------------
-!BOC
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
    ! save and close the restart file
    localtime = (time_delta - real(bfmtime%step0,RLEN)) * bfmtime%timestep
    call save_rst_bfm(localtime)
@@ -525,9 +490,11 @@ real(RLEN) :: localtime
    call Date_And_Time(datestr,timestr)
    STDERR LINE
    STDERR 'BFM standalone finished on  ',datestr,' ',timestr
+
    end subroutine end_standalone
-!EOC
-!-----------------------------------------------------------------------
 
    END MODULE standalone
 
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

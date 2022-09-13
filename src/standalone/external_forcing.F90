@@ -1,20 +1,37 @@
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! ROUTINE: external_forcing
+!
+! DESCRIPTION
+!   Read forcing data, interpolate in time
+!  
+! NOTE
+!   This is a template file and must be edited by the user 
+!   depending on the type of input forcings
+!
+! COPYING
+!
+!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU General Public License for more details.
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! INCLUDE
 #include "cppdefs.h"
 #include "INCLUDE.h"
-!-----------------------------------------------------------------------
-!BOP
 !
-! !ROUTINE: Read forcing data, interpolate in time
-! 
-! NOTE: this is a template file and must be edited by the user 
-!       depending on the type of input forcings
-!
-! !INTERFACE:
+! INTERFACE
    subroutine external_forcing
 !
-! !DESCRIPTION:
-
-!
-! !USES:
+! USES
    use global_mem, only: RLEN,ZERO
    use mem_PAR,    only: ChlAttenFlag, P_PARRGB, P_PAR, &
                          R_EPS, B_EPS, G_EPS,           &
@@ -36,36 +53,19 @@
                          unit_forcing, read_obs, READ_ERROR, END_OF_FILE
    use standalone, only: latitude
    use bfm_error_msg
+
    IMPLICIT NONE
-!
-! !INPUT PARAMETERS:
-!
-! !REVISION HISTORY:
-!  Original author(s): Karsten Bolding
-!  modified for BFM by: Marcello Vichi
-!
-! COPYING
-!
-!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
-!
-!   This program is free software; you can redistribute it and/or modify
-!   it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation;
-!   This program is distributed in the hope that it will be useful,
-!   but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-!   GNU General Public License for more details.
-!
-!EOP
-!
-! !LOCAL VARIABLES:
-! --------- to be edited by user --------------------------------------
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Local Variables
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! --------- to be edited by user --------------------------------------
    integer,parameter         :: NOBS=4 ! no of coulumns
    integer,parameter         :: iETW=1 ! column for temperature [degC]
    integer,parameter         :: iESW=2 ! column for salinity [-]
    integer,parameter         :: iWND=3 ! column for wind speed [m/s]
    integer,parameter         :: iEIR=4 ! column for irradiance [W/m2]
-! --------- end part edited by user -----------------------------------
+   ! --------- end part edited by user -----------------------------------
    integer                   :: yy,mm,dd,hh,min,ss,dyear
    real(RLEN)                :: t,alpha,jday
    real(RLEN), save          :: dt
@@ -74,8 +74,8 @@
    real(RLEN), save          :: obs1(NOBS),obs2(NOBS)=0.
    integer                   :: jh,jn
    integer                   :: ierr
-!-----------------------------------------------------------------------
-!BOC
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
 #ifdef DEBUG
    LEVEL1 'external_forcing (jul,sec): ',julianday,secondsofday
    call  calendar_date(real(julianday,RLEN),yy,mm,dd,jh,jn)
@@ -166,6 +166,9 @@
    LEVEL2 'SUNQ=',SUNQ
 #endif
   return
-   end subroutine external_forcing
-!EOC
 
+   end subroutine external_forcing
+
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

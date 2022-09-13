@@ -1,44 +1,43 @@
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! ROUTINE: Initialise the standalone BFM
+!
+! DESCRIPTION
+!   Read the namelist parameters for the analytical forcings
+!   Also initialize additional components for other forcing methods
+!
+! COPYING
+!
+!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU General Public License for more details.
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! INCLUDE
 #include "cppdefs.h"
-!-----------------------------------------------------------------------
-!BOP
 !
-! !IROUTINE: Initialise the standalone BFM
-!
-! !INTERFACE:
+! INTERFACE
    subroutine init_envforcing_bfm
 !
-! !DESCRIPTION:
-!  Read the namelist parameters for the analytical forcings
-!  Also initialize additional components for other forcing methods
-!
-!
-! !USES:
+! USES
    use global_mem, only:RLEN,LOGUNIT,NML_OPEN,NML_READ,error_msg_prn,NMLUNIT
    use api_bfm
    use time
    use envforcing
 
    IMPLICIT NONE
-!
-! !INPUT PARAMETERS:
-!
-! !REVISION HISTORY:
-!  Original author(s): Marcello Vichi
-!
-!
-! COPYING
-!
-!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
-!
-!   This program is free software; you can redistribute it and/or modify
-!   it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation;
-!   This program is distributed in the hope that it will be useful,
-!   but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-!   GNU General Public License for more details.
-!
-! !LOCAL VARIABLES:
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Local Variables
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    logical :: use_seaice_data
 
    namelist /forcings_nml/ forcing_method,ltype,lw,ls,sw,ss,tw,ts,tde, & 
@@ -47,11 +46,8 @@
             use_seaice_data, seaice_file, &
             use_external_data, data_file, &
             use_event_data, event_file
-!
-! !LOCAL VARIABLES:
-!EOP
-!-----------------------------------------------------------------------
-!BOC
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
    LEVEL2 'init_envforcing_bfm'
        !---------------------------------------------
        ! Give initial default values
@@ -118,4 +114,7 @@
 109   call error_msg_prn(NML_OPEN,"init_envforcing_bfm.f90",trim(event_file))
 
    end subroutine init_envforcing_bfm
-!EOC
+
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

@@ -1,15 +1,32 @@
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! ROUTINE: Euler-forward time-integration
+!
+! DESCRIPTION
+!   Euler-forward integration with time step adjustment
+!
+! COPYING
+!
+!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU General Public License for more details.
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! INCLUDE
 #include "cppdefs.h"
-!-----------------------------------------------------------------------
-!BOP
 !
-! !ROUTINE: Euler-forward time-integration
-!
-! !INTERFACE
+! INTERFACE
    SUBROUTINE integrationEfw
 !
-! !DESCRIPTION
-!  Euler-forward integration with time step adjustment
-! !USES
+! USES
    use global_mem, ONLY:RLEN
    use mem,  ONLY: NO_D3_BOX_STATES,NO_BOXES,D3SOURCE,D3STATE, &
                    D3STATETYPE
@@ -33,29 +50,12 @@
    use standalone
    use api_bfm
    use time, ONLY: update_time
+
    implicit none
-!
-! !INPUT PARAMETERS:
-!
-! !OUTPUT PARAMETERS:
-!
-! !REVISION HISTORY:
-!  Original author(s): Momme Butenschoen (UNIBO)
-!
-!
-! COPYING
-!
-!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
-!
-!   This program is free software; you can redistribute it and/or modify
-!   it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation;
-!   This program is distributed in the hope that it will be useful,
-!   but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-!   GNU General Public License for more details.
-!
-! !LOCAL VARIABLES:
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Local Variables
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    real(RLEN),parameter      :: eps=0.
    real(RLEN)                :: min3D,min2D
    logical                   :: cut,cut_pel
@@ -69,10 +69,8 @@
    real(RLEN)                :: min2D_ben
    integer,dimension(2,2)    :: blccc_ben
    logical                   :: cut_ben
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-!EOP
-!-----------------------------------------------------------------------
-!BOC
 #ifdef DEBUG
    LEVEL1 'integration efw: starting delt = ',delt
 #endif
@@ -213,5 +211,7 @@
 #endif
 
    END SUBROUTINE integrationEfw
-!EOC
-!-----------------------------------------------------------------------
+
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

@@ -1,17 +1,35 @@
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! ROUTINE: external_seaice
+!
+! DESCRIPTION
+!   Read seaice data, interpolate in time
+!   Coupling of sea ice processes for Kobbefjord site
+!
+! COPYING
+!
+!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU General Public License for more details.
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! INCLUDE
 #include "cppdefs.h"
-!-----------------------------------------------------------------------
-!BOP
 !
-! !IROUTINE: Read seaice data, interpolate in time
-!
-! !INTERFACE:
+! INTERFACE
    subroutine external_seaice
+
 #ifdef INCLUDE_SEAICE
 !
-! !DESCRIPTION:
-! Coupling of sea ice processes for Kobbefjord site
-!
-! !USES:
+! USES
    use global_mem, only: RLEN,ZERO,ONE
    use constants,  only: E2W, SEC_PER_DAY
    ! seaice forcings
@@ -23,30 +41,12 @@
                          unit_seaice, read_obs, END_OF_FILE, READ_ERROR
    use standalone, only: latitude
    use bfm_error_msg
+
    IMPLICIT NONE
-!
-! !INPUT PARAMETERS:
-!
-! !REVISION HISTORY:
-!  Original author(s): Karsten Bolding
-!  modified for BFM by: Marcello Vichi
-!
-! COPYING
-!
-!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
-!
-!   This program is free software; you can redistribute it and/or modify
-!   it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation;
-!   This program is distributed in the hope that it will be useful,
-!   but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-!   GNU General Public License for more details.
-!
-!
-!EOP
-!
-! !LOCAL VARIABLES:
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Local Variables
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    integer,parameter                  :: NSI=9
    integer                            :: yy,mm,dd,hh,minutes,ss
    real(RLEN)                         :: t,alpha,jday
@@ -55,8 +55,8 @@
    integer, save                      :: data_jul2=0,data_secs2=0
    real(RLEN), save                   :: obs1(NSI),obs2(NSI)=0.
    integer                            :: ierr,jh,jn
-!-----------------------------------------------------------------------
-!BOC
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
 #ifdef DEBUG
    LEVEL1 'external_forcing (jul,sec): ',julianday,secondsofday
    call  calendar_date(real(julianday,RLEN),yy,mm,dd,jh,jn)
@@ -135,6 +135,9 @@
 #endif
   return
 #endif
-   end subroutine external_seaice
-!EOC
 
+   end subroutine external_seaice
+
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

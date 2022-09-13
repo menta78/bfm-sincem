@@ -1,16 +1,33 @@
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! ROUTINE analytical_forcing
+!
+! DESCRIPTION
+!   Define analytical forcings used in the BFM
+!
+! COPYING
+!
+!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU General Public License for more details.
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! INCLUDE
 #include "cppdefs.h"
 #include "INCLUDE.h"
-!-----------------------------------------------------------------------
-!BOP
 !
-! !ROUTINE: analytical_forcing
-!
-! !INTERFACE
+! INTERFACE
 subroutine analytical_forcing
 !
-! !DESCRIPTION
-!   Define analytical forcings used in the BFM
-! !USES
+! USES
    use api_bfm
    use global_mem, only: RLEN,ONE
 #ifdef NOPOINTERS
@@ -41,34 +58,16 @@ subroutine analytical_forcing
    use bfm_error_msg
 
    IMPLICIT NONE
-!
-! !INPUT PARAMETERS:
-!
-! !OUTPUT PARAMETERS:
-!
-! !REVISION HISTORY:
-!  Original author(s): Momme Butenschoen (UNIBO), M. Vichi (CMCC)
-!
-! COPYING
-!
-!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
-!
-!   This program is free software; you can redistribute it and/or modify
-!   it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation;
-!   This program is distributed in the hope that it will be useful,
-!   but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-!   GNU General Public License for more details.
-!
-! !LOCAL VARIABLES:
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Local Variables
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    real(RLEN)          :: dfrac,wlight,dtime
    integer             :: dyear
    real(RLEN),external :: GetDelta
    real(RLEN)          :: biodelta
-!EOP
-!-----------------------------------------------------------------------
-!BOC
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
 #ifdef DEBUG
    LEVEL1 'envforcing_bfm: analytical'
    LEVEL2 'time=',timesec
@@ -163,6 +162,7 @@ subroutine analytical_forcing
 #endif
 
 end subroutine analytical_forcing
-!EOC
-!-----------------------------------------------------------------------
 
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
