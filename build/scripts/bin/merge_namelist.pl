@@ -1,12 +1,31 @@
 #!/usr/bin/perl -w
-# merge two namelists, a default one that contains all parameters and another one with only the changed parameters 
-# usage: namelist.pl [default_namelist] [changed_namelist] [output_namelist]
 
-#Author: Esteban Gutierrez esteban.gutierrez@cmcc.it
+#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+# MODEL  BFM - Biogeochemical Flux Model
+#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+#
+# DESCRIPTION
+#   Merge two namelists, a default one that contains all parameters and 
+#   another one with only the changed parameters
+#
+# USAGE 
+#   namelist.pl [default_namelist] [changed_namelist] [output_namelist]
+#
+# COPYING
+#
+#   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
+#
+#   This program is free software: you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation.
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+#   See the GNU General Public License for more details.
+#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 use strict;
 use warnings;
-
 
 #my $XPR_START_BLOCK = '^&(\S*)\s*!(.*)';
 #my $XPR_VAR_BLOCK = '\s*(\S*)\s*=\s*(\S*)\s*!(.*)';
