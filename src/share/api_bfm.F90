@@ -1,24 +1,36 @@
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! MODULE: api_bfm
+!
+! DESCRIPTION:
+!   API for the BFM.
+!   Storage of variables and diagnostics
+!
+! COPYING
+!
+!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU General Public License for more details.
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! INCLUDE
 #include"cppdefs.h"
-!-----------------------------------------------------------------------
-!BOP
 !
-! !MODULE: bfm
+! INTERFACE
+  module api_bfm
 !
-! !INTERFACE:
-   module api_bfm
-!
-! !DESCRIPTION: 
-! API for the BFM. 
-! Storage of variables and diagnostics
-! To be used in all the coupled applications except
-! GOTM, where it actually originated from.
-! The GOTM module netcdfout is needed
-! Appropriate functions are already available in the GOTM structure
-
-!
-! !USE:
+! USES
    use global_mem, only:RLEN,ZERO,bfm_lwp,LOGUNIT,NMLUNIT,bfm_file_FirstUnit
    use mem,        only:NO_D3_BOX_STATES
+
    implicit none
 
 !
@@ -228,32 +240,14 @@
    real(RLEN),allocatable,dimension(:,:,:),public :: rtmp3Db
 #endif
 
-!
-! !REVISION HISTORY:
-!  Author(s): Marcello Vichi and Piet Ruardij
-!  Uses functions and portions of code from GOTM
-!  by Hans Burchard and Karsten Bolding
-!
-! !LOCAL VARIABLES:
-!
-! !BUGS
-!
-!EOP
-!-----------------------------------------------------------------------
-
 contains
 
-!-----------------------------------------------------------------------
-!BOP
-!
-! !IROUTINE: Initialise the bfm module
-!
-! !INTERFACE:
    subroutine init_bfm(cpllog)
 !
-! !DESCRIPTION:
+! DESCRIPTION
+!   Initialise the bfm module
 !
-! !USES:
+! USES
    use mem, only: NO_D3_BOX_STATES, NO_BOXES,            &
                   NO_BOXES_X, NO_BOXES_Y, NO_BOXES_Z,    &
                   NO_BOXES_XY,                           &
@@ -274,15 +268,14 @@ contains
    use time, only: bfmtime, outdeltalab
 
    IMPLICIT NONE
-!
-! !INPUT PARAMETERS:
+
+  ! INPUT
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    CHARACTER(len=*),INTENT(IN),OPTIONAL   :: cpllog
-!
-! !REVISION HISTORY:
-!  Original author(s): Marcello Vichi
-!  Adapted from GOTM code by Hans Burchard & Karsten Bolding
-!
-! !LOCAL VARIABLES:
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Local Variables
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    integer                   :: rc,n
    character(len=PATH_MAX)   :: logfname, thistime, tmpname
 #if defined key_obcbfm
@@ -294,10 +287,7 @@ contains
                       parallel_log,unpad_out,                   &
                       in_rst_fname,                             &
                       nc_compres,nc_shuffle,nc_defllev
-!EOP
-!-----------------------------------------------------------------------
-!BOC
-
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
    !---------------------------------------------
    ! Provide sensible values for namelist parameters
@@ -561,22 +551,16 @@ contains
    stop 'init_bfm'
 
   end subroutine init_bfm
-!EOC
-
 
 !-----------------------------------------------------------------------
-!BOP
-!
-! !IROUTINE:
-!
-! !INTERFACE:
+
    subroutine update_save_delta(outdelta,savedelta,timedelta)
 !
-! !DESCRIPTION:
-!  Dynamically set the output stepping for saving data based on outdelta value
-!  NOTE: if outdelta is a negative number then outputs the real monthly data
+! DESCRIPTION
+!   Dynamically set the output stepping for saving data based on outdelta value
+!   NOTE: if outdelta is a negative number then outputs the real monthly data
 !
-! !USES:
+! USES
    use time
    use global_mem, only: RLEN,LOGUNIT
    use constants,  only: SEC_PER_DAY
@@ -623,20 +607,15 @@ contains
    if (ave_ctl) timedelta = real(savedelta,RLEN) - (real(tmptime,RLEN) / 2.0) 
 
    end subroutine  update_save_delta
-!EOC
 
 !-----------------------------------------------------------------------
-!BOP
-!
-! !IROUTINE: 
-!
-! !INTERFACE:
+
    function find(vector,nt)
 !
-! !DESCRIPTION:
-!  Finds the location of true elements in logical arrays
+! DESCRIPTION
+!   Finds the location of true elements in logical arrays
 !
-! !USES:
+! USES
    implicit none
 !
 ! !INPUT PARAMETERS:
@@ -644,21 +623,14 @@ contains
    integer,intent(IN) :: nt   ! number of true elements in vector
                               ! nt = count(vector)
                               ! enter as an argument for check
-!
-! !INPUT/OUTPUT PARAMETERS:
-!
 ! !OUTPUT PARAMETERS:
    integer            :: find(nt)
-!
-! !REVISION HISTORY:
-!  Author(s): Marcello Vichi
 !
 ! !LOCAL VARIABLES:
    integer            :: l,m,n
 !
 !EOP
 !-----------------------------------------------------------------------
-!BOC
 
     if (nt /= count(vector)) stop '#### Error in find: check the input array ####'
     m = size(vector,1)
@@ -673,16 +645,13 @@ contains
    return
    end function find
 
-!EOC
-!-------------------------------------------------------------------------!
-!BOP
-!
-! !ROUTINE:
-!
-! !INTERFACE:
+!-----------------------------------------------------------------------
+
  integer function GetLun ()
-! adapted from Lionel, Shepherd, Clodius, Page, Drummond.
-! and others as posed at comp.lang.fortran on 1997-09-01
+!
+! DESCRIPTION:
+!   Adapted from Lionel, Shepherd, Clodius, Page, Drummond.
+!   and others as posed at comp.lang.fortran on 1997-09-01
       implicit none
       logical :: exs, opn
       integer :: i
@@ -699,19 +668,15 @@ contains
       return
       stop "There are no free Fortran logical units available."
  end function GetLun
-!EOP
+
 !-----------------------------------------------------------------------
-!BOP
-!
-! !IROUTINE:
-!
-! !INTERFACE:
+
    subroutine printDEBUG( ntime )
 !
-! !DESCRIPTION:
-!  Print debug information
+! DESCRIPTION
+!   Print debug information
 !
-! !USES:
+! USES
      use mem, only: D3STATE
      use global_mem, only: RLEN,LOGUNIT
 
@@ -728,12 +693,8 @@ contains
      write(LOGUNIT,*)
 
    end subroutine  printDEBUG
-!EOC
+
 !-----------------------------------------------------------------------
 
- end module api_bfm
-
- !-----------------------------------------------------------------------
- !Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
- !Copyright (C) 2006 - Marcello Vichi
+  end module api_bfm
 

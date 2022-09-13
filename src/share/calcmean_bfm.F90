@@ -1,19 +1,35 @@
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! ROUTINE: compute the average field
+!
+! DESCRIPTION
+!   This is a sophisticated subroutine to accumulate instantaneous
+!   values and compute averages over each output interval.
+!   It stores only the variables defined in the {/tt namelist} variable
+!   {/tt ave_save}.
+!
+! COPYING
+!
+!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU General Public License for more details.
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! INCLUDE
 #include "cppdefs.h"
-!-----------------------------------------------------------------------
-!BOP
 !
-! !ROUTINE: compute the average field
-!
-! !INTERFACE:
+! INTERFACE
    subroutine calcmean_bfm(mode)
 !
-! !DESCRIPTION:
-!  This is a sophisticated subroutine to accumulate instantaneous
-!  values and compute averages over each output interval.
-!  It stores only the variables defined in the {/tt namelist} variable
-!  {/tt ave_save}.
-!
-! !USES:
+! USES
    use api_bfm
    use mem, only: D3STATE,D3DIAGNOS,D2DIAGNOS
 
@@ -26,14 +42,13 @@
 
    implicit none
 
-!
-! !INPUT PARAMETERS:
+  ! INPUT
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    integer,intent(IN)                  :: mode
-!
-! !REVISION HISTORY:
-!  Original author(s): Piet Ruardij (NIOZ)
-!
-! !LOCAL VARIABLES:
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Local Variables
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     integer                     ::i
     integer                     ::j
     integer                     ::k
@@ -43,10 +58,8 @@
     logical,save                ::do_2ave_ice
 #endif
     logical,save                ::do_2ave_ben
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-!EOP
-!-----------------------------------------------------------------------
-!BOC
 #ifdef DEBUG
    LEVEL1 'calcmean_bfm, mode=',mode
 #endif
@@ -266,4 +279,7 @@
    end select
 
 end subroutine calcmean_bfm
-!EOC
+
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

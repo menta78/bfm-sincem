@@ -1,15 +1,32 @@
-!-----------------------------------------------------------------------
-!BOP
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 !
-! !MODULE: SeaWater tools for conversion of ocean physical quantities
-!          Uses functions from UNESCO 1983 (EOS80) and TEOS10
+! MODULE: sw_tool
 !
-! !INTERFACE:
+! DESCRIPTION
+!   SeaWater tools for conversion of ocean physical quantities
+!   Uses functions from UNESCO 1983 (EOS80) and TEOS10
+!
+! COPYING
+!
+!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU General Public License for more details.
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! INCLUDE
+!
+! INTERFACE
    module sw_tool
 !
-! !DESCRIPTION:
-!
-! !USE:
+! USES
    use global_mem, only: RLEN,ZERO,bfm_lwp,LOGUNIT,NMLUNIT,bfm_file_FirstUnit
    use mem,        only: NO_BOXES
    use global_mem, only: PI
@@ -53,6 +70,7 @@
 
    return
    end function
+
    !-------------------------------------------------------------------------- 
 
    elemental function sw_pt_from_t (sp, t, p, p_ref )
@@ -93,6 +111,7 @@
 
    return
    end function
+
    !--------------------------------------------------------------------------
    
    elemental function sw_adtg (sp, t, p)
@@ -139,6 +158,7 @@
 
    return
    end function
+
    !--------------------------------------------------------------------------
 
    elemental function sw_rho_t (sp, pt, p)
@@ -201,6 +221,7 @@
 
    return
    end function
+
    !--------------------------------------------------------------------------
 
 
@@ -245,6 +266,7 @@
 
    return
    end function
+
    !--------------------------------------------------------------------------
 
    elemental function gsw_specvol_sso_0 (p)
@@ -274,6 +296,7 @@
 
    return
    end function
+
    !--------------------------------------------------------------------------
 
    elemental function gsw_enthalpy_sso_0 (p)
@@ -304,7 +327,11 @@
 
    return
    end function
+
    !--------------------------------------------------------------------------
 
    end module sw_tool
 
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

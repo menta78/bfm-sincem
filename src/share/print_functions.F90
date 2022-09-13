@@ -1,69 +1,70 @@
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! MODULE: print_functions --- 
+!
+! DESCRIPTION
+!   Print functions to output arrays
+!
+! COPYING
+!
+!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU General Public License for more details.
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! INCLUDE
 #include"cppdefs.h"
-!-----------------------------------------------------------------------
-!BOP
 !
-! !MODULE: print_functions --- 
-!
-! !INTERFACE:
+! INTERFACE:
    MODULE print_functions
 !
-! !DESCRIPTION:
-!   Print functions to output arrays
-! !USES:
+! USES
    use global_mem, ONLY: RLEN,ZERO,ONE
+
    IMPLICIT NONE
 
    public prxy
-!
-!-----------------------------------------------------------------------
 
    contains
 
-!-----------------------------------------------------------------------
-!BOP
-!
-! !IROUTINE: the famous PRXY from glorious POM
-!
-! !INTERFACE:
      subroutine prxy(theunit,label,array, &
                      im,iskp,jm,jskp,scala)
-!
-! !DESCRIPTION:
-!
-! **********************************************************************
-! *                                                                    *
-! * FUNCTION    :  Writes a horizontal 2-D field.                      *
-! *                                                                    *
-! *                label ....... label for output                      *
-! *                array(im,jm). array to be printed                   *
-! *                iskp ........ skipping interval for i               *
-! *                jskp ........ skipping interval for j               *
-! *                scala ....... < 0 for floating point numbers output *
-! *                              0 for integer output, divisor for a   *
-! *                                based on magnitudes of |a| values   *
-! *                              > 0 for integer output, divisor for a *
-! *                                given by scala                      *
-! *                                                                    *
-! **********************************************************************
-!
-! !INPUT PARAMETERS:
+! DESCRIPTION:
+!   Writes a horizontal 2-D field. 
+!    label ....... label for output                      
+!    array(im,jm). array to be printed                   
+!    iskp ........ skipping interval for i               
+!    jskp ........ skipping interval for j               
+!    scala ....... < 0 for floating point numbers output 
+!                  0 for integer output, divisor for a   
+!                    based on magnitudes of |a| values   
+!                  > 0 for integer output, divisor for a 
+!                    given by scala                      
+
+  ! INPUT
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
      integer, intent(in)                      :: theunit, im, iskp, &
                                                  jm, jskp
      character(len=*), intent(in)             :: label
      real(RLEN), dimension(im,jm), intent(in) :: &
          array                       ! integer 2D array to be print
      real(RLEN), intent(in)                   :: scala
-!
-! !REVISION HISTORY:
-!  Original author(s): G. Mellor
-!
-!EOP
-!
-! !LOCAL VARIABLES:
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Local Variables
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     real(RLEN)                             :: amx,scale
     integer                                :: i,ib,ie,j,jwr,cols
-!-------------------------------------------------------------------------
-!BOC
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
       if(scala.ge.ZERO) then
         cols=24
       else
@@ -117,12 +118,9 @@
       end do
 
       end subroutine prxy
-!EOC
-!-----------------------------------------------------------------------
-
-
-!-----------------------------------------------------------------------
 
 end module print_functions
 
-!-----------------------------------------------------------------------
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

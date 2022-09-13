@@ -1,27 +1,42 @@
-!$Id: time.F90,v 1.8 2005-06-27 13:44:07 kbk Exp $
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! MODULE  time --- keep control of time \label{sec:time}
+!
+! DESCRIPTION
+!   This module provides a number of routines/functions and variables
+!   related to the mode time in GOTM.
+!   The basic concept used in this module is that time is expressed
+!   as two integers --- one is the true Julian day and the other is
+!   seconds since midnight. All calculations with time then become
+!   very simple operations on integers.
+!
+! COPYING
+!
+!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU General Public License for more details.
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! INCLUDE
 #include "cppdefs.h"
-!-----------------------------------------------------------------------
-!BOP
 !
-! !MODULE:  time --- keep control of time \label{sec:time}
-!
-! !INTERFACE:
+! INTERFACE
    MODULE time
 !
-! !DESCRIPTION:
-!  This module provides a number of routines/functions and variables
-!  related to the mode time in GOTM.
-!  The basic concept used in this module is that time is expressed
-!  as two integers --- one is the true Julian day and the other is
-!  seconds since midnight. All calculations with time then become
-!  very simple operations on integers.
-!
-! !USES:
+! USES
    use global_mem, only: RLEN, bfm_lwp, LOGUNIT
    use constants,  only: SEC_PER_DAY
+
    IMPLICIT NONE
-!
-!  default: all is private.
+
    private
 
    type TimeInfo
@@ -36,7 +51,7 @@
       integer                :: timestep     ! Delta t
    end type TimeInfo
 !
-! tom: maybe this structure can be used to replace maby time parameters
+! tom: maybe this structure can be used to replace time parameters
 !
 ! !PUBLIC MEMBER FUNCTIONS:
    type(TimeInfo), public              :: bfmtime
@@ -57,75 +72,37 @@
    integer,           public           :: timefmt,simdays
    integer,           public           :: MinN,MaxN
    logical,           public           :: HasRealTime=.true.
-!
-! !REVISION HISTORY:
-!  Original author(s): Karsten Bolding & Hans Burchard
-!  $Log: time.F90,v $
-!  Revision 1.8  2005-06-27 13:44:07  kbk
-!  modified + removed traling blanks
-!
-!  Revision 1.7  2004/08/17 15:45:16  lars
-!  corrected typos in docu
-!
-!  Revision 1.6  2003/03/28 09:38:54  kbk
-!  removed tabs
-!
-!  Revision 1.5  2003/03/28 09:20:36  kbk
-!  added new copyright to files
-!
-!  Revision 1.4  2003/03/28 07:56:05  kbk
-!  removed tabs
-!
-!  Revision 1.3  2003/03/10 13:48:15  lars
-!  changed intent(out) to intent(inout) for MaxN in init_time
-!
-!  Revision 1.2  2003/03/10 08:54:16  gotm
-!  Improved documentation and cleaned up code
-!
-!  Revision 1.1.1.1  2001/02/12 15:55:57  gotm
-!  initial import into CVS
-!
-!EOP
-!
+
 ! !PRIVATE DATA MEMBERS:
    integer                   :: jul0=-1,secs0=-1
-!
 !-----------------------------------------------------------------------
-!
+
    contains
 
-!-----------------------------------------------------------------------
-!BOP
-!
-! !IROUTINE: Initialise the time system
-!
-! !INTERFACE:
    subroutine init_time(MinN,MaxN)
 !
-! !DESCRIPTION:
-!  The subroutine {\tt init\_time()} initialises the time module by reading
-!  a namelist and take actions according to the specifications.
-!  On exit from this subroutine the two variables MinN and MaxN have well
-!  defined values and can be used in the time loop.
+! DESCRIPTION
+!   The subroutine initialises the time module by reading
+!   a namelist and take actions according to the specifications.
+!   On exit from this subroutine the two variables MinN and MaxN have well
+!   defined values and can be used in the time loop.
 !
-! !USES:
+! USES
+
    IMPLICIT NONE
-!
-! !INPUT/OUTPUT PARAMETERS:
+
+  ! INPUT/OUTPUT
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    integer, intent(inout)    :: MinN,MaxN
-!
-! !REVISION HISTORY:
-!  Original author(s): Karsten Bolding & Hans Burchard
-!
-!EOP
-!
-! !LOCAL VARIABLES:
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Local Variables
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    integer                   :: jul1=-1,secs1=-1,jul2,secs2
    integer                   :: ndays,nsecs,dd,mm,yy,hh,nn
    real(RLEN)                :: jday
-!
-!-------------------------------------------------------------------------
-!BOC
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
 !  Read time specific things from the namelist.
 !
    LEVEL1 'EXPERIMENT TIME SETTINGS'
@@ -204,41 +181,33 @@
 
    return
    end subroutine init_time
-!EOC
+
 !-----------------------------------------------------------------------
-!BOP
-!
-! !IROUTINE:  Convert true Julian day to calendar date
-!
-! !INTERFACE:
+
    subroutine calendar_date(julian,yyyy,mm,dd,hh,nn)
 !
-! !DESCRIPTION:
-!  Converts a Julian day to a calendar date --- year, month and day.
-!  Based on a similar routine in \emph{Numerical Recipes}.
+! DESCRIPTION
+!   Converts a Julian day to a calendar date --- year, month and day.
+!   Based on a similar routine in Numerical Recipes.
 !
-! !USES:
+! USES
    IMPLICIT NONE
-!
-! !INPUT PARAMETERS:
+
+  ! INPUT
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    REAL(RLEN), INTENT(IN)              :: julian
-!
-! !OUTPUT PARAMETERS:
+  ! OUTPUT
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    INTEGER, INTENT(OUT)                :: yyyy,mm,dd,hh,nn
-!
-! !REVISION HISTORY:
-!  Original author(s): Karsten Bolding & Hans Burchard
-!  Revision 1.0      : Tomas Lovato (2012)
-!
-!EOP
-!
-! !LOCAL VARIABLES:
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Local Variables
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    INTEGER, PARAMETER        :: IGREG = 2299161
    INTEGER                   :: ja, jb, jc, jd, je, jday
    REAL(RLEN)                :: x, res
-!
-!-----------------------------------------------------------------------
-!BOC
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
    jday = floor(julian)
    if(jday >= IGREG ) then
       x = ((jday - 1867216) - 0.25) / 36524.25
@@ -263,42 +232,35 @@
    hh = floor(res * 24)
    nn = floor( ((res * 24) - real(hh,RLEN)) * 60)
    return
+
    end subroutine calendar_date
-!EOC
 
 !-----------------------------------------------------------------------
-!BOP
-!
-! !IROUTINE:  Convert a calendar date to true Julian day
-!
-! !INTERFACE:
+
    subroutine julian_day(yyyy,mm,dd,hh,nn,julian)
 !
-! !DESCRIPTION:
-!  Converts a calendar date to a Julian day.
-!  Based on a similar routine in \emph{Numerical Recipes}.
+! DESCRIPTION
+!   Converts a calendar date to a Julian day.
+!   Based on a similar routine in Numerical Recipes.
 !
-! !USES:
+! USES
+
    IMPLICIT NONE
-!
-! !INPUT PARAMETERS:
+
+  ! INPUT
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
    INTEGER, INTENT(IN)                 :: yyyy, mm, dd, hh, nn
-!
-! !OUTPUT PARAMETERS:
+  ! OUTPUT
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
    REAL(RLEN), INTENT(OUT)                   :: julian
-!
-! !REVISION HISTORY:
-!  Original author(s): Karsten Bolding & Hans Burchard
-!  Revision 1.0      : Tomas Lovato (2012)
-!
-!EOP
-!
-! !LOCAL VARIABLES:
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Local Variables
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    INTEGER, PARAMETER        :: IGREG = 15 + 31 * ( 10 + 12 * 1582 )
    INTEGER                   :: ja, jy, jm, jh ,jn, jday
-!
-!-----------------------------------------------------------------------
-!BOC
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
    jy = yyyy
    if (jy < 0) jy = jy + 1
    if (mm > 2) then
@@ -325,81 +287,67 @@
    julian  = real(jday,RLEN) +  real(jh,RLEN)/24 + real(jn,RLEN)/ ( 24 * 60)
 
    return
+
    end subroutine julian_day
-!EOC
 
 !-----------------------------------------------------------------------
-!BOP
-!
-! !IROUTINE:  Keep track of time (Julian days and seconds)
-!
-! !INTERFACE:
+
    subroutine update_time(n)
 !
-! !DESCRIPTION:
-!  Based on a starting time this routine calculates the actual time
-!  in a model integration using the number of time steps, {\tt n},
-!  and the size of the time step, {\tt timestep}. More public variables
-!  can be updated here if necessary.
+! DESCRIPTION
+!   Based on a starting time this routine calculates the actual time
+!   in a model integration using the number of time steps, {\tt n},
+!   and the size of the time step, {\tt timestep}. More public variables
+!   can be updated here if necessary.
 !
-! !USES:
+! USES
    IMPLICIT NONE
-!
-! !INPUT PARAMETERS:
+
+  ! INPUT
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    integer, intent(in)                 :: n
-!
-! !REVISION HISTORY:
-!  Original author(s): Karsten Bolding & Hans Burchard
-!
-!EOP
-!
-! !LOCAL VARIABLES:
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Local Variables
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    integer                   :: nsecs
-!
-!-----------------------------------------------------------------------
-!BOC
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
    nsecs = nint(n*timestep) + secs0
    fsecs = n*timestep + secs0
    julianday    = jul0 + nsecs/86400
    secondsofday = mod(nsecs,86400)
 
    return
+
    end subroutine update_time
-!EOC
 
 !-----------------------------------------------------------------------
-!BOP
-!
-! !IROUTINE:  Convert a time string to Julian day and seconds
-!
-! !INTERFACE:
+
    subroutine read_time_string(timestr,jul,secs)
 !
-! !DESCRIPTION:
-!  Converts a time string to the true Julian day and seconds of that day.
-!  The format of the time string must be: {\tt yyyy-mm-dd hh:hh:ss }.
+! DESCRIPTION
+!   Converts a time string to the true Julian day and seconds of that day.
+!   The format of the time string must be: {\tt yyyy-mm-dd hh:hh:ss }.
 !
-! !USES:
+! USES
+
    IMPLICIT NONE
-!
-! !INPUT PARAMETERS:
+
+  ! INPUT
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    character(len=19)                   :: timestr
-!
-! !OUTPUT PARAMETERS:
+  ! OUTPUT
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    integer, intent(out)                :: jul,secs
-!
-! !REVISION HISTORY:
-!  Original author(s): Karsten Bolding & Hans Burchard
-!
-!EOP
-!
-! !LOCAL VARIABLES:
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Local Variables
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    character                 :: c1,c2,c3,c4
    integer                   :: yy,mm,dd,hh,min,ss
    real(RLEN)                :: jday
-!
-!-----------------------------------------------------------------------
-!BOC
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
    read(timestr,'(i4,a1,i2,a1,i2,1x,i2,a1,i2,a1,i2)')  &
                           yy,c1,mm,c2,dd,hh,c3,min,c4,ss
    call julian_day(yy,mm,dd,0,0,jday)
@@ -407,41 +355,35 @@
    secs = 3600*hh + 60*min + ss
 
    return
+
    end subroutine read_time_string
-!EOC
 
 !-----------------------------------------------------------------------
-!BOP
-!
-! !IROUTINE:  Convert Julian day and seconds into a time string
-!
-! !INTERFACE:
+
    subroutine write_time_string(jul,secs,timestr)
 !
-! !DESCRIPTION:
-!  Formats Julian day and seconds of that day to a nice looking
-!  character string.
+! DESCRIPTION
+!   Formats Julian day and seconds of that day to a nice looking
+!   character string.
 !
-! !USES:
+! USES
+
    IMPLICIT NONE
-!
-! !INPUT PARAMETERS:
+
+  ! INPUT
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    integer, intent(in)                 :: jul,secs
-!
-! !OUTPUT PARAMETERS:
+  ! OUTPUT
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    character(len=19)                   :: timestr
-!
-! !REVISION HISTORY:
-!  Original author(s): Karsten Bolding & Hans Burchard
-!
-!EOP
-!
-! !LOCAL VARIABLES:
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Local Variables
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    integer                   :: ss,min,hh,dd,mm,yy,jh,jn
    real(RLEN)                :: jday
-!
-!-----------------------------------------------------------------------
-!BOC
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
    hh   = secs/3600
    min  = (secs-hh*3600)/60
    ss   = secs - 3600*hh - 60*min
@@ -453,85 +395,77 @@
                         yy,'-',mm,'-',dd,hh,':',min,':',ss
 
    return
+
    end subroutine write_time_string
-!EOC
 
 !-----------------------------------------------------------------------
-!BOP
-!
-! !IROUTINE:  Return the time difference in seconds
-!
-! !INTERFACE:
+
    integer FUNCTION time_diff(jul1,secs1,jul2,secs2)
 !
-! !DESCRIPTION:
-! This functions returns the time difference between two
-! dates in seconds. The dates are given as Julian day and seconds
-! of that day.
+! DESCRIPTION
+!   This functions returns the time difference between two
+!   dates in seconds. The dates are given as Julian day and seconds
+!   of that day.
 !
-! !USES:
+! USES
    IMPLICIT NONE
-!
-! !INPUT PARAMETERS:
+
+  ! INPUT
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    integer, intent(in)                 :: jul1,secs1,jul2,secs2
-!
-! !REVISION HISTORY:
-!  Original author(s): Karsten Bolding & Hans Burchard
-!
-!EOP
-!-----------------------------------------------------------------------
-!BOC
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
    time_diff = 86400*(jul1-jul2) + (secs1-secs2)
 
    return
+
    end function  time_diff
-!EOC
 
 !-----------------------------------------------------------------------
-!BOP
-!
-! !IROUTINE:  Convert a calendar date to true Julian day
-!
-! !INTERFACE:
+
    subroutine dayofyear(julian,ddyear)
 !
-! !DESCRIPTION:
-!  Converts a Julian day to the day number in the current year
+! DESCRIPTION
+!   Converts a Julian day to the day number in the current year
 !
-! !USES:
+! USES
    IMPLICIT NONE
-!
-! !INPUT PARAMETERS:
+
+  ! INPUT
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    integer                             :: julian
-!
-! !OUTPUT PARAMETERS:
+  ! OUTPUT
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    integer                             :: ddyear
-!
-! !REVISION HISTORY:
-!  Original author(s): Marcello Vichi
-!
-!EOP
-!
-! !LOCAL VARIABLES:
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Local Variables
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    integer                             :: yy,mm,dd,hh,nn
    real(RLEN)                          :: julian0,jday
-!
-!-----------------------------------------------------------------------
-!BOC
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
       jday = real(julian,RLEN)
       call calendar_date(jday,yy,mm,dd,hh,nn)
       call julian_day(yy,1,1,0,0,julian0)
       ddyear = julian - int(julian0) + 1
 
    end subroutine dayofyear
-!EOC
 
-!-------------------------------------------------------------------------!
-!-------------------------------------------------------------------------!
+!-----------------------------------------------------------------------
+
  integer function eomdays(Year, Month)
- ! Adapted from Lin Jensen, 1998
+!
+! DESCRIPTION
+!   Days in a month. Adapted from Lin Jensen, 1998
+!
+! USES
      implicit none
+
+  ! INPUT
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
      integer :: Month, Year
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
      SELECT CASE (Month)                       !!Find number of days in a Month
        CASE (:0, 13:)
                Stop "eomdays: Invalid month!!"
@@ -544,24 +478,46 @@
                eomdays = 30              !! Thirty days hath ...^
      END SELECT
      return
+
  end function eomdays
-!-------------------------------------------------------------------------!
-!-------------------------------------------------------------------------!
+
+!-----------------------------------------------------------------------
+
  integer function yeardays(Year)
+!
+! DESCRIPTION
+!   Days in a year
+!
+! USES
      implicit none
+
+  ! INPUT
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
      integer :: im, Year
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
      yeardays = 0
      do im = 1 , 12
         yeardays = yeardays + FLOAT(eomdays(Year, im))
      enddo
      if (yeardays == 0 .OR. yeardays > 366) stop ' yeardays out of bounds!'
      return
+
  end function yeardays
-!-------------------------------------------------------------------------!
-!-------------------------------------------------------------------------!
+
+!-----------------------------------------------------------------------
+
  character(len=PATH_MAX) function outdeltalab(outdelta)
+!
+! DESCRIPTION
+!   Get time frequency label from floar input value.
+!
+! USES
      implicit none
+
+  ! INPUT
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
      integer :: outdelta, timesec, outfreq , thisrdt
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
      thisrdt = int(bfmtime%timestep)
      timesec = outdelta * thisrdt
@@ -591,12 +547,11 @@
      outdeltalab = ADJUSTL( outdeltalab ) 
 
      return
+
  end function outdeltalab
-!-----------------------------------------------------------------------
-!-----------------------------------------------------------------------
 
    end module time
 
-!-----------------------------------------------------------------------
-! Copyright by the GOTM-team under the GNU Public License - www.gnu.org
-!-----------------------------------------------------------------------
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
