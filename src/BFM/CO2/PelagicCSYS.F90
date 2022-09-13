@@ -49,11 +49,7 @@
   use mem_CSYS, ONLY : CarbonateSystem
   use AirSeaExchange, ONLY: AirSeaCO2, AirpGas
   use BFM_ERROR_MSG, ONLY: BFM_ERROR
-#ifdef BFM_GOTM
-  use bio_var, ONLY: SRFindices
-#else
   use api_bfm, ONLY: SRFindices,bfm_init
-#endif
 
   IMPLICIT NONE
 

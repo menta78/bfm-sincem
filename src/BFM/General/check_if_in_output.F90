@@ -28,11 +28,7 @@
 ! USES
   use global_mem, ONLY:RLEN
   use string_functions, ONLY: getseq_number
-#ifdef BFM_GOTM
-  use bio_var, only: var_names,var_ids,stBenFluxE
-#else
   use api_bfm, only: var_names,var_ids,stPelRivE
-#endif
 
   IMPLICIT NONE
 

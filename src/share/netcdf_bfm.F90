@@ -255,14 +255,6 @@
    call check_err(set_attributes(ncid_bfm,surfpoint_id,formula_term='surface points'), fname)
    call check_err(set_attributes(ncid_bfm,surfpoint_id,compress='none'), fname)
 #endif
-#ifdef BFM_GOTM
-   call check_err(set_attributes(ncid_bfm,ocepoint_id,formula_term='watercolumn levels'), fname)
-   call check_err(set_attributes(ncid_bfm,ocepoint_id,compress='z'), fname)
-   call check_err(set_attributes(ncid_bfm,surfpoint_id,formula_term='watercolumn surface'), fname)
-   call check_err(set_attributes(ncid_bfm,surfpoint_id,compress='z'), fname)
-   call check_err(set_attributes(ncid_bfm,botpoint_id,formula_term='watercolumn bottom'), fname)
-   call check_err(set_attributes(ncid_bfm,botpoint_id,compress='z'), fname)
-#endif
 #ifdef BFM_NEMO
    if (present(column)) then
       call check_err(set_attributes(ncid_bfm,ocepoint_id,formula_term='watercolumn levels'), fname)
@@ -515,14 +507,6 @@
    call check_err(set_attributes(ncid_rst,surfpoint_rid,compress='none'), fname)
    call check_err(set_attributes(ncid_rst,botpoint_rid,formula_term='bottom points'), fname)
    call check_err(set_attributes(ncid_rst,botpoint_rid,compress='none'), fname)
-#endif
-#ifdef BFM_GOTM
-   call check_err(set_attributes(ncid_rst,ocepoint_rid,formula_term='watercolumn levels'), fname)
-   call check_err(set_attributes(ncid_rst,ocepoint_rid,compress='z'), fname)
-   call check_err(set_attributes(ncid_rst,surfpoint_rid,formula_term='watercolumn surface'), fname)
-   call check_err(set_attributes(ncid_rst,surfpoint_rid,compress='z'), fname)
-   call check_err(set_attributes(ncid_rst,botpoint_rid,formula_term='watercolumn bottom'), fname)
-   call check_err(set_attributes(ncid_rst,botpoint_rid,compress='z'), fname)
 #endif
 #ifdef BFM_NEMO
    call check_err(set_attributes(ncid_rst,ocepoint_rid,formula_term='water points'), fname)

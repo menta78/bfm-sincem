@@ -16,9 +16,6 @@
      use constants, only: RLEN, SEC_PER_DAY
      use mem_Param, only: p_small
      use global_mem, only: ONE,ZERO
-#ifdef BFM_GOTM
-     use turbulence,  ONLY: kappa
-#endif
 #ifdef NOPOINTERS
      use mem
 #else
@@ -67,9 +64,6 @@
       real(RLEN),dimension(NO_BOXES_XY)                ::b
       real(RLEN),dimension(NO_BOXES_XY)                ::f
       real(RLEN),dimension(NO_BOXES_XY)                ::r
-#ifndef BFM_GOTM
-      real(RLEN),parameter                             ::kappa=1.0E-5_RLEN
-#endif
     
       f=  min(fto,DepthLayer)
       b = min(100.0_RLEN,Sedi/(p_small+SEC_PER_DAY*kappa*ETAUB(:))) 

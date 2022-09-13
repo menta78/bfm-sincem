@@ -44,19 +44,10 @@ subroutine correct_flux_output(mode, nr0,zlev,nlev,out)
 
   use mem, only: NO_BOXES, PELBOTTOM,PELSURFACE,Depth, D3FLUX_FUNC, D3FLUX_MATRIX
 
-#ifdef BFM_GOTM
-  use bio_var, only: stPelStateS, stPelStateE
-#else
   use api_bfm, only: stPelStateS, stPelStateE
 #endif
 
-#endif
-
-#ifdef BFM_GOTM
-  use bio_var, ONLY: SRFindices,BOTindices
-#else
   use api_bfm, ONLY: SRFindices,BOTindices
-#endif
 
   implicit none
 
@@ -66,11 +57,7 @@ subroutine correct_flux_output(mode, nr0,zlev,nlev,out)
   integer,intent(IN)                  ::nr0
   integer,intent(IN)                  ::zlev
   integer,intent(IN)                  ::nlev
-#ifdef BFM_GOTM
-  real(RLEN),intent(OUT),dimension(0:nlev)  :: out
-#else
   real(RLEN),intent(OUT),dimension(nlev)    :: out
-#endif
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Local Variables
@@ -82,11 +69,7 @@ subroutine correct_flux_output(mode, nr0,zlev,nlev,out)
 #ifndef NOPOINTERS
   integer      ::idummy
 #endif
-#ifdef BFM_GOTM
-  real(RLEN),dimension(0:NO_BOXES) :: hulp
-#else
   real(RLEN),dimension(NO_BOXES)   :: hulp
-#endif
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   nr=nr0
 

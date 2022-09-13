@@ -79,11 +79,7 @@
    use mem, ONLY: jPIY3c, jZIY3c, ZI_Fc, jRIY3c, jRIY3n, jRIY3p, jRIY3s,  &
                   D1m, D6m, D7m, D8m, D9m, ppD6m, ppD7m, ppD8m, ppD9m
 #endif
-#ifdef BFM_GOTM
- use bio_var, ONLY: BOTindices
-#else
  use api_bfm, ONLY: BOTindices
-#endif
 
    IMPLICIT NONE
  

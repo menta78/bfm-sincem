@@ -42,11 +42,7 @@
 #endif
 #endif
   use mem_Param,  ONLY: p_small
-#ifdef BFM_GOTM
-  use bio_var, ONLY: BOTindices
-#else
   use api_bfm, ONLY: BOTindices
-#endif
 #ifdef BFM_POM
 use mem_Phyto
 use mem_Settling

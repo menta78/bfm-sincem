@@ -47,9 +47,6 @@
   use mem, ONLY: iiF, qfcPPY, ppR6f
 #endif
 #endif
-#ifdef BFM_GOTM
-  use mem, ONLY: jnetMeZc
-#endif
   use mem_Param,  ONLY: p_small
   use bfm_error_msg, ONLY: bfm_error
   use constants,ONLY: MIN_VAL_EXPFUN, MW_C, C2ALK

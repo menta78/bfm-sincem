@@ -51,11 +51,7 @@
   use mem_Param, ONLY: CalcConservationFlag, AssignPelBenFluxesInBFMFlag
   use constants, ONLY: MW_C
   use mem_globalfun, ONLY: MM_POWER
-#ifdef BFM_GOTM
- use bio_var, ONLY: BOTindices
-#else
- use api_bfm, ONLY: BOTindices
-#endif
+  use api_bfm, ONLY: BOTindices
 
   IMPLICIT NONE
 
