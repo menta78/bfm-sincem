@@ -1,13 +1,28 @@
-# Python script to generate plots of BFM STANDALONE results
-# with HTML index file in the experiment directory
+#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+# MODEL  BFM - Biogeochemical Flux Model
+#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 #
-# T.Lovato for BFM System Team (2020)
+# DESCRIPTION
+#   Python script to generate plots of BFM STANDALONE results
+#   with HTML index file in the experiment directory
 #
-# Prerequisite: install "bfm_standalone_diag" python conda environment
-#   `conda env create -f environment.yml`
+# USAGE
+#   Install "bfm_standalone_diag" python conda environment
+#      `conda env create -f environment.yml`
+#   Execution: python standalone_diag.py <bfm-output.nc>
 #
-# Usage: python standalone_diag.py <bfm-output.nc>
+# COPYING
 #
+#   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
+#
+#   This program is free software: you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation.
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+#   See the GNU General Public License for more details.
+#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 from matplotlib import use
 use("Agg")
