@@ -7,6 +7,18 @@
 ! DESCRIPTION
 !   Read seaice data, interpolate in time
 !   Coupling of sea ice processes for Kobbefjord site
+!   Required input fields:
+!      EICE : Seaice cover                   : --
+!      EHB  : Sea-ice biotic layer thickness : m
+!      EVB  : Brine volume fraction          : --
+!      ETB  : Brine temperature              : C
+!      ESB  : Brine salinity                 : --
+!      EIB  : Brine irradiance               : uE/m2/s
+!      ESI  : Sea-ice bulk salinity          : --
+!      EDH  : Sea-ice growth rate at bottom  : m/s
+!      EDS  : Snow growth rate at surface    : m/s
+!      EDM  : Snow ice layer growth rate     : m/s
+!      EIR  : Irradiance                     : uE/m2/s
 !
 ! COPYING
 !

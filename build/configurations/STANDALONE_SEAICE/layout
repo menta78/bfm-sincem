@@ -70,10 +70,9 @@ end
   ESB  : Brine salinity	  		: --
   EIB  : Brine irradiance      		: uE/m2/s
   ESI  : Sea-ice bulk salinity	  	: --
-  EDH  : Sea-ice velocity at the bottom	: m/s
-  EDS  : Snow velocity at the surface	: m/s
-  EDM  : Snow ice layer velocity        : m/s
-
+  EDH  : Sea-ice growth rate at bottom  : m/s
+  EDS  : Snow growth rate at surface    : m/s
+  EDM  : Snow ice layer growth rate     : m/s
 end
 
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
