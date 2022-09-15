@@ -79,9 +79,6 @@
         real(RLEN),public,pointer,dimension(:,:)   :: D3SOURCE
 
         integer,public,pointer,dimension(:) :: D3STATETYPE
-#ifdef BFM_NEMO
-       integer,public,pointer,dimension(:)  :: D3STATEOBC
-#endif
 
         real(RLEN),public,pointer,dimension(:,:) :: %pel-field-array surface
         real(RLEN),public,pointer,dimension(:,:) :: %pel-field-array bottom
@@ -104,9 +101,6 @@
         real(RLEN),public,pointer,dimension(:,:)   :: D2SOURCE_ICE
 
         integer,public,pointer,dimension(:) :: D2STATETYPE_ICE
-#ifdef BFM_NEMO
-       integer,public,pointer,dimension(:)  :: D2STATEOBC_ICE
-#endif
 
         real(RLEN),public,pointer,dimension(:,:) :: D2DIAGNOS_ICE
 
@@ -121,9 +115,6 @@
         real(RLEN),public,pointer,dimension(:,:)   :: D2SOURCE_BEN
 
         integer,public,pointer,dimension(:) :: D2STATETYPE_BEN
-#ifdef BFM_NEMO
-       integer,public,pointer,dimension(:)  :: D2STATEOBC_BEN
-#endif
 
         real(RLEN),public,pointer,dimension(:,:) :: D2DIAGNOS_BEN
 
