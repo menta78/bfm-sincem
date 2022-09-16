@@ -61,8 +61,6 @@
   integer,    parameter ::OFF=-100
   integer,    parameter ::SINKSOURCE=-1
   integer,    parameter ::NOTRANSPORT=0
-  integer,    parameter ::NOOBCSTATES=0
-  integer,    parameter ::OBCSTATES=1
   integer,    parameter ::HORTRANSPORT=10
   integer,    parameter ::ALLTRANSPORT=20
   real(RLEN), parameter :: DONE=1._RLEN

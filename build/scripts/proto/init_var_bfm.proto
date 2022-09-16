@@ -452,15 +452,6 @@ END MODULE init_var_bfm_local
         LEVEL3 "Benthic model is: not used"
    endif
 
-#if defined key_obcbfm
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! All variables are inizialized on obc default
-  ! D3STATEOBC(:)=OBCSTATES
-  ! Put D3STATEOBC(..)=NOOBCSTATES to exclude
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-    D3STATEOBC(:)=OBCSTATES
-#endif
-
    !---------------------------------------------
    ! Check for transport flag
    !---------------------------------------------

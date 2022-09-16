@@ -337,11 +337,6 @@ sub func_ALLOC {
         print $file "${SPACE}allocate(D${dim}STATETYPE${SUBTYPE}(1:NO_D${dim}_BOX_${TYPE}S${SUBTYPE} ),stat=status)\n";
         print $file "${SPACE}if (status /= 0) call error_msg_prn(ALLOC,\"AllocateMem\",\"D${dim}STATETYPE${SUBTYPE}\")\n";
         print $file "${SPACE}D${dim}STATETYPE${SUBTYPE} = ZERO\n";
-        print $file "#ifdef BFM_NEMO\n";
-        print $file "${SPACE}  allocate(D${dim}STATEOBC${SUBTYPE}(1:NO_D${dim}_BOX_STATES${SUBTYPE}),stat=status)\n";
-        print $file "${SPACE}  if (status /= 0) call error_msg_prn(ALLOC,\"AllocateMem\",\"D${dim}STATEOBC${SUBTYPE}\")\n";
-        print $file "${SPACE}  D${dim}STATEOBC${SUBTYPE} = ZERO\n";
-        print $file "#endif\n";
     }
 }
 
@@ -1557,9 +1552,6 @@ sub func_INIT_FUNC_ZERO {
             $line .= "${SPACE}      if ( pp" . $group->getSigla() . "(j,i) /= 0 ) then \n";
             $line .= "${SPACE}        D${dim}STATE${SUBTYPE}(pp" . $group->getSigla() . "(j,i),:) = p_small\n";
             $line .= "${SPACE}        D${dim}STATETYPE${SUBTYPE}(pp" . $group->getSigla() . "(j,i)) = OFF\n";
-            $line .= "#if defined key_obcbfm\n";
-            $line .= "${SPACE}        D${dim}STATEOBC${SUBTYPE}(pp" . $group->getSigla() . "(j,i)) = NOOBCSTATES\n";
-            $line .= "#endif\n";
             $line .= "${SPACE}      end if\n";
             $line .= "${SPACE}    end do\n";
             $line .= "${SPACE}  end if\n";
