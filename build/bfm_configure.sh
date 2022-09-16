@@ -615,11 +615,11 @@ if [[ ${DEP} && "$MODE" != "NEMO_CESM" ]]; then
         #link reference nemo files from the shared directory
         if [[ "$MODE" == "NEMO" || "$MODE" == "NEMO_3DVAR" ]] && [ -d ${NEMODIRCFG}/SHARED ]; then 
            if [ "x${VER}" == "x" ] ; then
-               shared_files="namelist_ref namelist_top_ref domain_def.xml field_def.xml"
-               [[ "${NEMOSUB}" == *"LIM_SRC_2"* ]] && ln -sf ${NEMODIRCFG}/SHARED/namelist_ice_lim2_ref namelist_ice_ref
-           else
                shared_files="namelist_ref namelist_top_ref axis_def_nemo.xml domain_def_nemo.xml grid_def_nemo.xml field_def_nemo-oce.xml"
                [[ "${NEMOSUB}" == *"ICE"* ]] && shared_files="$shared_files namelist_ice_ref field_def_nemo-ice.xml"
+           else
+               shared_files="namelist_ref namelist_top_ref domain_def.xml field_def.xml"
+               [[ "${NEMOSUB}" == *"LIM_SRC_2"* ]] && ln -sf ${NEMODIRCFG}/SHARED/namelist_ice_lim2_ref namelist_ice_ref
            fi
            for ff in ${shared_files} ; do
                ln -sf ${NEMODIRCFG}/SHARED/${ff} ${exedir}/
