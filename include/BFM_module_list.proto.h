@@ -19,7 +19,6 @@
        USE mem_pelsinkset
        USE mem_phyto
        USE netcdf_bfm
-       USE print_functions
 !       USE standalone
        USE string_functions
        USE sw_tool
