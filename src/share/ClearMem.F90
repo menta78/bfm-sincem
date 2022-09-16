@@ -97,9 +97,6 @@ subroutine ClearMem
      deallocate(D3STATETYPE)
      deallocate(D3DIAGNOS)
      deallocate(D2DIAGNOS)
-#ifdef BFM_NEMO
-     deallocate(D3STATEOBC)
-#endif
 
 #if defined INCLUDE_SEAICE
      if ( allocated(D2ave_ice) ) deallocate(D2ave_ice)
@@ -107,9 +104,6 @@ subroutine ClearMem
      deallocate(D2STATE_ICE)
      deallocate(D2SOURCE_ICE)
      deallocate(D2STATETYPE_ICE)
-#ifdef BFM_NEMO
-     deallocate(D2STATEOBC_ICE)
-#endif
 #endif
 
      if ( allocated(D2ave_ben) ) deallocate(D2ave_ben)
@@ -117,9 +111,6 @@ subroutine ClearMem
      deallocate(D2STATE_BEN)
      deallocate(D2SOURCE_BEN)
      deallocate(D2STATETYPE_BEN)
-#ifdef BFM_NEMO
-     deallocate(D2STATEOBC_BEN)
-#endif
 
 #endif
 

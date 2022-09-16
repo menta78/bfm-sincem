@@ -277,9 +277,6 @@ contains
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    integer                   :: rc,n
    character(len=PATH_MAX)   :: logfname, thistime, tmpname
-#if defined key_obcbfm
-   character(len=PATH_MAX)   :: logfnameobc
-#endif
    namelist /bfm_nml/ bio_calc,bio_setup,bfm_init,bfm_rstctl,   &
                       out_fname,out_dir,out_units,out_title,    &
                       out_delta,out_secs,bioshade_feedback,     &
