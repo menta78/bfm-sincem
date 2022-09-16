@@ -37,7 +37,7 @@
     N4n, N1p, N3n, R3c, iiR1, iiR6, D3STATE
   use mem, ONLY: iiPelBacteria, ppPelBacteria, iiC, iiN, iiP, ppR6c, ppR6n, ppR6p, &
     ppR1c, ppR1n, ppR1p, ppR2c, ppO2o, ppN6r, ppN4n, ppN1p, ppN3n, ppR3c, ETW, EPR, &
-    qncPBA, qpcPBA, eO2mO2, qpcOMT, qncOMT, NO_BOXES, iiBen, iiPel, flux_vector,quota_flux
+    qncPBA, qpcPBA, qpcOMT, qncOMT, NO_BOXES, iiBen, iiPel, flux_vector, quota_flux
 #ifdef INCLUDE_PELCO2
   use mem, ONLY: ppO3c
 #endif
@@ -102,7 +102,7 @@
   ppbacc = ppPelBacteria(bac,iiC)
   ppbacn = ppPelBacteria(bac,iiN)
   ppbacp = ppPelBacteria(bac,iiP)
-  bacc = D3STATE(ppbacc,:)
+  bacc = D3STATE(:,ppbacc)
 
   ! Quota collectors
   tfluxC = ZERO
@@ -143,16 +143,16 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-==--=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-
   ! Internal Nutrient limitation (always one for fixed stoichiometry)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  iNIn = min(ONE, max(ZERO, qncPBA(bac,:)/p_qncPBA(bac)))  !Nitrogen
-  iN1p = min(ONE, max(ZERO, qpcPBA(bac,:)/p_qpcPBA(bac)))  !Phosphorus
+  iNIn = min(ONE, max(ZERO, qncPBA(:,bac)/p_qncPBA(bac)))  !Nitrogen
+  iN1p = min(ONE, max(ZERO, qpcPBA(:,bac)/p_qpcPBA(bac)))  !Phosphorus
   iN   = min(iN1p, iNIn)
 
   ! DOC aggregation into POC
   rugch = ZERO
   rugch =  MIN(R1c(:), R6c(:) * p_sulR1(bac))
   call flux_vector(iiPel, ppR1c, ppR6c, rugch) 
-  call flux_vector(iiPel, ppR1n, ppR6n, rugch*qncOMT(iiR1,:)) 
-  call flux_vector(iiPel, ppR1p, ppR6p, rugch*qpcOMT(iiR1,:)) 
+  call flux_vector(iiPel, ppR1n, ppR6n, rugch*qncOMT(:,iiR1)) 
+  call flux_vector(iiPel, ppR1p, ppR6p, rugch*qpcOMT(:,iiR1)) 
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Potential uptake by bacteria
@@ -184,13 +184,13 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Organic Nitrogen and Phosphrous uptake
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  ruR1n = qncOMT(iiR1,:)*ruR1c
-  ruR6n = qncOMT(iiR6,:)*ruR6c
+  ruR1n = qncOMT(:,iiR1)*ruR1c
+  ruR6n = qncOMT(:,iiR6)*ruR6c
   call quota_flux(iiPel, ppbacn, ppR1n, ppbacn, ruR1n, tfluxN)
   call quota_flux(iiPel, ppbacn, ppR6n, ppbacn, ruR6n, tfluxN)
 
-  ruR1p = qpcOMT(iiR1,:)*ruR1c
-  ruR6p = qpcOMT(iiR6,:)*ruR6c
+  ruR1p = qpcOMT(:,iiR1)*ruR1c
+  ruR6p = qpcOMT(:,iiR6)*ruR6c
   call quota_flux(iiPel, ppbacp, ppR1p, ppbacp, ruR1p, tfluxP)
   call quota_flux(iiPel, ppbacp, ppR6p, ppbacp, ruR6p, tfluxP)
 
@@ -200,13 +200,13 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   rdru = rd*(ONE-ruR6c/rug)
   call quota_flux(iiPel, ppbacc, ppbacc, ppR1c, rdru              , tfluxC)
-  call quota_flux(iiPel, ppbacn, ppbacn, ppR1n, rdru*qncPBA(bac,:), tfluxN)
-  call quota_flux(iiPel, ppbacp, ppbacp, ppR1p, rdru*qpcPBA(bac,:), tfluxP)
+  call quota_flux(iiPel, ppbacn, ppbacn, ppR1n, rdru*qncPBA(:,bac), tfluxN)
+  call quota_flux(iiPel, ppbacp, ppbacp, ppR1p, rdru*qpcPBA(:,bac), tfluxP)
 
   rdru = rd*ruR6c/rug
   call quota_flux(iiPel, ppbacc, ppbacc, ppR6c, rdru              , tfluxC)
-  call quota_flux(iiPel, ppbacn, ppbacn, ppR6n, rdru*qncPBA(bac,:), tfluxN)
-  call quota_flux(iiPel, ppbacp, ppbacp, ppR6p, rdru*qpcPBA(bac,:), tfluxP)
+  call quota_flux(iiPel, ppbacn, ppbacn, ppR6n, rdru*qncPBA(:,bac), tfluxN)
+  call quota_flux(iiPel, ppbacp, ppbacp, ppR6p, rdru*qpcPBA(:,bac), tfluxP)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Aerobic and anaerobic respiration
@@ -247,7 +247,7 @@
   ! This rate is assumed to occur with a timescale p_ruen=1 day
   ! and controlled with a Michaelis-Menten function
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  ren = (qncPBA(bac,:) - p_qncPBA(bac))*bacc*p_ruen(bac)
+  ren = (qncPBA(:,bac) - p_qncPBA(bac))*bacc*p_ruen(bac)
 
   ! Fix-quota: actual quota comes from detritus uptake vs. realized growth
   if ( ppbacn == 0 ) & 
@@ -262,7 +262,7 @@
   ! This rate is assumed to occur with a timescale of p_ruep=1 day
   ! and controlled with a Michaelis-Menten function
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  rep = (qpcPBA(bac,:) - p_qpcPBA(bac))*bacc*p_ruep(bac)
+  rep = (qpcPBA(:,bac) - p_qpcPBA(bac))*bacc*p_ruep(bac)
 
   ! Fix-quota: actual quota comes from detritus uptake vs. realized growth
   if ( ppbacp == 0 ) &
@@ -278,7 +278,7 @@
      ! Eliminate the excess of the non-limiting constituent under fixed quota
      ! Determine release due to either C, P, or N limitation
      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-     call fixratio(tfluxC,tfluxN,tfluxP,qncPBA(bac,:),qpcPBA(bac,:),pe_R6c, pe_N4n, pe_N1p)
+     call fixratio(tfluxC,tfluxN,tfluxP,qncPBA(:,bac),qpcPBA(:,bac),pe_R6c, pe_N4n, pe_N1p)
 
      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
      ! Apply the correction terms depending on the limiting constituent

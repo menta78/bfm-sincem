@@ -145,7 +145,7 @@
          ppstate = ppPelDetritus(iiR6,n)
          if (ppstate > 0) then 
             SINKD3STATE(ppstate)%dosink = .TRUE.
-            SINKD3STATE(ppstate)%sedi => sediR6
+            SINKD3STATE(ppstate)%sedi => sediR6(:)
          endif
      enddo
   endif
@@ -156,7 +156,7 @@
          ppstate = ppPelDetritus(iiR3,n)
          if (ppstate > 0) then
             SINKD3STATE(ppstate)%dosink = .TRUE.
-            SINKD3STATE(ppstate)%sedi => sediR3
+            SINKD3STATE(ppstate)%sedi => sediR3(:)
          endif
      enddo
   endif
@@ -165,7 +165,7 @@
   ! Calcite (O5)
   if ( p_rO5m > 0.0_RLEN) then
      SINKD3STATE(ppO5c)%dosink = .TRUE.      
-     SINKD3STATE(ppO5c)%sedi => sediO5   
+     SINKD3STATE(ppO5c)%sedi => sediO5(:)
   endif
 #endif
 
@@ -177,7 +177,7 @@
             if (ppstate > 0) then 
                SINKD3STATE(ppstate)%dosink = .TRUE.
                SINKD3STATE(ppstate)%group  = 1
-               SINKD3STATE(ppstate)%sedi  => sediPPY(m,:)
+               SINKD3STATE(ppstate)%sedi  => sediPPY(:,m)
             endif
          enddo
       endif

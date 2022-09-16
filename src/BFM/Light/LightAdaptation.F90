@@ -81,13 +81,13 @@
 
     case ( NOTRANSPORT )
 
-      rate_ELiPPY  =   p_ruELiPPY(phyto)*( new_ELiPPY(:)- ELiPPY(phyto,:))
+      rate_ELiPPY  =   p_ruELiPPY(phyto)*( new_ELiPPY(:)- ELiPPY(:,phyto))
       call flux_vector( iiPel, iphytol,iphytol, rate_ELiPPY )
 
     case default
 
-      rate_PLi = Source_D3_vector(ppPhytoPlankton(phyto,iiC))* ELiPPY(phyto,:)+ &
-                 p_ruELiPPY(phyto)*( new_ELiPPY- ELiPPY(phyto,:))* PhytoPlankton(phyto,iiC)
+      rate_PLi = Source_D3_vector(ppPhytoPlankton(phyto,iiC))* ELiPPY(:,phyto)+ &
+                 p_ruELiPPY(phyto)*( new_ELiPPY- ELiPPY(:,phyto))* PhytoPlankton(phyto,iiC)
       call flux_vector( iiPel, iphytol,iphytol, rate_PLi )
 
   end select

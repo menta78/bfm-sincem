@@ -56,27 +56,27 @@
   ! Pelagic Bacteria
   do i=1, iiPelBacteria
      totpelc(:)=totpelc(:) + PelBacteria(i,iiC)
-     totpeln(:)=totpeln(:) + PelBacteria(i,iiC)*qncPBA(i,:)
-     totpelp(:)=totpelp(:) + PelBacteria(i,iiC)*qpcPBA(i,:)
+     totpeln(:)=totpeln(:) + PelBacteria(i,iiC)*qncPBA(:,i)
+     totpelp(:)=totpelp(:) + PelBacteria(i,iiC)*qpcPBA(:,i)
   end do
   ! PhytoPlankton
   do i=1, iiPhytoPlankton
      totpelc(:)=totpelc(:) + PhytoPlankton(i,iiC)
-     totpeln(:)=totpeln(:) + PhytoPlankton(i,iiC)*qncPPY(i,:)
-     totpelp(:)=totpelp(:) + PhytoPlankton(i,iiC)*qpcPPY(i,:)
-     totpels(:)=totpels(:) + PhytoPlankton(i,iiC)*qscPPY(i,:)
+     totpeln(:)=totpeln(:) + PhytoPlankton(i,iiC)*qncPPY(:,i)
+     totpelp(:)=totpelp(:) + PhytoPlankton(i,iiC)*qpcPPY(:,i)
+     totpels(:)=totpels(:) + PhytoPlankton(i,iiC)*qscPPY(:,i)
   end do
   ! MicroZooplankton
   do i=1, iiMicroZooplankton
      totpelc(:)=totpelc(:) + MicroZooplankton(i,iiC)
-     totpeln(:)=totpeln(:) + MicroZooplankton(i,iiC)*qncMIZ(i,:)
-     totpelp(:)=totpelp(:) + MicroZooplankton(i,iiC)*qpcMIZ(i,:)
+     totpeln(:)=totpeln(:) + MicroZooplankton(i,iiC)*qncMIZ(:,i)
+     totpelp(:)=totpelp(:) + MicroZooplankton(i,iiC)*qpcMIZ(:,i)
   end do
   ! MesoZooPlankton
   do i=1, iiMesoZooPlankton
      totpelc(:)=totpelc(:) + MesoZooPlankton(i,iiC)
-     totpeln(:)=totpeln(:) + MesoZooPlankton(i,iiC)*qncMEZ(i,:)
-     totpelp(:)=totpelp(:) + MesoZooPlankton(i,iiC)*qpcMEZ(i,:)
+     totpeln(:)=totpeln(:) + MesoZooPlankton(i,iiC)*qncMEZ(:,i)
+     totpelp(:)=totpelp(:) + MesoZooPlankton(i,iiC)*qpcMEZ(:,i)
    end do
   ! Pelagic Detritus
   do i=1, iiPelDetritus
@@ -165,7 +165,7 @@
 #endif
 
 #ifdef INCLUDE_BENCO2
-     totbenc(:) = totbenc(:)+G3c(:)
+     totbenc(:) = totbenc(:) + G3c(:)
 #endif
      ! Convert from default units to g and multiply for the sediment volume
      totbenc(:) = totbenc(:)/1000.0_RLEN*Area2d(:)

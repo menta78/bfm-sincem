@@ -117,9 +117,9 @@
   ppzoon = ppMesoZooPlankton(zoo,iiN)
   ppzoop = ppMesoZooPlankton(zoo,iiP)
 
-  zooc = D3STATE(ppzooc,:)
-  zoon = zooc * qncMEZ(zoo,:)
-  zoop = zooc * qpcMEZ(zoo,:)
+  zooc = D3STATE(:,ppzooc)
+  zoon = zooc * qncMEZ(:,zoo)
+  zoop = zooc * qpcMEZ(:,zoo)
 
   ! Quota collectors
   tfluxC = ZERO
@@ -169,22 +169,22 @@
   do i = 1, iiPhytoPlankton
     ruPPYc = sut*PPYc(:,i)
     call flux_vector(iiPel, ppPhytoPlankton(i,iiC), ppzooc, ruPPYc)
-    call flux_vector(iiPel, ppPhytoPlankton(i,iiN), ppzoon, ruPPYc*qncPPY(i,:))
-    call flux_vector(iiPel, ppPhytoPlankton(i,iiP), ppzoop, ruPPYc*qpcPPY(i,:))
+    call flux_vector(iiPel, ppPhytoPlankton(i,iiN), ppzoon, ruPPYc*qncPPY(:,i))
+    call flux_vector(iiPel, ppPhytoPlankton(i,iiP), ppzoop, ruPPYc*qpcPPY(:,i))
     rut_c = rut_c + ruPPYc
-    rut_n = rut_n + ruPPYc*qncPPY(i,:)
-    rut_p = rut_p + ruPPYc*qpcPPY(i,:)
+    rut_n = rut_n + ruPPYc*qncPPY(:,i)
+    rut_p = rut_p + ruPPYc*qpcPPY(:,i)
     ! Chl is transferred to the infinite sink
     call flux_vector(iiPel, ppPhytoPlankton(i,iiL), &
-               ppPhytoPlankton(i,iiL), -ruPPYc*qlcPPY(i,:))
+               ppPhytoPlankton(i,iiL), -ruPPYc*qlcPPY(:,i))
     ! silicon constituent is transferred to biogenic silicate
     if ( ppPhytoPlankton(i,iiS) .gt. 0 ) & 
-       call flux_vector(iiPel, ppPhytoPlankton(i,iiS), ppR6s, ruPPYc*qscPPY(i,:))
+       call flux_vector(iiPel, ppPhytoPlankton(i,iiS), ppR6s, ruPPYc*qscPPY(:,i))
 
 #ifdef INCLUDE_PELFE
     ! Fe constituent is transferred to particulate iron
     if ( ppPhytoPlankton(i,iiF) .gt. 0 ) & 
-       call flux_vector(iiPel, ppPhytoPlankton(i,iiF), ppR6f, ruPPYc*qfcPPY(i,:))
+       call flux_vector(iiPel, ppPhytoPlankton(i,iiF), ppR6f, ruPPYc*qfcPPY(:,i))
 #endif
 
 #if defined INCLUDE_PELCO2
@@ -195,8 +195,8 @@
     ! that only a portion is egested
     ! Calcite production is parameterized as a flux between DIC and PIC
     ! that affects alkalinity
-    call flux_vector( iiPel, ppO3c,ppO5c, p_pecaco3(zoo)*ruPPYc*qccPPY(i,:))
-    call flux_vector( iiPel, ppO3h,ppO3h, -C2ALK*p_pecaco3(zoo)*ruPPYc*qccPPY(i,:))
+    call flux_vector( iiPel, ppO3c,ppO5c, p_pecaco3(zoo)*ruPPYc*qccPPY(:,i))
+    call flux_vector( iiPel, ppO3h,ppO3h, -C2ALK*p_pecaco3(zoo)*ruPPYc*qccPPY(:,i))
 #endif
 
   end do
@@ -205,11 +205,11 @@
   do i = 1, iiMicroZooPlankton
     ruMIZc = sut*MIZc(:,i)
     call flux_vector(iiPel, ppMicroZooPlankton(i,iiC), ppzooc, ruMIZc)
-    call flux_vector(iiPel, ppMicroZooPlankton(i,iiN), ppzoon, ruMIZc*qncMIZ(i,:))
-    call flux_vector(iiPel, ppMicroZooPlankton(i,iiP), ppzoop, ruMIZc*qpcMIZ(i,:))
+    call flux_vector(iiPel, ppMicroZooPlankton(i,iiN), ppzoon, ruMIZc*qncMIZ(:,i))
+    call flux_vector(iiPel, ppMicroZooPlankton(i,iiP), ppzoop, ruMIZc*qpcMIZ(:,i))
     rut_c = rut_c + ruMIZc
-    rut_n = rut_n + ruMIZc*qncMIZ(i,:)
-    rut_p = rut_p + ruMIZc*qpcMIZ(i,:)
+    rut_n = rut_n + ruMIZc*qncMIZ(:,i)
+    rut_p = rut_p + ruMIZc*qpcMIZ(:,i)
   end do
 
   ! Mesozooplankton
@@ -218,12 +218,12 @@
     ! Note that intra-group predation (cannibalism) is not added as a flux
     if ( i/= zoo ) then
       call flux_vector(iiPel, ppMesoZooPlankton(i,iiC), ppzooc, ruMEZc)
-      call flux_vector(iiPel, ppMesoZooPlankton(i,iiN), ppzoon, ruMEZc*qncMEZ(i,:))
-      call flux_vector(iiPel, ppMesoZooPlankton(i,iiP), ppzoop, ruMEZc*qpcMEZ(i,:))
+      call flux_vector(iiPel, ppMesoZooPlankton(i,iiN), ppzoon, ruMEZc*qncMEZ(:,i))
+      call flux_vector(iiPel, ppMesoZooPlankton(i,iiP), ppzoop, ruMEZc*qpcMEZ(:,i))
     end if
     rut_c = rut_c + ruMEZc
-    rut_n = rut_n + ruMEZc*qncMEZ(i,:)
-    rut_p = rut_p + ruMEZc*qpcMEZ(i,:)
+    rut_n = rut_n + ruMEZc*qncMEZ(:,i)
+    rut_p = rut_p + ruMEZc*qpcMEZ(:,i)
   end do
 
   ! Note that tfluxC include also intra-group predation
@@ -253,8 +253,8 @@
   ! Eq. 40 and 44 Vichi et al. 2007
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   rq6c = p_peI(zoo)*rut_c + rdo_c + rd_c
-  rq6n = p_peI(zoo)*rut_n + qncMEZ(zoo,:)*(rdo_c + rd_c)
-  rq6p = p_peI(zoo)*rut_p + qpcMEZ(zoo,:)*(rdo_c + rd_c)
+  rq6n = p_peI(zoo)*rut_n + qncMEZ(:,zoo)*(rdo_c + rd_c)
+  rq6p = p_peI(zoo)*rut_p + qpcMEZ(:,zoo)*(rdo_c + rd_c)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Nutrient remineralization 
@@ -295,15 +295,15 @@
      ! value to variable limit
      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
      limit = iiC
-     temp_p  = pu_e_p/qpcMEZ(zoo,:)
-     temp_n  = pu_e_n/qncMEZ(zoo,:)
+     temp_p  = pu_e_p/qpcMEZ(:,zoo)
+     temp_n  = pu_e_n/qncMEZ(:,zoo)
 
      WHERE ( temp_p<temp_n .OR. abs(temp_p-temp_n)<p_small ) 
-         WHERE ( pu_e_p< qpcMEZ(zoo,:) )
+         WHERE ( pu_e_p< qpcMEZ(:,zoo) )
            limit = iiP
          END WHERE
      ELSEWHERE
-         WHERE ( pu_e_n<qncMEZ(zoo,:) )
+         WHERE ( pu_e_n<qncMEZ(:,zoo) )
            limit = iiN
          END WHERE
      END WHERE
@@ -330,7 +330,7 @@
      ! Eliminate the excess of the non-limiting constituent under fixed quota
      ! Determine release due to either C, P, or N limitation
      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-     call fixratio(tfluxC,tfluxN,tfluxP,qncMEZ(zoo,:),qpcMEZ(zoo,:),pe_R6c, pe_N4n, pe_N1p)
+     call fixratio(tfluxC,tfluxN,tfluxP,qncMEZ(:,zoo),qpcMEZ(:,zoo),pe_R6c, pe_N4n, pe_N1p)
    
   endif
 

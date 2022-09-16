@@ -79,7 +79,7 @@
   sediO5(:) = p_rO5m
 #endif
   do i = 1 , (iiPhytoPlankton)
-    sediPPY(i,:) = p_rPIm( i)
+    sediPPY(:,i) = p_rPIm( i)
   end do
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -150,7 +150,7 @@
       sediO5(BOTindices) = p_burvel_O5
 #endif
       do i = 1 , ( iiPhytoPlankton)
-          sediPPY(i,BOTindices)  =   p_burvel_PI
+          sediPPY(BOTindices,i)  =   p_burvel_PI
       end do
   endif
 

@@ -131,14 +131,14 @@
   ppphytop = ppPhytoPlankton(phyto,iiP)
   ppphytos = ppPhytoPlankton(phyto,iiS)
   ppphytol = ppPhytoPlankton(phyto,iiL)
-  phytoc(:) = D3STATE(ppphytoc,:)
-  phyton(:) = phytoc(:) * qncPPY(phyto,:)
-  phytop(:) = phytoc(:) * qpcPPY(phyto,:)
-  phytol(:) = phytoc(:) * qlcPPY(phyto,:)
-  if ( ppphytos > 0 )  phytos(:) = phytoc(:) * qscPPY(phyto,:)
+  phytoc(:) = D3STATE(:,ppphytoc)
+  phyton(:) = phytoc(:) * qncPPY(:,phyto)
+  phytop(:) = phytoc(:) * qpcPPY(:,phyto)
+  phytol(:) = phytoc(:) * qlcPPY(:,phyto)
+  if ( ppphytos > 0 )  phytos(:) = phytoc(:) * qscPPY(:,phyto)
 #ifdef INCLUDE_PELFE
   ppphytof = ppPhytoPlankton(phyto,iiF)
-  if ( ppphytof > 0 ) phytof(:) = phytoc(:) * qfcPPY(phyto,:)
+  if ( ppphytof > 0 ) phytof(:) = phytoc(:) * qfcPPY(:,phyto)
 #endif
   ! Quota collectors
   tfluxC = ZERO
@@ -158,9 +158,9 @@
   !                 The limiting role of the population size (intraspecific 
   !                 competition) can be tuned by increasing p_Contois 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  iN1p = min( ONE, max( p_small, ( qpcPPY(phyto,:) &
+  iN1p = min( ONE, max( p_small, ( qpcPPY(:,phyto) &
          - p_qplc(phyto))/( p_qpcPPY(phyto)- p_qplc(phyto))))
-  iNIn = min( ONE, max( p_small, ( qncPPY(phyto,:) &
+  iNIn = min( ONE, max( p_small, ( qncPPY(:,phyto) &
          - p_qnlc(phyto))/( p_qncPPY(phyto)- p_qnlc(phyto))))
   if (ppphytos > 0) then
      select case (p_switchSi(phyto)) 
@@ -169,7 +169,7 @@
          fpplim = eN5s
          iN5s   = ONE  
        case (2) ! internal control
-         iN5s = min(ONE, max( p_small, ( qscPPY(phyto,:) &
+         iN5s = min(ONE, max( p_small, ( qscPPY(:,phyto) &
                 - p_qslc(phyto))/( p_qscPPY(phyto)- p_qslc(phyto))))
          fpplim = iN5s
          eN5s   = ONE  
@@ -181,7 +181,7 @@
   end if
 #ifdef INCLUDE_PELFE
   if (ppphytof > 0) then
-     iN7f = min( ONE, max( p_small, ( qfcPPY(phyto,:) &
+     iN7f = min( ONE, max( p_small, ( qfcPPY(:,phyto) &
             - p_qflc(phyto))/( p_qfcPPY(phyto)- p_qflc(phyto))))
      fpplim = fpplim*iN7f
   else 
@@ -239,7 +239,7 @@
     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     ! Compute exponent E_PAR/E_K = alpha0/PBmax
     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    r(:) = qlcPPY(phyto, :)*p_alpha_chl(phyto)/p_sum(phyto)* Irr
+    r(:) = qlcPPY(:,phyto)*p_alpha_chl(phyto)/p_sum(phyto)* Irr
     select case ( LightPeriodFlag)
       case ( 1 ) ! instantaneous light
         ! no other factors needed
@@ -253,13 +253,13 @@
     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     ! Light limitation factor according to Platt
     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    eiPPY(phyto,:) = ( ONE- exp( - r))
+    eiPPY(:,phyto) = ( ONE- exp( - r))
   end if
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Total photosynthesis
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  sum  =   p_sum(phyto)*et*eiPPY(phyto,:)*fpplim
+  sum  =   p_sum(phyto)*et*eiPPY(:,phyto)*fpplim
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Respiration rate
@@ -295,8 +295,8 @@
   ! at least a fraction equal to the minimum quota is released as POM.
   ! Therefore, nutrients (and C) in the structural part go to R6.
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  pe_R6 = min( p_qplc(phyto)/( qpcPPY(phyto, :)+ p_small), p_qnlc(phyto)/ &
-          ( qncPPY(phyto, :)+ p_small))
+  pe_R6 = min( p_qplc(phyto)/( qpcPPY(:,phyto)+ p_small), p_qnlc(phyto)/ &
+          ( qncPPY(:,phyto)+ p_small))
   pe_R6 = min(  ONE,  pe_R6)
   rr6c  =     pe_R6     * sdo * phytoc
   rr1c  = (ONE - pe_R6) * sdo * phytoc
@@ -339,7 +339,7 @@
   call flux_vector( iiPel, ppO2o,ppO2o, rugc/ MW_C ) 
 
 #ifdef BFM_OGS
-  exPPYR2ac(phyto,:) = sea* phytoc
+  exPPYR2ac(:,phyto) = sea* phytoc
 #endif
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Potential-Net prim prod. (mgC /m3/d)
@@ -369,9 +369,9 @@
    ! N and P uptake are compared sequentially
    !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
       netgrowth = min( run, ( rumn+ max( ZERO, 0.05_RLEN* &
-      rugc*( qncPPY(phyto, :)- p_qnlc(phyto))))/ p_qnlc(phyto))
+      rugc*( qncPPY(:,phyto)- p_qnlc(phyto))))/ p_qnlc(phyto))
       netgrowth = min( netgrowth, ( rump+ max( ZERO, &
-       0.05_RLEN* rugc*( qpcPPY(phyto, :)- p_qplc(phyto))))/ p_qplc(phyto))
+       0.05_RLEN* rugc*( qpcPPY(:,phyto)- p_qplc(phyto))))/ p_qplc(phyto))
    !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
    ! Excrete C that cannot be used for growth as carbo-hydrates:
    ! Correct the net C uptake
@@ -386,7 +386,7 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Specific net growth rate (d-1)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  sunPPY(phyto,:)  =   run/( p_small+ phytoc)
+  sunPPY(:,phyto)  =   run/( p_small+ phytoc)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Nutrient dynamics: NITROGEN
@@ -490,7 +490,7 @@
      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
      ! Losses of Fe
      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-     rr6f  =   rr6c* qfcPPY(phyto,:)
+     rr6f  =   rr6c* qfcPPY(:,phyto)
      rr1f  =   sdo* phytof- rr6f
      call flux_vector( iiPel, ppphytof,ppR1f, rr1f )
      call flux_vector( iiPel, ppphytof,ppR6f, rr6f )
@@ -503,11 +503,11 @@
     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     select case (p_switchChl(phyto))
       case (1) ! PELAGOS
-           rho_Chl = p_qlcPPY( phyto)* min(ONE, p_sum(phyto)* eiPPY(phyto,:)* phytoc/( &
+           rho_Chl = p_qlcPPY( phyto)* min(ONE, p_sum(phyto)* eiPPY(:,phyto)* phytoc/( &
                      p_alpha_chl(phyto)*( phytol+ p_small)* Irr))
            rate_Chl = rho_Chl*(sum - seo - sea - sra) * phytoc - sdo*phytol
       case (2) ! OPATM-BFM
-           rho_Chl  =   p_qlcPPY(phyto)* sum/( p_alpha_chl(phyto)* qlcPPY(phyto,:)* Irr)
+           rho_Chl  =   p_qlcPPY(phyto)* sum/( p_alpha_chl(phyto)* qlcPPY(:,phyto)* Irr)
            rate_Chl = iN* rho_Chl* run- max( p_sdchl(phyto)*( ONE - iN), sdo)* &
                phytol+ min( ZERO, sum- slc+ sdo)* max( ZERO, phytol- p_qlcPPY(phyto)* phytoc)
       case (3) ! UNIBO
@@ -526,7 +526,7 @@
           ! total synthesis, only when there is net production (run > 0)
           ! The fixed loss rate due to basal respiration is introduced to have 
           ! chl loss in the absence of light (< 1 uE/m2/s)
-           rho_Chl = p_qlcPPY( phyto)* min(ONE, p_sum(phyto)* eiPPY(phyto,:)* phytoc/( &
+           rho_Chl = p_qlcPPY( phyto)* min(ONE, p_sum(phyto)* eiPPY(:,phyto)* phytoc/( &
                      p_alpha_chl(phyto)*( phytol+ p_small)* Irr))
            rate_Chl = rho_Chl*run - p_sdchl(phyto)*phytol*max( ZERO, ( p_thdo(phyto)-tN)) &
                      -srs * phytol * ONE/(Irr+ONE)
@@ -538,7 +538,7 @@
   ! Sedimentation
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   if ( p_res(phyto)> ZERO) then
-    sediPPY(phyto,:) = sediPPY(phyto,:) &
+    sediPPY(:,phyto) = sediPPY(:,phyto) &
                    + p_res(phyto)* max( ZERO, ( p_esNI(phyto)-tN))
   end if
 
@@ -555,10 +555,10 @@
   !  - density enhancement
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   if ( p_caco3r(phyto) > ZERO ) then
-     qccPPY(phyto, :) = p_caco3r(phyto)
+     qccPPY(:,phyto) = p_caco3r(phyto)
      ! Calcite production represented as a flux between DIC and PIC, impacting ALK
-     call flux_vector( iiPel, ppO3c,ppO5c, qccPPY(phyto, :)*rr6c )
-     call flux_vector( iiPel, ppO3h,ppO3h, -C2ALK*qccPPY(phyto, :)*rr6c )
+     call flux_vector( iiPel, ppO3c,ppO5c, qccPPY(:,phyto)*rr6c )
+     call flux_vector( iiPel, ppO3h,ppO3h, -C2ALK*qccPPY(:,phyto)*rr6c )
   endif
 #endif
 
