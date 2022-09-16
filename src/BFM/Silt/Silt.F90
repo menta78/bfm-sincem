@@ -33,7 +33,7 @@
 #ifdef NOPOINTERS
   use mem,  ONLY: D3STATE
 #else
-  use mem,  ONLY: R9x, ppR9x,ERHO,EWIND
+  use mem,  ONLY: R9x, ppR9x, ERHO, EWIND
 #endif
   use mem, ONLY: Depth,ETW, NO_BOXES, iiBen, iiPel, flux_vector,InitializeModel
   use mem_Param,  ONLY: p_small, p_poro
