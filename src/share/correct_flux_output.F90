@@ -73,7 +73,7 @@ subroutine correct_flux_output(mode, nr0,zlev,nlev,out)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   nr=nr0
 
-  out(:) = D3FLUX_FUNC(nr0,:)
+  out(:) = D3FLUX_FUNC(:,nr0)
 
   ! correcting for fluxes  to other systems along the diagonal (origin == destination)
   do idx_i=stPelStateS, stPelStateE
@@ -94,10 +94,10 @@ subroutine correct_flux_output(mode, nr0,zlev,nlev,out)
                  !     " PELSURFACE(", origin, "): ", PELSURFACE(origin,:)
                  out(BOTindices) = out(BOTindices) - &
                       SIGN( 1, D3FLUX_MATRIX(origin,destination)%p(idx_j) ) * &
-                      max(ZERO, PELBOTTOM(origin,:)) / Depth(BOTindices)
+                      max(ZERO, PELBOTTOM(:,origin)) / Depth(BOTindices)
                  out(SRFindices) = out(SRFindices) - &
                       SIGN( 1, D3FLUX_MATRIX(origin,destination)%p(idx_j) ) * &
-                      max(ZERO, PELSURFACE(origin,:)) / Depth(SRFindices)
+                      max(ZERO, PELSURFACE(:,origin)) / Depth(SRFindices)
                  ! write(LOGUNIT,format2) "FUNC_SS0(", nr0 , ")-> ", "BOT: ", out(BOTindices)/SEC_PER_DAY, &
                  !     " -- SUR: ", out(SRFindices)/SEC_PER_DAY
               else ! "A<-B" => (in flow) => flux > ZERO => D3SOURCE
@@ -107,10 +107,10 @@ subroutine correct_flux_output(mode, nr0,zlev,nlev,out)
                  !     " PELSURFACE(", origin, "): ", PELSURFACE(origin,:)
                  out(BOTindices) = out(BOTindices) + &
                       SIGN( 1, D3FLUX_MATRIX(origin,destination)%p(idx_j) ) * &
-                      min(ZERO, PELBOTTOM(origin,:)) / Depth(BOTindices)
+                      min(ZERO, PELBOTTOM(:,origin)) / Depth(BOTindices)
                  out(SRFindices) = out(SRFindices) + &
                       SIGN( 1, D3FLUX_MATRIX(origin,destination)%p(idx_j) ) * &
-                      min(ZERO, PELSURFACE(origin,:)) / Depth(SRFindices)
+                      min(ZERO, PELSURFACE(:,origin)) / Depth(SRFindices)
                  ! write(LOGUNIT,format2) "FUNC_SS1(", nr0 , ")-> ", "BOT: ", out(BOTindices)/SEC_PER_DAY, &
                  !     " -- SUR: ", out(SRFindices)/SEC_PER_DAY
               endif

@@ -664,7 +664,7 @@ contains
      write(LOGUNIT,*) 'D3STATE: (', ntime, ')'
      do idx = stPelStateS , stPelStateE
         idx_tmp=idx-stPelStateS+1
-        write(LOGUNIT,*) "  ", trim(var_names(idx)), "= ", D3STATE(idx_tmp,:)
+        write(LOGUNIT,*) "  ", trim(var_names(idx)), "= ", D3STATE(:,idx_tmp)
      end do
      write(LOGUNIT,*)
 

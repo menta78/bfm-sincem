@@ -84,8 +84,8 @@
 
     ! reset surface and bottom fluxes
     do i=1,NO_D3_BOX_STATES
-       PELSURFACE(i,:) = ZERO 
-       PELBOTTOM(i,:) = ZERO
+       PELSURFACE(:,i) = ZERO 
+       PELBOTTOM(:,i) = ZERO
     end do
 
   end subroutine ResetFluxes

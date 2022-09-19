@@ -415,8 +415,8 @@
    call check_err(NF90_DEF_DIM(ncid_rst, 'char_max', LEN(var_names), chars_rdim), fname)
    call check_err(NF90_DEF_DIM(ncid_rst, 'd3vars', NO_D3_BOX_STATES, d3vars_rdim), fname)
    ALLOCATE(dims(2))
-   dims(1) = d3vars_rdim
-   dims(2) = ocepoint_rdim
+   dims(1) = ocepoint_rdim
+   dims(2) = d3vars_rdim
    call check_err(NF90_DEF_VAR(ncid_rst,'D3STATE',NF90_DOUBLE,dims,d3state_rid), fname)
    call check_err(NF90_DEF_VAR(ncid_rst,'D3STATE_NAME',NF90_CHAR,(/chars_rdim, d3vars_rdim/),d3state_name_rid), fname)
    call check_err(NF90_DEF_VAR(ncid_rst,'D3STATE_UNITS',NF90_CHAR,(/chars_rdim, d3vars_rdim/),d3state_units_rid), fname)
@@ -454,8 +454,8 @@
    ! define 2D Seaice dimensions and variables
    !---------------------------------------------
    call check_err(NF90_DEF_DIM(ncid_rst,'d2vars_ice', NO_D2_BOX_STATES_ICE, d2vars_rdim_ice), fname)
-   dims(1) = d2vars_rdim_ice
-   dims(2) = surfpoint_rdim
+   dims(1) = surfpoint_rdim
+   dims(2) = d2vars_rdim_ice
    call check_err(NF90_DEF_VAR(ncid_rst,'D2STATE_ICE',NF90_DOUBLE,dims,d2state_rid_ice), fname)
    call check_err(NF90_DEF_VAR(ncid_rst,'D2STATE_ICE_NAME',NF90_CHAR,(/chars_rdim, d2vars_rdim_ice/),d2state_name_rid_ice), fname)
    call check_err(NF90_DEF_VAR(ncid_rst,'D2STATE_ICE_UNITS',NF90_CHAR,(/chars_rdim, d2vars_rdim_ice/),d2state_units_rid_ice), fname)
@@ -470,8 +470,8 @@
    ! define 2D Benthic dimensions and variables
    !---------------------------------------------
    call check_err(NF90_DEF_DIM(ncid_rst,'d2vars_ben', NO_D2_BOX_STATES_BEN, d2vars_rdim_ben), fname)
-   dims(1) = d2vars_rdim_ben
-   dims(2) = botpoint_rdim
+   dims(1) = botpoint_rdim
+   dims(2) = d2vars_rdim_ben
    call check_err(NF90_DEF_VAR(ncid_rst,'D2STATE_BEN',NF90_DOUBLE,dims,d2state_rid_ben), fname)
    call check_err(NF90_DEF_VAR(ncid_rst,'D2STATE_BEN_NAME',NF90_CHAR,(/chars_rdim, d2vars_rdim_ben/),d2state_name_rid_ben), fname)
    call check_err(NF90_DEF_VAR(ncid_rst,'D2STATE_BEN_UNITS',NF90_CHAR,(/chars_rdim, d2vars_rdim_ben/),d2state_units_rid_ben), fname)
@@ -642,8 +642,8 @@ end subroutine init_netcdf_rst_bfm
 
 
      restfile="out_restart"
-     start(1) = 1;   edges(1) = NO_D3_BOX_STATES
-     start(2) = 1;   edges(2) = NO_BOXES
+     start(1) = 1;   edges(1) = NO_BOXES
+     start(2) = 1;   edges(2) = NO_D3_BOX_STATES
      tmp_d3names(:) = var_names(stPelStateS:stPelStateE)
      do iter=1, SIZE(tmp_d3names)
         call replace_char(str=tmp_d3names(iter), Tar='()', rep='_')
@@ -665,8 +665,8 @@ end subroutine init_netcdf_rst_bfm
 #endif
 
 #if defined INCLUDE_SEAICE
-     start(1) = 1;   edges(1) = NO_D2_BOX_STATES_ICE
-     start(2) = 1;   edges(2) = NO_BOXES_XY
+     start(1) = 1;   edges(1) = NO_BOXES_XY
+     start(2) = 1;   edges(2) = NO_D2_BOX_STATES_ICE
      tmp_d2names_ice(:) = var_names(stIceStateS:stIceStateE)
      do iter=1, SIZE(tmp_d2names_ice)
         call replace_char(str=tmp_d2names_ice(iter), tar='()', rep='_')
@@ -685,8 +685,8 @@ end subroutine init_netcdf_rst_bfm
 #endif
 #endif
 
-     start(1) = 1;   edges(1) = NO_D2_BOX_STATES_BEN
-     start(2) = 1;   edges(2) = NO_BOXES_XY
+     start(1) = 1;   edges(1) = NO_BOXES_XY
+     start(2) = 1;   edges(2) = NO_D2_BOX_STATES_BEN
      tmp_d2names_ben(:) = var_names(stBenStateS:stBenStateE)
      do iter=1, SIZE(tmp_d2names_ben)
         call replace_char(str=tmp_d2names_ben(iter), tar='()', rep='_')
@@ -786,7 +786,7 @@ end subroutine init_netcdf_rst_bfm
    call check_err(NF90_GET_VAR(ncid_rst_in,nstate_id,D3STATE(:,:)), fname)
 #ifdef INCLUDE_PELCO2
    call check_err(NF90_INQ_VARID(ncid_rst_in,"pH",nstate_id), fname)
-   call check_err(NF90_GET_VAR(ncid_rst_in,nstate_id,D3DIAGNOS(pppH,:)), fname)
+   call check_err(NF90_GET_VAR(ncid_rst_in,nstate_id,D3DIAGNOS(:,pppH)), fname)
 #endif 
 #if defined BFM_NEMO || defined BFM_POM
    call check_err(NF90_INQ_VARID(ncid_rst_in,"D3STATEB",nstate_id), fname)
@@ -995,7 +995,7 @@ end subroutine init_netcdf_rst_bfm
                do idx_i=1,cntI
                   if( SEAmask(idx_i,idx_j,idx_k) ) then
                      noce = noce+1
-                     D3STATE(idx_var_array,noce) = array_3d(idx_i,idx_j,idx_k,1)
+                     D3STATE(noce,idx_var_array) = array_3d(idx_i,idx_j,idx_k,1)
                   end if
                end do
             end do
@@ -1018,7 +1018,7 @@ end subroutine init_netcdf_rst_bfm
          do idx_i=1,cntI
             if( SEAmask(idx_i,idx_j,idx_k) ) then
                noce = noce+1
-               D3DIAGNOS(pppH,noce) = array_3d(idx_i,idx_j,idx_k,1)
+               D3DIAGNOS(noce,pppH) = array_3d(idx_i,idx_j,idx_k,1)
             end if
          end do
       end do
@@ -1046,7 +1046,7 @@ end subroutine init_netcdf_rst_bfm
             do idx_i=1,cntI
                if( SEAmask(idx_i,idx_j,1) ) then
                   noce = noce+1
-                  D2STATE_BEN(idx_var_array,noce) = array_2d(idx_i,idx_j,1)
+                  D2STATE_BEN(noce,idx_var_array) = array_2d(idx_i,idx_j,1)
                end if
             end do
          end do
@@ -1231,12 +1231,12 @@ end subroutine init_netcdf_rst_bfm
          !-- Store snapshot of pelagic state variables
          if ( n >= stPelStateS .AND. n <= stPelStateE ) then
             idx_tmp=n-stPelStateS+1
-            iret = store_data(ncid_bfm,var_ids(n),OCET_SHAPE,NO_BOXES,garray=D3STATE(idx_tmp,:))     
+            iret = store_data(ncid_bfm,var_ids(n),OCET_SHAPE,NO_BOXES,garray=D3STATE(:,idx_tmp))     
          end if
          !-- Store snapshot of pelagic diagnostics
          if ( n >= stPelDiagS .AND. n <= stPelDiagE ) then
             idx_tmp=n-stPelDiagS+1
-            iret = store_data(ncid_bfm,var_ids(n),OCET_SHAPE,NO_BOXES,garray=D3DIAGNOS(idx_tmp,:))
+            iret = store_data(ncid_bfm,var_ids(n),OCET_SHAPE,NO_BOXES,garray=D3DIAGNOS(:,idx_tmp))
          end if
          !-- Store snapshot of pelagic fluxes
          if ( n >= stPelFluxS .AND. n <= stPelFluxE ) then 
@@ -1249,7 +1249,7 @@ end subroutine init_netcdf_rst_bfm
         ELSE
            if (temp_time /= ZERO ) then
               k=k+1
-              iret = store_data(ncid_bfm,var_ids(n),OCET_SHAPE,NO_BOXES,garray=D3ave(k,:))
+              iret = store_data(ncid_bfm,var_ids(n),OCET_SHAPE,NO_BOXES,garray=D3ave(:,k))
            endif
         ENDIF
  
@@ -1266,23 +1266,23 @@ end subroutine init_netcdf_rst_bfm
             ! Store snapshot of pelagic 2D diagnostics
             if ( n >= stPelDiag2dS .AND. n <= stPelDiag2dE ) then
                idx_tmp=n-stPelDiag2dS+1
-               iret = store_data(ncid_bfm,var_ids(n),SURFT_SHAPE,NO_BOXES_XY,garray=D2DIAGNOS(idx_tmp,:))
+               iret = store_data(ncid_bfm,var_ids(n),SURFT_SHAPE,NO_BOXES_XY,garray=D2DIAGNOS(:,idx_tmp))
             end if
             ! Store snapshot of pelagic 2D diagnostics at surface
             if ( n >= stPelSurS .AND. n <= stPelSurE) then
                idx_tmp=n-stPelDiag2dS+1
-               iret = store_data(ncid_bfm,var_ids(n),SURFT_SHAPE,NO_BOXES_XY,garray=D2DIAGNOS(idx_tmp,:))
+               iret = store_data(ncid_bfm,var_ids(n),SURFT_SHAPE,NO_BOXES_XY,garray=D2DIAGNOS(:,idx_tmp))
             end if
             ! Store snapshot of pelagic 2D diagnostics at bottom
             if ( n >= stPelBotS .AND. n <= stPelRivE) then
                idx_tmp=n-stPelDiag2dS+1
-               iret = store_data(ncid_bfm,var_ids(n),BOTT_SHAPE,NO_BOXES_XY,garray=D2DIAGNOS(idx_tmp,:))
+               iret = store_data(ncid_bfm,var_ids(n),BOTT_SHAPE,NO_BOXES_XY,garray=D2DIAGNOS(:,idx_tmp))
             end if
          ELSE
             ! Store mean values of (pelagic) 2D entity
             if ( temp_time /= ZERO ) then
                k=k+1
-               iret = store_data(ncid_bfm,var_ids(n),SURFT_SHAPE,NO_BOXES_XY,garray=D2ave(k,:))
+               iret = store_data(ncid_bfm,var_ids(n),SURFT_SHAPE,NO_BOXES_XY,garray=D2ave(:,k))
             end if
          ENDIF
       end if
@@ -1300,23 +1300,23 @@ end subroutine init_netcdf_rst_bfm
             ! Store snapshot of seaice 2D state
             if ( n >= stIceStateS .AND. n <= stIceStateE) then
                idx_tmp=n-stIceStateS+1
-               iret = store_data(ncid_bfm,var_ids(n),SURFT_SHAPE,NO_BOXES_XY,garray=D2STATE_ICE(idx_tmp,:))
+               iret = store_data(ncid_bfm,var_ids(n),SURFT_SHAPE,NO_BOXES_XY,garray=D2STATE_ICE(:,idx_tmp))
             end if
             ! Store snapshot of seaice 2D diagnostics
             if ( n >= stIceDiag2dS .AND. n <= stIceDiag2dE ) then
                idx_tmp=n-stIceDiag2dS+1
-               iret = store_data(ncid_bfm,var_ids(n),SURFT_SHAPE,NO_BOXES_XY,garray=D2DIAGNOS_ICE(idx_tmp,:))
+               iret = store_data(ncid_bfm,var_ids(n),SURFT_SHAPE,NO_BOXES_XY,garray=D2DIAGNOS_ICE(:,idx_tmp))
             end if
             ! Store snapshot of seaice 2D flux
             if ( n >= stIceFlux2dS .AND. n <= stIceFlux2dE ) then
                idx_tmp=n-stIceFlux2dS+1
-               iret = store_data(ncid_bfm,var_ids(n),SURFT_SHAPE,NO_BOXES_XY,garray=D2FLUX_FUNC_ICE(idx_tmp,:))
+               iret = store_data(ncid_bfm,var_ids(n),SURFT_SHAPE,NO_BOXES_XY,garray=D2FLUX_FUNC_ICE(:,idx_tmp))
             end if
          ELSE
             ! Store mean values of (any) 2D entity
             if ( temp_time /= ZERO ) then
                k=k+1
-               iret = store_data(ncid_bfm,var_ids(n),SURFT_SHAPE,NO_BOXES_XY,garray=D2ave_ice(k,:))
+               iret = store_data(ncid_bfm,var_ids(n),SURFT_SHAPE,NO_BOXES_XY,garray=D2ave_ice(:,k))
             end if
          ENDIF
       end if
@@ -1334,23 +1334,23 @@ end subroutine init_netcdf_rst_bfm
             ! Store snapshot of benthic 2D state
             if ( n >= stBenStateS .AND. n <= stBenStateE) then
                idx_tmp=n-stBenStateS+1
-               iret = store_data(ncid_bfm,var_ids(n),BOTT_SHAPE,NO_BOXES_XY,garray=D2STATE_BEN(idx_tmp,:))
+               iret = store_data(ncid_bfm,var_ids(n),BOTT_SHAPE,NO_BOXES_XY,garray=D2STATE_BEN(:,idx_tmp))
             end if
             ! Store snapshot of benthic 2D diagnostics
             if ( n >= stBenDiag2dS .AND. n <= stBenDiag2dE ) then
                idx_tmp=n-stBenDiag2dS+1
-               iret = store_data(ncid_bfm,var_ids(n),BOTT_SHAPE,NO_BOXES_XY,garray=D2DIAGNOS_BEN(idx_tmp,:))
+               iret = store_data(ncid_bfm,var_ids(n),BOTT_SHAPE,NO_BOXES_XY,garray=D2DIAGNOS_BEN(:,idx_tmp))
             end if
             ! Store snapshot of benthic 2D flux
             if ( n >= stBenFlux2dS .AND. n <= stBenFlux2dE ) then
                idx_tmp=n-stBenFlux2dS+1
-               iret = store_data(ncid_bfm,var_ids(n),BOTT_SHAPE,NO_BOXES_XY,garray=D2FLUX_FUNC_BEN(idx_tmp,:))
+               iret = store_data(ncid_bfm,var_ids(n),BOTT_SHAPE,NO_BOXES_XY,garray=D2FLUX_FUNC_BEN(:,idx_tmp))
             end if
          ELSE
             ! Store mean values of (any) 2D entity
             if ( temp_time /= ZERO ) then
                k=k+1
-               iret = store_data(ncid_bfm,var_ids(n),BOTT_SHAPE,NO_BOXES_XY,garray=D2ave_ben(k,:))
+               iret = store_data(ncid_bfm,var_ids(n),BOTT_SHAPE,NO_BOXES_XY,garray=D2ave_ben(:,k))
             end if
          ENDIF
       end if

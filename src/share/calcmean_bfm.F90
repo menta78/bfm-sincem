@@ -68,7 +68,7 @@
       case(INIT)   ! initialization
          i=count(var_ave(stPelStart:stPelFluxE))
          if ( i > 0 ) then
-            allocate(D3ave(1:i,1:NO_BOXES),stat=rc)
+            allocate(D3ave(1:NO_BOXES,1:i),stat=rc)
             if (rc /= 0) stop 'init_bio(): Error allocating D3ave'
             D3ave=0.0
             do_3ave = .true.
@@ -77,7 +77,7 @@
          endif
          i=count(var_ave(stPelDiag2dS:stPelEnd))
          if ( i > 0 ) then
-            allocate(D2ave(1:i,1:NO_BOXES_XY),stat=rc)
+            allocate(D2ave(1:NO_BOXES_XY,1:i),stat=rc)
             if (rc /= 0) stop 'init_bio(): Error allocating D2ave'
             D2ave=0.0
             do_2ave = .true.
@@ -87,7 +87,7 @@
 #if defined INCLUDE_SEAICE
          i=count(var_ave(stIceStart:stIceEnd))
          if ( i > 0 ) then
-            allocate(D2ave_ice(1:i,1:NO_BOXES_XY),stat=rc)
+            allocate(D2ave_ice(1:NO_BOXES_XY,1:i),stat=rc)
             if (rc /= 0) stop 'init_bio(): Error allocating D2ave_ice'
             D2ave_ice=0.0
             do_2ave_ice = .true.
@@ -97,7 +97,7 @@
 #endif
          i=count(var_ave(stBenStart:stBenEnd))
          if ( i > 0 ) then
-            allocate(D2ave_ben(1:i,1:NO_BOXES_XY),stat=rc)
+            allocate(D2ave_ben(1:NO_BOXES_XY,1:i),stat=rc)
             if (rc /= 0) stop 'init_bio(): Error allocating D2ave_ben'
             D2ave_ben=0.0
             do_2ave_ben = .true.
@@ -132,9 +132,9 @@
                if ( var_ave(i) ) then
                   k=k+1
                   if ( ave_count < 1.5 ) then
-                     D3ave(k,:)=D3STATE(j,:)
+                     D3ave(:,k)=D3STATE(:,j)
                   else
-                     D3ave(k,:)=D3ave(k,:)+D3STATE(j,:)
+                     D3ave(:,k)=D3ave(:,k)+D3STATE(:,j)
                   end if
                end if
             end do
@@ -145,9 +145,9 @@
                if ( var_ave(i) ) then
                   k=k+1
                   if ( ave_count < 1.5 ) then
-                     D3ave(k,:)=D3DIAGNOS(j,:)
+                     D3ave(:,k)=D3DIAGNOS(:,j)
                   else
-                     D3ave(k,:)=D3ave(k,:)+D3DIAGNOS(j,:)
+                     D3ave(:,k)=D3ave(:,k)+D3DIAGNOS(:,j)
                   end if
                end if
             end do
@@ -159,9 +159,9 @@
                   k=k+1
                   call correct_flux_output(1,j,1,NO_BOXES,c1dim)
                   if ( ave_count < 1.5 ) then
-                     D3ave(k,:)=c1dim
+                     D3ave(:,k)=c1dim
                   else
-                     D3ave(k,:)=D3ave(k,:)+c1dim
+                     D3ave(:,k)=D3ave(:,k)+c1dim
                   end if
                end if
             end do
@@ -177,9 +177,9 @@
                if ( var_ave(i) ) then
                   k=k+1
                   if ( ave_count < 1.5 ) then
-                     D2ave(k,:)=D2DIAGNOS(j,:)
+                     D2ave(:,k)=D2DIAGNOS(:,j)
                   else
-                     D2ave(k,:)=D2ave(k,:)+D2DIAGNOS(j,:)
+                     D2ave(:,k)=D2ave(:,k)+D2DIAGNOS(:,j)
                   end if
                end if
             end do
@@ -197,9 +197,9 @@
                if ( var_ave(i) ) then
                   k=k+1
                   if ( ave_count < 1.5 ) then
-                     D2ave_ice(k,:)=D2STATE_ICE(j,:)
+                     D2ave_ice(:,k)=D2STATE_ICE(:,j)
                   else
-                     D2ave_ice(k,:)=D2ave_ice(k,:)+D2STATE_ICE(j,:)
+                     D2ave_ice(:,k)=D2ave_ice(:,k)+D2STATE_ICE(:,j)
                   end if
                end if
             end do
@@ -210,9 +210,9 @@
                if ( var_ave(i) ) then
                   k=k+1
                   if ( ave_count < 1.5 ) then
-                     D2ave_ice(k,:)=D2DIAGNOS_ICE(j,:)
+                     D2ave_ice(:,k)=D2DIAGNOS_ICE(:,j)
                   else
-                     D2ave_ice(k,:)=D2ave_ice(k,:)+D2DIAGNOS_ICE(j,:)
+                     D2ave_ice(:,k)=D2ave_ice(:,k)+D2DIAGNOS_ICE(:,j)
                   end if
                end if
             end do
@@ -223,9 +223,9 @@
                if ( var_ave(i) ) then
                   k=k+1
                   if ( ave_count < 1.5 ) then
-                     D2ave_ice(k,:)=D2FLUX_FUNC_ICE(j,:)
+                     D2ave_ice(:,k)=D2FLUX_FUNC_ICE(:,j)
                   else
-                     D2ave_ice(k,:)=D2ave_ice(k,:)+D2FLUX_FUNC_ICE(j,:)
+                     D2ave_ice(:,k)=D2ave_ice(:,k)+D2FLUX_FUNC_ICE(:,j)
                   end if
                end if
             end do
@@ -243,9 +243,9 @@
                if ( var_ave(i) ) then
                   k=k+1
                   if ( ave_count < 1.5 ) then
-                     D2ave_ben(k,:)=D2STATE_BEN(j,:)
+                     D2ave_ben(:,k)=D2STATE_BEN(:,j)
                   else
-                     D2ave_ben(k,:)=D2ave_ben(k,:)+D2STATE_BEN(j,:)
+                     D2ave_ben(:,k)=D2ave_ben(:,k)+D2STATE_BEN(:,j)
                   end if
                end if
             end do
@@ -256,9 +256,9 @@
                if ( var_ave(i) ) then
                   k=k+1
                   if ( ave_count < 1.5 ) then
-                     D2ave_ben(k,:)=D2DIAGNOS_BEN(j,:)
+                     D2ave_ben(:,k)=D2DIAGNOS_BEN(:,j)
                   else
-                     D2ave_ben(k,:)=D2ave_ben(k,:)+D2DIAGNOS_BEN(j,:)
+                     D2ave_ben(:,k)=D2ave_ben(:,k)+D2DIAGNOS_BEN(:,j)
                   end if
                end if
             end do
@@ -269,9 +269,9 @@
                if ( var_ave(i) ) then
                   k=k+1
                   if ( ave_count < 1.5 ) then
-                     D2ave_ben(k,:)=D2FLUX_FUNC_BEN(j,:)
+                     D2ave_ben(:,k)=D2FLUX_FUNC_BEN(:,j)
                   else
-                     D2ave_ben(k,:)=D2ave_ben(k,:)+D2FLUX_FUNC_BEN(j,:)
+                     D2ave_ben(:,k)=D2ave_ben(:,k)+D2FLUX_FUNC_BEN(:,j)
                   end if
                end if
             end do
