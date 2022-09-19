@@ -90,11 +90,11 @@
          !  Assign the instantaneous value (ex. phytoplankton)
          do i=1,iiPhytoPlankton
             if (obs2(i) > ZERO) then
-               D3STATE(ppPhytoPlankton(i,iiC),:) = obs2(i) 
-               D3STATE(ppPhytoPlankton(i,iiN),:) = obs2(i) * nc_ratio
-               D3STATE(ppPhytoPlankton(i,iiP),:) = obs2(i) * pc_ratio
-               D3STATE(ppPhytoPlankton(i,iiS),:) = obs2(i) * sc_ratio
-               D3STATE(ppPhytoPlankton(i,iiL),:) = obs2(i) * lc_ratio
+               D3STATE(:,ppPhytoPlankton(i,iiC)) = obs2(i) 
+               D3STATE(:,ppPhytoPlankton(i,iiN)) = obs2(i) * nc_ratio
+               D3STATE(:,ppPhytoPlankton(i,iiP)) = obs2(i) * pc_ratio
+               D3STATE(:,ppPhytoPlankton(i,iiS)) = obs2(i) * sc_ratio
+               D3STATE(:,ppPhytoPlankton(i,iiL)) = obs2(i) * lc_ratio
             end if
          end do
       end if

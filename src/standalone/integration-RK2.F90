@@ -86,21 +86,21 @@
 
       DO j=1,NO_D3_BOX_STATES
          IF (D3STATETYPE(j).ge.0) THEN
-            D3STATE(j,:) = ccc_tmp3D(j,:) + delt*D3SOURCE(j,:)
+            D3STATE(:,j) = ccc_tmp3D(:,j) + delt*D3SOURCE(:,j)
          END IF
       END DO
 
 #if defined INCLUDE_SEAICE
       DO j=1,NO_D2_BOX_STATES_ICE
          IF (D2STATETYPE_ICE(j).ge.0) THEN
-            D2STATE_ICE(j,:) = ccc_tmp2D_ice(j,:) + delt*D2SOURCE_ICE(j,:)
+            D2STATE_ICE(:,j) = ccc_tmp2D_ice(:,j) + delt*D2SOURCE_ICE(:,j)
          END IF
       END DO
 #endif
 
       DO j=1,NO_D2_BOX_STATES_BEN
          IF (D2STATETYPE_BEN(j).ge.0) THEN
-            D2STATE_BEN(j,:) = ccc_tmp2D_ben(j,:) + delt*D2SOURCE_BEN(j,:)
+            D2STATE_BEN(:,j) = ccc_tmp2D_ben(:,j) + delt*D2SOURCE_BEN(:,j)
          END IF
       END DO
 
@@ -124,8 +124,8 @@
             if ( cut_pel) then
                blccc(:,1)=minloc(D3STATE)
                LEVEL1 'Pelagic variable: ',var_names(stPelStateS+blccc(1,1)-1)
-               LEVEL1 'Value=',ccc_tmp3D(blccc(1,1),blccc(2,1)), &
-                              'Rate=',bccc3D(blccc(1,1),blccc(2,1))
+               LEVEL1 'Value=',ccc_tmp3D(blccc(2,1),blccc(1,1)), &
+                              'Rate=',bccc3D(blccc(2,1),blccc(1,1))
                D3STATE=bbccc3D
             end if
 
@@ -133,8 +133,8 @@
             if ( cut_ice) then
                blccc_ice(:,2)=minloc(D2STATE_ICE)
                LEVEL1 'Sea ice variable: ', var_names(stIceStateS+blccc_ice(1,2)-1)
-               LEVEL1 'Value=',ccc_tmp2D_ice(blccc_ice(1,2),blccc_ice(2,2)), &
-                              'Rate=',bccc2D_ice(blccc_ice(1,2),blccc_ice(2,2))
+               LEVEL1 'Value=',ccc_tmp2D_ice(blccc_ice(2,2),blccc_ice(1,2)), &
+                              'Rate=',bccc2D_ice(blccc_ice(2,2),blccc_ice(1,2))
                D2STATE_ICE=bbccc2D_ice
             end if
 #endif
@@ -142,8 +142,8 @@
             if ( cut_ben) then
                blccc_ben(:,2)=minloc(D2STATE_BEN)
                LEVEL1 'Benthic Variable: ', var_names(stBenStateS+blccc_ben(1,2)-1)
-               LEVEL1 'Value=',ccc_tmp2D_ben(blccc_ben(1,2),blccc_ben(2,2)), &
-                              'Rate=',bccc2D_ben(blccc_ben(1,2),blccc_ben(2,2))
+               LEVEL1 'Value=',ccc_tmp2D_ben(blccc_ben(2,2),blccc_ben(1,2)), &
+                              'Rate=',bccc2D_ben(blccc_ben(2,2),blccc_ben(1,2))
                D2STATE_BEN=bbccc2D_ben
             end if
 
@@ -183,23 +183,23 @@
          call EcologyDynamics
          DO j=1,NO_D3_BOX_STATES
             IF (D3STATETYPE(j).ge.0) THEN
-               D3STATE(j,:) = ccc_tmp3D(j,:) +.5*delt*(D3SOURCE(j,:)+bccc3D(j,:)) 
+               D3STATE(:,j) = ccc_tmp3D(:,j) +.5*delt*(D3SOURCE(:,j)+bccc3D(:,j)) 
             END IF
          END DO
 
 #if defined INCLUDE_SEAICE
          DO j=1,NO_D2_BOX_STATES_ICE
             IF (D2STATETYPE_ICE(j).ge.0) THEN
-               D2STATE_ICE(j,:) = ccc_tmp2D_ice(j,:) + &
-                  .5*delt*(D2SOURCE_ICE(j,:)+bccc2D_ice(j,:))
+               D2STATE_ICE(:,j) = ccc_tmp2D_ice(:,j) + &
+                  .5*delt*(D2SOURCE_ICE(:,j)+bccc2D_ice(:,j))
             END IF
          END DO
 #endif
 
          DO j=1,NO_D2_BOX_STATES_BEN
             IF (D2STATETYPE_BEN(j).ge.0) THEN
-               D2STATE_BEN(j,:) = ccc_tmp2D_ben(j,:) + &
-                  .5*delt*(D2SOURCE_BEN(j,:)+bccc2D_ben(j,:))
+               D2STATE_BEN(:,j) = ccc_tmp2D_ben(:,j) + &
+                  .5*delt*(D2SOURCE_BEN(:,j)+bccc2D_ben(:,j))
             END IF
          END DO
 
@@ -223,8 +223,8 @@
                if ( cut_pel) then
                   blccc(:,1)=minloc(D3STATE)
                   LEVEL1 'Pelagic variable: ',var_names(stPelStateS+blccc(1,1)-1)
-                  LEVEL1 'value=',ccc_tmp3D(blccc(1,1),blccc(2,1)), &
-                                 'rate=',bccc3D(blccc(1,1),blccc(2,1))
+                  LEVEL1 'value=',ccc_tmp3D(blccc(2,1),blccc(1,1)), &
+                                 'rate=',bccc3D(blccc(2,1),blccc(1,1))
                   D3STATE=bbccc3D
                end if
 
@@ -232,8 +232,8 @@
                if ( cut_ice) then
                   blccc_ice(:,2)=minloc(D2STATE_ICE)
                   LEVEL1 'Sea ice variable: ', var_names(stIceStateS+blccc_ice(1,2)-1)
-                  LEVEL1 'value=',ccc_tmp2D_ice(blccc_ice(1,2),blccc_ice(2,2)), &
-                                 'rate=',bccc2D_ice(blccc_ice(1,2),blccc_ice(2,2))
+                  LEVEL1 'value=',ccc_tmp2D_ice(blccc_ice(2,2),blccc_ice(1,2)), &
+                                 'rate=',bccc2D_ice(blccc_ice(2,2),blccc_ice(1,2))
                   D2STATE_ICE=bbccc2D_ice
                end if
 #endif
@@ -241,8 +241,8 @@
                if ( cut_ben) then
                   blccc_ben(:,2)=minloc(D2STATE_BEN)
                   LEVEL1 'Benthic variable: ', var_names(stBenStateS+blccc_ben(1,2)-1)
-                  LEVEL1 'value=',ccc_tmp2D_ben(blccc_ben(1,2),blccc_ben(2,2)), &
-                                 'rate=',bccc2D_ben(blccc_ben(1,2),blccc_ben(2,2))
+                  LEVEL1 'value=',ccc_tmp2D_ben(blccc_ben(2,2),blccc_ben(1,2)), &
+                                 'rate=',bccc2D_ben(blccc_ben(2,2),blccc_ben(1,2))
                   D2STATE_BEN=bbccc2D_ben
                end if
 

@@ -52,15 +52,15 @@
    logical                 :: min
    integer                 :: i,j,n
    integer,dimension(2,2)  :: blccc
-   real(RLEN),dimension(NO_D3_BOX_STATES,NO_BOXES)    :: bc3D
+   real(RLEN),dimension(NO_BOXES,NO_D3_BOX_STATES)    :: bc3D
 #if defined INCLUDE_SEAICE
    real(RLEN)                                                 :: min2D_ice
    integer,dimension(2,2)                                     :: blccc_ice
-   real(RLEN),dimension(NO_D2_BOX_STATES_ICE,NO_BOXES_XY) :: bc2D_ice
+   real(RLEN),dimension(NO_BOXES_XY,NO_D2_BOX_STATES_ICE) :: bc2D_ice
 #endif
    real(RLEN)                                                 :: min2D_ben
    integer,dimension(2,2)                                     :: blccc_ben
-   real(RLEN),dimension(NO_D2_BOX_STATES_BEN,NO_BOXES_XY) :: bc2D_ben
+   real(RLEN),dimension(NO_BOXES_XY,NO_D2_BOX_STATES_BEN) :: bc2D_ben
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 #ifdef DEBUG
@@ -82,21 +82,21 @@
       ! Integration step:
       DO j=1,NO_D3_BOX_STATES
          IF(D3STATETYPE(j).ge.0) THEN
-            ccc_tmp3D(j,:) = bbccc3D(j,:) + delt * D3SOURCE(j,:)
+            ccc_tmp3D(:,j) = bbccc3D(:,j) + delt * D3SOURCE(:,j)
          END IF
       END DO
 
 #if defined INCLUDE_SEAICE
       DO j=1,NO_D2_BOX_STATES_ICE
          IF(D2STATETYPE_ICE(j).ge.0) THEN
-                  ccc_tmp2D_ice(j,:) = bbccc2D_ice(j,:) + delt*D2SOURCE_ICE(j,:)
+                  ccc_tmp2D_ice(:,j) = bbccc2D_ice(:,j) + delt*D2SOURCE_ICE(:,j)
          END IF
       END DO
 #endif
 
       DO j=1,NO_D2_BOX_STATES_BEN
          IF(D2STATETYPE_BEN(j).ge.0) THEN
-                  ccc_tmp2D_ben(j,:) = bbccc2D_ben(j,:) + delt*D2SOURCE_BEN(j,:)
+                  ccc_tmp2D_ben(:,j) = bbccc2D_ben(:,j) + delt*D2SOURCE_BEN(:,j)
          END IF
       END DO
 
@@ -115,16 +115,16 @@
          IF (nstep.eq.1) THEN
             LEVEL1 'Necessary Time Step too small! Exiting...'
                blccc(1,:)=minloc(ccc_tmp3D)
-               LEVEL2 ccc_tmp3D(blccc(1,1),blccc(1,2)), &
-                           bbccc3D(blccc(1,1),blccc(1,2))
+               LEVEL2 ccc_tmp3D(blccc(1,2),blccc(1,1)), &
+                           bbccc3D(blccc(1,2),blccc(1,1))
 #if defined INCLUDE_SEAICE
                blccc_ice(2,:)=minloc(ccc_tmp2D_ice)
-               LEVEL2 ccc_tmp2D_ice(blccc_ice(2,1),blccc_ice(2,2)), &
-                           bbccc2D_ice(blccc_ice(2,1),blccc_ice(2,2))
+               LEVEL2 ccc_tmp2D_ice(blccc_ice(2,2),blccc_ice(2,1)), &
+                           bbccc2D_ice(blccc_ice(2,2),blccc_ice(2,1))
 #endif
                blccc_ben(2,:)=minloc(ccc_tmp2D_ben)
-               LEVEL2 ccc_tmp2D_ben(blccc_ben(2,1),blccc_ben(2,2)), &
-                           bbccc2D_ben(blccc_ben(2,1),blccc_ben(2,2))
+               LEVEL2 ccc_tmp2D_ben(blccc_ben(2,2),blccc_ben(2,1)), &
+                           bbccc2D_ben(blccc_ben(2,2),blccc_ben(2,1))
 
                LEVEL2 'EXIT at time: ',timesec
             STOP
@@ -145,24 +145,24 @@
          write(6,*) 'filtered'
          DO j=1,NO_D3_BOX_STATES
             IF (D3STATETYPE(j).ge.0) THEN
-               bbccc3D(j,:) = D3STATE(j,:) + &
-                     ass*(bbccc3D(j,:)-2._RLEN*D3STATE(j,:)+ccc_tmp3D(j,:))
+               bbccc3D(:,j) = D3STATE(:,j) + &
+                     ass*(bbccc3D(:,j)-2._RLEN*D3STATE(:,j)+ccc_tmp3D(:,j))
             END IF
          END DO
          D3STATE=ccc_tmp3D
 #if defined INCLUDE_SEAICE
          DO j=1,NO_D2_BOX_STATES_ICE
             IF (D2STATETYPE_ICE(j).ge.0) THEN
-               bbccc2D_ice(j,:) = D2STATE_ICE(j,:) + &
-                     ass*(bbccc2D_ice(j,:)-2._RLEN*D2STATE_ICE(j,:)+ccc_tmp2D_ice(j,:))
+               bbccc2D_ice(:,j) = D2STATE_ICE(:,j) + &
+                     ass*(bbccc2D_ice(:,j)-2._RLEN*D2STATE_ICE(:,j)+ccc_tmp2D_ice(:,j))
             END IF
          END DO
          D2STATE_ICE=ccc_tmp2D_ice
 #endif
          DO j=1,NO_D2_BOX_STATES_BEN
             IF (D2STATETYPE_BEN(j).ge.0) THEN
-               bbccc2D_ben(j,:) = D2STATE_BEN(j,:) + &
-                     ass*(bbccc2D_ben(j,:)-2._RLEN*D2STATE_BEN(j,:)+ccc_tmp2D_ben(j,:))
+               bbccc2D_ben(:,j) = D2STATE_BEN(:,j) + &
+                     ass*(bbccc2D_ben(:,j)-2._RLEN*D2STATE_BEN(:,j)+ccc_tmp2D_ben(:,j))
             END IF
          END DO
          D2STATE_BEN=ccc_tmp2D_ben
@@ -204,8 +204,8 @@
       bbccc3D=bccc3D
       DO j=1,NO_D3_BOX_STATES
          IF (D3STATETYPE(j).ge.0) THEN
-            bbccc3D(j,:) = bccc3d(j,:) + &
-               ass*(bc3D(j,:)-2._RLEN*bccc3d(j,:)+D3STATE(j,:))
+            bbccc3D(:,j) = bccc3d(:,j) + &
+               ass*(bc3D(:,j)-2._RLEN*bccc3d(:,j)+D3STATE(:,j))
          END IF
       END DO
 
@@ -213,8 +213,8 @@
       bbccc2D_ice=bccc2D_ice
       DO j=1,NO_D2_BOX_STATES_ICE
          IF (D2STATETYPE_ICE(j).ge.0) THEN
-            bbccc2d_ice(j,:) = bccc2d_ice(j,:) + &
-               ass*(bc2D_ice(j,:)-2._RLEN*bccc2d_ice(j,:)+D2STATE_ICE(j,:))
+            bbccc2d_ice(:,j) = bccc2d_ice(:,j) + &
+               ass*(bc2D_ice(:,j)-2._RLEN*bccc2d_ice(:,j)+D2STATE_ICE(:,j))
          END IF
       END DO
 #endif
@@ -222,8 +222,8 @@
       bbccc2D_ben=bccc2D_ben
       DO j=1,NO_D2_BOX_STATES_BEN
          IF (D2STATETYPE_BEN(j).ge.0) THEN
-            bbccc2d_ben(j,:) = bccc2d_ben(j,:) + &
-               ass*(bc2D_ben(j,:)-2._RLEN*bccc2d_ben(j,:)+D2STATE_BEN(j,:))
+            bbccc2d_ben(:,j) = bccc2d_ben(:,j) + &
+               ass*(bc2D_ben(:,j)-2._RLEN*bccc2d_ben(:,j)+D2STATE_BEN(:,j))
          END IF
       END DO
 

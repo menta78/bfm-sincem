@@ -75,21 +75,21 @@
    ! Integration step:
       DO j=1,NO_D3_BOX_STATES
          IF (D3STATETYPE(j).ge.0) THEN
-            D3STATE(j,:) = D3STATE(j,:) + delt * D3SOURCE(j,:)
+            D3STATE(:,j) = D3STATE(:,j) + delt * D3SOURCE(:,j)
          END IF
       END DO
 
 #if defined INCLUDE_SEAICE
       DO j=1,NO_D2_BOX_STATES_ICE
          IF (D2STATETYPE_ICE(j).ge.0) THEN
-            D2STATE_ICE(j,:) = D2STATE_ICE(j,:) + delt*D2SOURCE_ICE(j,:)
+            D2STATE_ICE(:,j) = D2STATE_ICE(:,j) + delt*D2SOURCE_ICE(:,j)
          END IF
       END DO
 #endif
 
       DO j=1,NO_D2_BOX_STATES_BEN
          IF (D2STATETYPE_BEN(j).ge.0) THEN
-            D2STATE_BEN(j,:) = D2STATE_BEN(j,:) + delt*D2SOURCE_BEN(j,:)
+            D2STATE_BEN(:,j) = D2STATE_BEN(:,j) + delt*D2SOURCE_BEN(:,j)
          END IF
       END DO
 
@@ -114,8 +114,8 @@
                blccc(:,1)=minloc(D3STATE)
                bbccc3D = D3SOURCE(:,:)
                LEVEL1 'Pelagic Variable:',trim(var_names(stPelStateS+blccc(1,1)-1))
-               LEVEL1 'Value: ',D3STATE(blccc(1,1),blccc(2,1)),' Rate: ', &
-                        bbccc3D(blccc(1,1),blccc(2,1))
+               LEVEL1 'Value: ',D3STATE(blccc(2,1),blccc(1,1)),' Rate: ', &
+                        bbccc3D(blccc(2,1),blccc(1,1))
             end if
 
 #if defined INCLUDE_SEAICE
@@ -123,8 +123,8 @@
                blccc_ice(:,2)=minloc(D2STATE_ICE)
                bbccc2D_ice = D2SOURCE_ICE(:,:)
                LEVEL1 'Sea ice Variable:',trim(var_names(stIceStateS+blccc_ice(1,2)-1))
-               LEVEL1 'Value: ',D2STATE_ICE(blccc_ice(1,2),blccc_ice(2,2)),' Rate: ', &
-                           bbccc2D_ice(blccc_ice(1,2),blccc_ice(2,2))
+               LEVEL1 'Value: ',D2STATE_ICE(blccc_ice(2,2),blccc_ice(1,2)),' Rate: ', &
+                           bbccc2D_ice(blccc_ice(2,2),blccc_ice(1,2))
             end if
 #endif
 
@@ -132,8 +132,8 @@
                blccc_ben(:,2)=minloc(D2STATE_BEN)
                bbccc2D_ben = D2SOURCE_BEN(:,:)
                LEVEL1 'Benthic Variable:',trim(var_names(stBenStateS+blccc_ben(1,2)-1))
-               LEVEL1 'Value: ',D2STATE_BEN(blccc_ben(1,2),blccc_ben(2,2)),' Rate: ', &
-                           bbccc2D_ben(blccc_ben(1,2),blccc_ben(2,2))
+               LEVEL1 'Value: ',D2STATE_BEN(blccc_ben(2,2),blccc_ben(1,2)),' Rate: ', &
+                           bbccc2D_ben(blccc_ben(2,2),blccc_ben(1,2))
             end if
 
             LEVEL1 'EXIT at  time ',timesec

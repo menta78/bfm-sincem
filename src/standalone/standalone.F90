@@ -322,17 +322,17 @@
    !---------------------------------------------
    ! allocate and initialise integration arrays
    !---------------------------------------------
-   allocate(bbccc3D(NO_D3_BOX_STATES,NO_BOXES))
-   allocate(bccc3D(NO_D3_BOX_STATES,NO_BOXES))
-   allocate(ccc_tmp3D(NO_D3_BOX_STATES,NO_BOXES))
+   allocate(bbccc3D(NO_BOXES,NO_D3_BOX_STATES))
+   allocate(bccc3D(NO_BOXES,NO_D3_BOX_STATES))
+   allocate(ccc_tmp3D(NO_BOXES,NO_D3_BOX_STATES))
 #if defined INCLUDE_SEAICE
-   allocate(bccc2D_ice(NO_D2_BOX_STATES_ICE,NO_BOXES_ICE))
-   allocate(bbccc2D_ice(NO_D2_BOX_STATES_ICE,NO_BOXES_ICE))
-   allocate(ccc_tmp2D_ice(NO_D2_BOX_STATES_ICE,NO_BOXES_ICE))
+   allocate(bccc2D_ice(NO_BOXES_ICE,NO_D2_BOX_STATES_ICE))
+   allocate(bbccc2D_ice(NO_BOXES_ICE,NO_D2_BOX_STATES_ICE))
+   allocate(ccc_tmp2D_ice(NO_BOXES_ICE,NO_D2_BOX_STATES_ICE))
 #endif
-   allocate(bccc2D_ben(NO_D2_BOX_STATES_BEN,NO_BOXES_BEN))
-   allocate(bbccc2D_ben(NO_D2_BOX_STATES_BEN,NO_BOXES_BEN))
-   allocate(ccc_tmp2D_ben(NO_D2_BOX_STATES_BEN,NO_BOXES_BEN))
+   allocate(bccc2D_ben(NO_BOXES_BEN,NO_D2_BOX_STATES_BEN))
+   allocate(bbccc2D_ben(NO_BOXES_BEN,NO_D2_BOX_STATES_BEN))
+   allocate(ccc_tmp2D_ben(NO_BOXES_BEN,NO_D2_BOX_STATES_BEN))
 
    ! Initialize prior time step for leap-frog:
    if (method == 3) then
@@ -349,15 +349,15 @@
 #ifdef DEBUG
    ! print out initial values (first grid point only)
    do i=1,NO_D3_BOX_STATES
-     LEVEL1 trim(var_names(stPelStateS+i-1)),D3STATE(i,1)
+     LEVEL1 trim(var_names(stPelStateS+i-1)),D3STATE(1,i)
    end do
 #if defined INCLUDE_SEAICE
    do i=1,NO_D2_BOX_STATES_ICE
-     LEVEL1 trim(var_names(stIceStateS+i-1)),D2STATE_ICE(i,1)
+     LEVEL1 trim(var_names(stIceStateS+i-1)),D2STATE_ICE(1,i)
    end do
 #endif
    do i=1,NO_D2_BOX_STATES_BEN
-     LEVEL1 trim(var_names(stBenStateS+i-1)),D2STATE_BEN(i,1)
+     LEVEL1 trim(var_names(stBenStateS+i-1)),D2STATE_BEN(1,i)
    end do
 #endif
 
