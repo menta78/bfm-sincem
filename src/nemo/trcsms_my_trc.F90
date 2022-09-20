@@ -147,18 +147,18 @@ CONTAINS
       !---------------------------------------------
       DO jn = 1, NO_D3_BOX_STATES
          if (var_map(jn) > 0) &
-            D3STATE(jn,1:bot) = tr(ji,jj,1:bot,var_map(jn),Kmm)
+            D3STATE(1:bot,jn) = tr(ji,jj,1:bot,var_map(jn),Kmm)
       END DO
       DO jn = 1, NO_D2_BOX_STATES_BEN
-         D2STATE_BEN(jn,:) = tr_b(ji,jj,:,jn)
+         D2STATE_BEN(:,jn) = tr_b(ji,jj,:,jn)
       END DO
 #ifdef INCLUDE_SEAICE
       DO jn = 1, NO_D2_BOX_STATES_ICE
-         D2STATE_ICE(jn,:) = tr_i(ji,jj,:,jn)
+         D2STATE_ICE(:,jn) = tr_i(ji,jj,:,jn)
       END DO
 #endif
 #ifdef INCLUDE_PELCO2
-      D3DIAGNOS(pppH,1:bot) = ph(ji,jj,1:bot)
+      D3DIAGNOS(1:bot,pppH) = ph(ji,jj,1:bot)
 #endif
 
       ! Compute Biogeochemical trends
@@ -171,21 +171,21 @@ CONTAINS
       if (CalcPelagicFlag ) then
          do jn = 1, NO_D3_BOX_STATES
             if (var_map(jn) > 0) &
-               tr(ji,jj,1:bot,var_map(jn),Krhs) = D3SOURCE(jn,1:bot)
+               tr(ji,jj,1:bot,var_map(jn),Krhs) = D3SOURCE(1:bot,jn)
          end do
 #ifdef INCLUDE_PELCO2
          ! ph for next iteration
-         ph(ji,jj,1:bot) = D3DIAGNOS(pppH,1:bot)
+         ph(ji,jj,1:bot) = D3DIAGNOS(1:bot,pppH)
 #endif
       end if
       if (CalcBenthicFlag ) then
          DO jn = 1, NO_D2_BOX_STATES_BEN
-            tr_b(ji,jj,:,jn) = tr_b(ji,jj,:,jn) + delt*D2SOURCE_BEN(jn,:)
+            tr_b(ji,jj,:,jn) = tr_b(ji,jj,:,jn) + delt*D2SOURCE_BEN(:,jn)
          END DO
       end if
 #ifdef INCLUDE_SEAICE
       DO jn = 1, NO_D2_BOX_STATES_ICE
-         tr_i(ji,jj,:,jn) = tr_i(ji,jj,:,jn) + delt*D2SOURCE_ICE(jn,:)
+         tr_i(ji,jj,:,jn) = tr_i(ji,jj,:,jn) + delt*D2SOURCE_ICE(:,jn)
       END DO
 #endif
 

@@ -96,7 +96,7 @@ CONTAINS
             SELECT CASE (InitVar(jn) % init)
 
             CASE (0) ! Homogeneous IC
-               InitVar(jn)%unif = minval( D3STATE(jn,:) )
+               InitVar(jn)%unif = minval( D3STATE(:,jn) )
 
             CASE (1) ! Analytical IC
                ! Check consistency of input z1 and z2
@@ -106,7 +106,7 @@ CONTAINS
                   STOP
                ENDIF
                ! gdept_1d contains the model depth
-               D3STATE(jn,:) = analytical_ic( gdept_1d, InitVar(jn)%anz1, &
+               D3STATE(:,jn) = analytical_ic( gdept_1d, InitVar(jn)%anz1, &
                        InitVar(jn)%anv1, InitVar(jn)%anz2, InitVar(jn)%anv2 )
 
             CASE (2) ! IC from file (use nemo trcdta)
@@ -143,21 +143,21 @@ CONTAINS
          ! PELAGIC
          DO jn = 1, NO_D3_BOX_STATES
              DO_2D( nn_hls, nn_hls, nn_hls, nn_hls )
-                 tr(ji,jj,:,var_map(jn),Kmm) = D3STATE(jn,:)
+                 tr(ji,jj,:,var_map(jn),Kmm) = D3STATE(:,jn)
              END_2D
              tr(:,:,:,var_map(jn),Kmm) = tr(:,:,:,var_map(jn),Kmm) * tmask(:,:,:)
          END DO
          ! BENTHIC
          DO jn = 1, NO_D2_BOX_STATES_BEN
             DO jk = 1, jpk_b
-                tr_b(:,:,jk,jn) = tmask(:,:,1) * D2STATE_BEN(jn,1)
+                tr_b(:,:,jk,jn) = tmask(:,:,1) * D2STATE_BEN(1,jn)
             ENDDO
          END DO
 #ifdef INCLUDE_SEAICE
          ! SEAICE
          DO jn = 1, NO_D2_BOX_STATES_ICE
             DO jk = 1, jpk_i
-                tr_i(:,:,jk,jn) = tmask(:,:,1) * D2STATE_ICE(jn,1)
+                tr_i(:,:,jk,jn) = tmask(:,:,1) * D2STATE_ICE(1,jn)
             ENDDO
          END DO
 #endif

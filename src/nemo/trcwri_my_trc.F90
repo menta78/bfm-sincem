@@ -136,7 +136,7 @@ CONTAINS
          jl = id_dia3d(jn)
          IF ( jl >= stPelDiagS .AND. jl <= stPelDiagE ) THEN
             idx = jl - stPelDiagS + 1 
-            trc3d(ji, jj, 1:bot, jn) = D3DIAGNOS(idx,1:bot)
+            trc3d(ji, jj, 1:bot, jn) = D3DIAGNOS(1:bot,idx)
          ENDIF
          IF ( jl >= stPelFluxS .AND. jl <= stPelFluxE ) then
             idx = jl - stPelFluxS + 1
@@ -151,24 +151,24 @@ CONTAINS
          jl = id_dia2d(jn)
          IF ( jl >= stPelDiag2dS .AND. jl <= stPelRivE ) THEN
             idx = jl - stPelDiag2dS + 1
-            trc2d(ji, jj, jn) = D2DIAGNOS(idx,1)
+            trc2d(ji, jj, jn) = D2DIAGNOS(1,idx)
          ENDIF
          IF ( jl >= stBenDiag2dS .AND. jl <= stBenDiag2dE ) THEN
             idx = jl - stBenDiag2dS + 1
-            trc2d(ji, jj, jn) = D2DIAGNOS_BEN(idx,1)
+            trc2d(ji, jj, jn) = D2DIAGNOS_BEN(1,idx)
          ENDIF
          IF ( jl >= stBenFlux2dS .AND. jl <= stBenFlux2dE ) THEN
             idx = jl - stBenFlux2dS + 1
-            trc2d(ji, jj, jn) = D2FLUX_FUNC_BEN(idx,1)
+            trc2d(ji, jj, jn) = D2FLUX_FUNC_BEN(1,idx)
          ENDIF
 #if defined INCLUDE_SEAICE
          IF ( jl >= stIceDiag2dS .AND. jl <= stIceDiag2dE ) THEN
             idx = jl - stIceDiag2dS + 1
-            trc2d(ji, jj, jn) = D2DIAGNOS_ICE(idx,1)
+            trc2d(ji, jj, jn) = D2DIAGNOS_ICE(1,idx)
          ENDIF
          If ( jl >= stIceFlux2dS .AND. jl <= stIceFlux2dE ) THEN
             idx = jl - stIceFlux2dS + 1
-            trc2d(ji, jj, jn) = D2FLUX_FUNC_ICE(idx,1)
+            trc2d(ji, jj, jn) = D2FLUX_FUNC_ICE(1,idx)
          ENDIF
 #endif
       ENDDO
