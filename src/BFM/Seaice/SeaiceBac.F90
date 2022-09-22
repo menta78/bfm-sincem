@@ -85,7 +85,7 @@
   ppbacc = ppSeaiceBacteria(bac,iiC)
   ppbacn = ppSeaiceBacteria(bac,iiN)
   ppbacp = ppSeaiceBacteria(bac,iiP)
-  bacc = D2STATE_ICE(ppbacc,:)
+  bacc = D2STATE_ICE(:,ppbacc)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Temperature effect on pelagic bacteria:
@@ -116,12 +116,12 @@
   rd  =  ( p_sd(bac)*et + (p_sd2(bac)*bacc))*bacc
 
   call flux_vector( iiIce, ppbacc,ppU6c, rd*( ONE- p_pe_R1c) )
-  call flux_vector( iiIce, ppbacn,ppU6n, rd* qncSBA(bac,:)*( ONE- p_pe_R1n) )
-  call flux_vector( iiIce, ppbacp,ppU6p, rd* qpcSBA(bac,:)*( ONE- p_pe_R1p) )
+  call flux_vector( iiIce, ppbacn,ppU6n, rd* qncSBA(:,bac)*( ONE- p_pe_R1n) )
+  call flux_vector( iiIce, ppbacp,ppU6p, rd* qpcSBA(:,bac)*( ONE- p_pe_R1p) )
 
   call flux_vector( iiIce, ppbacc,ppU1c, rd* p_pe_R1c )
-  call flux_vector( iiIce, ppbacn,ppU1n, rd* qncSBA(bac,:)* p_pe_R1n )
-  call flux_vector( iiIce, ppbacp,ppU1p, rd* qpcSBA(bac,:)* p_pe_R1p )
+  call flux_vector( iiIce, ppbacn,ppU1n, rd* qncSBA(:,bac)* p_pe_R1n )
+  call flux_vector( iiIce, ppbacp,ppU1p, rd* qpcSBA(:,bac)* p_pe_R1p )
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Substrate availability
@@ -134,8 +134,8 @@
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-==--=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-
       ! Nutrient limitation (intracellular, eq. 51 Vichi et al. 2007)
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-      iNIn  =   min(ONE, max(ZERO, qncSBA(bac,:)/ p_qncSBA(bac)))  !Nitrogen
-      iI1p  =   min(ONE, max(ZERO, qpcSBA(bac,:)/ p_qpcSBA(bac)))  !Phosphorus
+      iNIn  =   min(ONE, max(ZERO, qncSBA(:,bac)/ p_qncSBA(bac)))  !Nitrogen
+      iI1p  =   min(ONE, max(ZERO, qpcSBA(:,bac)/ p_qpcSBA(bac)))  !Phosphorus
       iN  =   min(iI1p, iNIn)
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
       ! Potential uptake by bacteria (eq. 50 Vichi et al. 2007)
@@ -146,8 +146,8 @@
       ! correction of substrate quality depending on nutrient content
       ! (eq. 52 Vichi et al. 2007)
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-      cuU1 = min(ONE, qpcSOM(iiU1,:)/p_qpcSBA(bac), qncSOM(iiU1,:)/ p_qncSBA(bac))
-      cuU6 = min(ONE, qpcSOM(iiU6,:)/p_qpcSBA(bac), qncSOM(iiU6,:)/ p_qncSBA(bac))
+      cuU1 = min(ONE, qpcSOM(:,iiU1)/p_qpcSBA(bac), qncSOM(:,iiU1)/ p_qncSBA(bac))
+      cuU6 = min(ONE, qpcSOM(:,iiU6)/p_qpcSBA(bac), qncSOM(:,iiU6)/ p_qncSBA(bac))
 
   end select
 
@@ -177,13 +177,13 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Organic Nitrogen and Phosphrous uptake
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  ruU1n = qncSOM(iiU1,:)*ruU1c
-  ruU6n = qncSOM(iiU6,:)*ruU6c
+  ruU1n = qncSOM(:,iiU1)*ruU1c
+  ruU6n = qncSOM(:,iiU6)*ruU6c
   call flux_vector( iiIce, ppU1n, ppbacn, ruU1n )
   call flux_vector( iiIce, ppU6n, ppbacn, ruU6n )
 
-  ruU1p = qpcSOM(iiU1,:)*ruU1c
-  ruU6p = qpcSOM(iiU6,:)*ruU6c
+  ruU1p = qpcSOM(:,iiU1)*ruU1c
+  ruU6p = qpcSOM(:,iiU6)*ruU6c
   call flux_vector( iiIce, ppU1p, ppbacp, ruU1p )
   call flux_vector( iiIce, ppU6p, ppbacp, ruU6p )
 
@@ -217,7 +217,7 @@
       ! This rate is assumed to occur with a timescale p_ruen=1 day
       ! and controlled with a Michaelis-Menten function
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-      ren  =  (qncSBA(bac,:) - p_qncSBA(bac))*bacc*p_ruen(bac)
+      ren  =  (qncSBA(:,bac) - p_qncSBA(bac))*bacc*p_ruen(bac)
       call flux_vector(iiIce, ppbacn, ppI4n,       ren*insw( ren))
       call flux_vector(iiIce, ppI4n, ppbacn, -eI4n*ren*insw(-ren))
 
@@ -227,7 +227,7 @@
       ! This rate is assumed to occur with a timescale of p_ruep=1 day
       ! and controlled with a Michaelis-Menten function
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-      rep  =  (qpcSBA(bac,:) - p_qpcSBA(bac))*bacc*p_ruep(bac)
+      rep  =  (qpcSBA(:,bac) - p_qpcSBA(bac))*bacc*p_ruep(bac)
       call flux_vector(iiIce, ppbacp, ppI1p,       rep*insw( rep))
       call flux_vector(iiIce, ppI1p, ppbacp, -eI1p*rep*insw(-rep))
 

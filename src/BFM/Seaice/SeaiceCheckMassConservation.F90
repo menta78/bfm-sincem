@@ -67,10 +67,10 @@
   do i=1, iiSeaiceZoo
      j=max(1,ppSeaiceZoo(i,iiN))
      if ( j==1) &
-        totseaicen(:)=totseaicen(:) + SeaiceZoo(i,j)*qncSZO(i, :)
+        totseaicen(:)=totseaicen(:) + SeaiceZoo(i,j)*qncSZO(:, i)
      j=max(1,ppSeaiceZoo(i,iiP))
      if ( j==1) &
-        totseaicep(:)=totseaicep(:) + SeaiceZoo(i,j)*qpcSZO(i, :)
+        totseaicep(:)=totseaicep(:) + SeaiceZoo(i,j)*qpcSZO(:, i)
   end do
   do i=1, iiSeaiceDetritus
      if ( ppSeaiceDetritus(i,iiC)/=0) then

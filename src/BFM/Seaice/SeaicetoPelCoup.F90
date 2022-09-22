@@ -338,9 +338,9 @@
             if (p>0) call flux_vector( iiIce, p, p, flux_pel_ice(:) ) 
             p = ppPhytoPlankton(PPY(j),i)
             if (p>0) then
-               PELSURFACE(p,:) =  PELSURFACE(p,:) - flux_pel_ice(:)  
+               PELSURFACE(:,p) =  PELSURFACE(:,p) - flux_pel_ice(:)  
                ! map the flux into a 3D temporary array and send to D3SOURCE
-               tmpflux(SRFindices) = PELSURFACE(p,:) / Depth(SRFindices)
+               tmpflux(SRFindices) = PELSURFACE(:,p) / Depth(SRFindices)
                call flux_vector(iiPel, p, p, tmpflux(:) )
             end if
        end do
@@ -367,9 +367,9 @@
          if (p>0) call flux_vector( iiIce, p, p, flux_pel_ice(:) ) 
          p = ppPelDetritus(DET(j),i)
          if (p>0) then
-            PELSURFACE(p,:) =  PELSURFACE(p,:) - flux_pel_ice(:)  
+            PELSURFACE(:,p) =  PELSURFACE(:,p) - flux_pel_ice(:)  
             ! map the flux into a 3D temporary array
-            tmpflux(SRFindices) = PELSURFACE(p,:) / Depth(SRFindices)
+            tmpflux(SRFindices) = PELSURFACE(:,p) / Depth(SRFindices)
             call flux_vector(iiPel, p, p, tmpflux(:) )
          end if
       end do
@@ -396,9 +396,9 @@
            if (p>0) call flux_vector( iiIce, p,p, flux_pel_ice(:) ) 
            p = ppPelBacteria(BAC(j),i)
            if (p>0) then
-              PELSURFACE(p,:) =  PELSURFACE(p,:) - flux_pel_ice(:)  
+              PELSURFACE(:,p) =  PELSURFACE(:,p) - flux_pel_ice(:)  
               ! map the flux into a 3D temporary array
-              tmpflux(SRFindices) = PELSURFACE(p,:) / Depth(SRFindices)
+              tmpflux(SRFindices) = PELSURFACE(:,p) / Depth(SRFindices)
               call flux_vector(iiPel, p, p, tmpflux(:) )
            end if
         end do
@@ -426,9 +426,9 @@
            if (p>0) call flux_vector( iiIce, p,p, flux_pel_ice(:) ) 
            p = ppMicroZooPlankton(ZOO(j),i)
            if (p>0) then
-              PELSURFACE(p,:) =  PELSURFACE(p,:) - flux_pel_ice(:)  
+              PELSURFACE(:,p) =  PELSURFACE(:,p) - flux_pel_ice(:)  
               ! map the flux into a 3D temporary array
-              tmpflux(SRFindices) = PELSURFACE(p,:) / Depth(SRFindices)
+              tmpflux(SRFindices) = PELSURFACE(:,p) / Depth(SRFindices)
               call flux_vector(iiPel, p, p, tmpflux(:) )
            end if
         end do

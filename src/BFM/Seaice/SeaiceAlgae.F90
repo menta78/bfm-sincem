@@ -124,19 +124,19 @@
   ppalgp = ppSeaiceAlgae(alg,iiP)
   ppalgs = ppSeaiceAlgae(alg,iiS)
   ppalgl = ppSeaiceAlgae(alg,iiL)
-  algc = D2STATE_ICE(ppalgc,:)
-  algn = D2STATE_ICE(ppalgn,:)
-  algp = D2STATE_ICE(ppalgp,:)
-  algl = D2STATE_ICE(ppalgl,:)
-  if ( ppalgs > 0 )  algs = D2STATE_ICE(ppalgs,:)
+  algc = D2STATE_ICE(:,ppalgc)
+  algn = D2STATE_ICE(:,ppalgn)
+  algp = D2STATE_ICE(:,ppalgp)
+  algl = D2STATE_ICE(:,ppalgl)
+  if ( ppalgs > 0 )  algs = D2STATE_ICE(:,ppalgs)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Nutrient limitation (intracellular) N, P
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  iI1p = min( ONE, max( p_small, ( qpcSAL(alg, &
-    :)- p_qplc(alg))/( p_qpcSAL(alg)- p_qplc(alg))))
-  iINn = min( ONE, max( p_small, ( qncSAL(alg, &
-    :)- p_qnlc(alg))/( p_qncSAL(alg)- p_qnlc(alg))))
+  iI1p = min( ONE, max( p_small, ( qpcSAL(:,alg) - p_qplc(alg)) &
+          / ( p_qpcSAL(alg)- p_qplc(alg))))
+  iINn = min( ONE, max( p_small, ( qncSAL(:,alg) - p_qnlc(alg)) &
+          / ( p_qncSAL(alg)- p_qnlc(alg))))
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Sea ice algae growth is limited by nitrogen and phosphorus
@@ -170,9 +170,9 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Light is already at the middle of the cell in the BAL
   Irr =  max(p_small, EIB(:))*SEC_PER_DAY;
-  eiSAL(alg,:) = ( ONE- exp( - qlcSAL(alg, :)* p_alpha_chl(alg)/ &
+  eiSAL(alg,:) = ( ONE- exp( - qlcSAL(:, alg)* p_alpha_chl(alg)/ &
                  p_sum(alg)* Irr))
-  sum  =   p_sum(alg)* et* eiSAL(alg,:) * eI5s
+  sum  =   p_sum(alg)* et* eiSAL(:, alg) * eI5s
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Lysis and excretion
@@ -190,8 +190,8 @@
   ! at least a fraction equal to the minimum quota is released as POM.
   ! Therefore, nutrients (and C) in the structural part go to R6.
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  pe_U6 = min( p_qplc(alg)/( qpcSAL(alg, :)+ p_small), p_qnlc(alg)/( &
-             qncSAL(alg, :)+ p_small))
+  pe_U6 = min( p_qplc(alg)/( qpcSAL(:, alg)+ p_small), p_qnlc(alg)/( &
+             qncSAL(:, alg)+ p_small))
   pe_U6  =   min(  ONE,  pe_U6)
   rr6c  =   pe_U6* sdo* algc
   rr1c  =  ( ONE- pe_U6)* sdo* algc
@@ -214,13 +214,13 @@
   ! Nutrient-stress excretion is assigned to a temporary U2
   flSIU2c  =   seo*algc
 
-  call flux_vector( iiIce,ppF3c,ppalgc,rugc )
-  call flux_vector( iiIce, ppalgc,ppU6c, rr6c )
-  call flux_vector( iiIce, ppalgc,ppU1c, rr1c )
+  call flux_vector( iiIce, ppF3c, ppalgc, rugc )
+  call flux_vector( iiIce, ppalgc, ppU6c, rr6c )
+  call flux_vector( iiIce, ppalgc, ppU1c, rr1c )
 
-  call flux_vector( iiIce, ppalgc,ppF3c,rrc )
-  call flux_vector( iiIce, ppF2o,ppF2o,-(rrc/MW_C) )
-  call flux_vector( iiIce, ppF2o,ppF2o, rugc/MW_C )
+  call flux_vector( iiIce, ppalgc, ppF3c, rrc )
+  call flux_vector( iiIce, ppF2o,  ppF2o, -(rrc/MW_C) )
+  call flux_vector( iiIce, ppF2o,  ppF2o,  rugc/MW_C )
 
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -321,8 +321,8 @@
   ! Note that differently from phytoplankton, chl in sea ice algae 
   ! must be a variable
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  rho_Chl = p_qlcSAL( alg)* min(ONE, p_sum(alg)* eiSAL(alg,:) *  &
-            algc/(p_alpha_chl(alg)*( algl+ p_small)* Irr))
+  rho_Chl = p_qlcSAL(alg)* min(ONE, p_sum(alg)* eiSAL(:,alg) *  &
+            algc/(p_alpha_chl(alg)*(algl+ p_small)* Irr))
   rate_Chl = rho_Chl*(sum - sea + seo) * algc - (srt+ sdo)*algl
   call flux_vector( iiIce, ppalgl,ppalgl, rate_Chl )
 
