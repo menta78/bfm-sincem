@@ -24,7 +24,7 @@
 ! INCLUDE
 #include "cppdefs.h"
 
-subroutine BFM1D_Output_EcologyDynamics(BFM1D_tra, BFM1D_sed, local_BFM1D_dia,local_BFM0D_dia2D)
+subroutine BFM1D_Output_EcologyDynamics(BFM1D_sed, local_BFM1D_dia,local_BFM0D_dia2D)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! The following global constants are used: RLEN
@@ -39,15 +39,14 @@ subroutine BFM1D_Output_EcologyDynamics(BFM1D_tra, BFM1D_sed, local_BFM1D_dia,lo
   ! Implicit typing is never allowed
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   IMPLICIT NONE
-  real(RLEN), intent(out) :: BFM1D_sed( iiPhytoPlankton , NO_BOXES )
-  real(RLEN), intent(out) :: BFM1D_tra( NO_D3_BOX_STATES, NO_BOXES )
+  real(RLEN), intent(out) :: BFM1D_sed( NO_BOXES, iiPhytoPlankton)
   INTEGER, parameter :: jptra_var = %3d-diagnos-pel-nr
   INTEGER, parameter :: jptra_flux = %3d-flux-pel-nr
       
   INTEGER, parameter :: jptra_dia = jptra_var + jptra_flux
   INTEGER, parameter :: jptra_dia_2d =  %2d-diagnos-pel-nrs
-  real(RLEN), intent(out) :: local_BFM1D_dia(jptra_dia, NO_BOXES)
-  real(RLEN), intent(out) :: local_BFM0D_dia2D(jptra_dia_2d) 
+  real(RLEN), intent(out) :: local_BFM1D_dia(NO_BOXES, jptra_dia)
+  real(RLEN), intent(out) :: local_BFM0D_dia2D(jptra_dia_2d)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Local Variables
@@ -55,18 +54,21 @@ subroutine BFM1D_Output_EcologyDynamics(BFM1D_tra, BFM1D_sed, local_BFM1D_dia,lo
   integer i
   integer ib
 
-  DO ib=1,NO_BOXES
-  DO i=1,NO_D3_BOX_STATES
-     BFM1D_tra(i,ib) = D3SOURCE(i,ib)
+!  DO ib=1,NO_BOXES
+!  DO i=1,NO_D3_BOX_STATES
+!     BFM1D_tra(i,ib) = D3SOURCE(i,ib)
 !    LEVEL1 'BFM1D_Output_EcologyDynamics:D3SOURCE(',i,')', D3SOURCE(i,ib)
-  END DO
-  END DO
+!  END DO
+!  END DO
 
+
+
+BFM1D_sed = sediPPY
   ! Sinking Velocity for Phytoplankton
-  DO ib=1,NO_BOXES
-  BFM1D_sed(:, ib) = sediPPY(:,ib)
+!  DO ib=1,NO_BOXES
+!  BFM1D_sed(ib,:) = sediPPY(ib,:)
 !    LEVEL1 'BFM1D_Output_EcologyDynamics:BFM1D_sed', sediPPY(:,ib)
-  END DO
+!  END DO
 
   local_BFM1D_dia = 0;
 

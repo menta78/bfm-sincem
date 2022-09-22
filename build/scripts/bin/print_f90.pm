@@ -2113,23 +2113,23 @@ sub func_FLUX_COUPLED{
                 foreach my $const ( sort { $$LST_CONST{$a} cmp $$LST_CONST{$b} } keys %$LST_CONST ){
                     if( exists ${$param->getComponents()}{$const} ){
                         my $nameC = $name . $const;
-                        if ( $dim == 2 ) {  $line .= ${localvarname} .  "(" . $index_group++ . ") = D". $dim . "DIAGNOS(pp${nameC},1)\n"; }
-                        if ( $dim == 3 ) { $line .= ${localvarname} .  "(" . $index_group++ . ",:) = D". $dim . "DIAGNOS(pp${nameC},:)\n"; }
+                        if ( $dim == 2 ) {  $line .= ${localvarname} .  "(" . $index_group++ . ") = D". $dim . "DIAGNOS(1,pp${nameC})\n"; }
+                        if ( $dim == 3 ) { $line .= ${localvarname} .  "(:," . $index_group++ . ") = D". $dim . "DIAGNOS(:,pp${nameC})\n"; }
                     }
                 }
                 if( $param->getComponentsEx() && keys(%{$param->getComponentsEx()}) != 0 ){
                     foreach my $const ( sort { $$LST_CONST{$a} cmp $$LST_CONST{$b} } keys %$LST_CONST ){
                         if( exists ${$param->getComponentsEx()}{$const} ){
                             my $nameC = $name . $const;
-                            if ( $dim == 2 ) { $line .= ${localvarname} .  "(" . $index_group++ . ") = D". $dim . "DIAGNOS(pp${nameC},1)\n"; }
-                            if ( $dim == 3 ) { $line .= ${localvarname} .  "(" . $index_group++ . ",:) = D". $dim . "DIAGNOS(pp${nameC},:)\n"; }
+                            if ( $dim == 2 ) { $line .= ${localvarname} .  "(" . $index_group++ . ") = D". $dim . "DIAGNOS(1,pp${nameC})\n"; }
+                            if ( $dim == 3 ) { $line .= ${localvarname} .  "(:," . $index_group++ . ") = D". $dim . "DIAGNOS(:,pp${nameC})\n"; }
                         }
                     }
                 }
             }else{
                 my $nameC = $name; #. $const;
-                if ( $dim == 2 ) {$line .= ${localvarname} .  "(" . $index_group++ . ") = D". $dim . "DIAGNOS(pp${nameC},1)\n";    }
-                if ( $dim == 3 ) { $line .= ${localvarname} .  "(" . $index_group++ . ",:) = D". $dim . "DIAGNOS(pp${nameC},:)\n"; }
+                if ( $dim == 2 ) {$line .= ${localvarname} .  "(" . $index_group++ . ") = D". $dim . "DIAGNOS(1, pp${nameC})\n";    }
+                if ( $dim == 3 ) { $line .= ${localvarname} .  "(:," . $index_group++ . ") = D". $dim . "DIAGNOS(:,pp${nameC})\n"; }
             }
         }
     }
@@ -2146,7 +2146,7 @@ sub func_FLUX_COUPLED{
             foreach my $member ( sort { $$LST_PARAM{$a}->getIndex() cmp $$LST_PARAM{$b}->getIndex() } keys %$LST_PARAM ){
                 my $param2 = $$LST_PARAM{$member};
                 if( defined($param2->getGroup()) && $param2->getGroup() eq $param->getQuota() ){
-                    $line .= "  local_BFM1D_dia(". $index_group++ . ",:) = D3DIAGNOS(pp${root}(ii${member}),:)\n"  ;
+                    $line .= "  local_BFM1D_dia(:,". $index_group++ . ") = D3DIAGNOS(:,pp${root}(ii${member}))\n"  ;
                 }
             }
         }
@@ -2168,19 +2168,19 @@ sub func_FLUX_COUPLED{
                 foreach my $const ( sort { $$LST_CONST{$a} cmp $$LST_CONST{$b} } keys %$LST_CONST ){
                     if( exists ${$param->getComponents()}{$const} ){
                         my $nameC = $name . $const;
-                        $line .= "  local_BFM1D_dia(" . $index_group++ . ",:) =  D3FLUX_FUNC(pp${nameC},:)\n";
+                        $line .= "  local_BFM1D_dia(:," . $index_group++ . ") =  D3FLUX_FUNC(:,pp${nameC})\n";
                     }
                 }
                 if( $param->getComponentsEx() && keys(%{$param->getComponentsEx()}) != 0 ){
                     foreach my $const ( sort { $$LST_CONST{$a} cmp $$LST_CONST{$b} } keys %$LST_CONST ){
                         if( exists ${$param->getComponentsEx()}{$const} ){
                             my $nameC = $name . $const;
-                            $line .= "  local_BFM1D_dia(". $index_group++ . ",:) = D3FLUX_FUNC(pp${nameC},:)\n";
+                            $line .= "  local_BFM1D_dia(:,". $index_group++ . ") = D3FLUX_FUNC(:,pp${nameC})\n";
                         }
                     }
                 }
             }else{
-                $line .= "  local_BFM1D_dia(". $index_group++ . ",:) = D3FLUX_FUNC(pp${name},:)\n"  ;
+                $line .= "  local_BFM1D_dia(:,". $index_group++ . ") = D3FLUX_FUNC(:,pp${name})\n"  ;
             }
         }
     }
