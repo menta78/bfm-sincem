@@ -50,7 +50,7 @@ subroutine ClearMem
        end do
     end do
     deallocate(D3FLUX_MATRIX)
-    deallocate(D3FLUX_FUNC)
+    if( allocated(D3FLUX_FUNC) ) deallocate(D3FLUX_FUNC)
     end if
 #if defined INCLUDE_SEAICE
     if (allocated(D2FLUX_MATRIX_ICE)) then
@@ -64,7 +64,7 @@ subroutine ClearMem
        end do
     end do
     deallocate(D2FLUX_MATRIX_ICE)
-    deallocate(D2FLUX_FUNC_ICE)
+    if( allocated(D2FLUX_FUNC_ICE) ) deallocate(D2FLUX_FUNC_ICE)
     end if
 #endif
     if (allocated(D2FLUX_MATRIX_BEN)) then
@@ -78,7 +78,7 @@ subroutine ClearMem
        end do
     end do
     deallocate(D2FLUX_MATRIX_BEN)
-    deallocate(D2FLUX_FUNC_BEN)
+    if( allocated(D2FLUX_FUNC_BEN) ) deallocate(D2FLUX_FUNC_BEN)
     end if
 
     ! from api_bfm 
