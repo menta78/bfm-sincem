@@ -128,7 +128,7 @@
             lcl_PhytoPlankton => PhytoPlankton(i,iiC)
             ! Check amount of carbon, this may generate a negligible,small mass loss
             if ( lcl_PhytoPlankton(kbot) > p_small) then
-               uptake = jPIY3c(i,Box)
+               uptake = jPIY3c(Box,i)
                j = ppPhytoPlankton(i,iiC)
                PELBOTTOM(Box,j) = - uptake
                j = ppPhytoPlankton(i,iiN) 
