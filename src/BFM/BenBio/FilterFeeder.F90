@@ -582,7 +582,7 @@
 
   ! The silicate is directly transferred to Q6.s
   ! the ruPis which is put back in R6 is however sedimentating:
-  jbotR6s(:)  =   jbotR6s(:)- ruPIs- ruR6s -reR6s
+  jbotR6s(:)  =   jbotR6s(:)- ruPIs- ruR6s
 
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
