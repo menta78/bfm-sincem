@@ -124,8 +124,8 @@
             if ( cut_pel) then
                blccc(:,1)=minloc(D3STATE)
                LEVEL1 'Pelagic variable: ',var_names(stPelStateS+blccc(1,1)-1)
-               LEVEL1 'Value=',ccc_tmp3D(blccc(2,1),blccc(1,1)), &
-                              'Rate=',bccc3D(blccc(2,1),blccc(1,1))
+               LEVEL1 'Value=',ccc_tmp3D(blccc(1,1),blccc(2,1)), &
+                              'Rate=',bccc3D(blccc(1,1),blccc(2,1))
                D3STATE=bbccc3D
             end if
 
@@ -140,10 +140,10 @@
 #endif
 
             if ( cut_ben) then
-               blccc_ben(:,2)=minloc(D2STATE_BEN)
-               LEVEL1 'Benthic Variable: ', var_names(stBenStateS+blccc_ben(1,2)-1)
-               LEVEL1 'Value=',ccc_tmp2D_ben(blccc_ben(2,2),blccc_ben(1,2)), &
-                              'Rate=',bccc2D_ben(blccc_ben(2,2),blccc_ben(1,2))
+               blccc_ben(:,1)=minloc(D2STATE_BEN)
+               LEVEL1 'Benthic Variable: ', var_names(stBenStateS+blccc_ben(1,1)-1)
+               LEVEL1 'Value=',ccc_tmp2D_ben(blccc_ben(1,1),blccc_ben(2,1)), &
+                              'Rate=',bccc2D_ben(blccc_ben(1,1),blccc_ben(2,1))
                D2STATE_BEN=bbccc2D_ben
             end if
 
@@ -239,10 +239,10 @@
 #endif
 
                if ( cut_ben) then
-                  blccc_ben(:,2)=minloc(D2STATE_BEN)
-                  LEVEL1 'Benthic variable: ', var_names(stBenStateS+blccc_ben(1,2)-1)
-                  LEVEL1 'value=',ccc_tmp2D_ben(blccc_ben(2,2),blccc_ben(1,2)), &
-                                 'rate=',bccc2D_ben(blccc_ben(2,2),blccc_ben(1,2))
+                  blccc_ben(:,1)=minloc(D2STATE_BEN)
+                  LEVEL1 'Benthic variable: ', var_names(stBenStateS+blccc_ben(1,1)-1)
+                  LEVEL1 'value=',ccc_tmp2D_ben(blccc_ben(2,1),blccc_ben(1,1)), &
+                                 'rate=',bccc2D_ben(blccc_ben(2,1),blccc_ben(1,1))
                   D2STATE_BEN=bbccc2D_ben
                end if
 
