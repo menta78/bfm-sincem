@@ -76,28 +76,28 @@ use mem_Settling
 
       do i = 1 , ( iiPhytoPlankton)
         lcl_PhytoPlankton => PhytoPlankton(i,iiC)
-        PI_Benc(i,:)  =   lcl_PhytoPlankton(BOTindices)
+        PI_Benc(:,i)  =   lcl_PhytoPlankton(BOTindices)
         lcl_PhytoPlankton => PhytoPlankton(i,iiN)
-        PI_Benn(i,:)  =   lcl_PhytoPlankton(BOTindices)
+        PI_Benn(:,i)  =   lcl_PhytoPlankton(BOTindices)
         lcl_PhytoPlankton => PhytoPlankton(i,iiP)
-        PI_Benp(i,:)  =   lcl_PhytoPlankton(BOTindices)
+        PI_Benp(:,i)  =   lcl_PhytoPlankton(BOTindices)
         j=ppPhytoPlankton(i,iiS)
         if ( j > 0 ) then
           lcl_PhytoPlankton => PhytoPlankton(i,iiS)
-          PI_Bens(i,:)  =   lcl_PhytoPlankton(BOTindices)
+          PI_Bens(:,i)  =   lcl_PhytoPlankton(BOTindices)
         else
-          PI_Bens(i,:)  =   0.0
+          PI_Bens(:,i)  =   0.0
         end if
 
   ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Set the  phytoplankton sinking vel. at the water  
   ! sediment interface 
   ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-      sediPPY_Ben(i,:)  =  sediPPY(i,BOTindices)
+      sediPPY_Ben(:,i)  =  sediPPY(BOTindices,i)
 #ifdef BFM_POM
       if(p_res(i).ne.ZERO) then 
          do l = 1, NO_BOXES_XY
-            if(sediPPY_Ben(i,l).gt.p_burvel_PI) sediPPY_Ben(i,l)=p_burvel_PI
+            if(sediPPY_Ben(l,i).gt.p_burvel_PI) sediPPY_Ben(l,i)=p_burvel_PI
          enddo
       endif
 #endif
@@ -118,14 +118,14 @@ use mem_Settling
            lcl_MicroZooPlankton => MicroZooPlankton(i,iiN)
            ZI_Fn(:)  =   ZI_Fn(:)+ lcl_MicroZooPlankton(BOTindices)
         else
-           ZI_Fn(:)  =   ZI_Fn(:)+ lcl_MicroZooPlankton(BOTindices)*qncMIZ(i,:)
+           ZI_Fn(:)  =   ZI_Fn(:)+ lcl_MicroZooPlankton(BOTindices)*qncMIZ(BOTindices,i)
         endif
         j = ppMicroZooPlankton(i,iiP)
         if ( j> 0) then
           lcl_MicroZooPlankton => MicroZooPlankton(i,iiP)
           ZI_Fp(:)  =   ZI_Fp(:)+ lcl_MicroZooPlankton(BOTindices)
         else
-          ZI_Fp(:)  =   ZI_Fp(:)+ lcl_MicroZooPlankton(BOTindices)*qpcMIZ(i,:)
+          ZI_Fp(:)  =   ZI_Fp(:)+ lcl_MicroZooPlankton(BOTindices)*qpcMIZ(BOTindices,i)
         endif
       enddo
 

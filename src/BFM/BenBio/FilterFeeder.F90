@@ -74,7 +74,7 @@
   real(RLEN),dimension(NO_BOXES_XY)  :: ePC
   real(RLEN),dimension(NO_BOXES_XY)  :: foodpm2
   real(RLEN),dimension(NO_BOXES_XY)  :: food
-  real(RLEN),dimension(iiPhytoPlankton,NO_BOXES_XY)  :: sfood_PI
+  real(RLEN),dimension(NO_BOXES_XY,iiPhytoPlankton)  :: sfood_PI
   real(RLEN),dimension(NO_BOXES_XY)  :: food_PT
   real(RLEN),dimension(NO_BOXES_XY)  :: sfood_ZI
   real(RLEN),dimension(NO_BOXES_XY)  :: sfood_RI
@@ -159,16 +159,16 @@
   ! For phytoplankton:
   food_PT=ZERO
   do i=1,iiPhytoPlankton
-     r =  MM( PI_Benc(i,:),  clu)
-     call CorrectConcNearBed(Depth_Ben(:), sediPPY_Ben(i,:), p_height, &
+     r =  MM( PI_Benc(:,i),  clu)
+     call CorrectConcNearBed(Depth_Ben(:), sediPPY_Ben(:,i), p_height, &
                                   p_max, p_vum*et*Y3c(:), corr)
 
 #ifdef BFM_POM
      corr=ONE
 #endif
 
-     sfood_PI(i,:)=corr*p_PI
-     food_PT(:)  =   food_PT(:)+ PI_Benc(i,:) * sfood_PI(i,:)
+     sfood_PI(:,i)=corr*p_PI
+     food_PT(:)  =   food_PT(:)+ PI_Benc(:,i) * sfood_PI(:,i)
   enddo
   food  =   food  + food_PT(:)
 
@@ -342,16 +342,16 @@
   rePIp  =   ZERO
 
   do i=1,iiPhytoPlankton
-    choice=sfood_PI(i,:)* fdepth
-    jPIY3c(i,:) =       PI_Benc(i,:)* sgu* choice
-    ruPIc  = ruPIc  +   PI_Benc(i,:)* sgu* choice
-    ruPIn  = ruPIn  +   PI_Benn(i,:)* sgu* choice
-    ruPIp  = ruPIp  +   PI_Benp(i,:)* sgu* choice
-    ruPIs  = ruPIs  +   PI_Bens(i,:)* sgu* choice
+    choice=sfood_PI(:,i)* fdepth
+    jPIY3c(:,i) =       PI_Benc(:,i)* sgu* choice
+    ruPIc  = ruPIc  +   PI_Benc(:,i)* sgu* choice
+    ruPIn  = ruPIn  +   PI_Benn(:,i)* sgu* choice
+    ruPIp  = ruPIp  +   PI_Benp(:,i)* sgu* choice
+    ruPIs  = ruPIs  +   PI_Bens(:,i)* sgu* choice
 
-    rePIc  = rePIc  +   PI_Benc(i,:)* se_uPI* choice
-    rePIn  = rePIn  +   PI_Benn(i,:)* se_uPI* choice*eNC
-    rePIp  = rePIp  +   PI_Benp(i,:)* se_uPI* choice*ePC
+    rePIc  = rePIc  +   PI_Benc(:,i)* se_uPI* choice
+    rePIn  = rePIn  +   PI_Benn(:,i)* se_uPI* choice*eNC
+    rePIp  = rePIp  +   PI_Benp(:,i)* se_uPI* choice*ePC
   enddo
 
   call flux_vector( iiBen, ppY3c,ppY3c, ruPIc )

@@ -114,9 +114,9 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   !  Copy  state var. object in local var
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  yc = D2STATE_BEN(ppyc,:)
-  yn = D2STATE_BEN(ppyn,:)
-  yp = D2STATE_BEN(ppyp,:)
+  yc = D2STATE_BEN(:,ppyc)
+  yn = D2STATE_BEN(:,ppyn)
+  yp = D2STATE_BEN(:,ppyp)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Physiological temperature and oxygen response

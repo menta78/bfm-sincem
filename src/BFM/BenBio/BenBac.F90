@@ -119,9 +119,9 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   !  Copy  state var. object in local var
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  hxc = D2STATE_BEN(pphxc,:)
-  hxn = D2STATE_BEN(pphxn,:)
-  hxp = D2STATE_BEN(pphxp,:)
+  hxc = D2STATE_BEN(:,pphxc)
+  hxn = D2STATE_BEN(:,pphxn)
+  hxp = D2STATE_BEN(:,pphxp)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Assign functional group-dependent parameters:
@@ -206,7 +206,7 @@
 
   call flux_vector( iiBen, ppQ6c,pphxc, ruQ6c )
   call flux_vector( iiBen, ppBenDetritus(p_iQ1(hx),iiC),pphxc, ruQ1c )
-  ruHI(hx,:)  =   ruQ1c
+  ruHI(:,hx)  =   ruQ1c
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Nutrient fluxes into bacteria from carbon fluxes
@@ -281,7 +281,7 @@
   call flux_vector( iiBen, pphxn,ppBenDetritus(p_iQ1(hx),iiN), hxn(:)* sm* p_pe_R1n )
   call flux_vector( iiBen, pphxp,ppBenDetritus(p_iQ1(hx),iiP), hxp(:)* sm* p_pe_R1p )
 
-  reHI(hx,:)  =  hxc(:)* sm* p_pe_R1c;
+  reHI(:,hx)  =  hxc(:)* sm* p_pe_R1c;
 
   call flux_vector( iiBen, pphxc,ppQ6c, rqt6c )
   call flux_vector( iiBen, pphxn,ppQ6n, rqt6n )
