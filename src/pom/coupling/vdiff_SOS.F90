@@ -148,8 +148,8 @@
 !
 !         -----LOAD BFM STATE VAR.-----
 !
-          fbio(:)  = D3STATE(m,:)
-          fbbio(:) = D3STATEB(m,:)
+          fbio(:)  = D3STATE(:,m)
+          fbbio(:) = D3STATEB(:,m)
 !
 !         -----ZEROING SINKING VELOCITY-----
 ! 
@@ -369,8 +369,8 @@
 !
      do n = 1, KB-1
 !
-      D3STATEB(m,n)=fbio(n)+0.5_RLEN*smoth*(ffbio(n)+ fbbio(n)-2.0_RLEN*fbio(n))
-      D3STATE(m,n)=ffbio(n)
+      D3STATEB(n,m)=fbio(n)+0.5_RLEN*smoth*(ffbio(n)+ fbbio(n)-2.0_RLEN*fbio(n))
+      D3STATE(n,m)=ffbio(n)
 !
      enddo
 !

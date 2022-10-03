@@ -101,12 +101,12 @@
 !    -----COMPUTE SOURCE/SINKS TREND-----
 !
      do n = 1, NO_D2_BOX_STATES_BEN
-        tempo(n) = tempo(n) + D2SOURCE_BEN(n,1)
+        tempo(n) = tempo(n) + D2SOURCE_BEN(1,n)
      end do 
 !
 !-----LEAP FROG INTEGRATION-----
 !
-     tempo=D2STATEB_BEN(:,1)+(tempo*dti2)
+     tempo=D2STATEB_BEN(1,:)+(tempo*dti2)
 !         
 !    -----CLIPPING (IF NEEDED....)-----
 !
@@ -118,18 +118,18 @@
 !
 !    -----ASSELIN FILTER-----
 !
-     D2STATE_BEN(:,1)=D2STATE_BEN(:,1)          + &
+     D2STATE_BEN(1,:)=D2STATE_BEN(1,:)          + &
                       0.5_RLEN*smoth            * &
                       (                           &
                        tempo(:)                 + &
-                       D2STATEB_BEN(:,1)        - &
-                       2.0_RLEN*D2STATE_BEN(:,1)  &
+                       D2STATEB_BEN(1,:)        - &
+                       2.0_RLEN*D2STATE_BEN(1,:)  &
                       )
 !
 !    -----RESTORE TIME SEQUENCE-----
 !
-     D2STATEB_BEN(:,1)=D2STATE_BEN(:,1)
-     D2STATE_BEN(:,1)=tempo(:)
+     D2STATEB_BEN(1,:)=D2STATE_BEN(1,:)
+     D2STATE_BEN(1,:)=tempo(:)
 !
     return
 !

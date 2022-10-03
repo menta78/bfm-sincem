@@ -288,13 +288,13 @@
 !  *******************************************************************
 !  *******************************************************************
 !
-   allocate(D3STATEB(NO_D3_BOX_STATES,NO_BOXES)) !PELAGIC
+   allocate(D3STATEB(NO_BOXES,NO_D3_BOX_STATES)) !PELAGIC
 !
 !  -----ZEROING-----
 !
    D3STATEB = ZERO
 !
-   allocate(D2STATEB_BEN(NO_D2_BOX_STATES_BEN,NO_BOXES_XY)) ! BENTHIC
+   allocate(D2STATEB_BEN(NO_BOXES_XY,NO_D2_BOX_STATES_BEN)) ! BENTHIC
 !
 !  -----ZEROING-----
 !
