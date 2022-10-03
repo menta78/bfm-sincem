@@ -24,6 +24,8 @@ package process_memLayout;
 
 use strict;
 use warnings;
+use experimental 'smartmatch';
+
 use Exporter;
 use Data::Dumper;
 

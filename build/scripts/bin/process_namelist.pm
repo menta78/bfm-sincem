@@ -59,7 +59,7 @@ sub getGroupComponents{
     foreach my $group_name (keys %$groups_ref){
         if( $$groups_ref{$group_name}->getAcro() eq $group_acro ){ 
             #calculate the number of elements belong to this group
-            foreach my $param ( sort { $$params_ref{$a}->getIndex() cmp $$params_ref{$b}->getIndex() } keys %$params_ref ){
+            foreach my $param ( sort { $$params_ref{$a}->getIndex() <=> $$params_ref{$b}->getIndex() } keys %$params_ref ){
                 my $prm_grp_name = $$params_ref{$param}->getGroup();
                 if( $prm_grp_name && $prm_grp_name eq $group_name ){
                   push( @components, $param );  
@@ -213,7 +213,7 @@ sub check_namelists{
                 my $list_name = $list->name;
                 #check all the parameters which are part of this group
                 my @params_grp = ();
-                foreach my $param ( sort { $$params_ref{$a}->getIndex() cmp $$params_ref{$b}->getIndex() } keys %$params_ref ){
+                foreach my $param ( sort { $$params_ref{$a}->getIndex() <=> $$params_ref{$b}->getIndex() } keys %$params_ref ){
                     my $prm_grp_name = $$params_ref{$param}->getGroup();
                     if( $prm_grp_name && $prm_grp_name eq $grp_name ){
                         push ( @params_grp, $param );
