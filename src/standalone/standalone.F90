@@ -382,9 +382,6 @@
    use mem
    use api_bfm, only: out_delta, save_delta , time_delta, update_save_delta
    use global_mem, only: RLEN, bfm_lwp, LOGUNIT
-#ifdef DEBUG
-   use api_bfm, only: printDEBUG
-#endif
    use time
 
    IMPLICIT NONE
@@ -492,6 +489,32 @@
    STDERR 'BFM standalone finished on  ',datestr,' ',timestr
 
    end subroutine end_standalone
+
+!-----------------------------------------------------------------------
+
+   subroutine printDEBUG( ntime )
+!
+! DESCRIPTION
+!   Print debug information
+!
+! USES
+     use mem, only: D3STATE
+     use global_mem, only: RLEN,LOGUNIT
+     use api_bfm, only: stPelStateS , stPelStateE, var_names
+
+     implicit none
+     integer, intent(IN) :: ntime
+     integer :: idx, idx_tmp
+
+     write(LOGUNIT,*)
+     write(LOGUNIT,*) 'D3STATE: (', ntime, ')'
+     do idx = stPelStateS , stPelStateE
+        idx_tmp=idx-stPelStateS+1
+        write(LOGUNIT,*) "  ", trim(var_names(idx)), "= ", D3STATE(:,idx_tmp)
+     end do
+     write(LOGUNIT,*)
+
+   end subroutine  printDEBUG
 
    END MODULE standalone
 

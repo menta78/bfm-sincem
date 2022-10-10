@@ -35,7 +35,7 @@
 
 !
 ! !PUBLIC MEMBER FUNCTIONS:
-   public init_bfm, find, update_save_delta, printDEBUG, GetLun
+   public init_bfm, find, update_save_delta, GetLun
 !
 ! !PUBLIC DATA MEMBERS:
    logical                            :: bio_calc,bioshade_feedback,bfm_rstctl
@@ -644,31 +644,6 @@ contains
       return
       stop "There are no free Fortran logical units available."
  end function GetLun
-
-!-----------------------------------------------------------------------
-
-   subroutine printDEBUG( ntime )
-!
-! DESCRIPTION
-!   Print debug information
-!
-! USES
-     use mem, only: D3STATE
-     use global_mem, only: RLEN,LOGUNIT
-
-     implicit none
-     integer, intent(IN) :: ntime
-     integer :: idx, idx_tmp
-
-     write(LOGUNIT,*)
-     write(LOGUNIT,*) 'D3STATE: (', ntime, ')'
-     do idx = stPelStateS , stPelStateE
-        idx_tmp=idx-stPelStateS+1
-        write(LOGUNIT,*) "  ", trim(var_names(idx)), "= ", D3STATE(:,idx_tmp)
-     end do
-     write(LOGUNIT,*)
-
-   end subroutine  printDEBUG
 
 !-----------------------------------------------------------------------
 
