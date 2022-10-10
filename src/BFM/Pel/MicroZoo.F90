@@ -257,7 +257,7 @@
   ! Organic Nitrogen dynamics
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   rrin = rugn*p_pu_ea(zoo) + rdc*qncMIZ(:,zoo)
-  rr1n = rrin*p_pe_R1c
+  rr1n = rrin*p_pe_R1n
   rr6n = rrin - rr1n
   call quota_flux(iiPel, ppzoon, ppzoon, ppR1n, rr1n, tfluxN)
   call quota_flux(iiPel, ppzoon, ppzoon, ppR6n, rr6n, tfluxN)
@@ -266,7 +266,7 @@
   ! Organic Phosphorus dynamics
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   rrip = rugp*p_pu_ea(zoo) + rdc*qpcMIZ(:,zoo)
-  rr1p = rrip*p_pe_R1c
+  rr1p = rrip*p_pe_R1p
   rr6p = rrip - rr1p
   call quota_flux(iiPel, ppzoop, ppzoop, ppR1p, rr1p, tfluxP)
   call quota_flux(iiPel, ppzoop, ppzoop, ppR6p, rr6p, tfluxP)
