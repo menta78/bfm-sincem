@@ -55,7 +55,7 @@ ERROR_MSG="Execute $0 -h for help if you don't know what is going wrong. PLEASE 
 
 #----------------- USER CONFIGURATION DEFAULT VALUES -----------------
 DEBUG="";
-BFMDIR_DEFAULT="${PWD}/.."
+BFMDIR_DEFAULT="$(dirname "${PWD}")"
 MODE="STANDALONE"
 CPPDEFS="BFM_STANDALONE INCLUDE_PELCO2 INCLUDE_DIAG"
 PRESET="STANDALONE"
@@ -63,7 +63,7 @@ ARCH="gfortran.inc"
 PROC=8
 PROC_CMP=8
 EXP="EXP00"
-QUEUE="poe_short"
+QUEUE="p_short"
 BFMEXE="bfm_standalone.x"
 CLEAN=1
 NETCDF_DEFAULT="/usr"
