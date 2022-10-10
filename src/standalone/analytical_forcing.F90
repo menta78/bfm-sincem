@@ -64,7 +64,6 @@ subroutine analytical_forcing
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    real(RLEN)          :: dfrac,wlight,dtime
    integer             :: dyear
-   real(RLEN),external :: GetDelta
    real(RLEN)          :: biodelta
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 

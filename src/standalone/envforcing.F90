@@ -34,7 +34,7 @@
    private
 !
 ! !PUBLIC MEMBER FUNCTIONS:
-   public daylength, temperature, salinity, lightAtTime
+   public daylength, temperature, salinity, lightAtTime, GetDelta
    public instLight, light, wind, deposition, density
    public read_obs
 ! !PUBLIC DATA MEMBERS:
@@ -72,6 +72,30 @@
 !
 
    contains
+
+!-----------------------------------------------------------------------
+
+   FUNCTION GetDelta() result(Delta)
+!
+! DESCRIPTION
+!  Transfer the integration time step to the BFM
+!  Unit conversion from seconds to days
+!
+! USES
+   use constants, only: RLEN, SEC_PER_DAY
+   use time,      only: timestep
+
+   IMPLICIT NONE
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+   real(RLEN) :: Delta
+
+   Delta = timestep/SEC_PER_DAY
+
+   return
+
+   END FUNCTION GetDelta
 
 !-----------------------------------------------------------------------
 
