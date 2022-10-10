@@ -152,7 +152,7 @@
           ERHO(SRFindices), EWIND, EICE, CO2(SRFindices) )
 
   jsurO3c(:) = jsurO3c(:) + CO2airflux(:) * MW_C
-  xflux(SRFindices) = jsurO3c(:) / Depth(SRFindices) * CO2fluxfac
+  xflux(SRFindices) = jsurO3c(:) / Depth(SRFindices)
   if ( AssignAirPelFluxesInBFMFlag)  call flux_vector( iiPel, ppO3c,ppO3c, xflux )
 
   end subroutine PelagicCSYS

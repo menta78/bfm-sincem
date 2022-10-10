@@ -293,7 +293,6 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
 ! AtmCO20          [ppmv]           Initial atmospheric concentration of CO2
 ! MaxIterPHsolver  integer          Maximum number of iterations for SolveSAPHE (default 50)
 ! CalcBioAlk       logical          Compute biological processes corrections on total alkalinity
-! Co2fluxfac        real            Multiplier to enhance air-sea co2 exchange rate
 !              ---------  Parameters for calcium and calcite ---------
 ! p_kdca          [d-1]           Calcite dissolution rate constant
 ! p_nomega        [-]             Order of the dissolution rate dependence on Omega
@@ -319,7 +318,6 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
     CalcBioAlk      =  .FALSE.
     p_kdca          =  10.9
     p_nomega        =  1
-    Co2fluxfac      = 1.0
     AtmCO2_N        =  0         'CMIP6_Historical_GHG_1765_2014.dat'  .FALSE.  'CO2'     '1765-01-01 00:00'  'yearly'  .TRUE.
     AtmSLP_N        =  0         'AtmSLP.nc'                           .TRUE.   'AtmSLP'  '1764-07-01 00:00'  'dummy'   .TRUE.
 	filename_nml_conf = 'Carbonate_Dynamics.nml',

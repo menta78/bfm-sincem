@@ -48,7 +48,6 @@
   ! AtmCO20         [ppmv]           Initial atmospheric concentration of CO2
   ! calcAtmpCO2     logical          Compute the partial pressure of Atmospheric CO2
   ! CalcBioAlk      logical          Compute biological processes corrections on total alkalinity
-  ! CO2fluxfac      real             Multipling factor for CO2 flux to accelerate air-sea exchange
   !              ---------  SolveSAPHE parameters  -----------
   ! MaxIterPHsolver integer          Maximum number of iterations (default 50)
   !              ---------  Parameters for calcium and calcite ---------
@@ -75,7 +74,6 @@
    real(RLEN)           :: p_kdca
    integer              :: p_nomega
    logical              :: CalcBioAlk = .FALSE.
-   real(RLEN)           :: Co2fluxfac = 1.0_RLEN
    type(ForcingName)    :: AtmCO2_N, AtmSLP_N
    type(ForcingField)   :: AtmCO2, AtmSLP
    ! ancillary
@@ -99,7 +97,7 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     namelist /CSYS_parameters/ AtmCO20, MaxIterPHsolver,         &
                             p_kdca, p_nomega,                  &
-                            AtmCO2_N, AtmSLP_N, CalcBioAlk, Co2fluxfac
+                            AtmCO2_N, AtmSLP_N, CalcBioAlk
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   integer            ::error=0
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
