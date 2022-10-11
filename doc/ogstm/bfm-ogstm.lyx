@@ -1,7 +1,9 @@
-#LyX 2.1 created this file. For more info see http://www.lyx.org/
-\lyxformat 474
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
 \begin_document
 \begin_header
+\save_transient_properties true
+\origin unavailable
 \textclass scrbook
 \begin_preamble
 \usepackage{listings}
@@ -48,16 +50,18 @@ eqs-within-sections
 \language_package default
 \inputencoding auto
 \fontencoding global
-\font_roman times
-\font_sans helvet
-\font_typewriter courier
-\font_math auto
+\font_roman "times" "default"
+\font_sans "helvet" "default"
+\font_typewriter "courier" "default"
+\font_math "auto" "auto"
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
-\font_sf_scale 100
-\font_tt_scale 100
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -87,6 +91,7 @@ eqs-within-sections
 \suppress_date true
 \justification true
 \use_refstyle 0
+\use_minted 0
 \index Index
 \shortcut idx
 \color #008000
@@ -99,7 +104,10 @@ eqs-within-sections
 \tocdepth 3
 \paragraph_separation indent
 \paragraph_indentation default
-\quotes_language english
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
 \papercolumns 2
 \papersides 2
 \paperpagestyle headings
@@ -133,14 +141,18 @@ begin{titlepage}
 \end_inset
 
 
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
 \align center
 \begin_inset Graphics
-	filename Figures/all_logos.png
-	lyxscale 25
-	scale 50
+	filename /Users/lovato/GIT/bfm-release/doc/logos/BFM-Consortium_members.png
+	lyxscale 15
+	scale 40
 
 \end_inset
 
@@ -225,12 +237,12 @@ P.
 
 \begin_layout Standard
 \align center
-DRAFT REVISION Release 1.0, March 2016
+Release 2.0, October 2022
 \begin_inset Newline newline
 \end_inset
 
------ BFM Report series N.
- 3 -----
+—– BFM Report series N.
+ 3 —–
 \begin_inset Newline newline
 \end_inset
 
@@ -248,7 +260,7 @@ http://bfm-community.eu
 \begin_inset Newline newline
 \end_inset
 
-info@bfm-community.eu
+bfm_st@cmcc.it
 \end_layout
 
 \begin_layout Standard
@@ -276,8 +288,8 @@ height "1pt"
 
 
 \begin_inset Graphics
-	filename Figures/BFM-gray.png
-	lyxscale 10
+	filename /Users/lovato/GIT/bfm-release/doc/logos/BFM_Full_logo.png
+	lyxscale 40
 	width 50text%
 
 \end_inset
@@ -314,9 +326,9 @@ This document should be cited as:
 \end_inset
 
 Lazzari, P., Bolzon, G.
- (2016) Coupling BFM with OGSTM model Release 1.0; BFM Report series N.
+ (2022) Coupling BFM with OGSTM model Release 2.0; BFM Report series N.
  3.
- March 2016, Trieste, Italy, http://bfm-community.eu
+ October 2022, Trieste, Italy, http://bfm-community.eu
 \end_layout
 
 \begin_layout Address
@@ -325,7 +337,7 @@ Lazzari, P., Bolzon, G.
 \begin_inset VSpace 13cm
 \end_inset
 
-Copyright 2016, The BFM System Team.
+Copyright 2022, The BFM System Team.
  This work is licensed under the Creative Commons Attribution-Noncommercial-No
  Derivative Works 2.5 License.
  To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-
@@ -1113,6 +1125,7 @@ This file contains the list of state variables and diagnostics defined in
 \begin_inset CommandInset citation
 LatexCommand citep
 key "BFM-manual"
+literal "true"
 
 \end_inset
 
@@ -1131,6 +1144,7 @@ This file contains all the parameters that characterize the biogeochemical
 \begin_inset CommandInset citation
 LatexCommand citep
 key "BFM-manual"
+literal "true"
 
 \end_inset
 
@@ -1882,7 +1896,7 @@ twocolumn
 \begin_layout Standard
 \begin_inset CommandInset bibtex
 LatexCommand bibtex
-bibfiles "bfm-nemo-references"
+bibfiles "bfm-ogstm-references"
 options "bibtotoc,elsart-harv"
 
 \end_inset
