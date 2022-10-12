@@ -49,10 +49,6 @@ subroutine set_var_info_bfm
 ! bottom
 !
 %pel-field-string bottom
-!
-! river
-!
-%pel-field-string river
 
 #ifdef INCLUDE_SEAICE
 !
@@ -82,7 +78,6 @@ subroutine set_var_info_bfm
 %2d-diagnos-pel-string-index
 %pel-string-index-field surface
 %pel-string-index-field bottom
-%pel-string-index-field river
 
 
 #ifdef INCLUDE_SEAICE

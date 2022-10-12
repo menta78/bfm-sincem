@@ -82,7 +82,6 @@
 
         real(RLEN),public,pointer,dimension(:,:) :: %pel-field-array surface
         real(RLEN),public,pointer,dimension(:,:) :: %pel-field-array bottom
-        real(RLEN),public,pointer,dimension(:,:) :: %pel-field-array river
 
         real(RLEN),public,pointer,dimension(:,:) :: D3DIAGNOS
         real(RLEN),public,pointer,dimension(:,:) :: D2DIAGNOS
@@ -328,7 +327,6 @@
 
         real(RLEN),public,dimension(:),pointer  :: %pel-field-pointer surface
         real(RLEN),public,dimension(:),pointer  :: %pel-field-pointer bottom
-        real(RLEN),public,dimension(:),pointer  :: %pel-field-pointer river
 
         !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
         !  Other 3d-Global Variables 

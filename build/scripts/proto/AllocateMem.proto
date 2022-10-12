@@ -105,7 +105,6 @@
 
 %pel-alloc-pointer-field surface
 %pel-alloc-pointer-field bottom
-%pel-alloc-pointer-field river
 
 %3d-variable-pel-alloc
 %2d-variable-pel-alloc
