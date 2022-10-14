@@ -1451,7 +1451,7 @@ status open
 \noindent
 \align center
 \begin_inset Graphics
-	filename ../manual/Figures/memory-variable-mapping.eps
+	filename Figures/memory-variable-mapping.eps
 	scale 80
 
 \end_inset

@@ -150,7 +150,7 @@ begin{titlepage}
 \begin_layout Standard
 \align center
 \begin_inset Graphics
-	filename /Users/lovato/GIT/bfm-release/doc/logos/BFM-Consortium_members.png
+	filename ../logos/BFM-Consortium_members.png
 	lyxscale 15
 	scale 40
 
@@ -288,7 +288,7 @@ height "1pt"
 
 
 \begin_inset Graphics
-	filename /Users/lovato/GIT/bfm-release/doc/logos/BFM_Full_logo.png
+	filename ../logos/BFM_Full_logo.png
 	lyxscale 40
 	width 50text%
 
