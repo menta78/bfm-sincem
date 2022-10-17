@@ -28852,7 +28852,7 @@ status open
 \noindent
 \align center
 \begin_inset Graphics
-	filename Figures/memory-variable-mapping.eps
+	filename Figures/memory-variable-mapping.png
 	scale 80
 
 \end_inset
