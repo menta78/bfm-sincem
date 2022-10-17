@@ -365,7 +365,7 @@ Lovato T., and Butenschön M.
  Modelling of the Ocean).
  BFM Report series N.
  2, Release 2.0, October 2022, Bologna, Italy, http://bfm-community.eu, pp.
- 31
+ 32
 \end_layout
 
 \begin_layout Address
@@ -789,9 +789,9 @@ NEMO contains an interface for the computation of biogeochemical tracers
 \emph on
 Traceurs Oceanographique Passives
 \emph default
-) which is widely described in 
+) which is described in the reference manual 
 \begin_inset CommandInset citation
-LatexCommand citep
+LatexCommand citet
 key "nemo_top_1471700"
 literal "false"
 
@@ -813,7 +813,7 @@ The BFM has been integrated in this framework with the addition of a seamless
  Sect.
  2.4.5 of 
 \begin_inset CommandInset citation
-LatexCommand citet
+LatexCommand citealp
 key "nemo_top_1471700"
 literal "false"
 
@@ -850,8 +850,367 @@ key_my_trc
 \family default
  and the BFM is plugged into the NEMO flow chart during the initialization
  and stepping phases.
- It important to make clear that BFM still uses its own libraries for diagnostic
+ It important to underline that BFM uses the TOP infrastructure to produce
  output and restart files.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Code flow chart
+\end_layout
+
+\begin_layout Standard
+In the present implementation, the BFM memory is allocated as a one dimensional
+ array corresponding to the vertical water column and the biogeochemical
+ computations are iterated over the horizonal dimensions of the 3D domain,
+ namely along 
+\family typewriter
+X
+\family default
+ and 
+\family typewriter
+Y
+\family default
+ (see Fig.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Remapping"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+).
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+placement ph
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\noindent
+\align center
+\begin_inset Graphics
+	filename ../manual/Figures/memory-variable-mapping.png
+	scale 60
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Remapping"
+
+\end_inset
+
+Layout of the main memory array for the pelagic variables and schematic
+ of the remapping into the NEMO three-dimensional ocean grid for transport
+ processes (see BFM core manual for a description of the code naming).
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Standard
+The flow of information between NEMO and the BFM is presented using workflow
+ diagrams that show the main caller of the function of interest and the
+ tree of calls.
+ By convention, the routines of NEMO are indicated with blue boxes while
+ the BFM routines are in green.
+ Routines indicated with red boxes originally belong to NEMO TOP interface
+ but are substituted by the ones provided in the BFM directory (
+\family typewriter
+$BFMDIR/src/nemo
+\family default
+).
+ The coupling structure uses as a base the modules and subroutines of TOP
+ generalized coupling interface MY_TRC.
+\end_layout
+
+\begin_layout Standard
+A scheme of the NEMO initialization of passive tracers is shown in Fig.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:workflow_init"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, where a specific routine was designed to handle the setup ot the TOP interface
+ with BFM state variables, diagnostics and grid structure (
+\family typewriter
+trc_nam_bfm).
+ 
+\family default
+In this function, the information on the state variables initialization
+ and boundary conditions defined in the namelist 
+\family typewriter
+bfm_init_nml
+\family default
+ (read by 
+\family typewriter
+init_var_bfm
+\family default
+) are used to fill the TOP data structures of passive tracers 
+\family typewriter
+sn_tracer
+\family default
+.
+ Subsequently the initial state of tracers is filled with uniform or analytical
+ vertical profiles in 
+\family typewriter
+trc_init_my_trc
+\family default
+ while 3D field form external input files are read in 
+\family typewriter
+trc_dta_ini
+\family default
+ according to input of namelist 
+\family typewriter
+namtrc_dta
+\family default
+ contained in 
+\family typewriter
+namelist_top_cfg
+\family default
+.
+ If needed restart conditions are then read overriding previous settings
+ and the boundary forcing are initialized.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename Figures/workflow_init.png
+	lyxscale 80
+	scale 80
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:workflow_init"
+
+\end_inset
+
+Workflow of the model initialization within TOP using the MY_TRC routines.
+ In 
+\family typewriter
+$BFMDIR/src/nemo
+\family default
+ are contained the files 
+\family typewriter
+trc_nam.F90
+\family default
+, 
+\family typewriter
+trcnam_bfm.F90
+\family default
+, 
+\family typewriter
+trcini_my_trc.F90
+\family default
+, and 
+\family typewriter
+trcrst.F90
+\family default
+.
+ 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The time marching computation in NEMO are performed in the 
+\family typewriter
+stp
+\family default
+ routine and the passive tracers are specifically addressed in 
+\family typewriter
+trc_stp
+\family default
+ of TOP interface (see Fig.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:workflow_step"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+).
+ The computation of biogeochemical rates is carried out in 
+\family typewriter
+trc_sms_my_trc
+\family default
+, with the computation of relevant biogeochemical forcings (
+\family typewriter
+trc_sms_my_trc
+\family default
+) and the subsequent solution of the BFM core processes.
+ The loop over X and Y gridpoints wraps the subroutines 
+\family typewriter
+environmental_conditions 
+\family default
+and 
+\family typewriter
+execute_bfm
+\family default
+ involved in the extraction of both physical and biogeochemical quantities
+ along the vertical water column of the 3D domain, the integration of BFM
+ equations (
+\family typewriter
+EcologyDynamics
+\family default
+), and the transfer of computed tendencies back in the main TOP arrays (the
+ same procedure appliea to diagnostic fields).
+ Finally, the tendency of the pelagic state variables undergoing to vertical
+ sinking is updated (
+\family typewriter
+trc_set
+\family default
+).
+ The transport of BFM state variables is operated by 
+\family typewriter
+trc_trp
+\family default
+ with the advection scheme defined in 
+\family typewriter
+namelist_top_cfg
+\family default
+, while the lateral diffusion is the same used for NEMO active tracers.
+ The data output (
+\family typewriter
+trc_wri_my_trc
+\family default
+) and restart file creation (
+\family typewriter
+trc_rst_write
+\family default
+) where adatapted to handle the specific structure of each component of
+ the BFM (pelagic, benthic, and seaice).
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename Figures/workflow_step.png
+	lyxscale 80
+	width 70page%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:workflow_step"
+
+\end_inset
+
+Workflow of the model time marching sequence within TOP interface.
+ In 
+\family typewriter
+$BFMDIR/src/nemo
+\family default
+ are contained the files 
+\family typewriter
+trc_sms_my_trc.F90
+\family default
+, 
+\family typewriter
+trcset.F90
+\family default
+, 
+\family typewriter
+trc_wri_my_trc.F90
+\family default
+, and 
+\family typewriter
+trc_rst.F90
+\family default
+.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section
@@ -870,9 +1229,100 @@ literal "false"
 
 , but when run in coupled configuration there are some additional parameters
  derived from the NEMO TOP namelist that must be adjusted.
- Particularly, this occurs for the prescription of initial and boundary
- conditions because both rely on the NEMO facilities for reading and interpolati
-ng external files.
+ 
+\end_layout
+
+\begin_layout Standard
+Since NEMO v4+, the setup of passive tracer interface occurs completely
+ trough the namelist 
+\family typewriter
+namtrc
+\family default
+, but only a minimal setting is here necessary to activate the MY_TRC submodule
+ (see the following example) and most of the parameters are then internally
+ re-defined using BFM settings when calling 
+\family typewriter
+trc_nam_bfm
+\family default
+ (see Fig.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:workflow_init"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+)
+\begin_inset listings
+lstparams "basicstyle={\tiny\ttfamily},breaklines=true,language=Fortran"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+!-------------------------------------------------------------------------!
+\end_layout
+
+\begin_layout Plain Layout
+
+!NAMELIST namtrc          !   tracers definition
+\end_layout
+
+\begin_layout Plain Layout
+
+!-------------------------------------------------------------------------!
+\end_layout
+
+\begin_layout Plain Layout
+
+&namtrc     
+\end_layout
+
+\begin_layout Plain Layout
+
+   jp_bgc        =  1          !  Number of passive tracers of the BGC model
+\end_layout
+
+\begin_layout Plain Layout
+
+   ln_my_trc     =  .true.
+     !  Run MY_TRC BGC model
+\end_layout
+
+\begin_layout Plain Layout
+
+!
+\end_layout
+
+\begin_layout Plain Layout
+
+!                !    name   !           title of the field            !
+   units    ! initial data from file or not !
+\end_layout
+
+\begin_layout Plain Layout
+
+   sn_tracer(1)   = 'DUMMY   ' , 'Dummy tracer      '                 ,
+  'dummy-units' ,  .false.
+\end_layout
+
+\begin_layout Plain Layout
+
+/
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Particularly, this occurs for the prescription of initial and boundary condition
+s because both rely on the NEMO facilities for reading and interpolating
+ external files.
  The file 
 \family typewriter
 namelist_top_cfg
@@ -1028,7 +1478,11 @@ reference "sec:Configuring-BFM-NEMO"
 \begin_layout Standard
 In addition to this part that is common to other biogeochemical models in
  the TOP interface, the BFM allows to choose the specific mode of initialization
- for each variable in the namelist bfm_init_nml.
+ for each variable in the namelist 
+\family typewriter
+bfm_init_nml
+\family default
+.
  This is the same namelist used for the STANDALONE model as described in
  BFM core manual (chap.
  5), but when coupled with NEMO it also allows to specify if each variable
@@ -1365,27 +1819,6 @@ status open
 
 \begin_layout Plain Layout
 
-! AggregateSink  logic   use aggregation = true to enhance the sink rate
-\end_layout
-
-\begin_layout Plain Layout
-
-!                        below a certain depth and bypass the prescribed
- 
-\end_layout
-
-\begin_layout Plain Layout
-
-!                        sinking
-\end_layout
-
-\begin_layout Plain Layout
-
-! depth_factor    [m]    depth factor for aggregation method
-\end_layout
-
-\begin_layout Plain Layout
-
 !-------------------------------------------------------------------------!
 \end_layout
 
@@ -1406,446 +1839,7 @@ status open
 
 \begin_layout Plain Layout
 
-  AggregateSink  = .FALSE.
-\end_layout
-
-\begin_layout Plain Layout
-
-  depth_factor   = 2000.0
-\end_layout
-
-\begin_layout Plain Layout
-
 /
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The coupling with NEMO adds three parameters that allow to parameterize
- the change in the sinking rate at depth.
- Below a certain depth, it is assumed that aggregation takes place.
- This is parametrized either by imposing the sinking rate of detritus to
- phytoplankton concentration below a fixed depth 
-\family typewriter
-KSINK_rPPy
-\family default
- (in meters), or by activating the enhancement of background velocity also
- found in the PISCES model of NEMO (
-\family typewriter
-AggregateSink = .TRUE.
-\family default
-).
-\end_layout
-
-\begin_layout Standard
-\begin_inset Float figure
-wide true
-sideways false
-status open
-
-\begin_layout Plain Layout
-\noindent
-\align center
-\begin_inset Graphics
-	filename Figures/memory-variable-mapping.eps
-	scale 80
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Caption Standard
-
-\begin_layout Plain Layout
-\begin_inset CommandInset label
-LatexCommand label
-name "fig:Remapping"
-
-\end_inset
-
-Layout of the main memory array for the pelagic variables and schematic
- of the remapping into the NEMO three-dimensional ocean grid for transport
- processes (see BFM core manual for a description of the code naming).
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Section
-The flow chart
-\end_layout
-
-\begin_layout Standard
-The BFM is zero-dimensional by construction and defined only in the ocean
- points.
- This implies that the BFM memory is one dimensional, with all the land
- points stripped out from the 3D domain and the remapping into the ocean
- grid is done only when dealing with transport processes (as shown in Fig.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:Remapping"
-
-\end_inset
-
- taken from the BFM manual).
- 
-\end_layout
-
-\begin_layout Standard
-The flow of information between NEMO and the BFM is presented using 
-\begin_inset Quotes eld
-\end_inset
-
-butterfly
-\begin_inset Quotes erd
-\end_inset
-
- graphs that show the main caller of the function of interest and the tree
- of calls.
- By convention, the routines of NEMO are indicated with blue boxes while
- the BFM routines are in green.
- Routines indicated with red boxes originally belong to NEMO TOP_SRC but
- are substituted by the ones provided in the BFM directory (
-\family typewriter
-$BFMDIR/src/nemo
-\family default
-).
-\end_layout
-
-\begin_layout Standard
-A scheme of the NEMO initialization of passive tracers is shown in Fig.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:NEMO_init_tracers"
-
-\end_inset
-
-, where a specific routine was designed to handle the information flow toward
- BFM (
-\family typewriter
-trc_ini_bfm).
- 
-\family default
-The initialization of BFM (Fig.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:BFM_init_in_NEMO"
-
-\end_inset
-
-) in the coupling is different from the STANDALONE configuration, because
- it includes also the transfer of grid parameters from NEMO and the reading
- of three-dimensional field data of initial conditions (see Sec.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Boundary-conditions-TOP"
-
-\end_inset
-
-).
- 
-\end_layout
-
-\begin_layout Standard
-The time marching computation in NEMO are performed in the 
-\family typewriter
-stp
-\family default
- routine (Fig.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:BFM-NEMO_Stepping"
-
-\end_inset
-
-) and the passive tracers are specifically addressed in 
-\family typewriter
-trc_stp
-\family default
-.
- A modified version of the latter subroutine was created to include three
- different routines for the solution of BFM core processes (
-\family typewriter
-trc_bfm
-\family default
-), the advection and diffusion of state variables (
-\family typewriter
-trc_trp_bfm
-\family default
-), and the computation of output data (
-\family typewriter
-trc_dia_bfm
-\family default
-).
- In particular, the 
-\family typewriter
-trc_bfm
-\family default
- routine includes the retrieval of environmental conditions from NEMO (
-\family typewriter
-envforcing_bfm
-\family default
-), like e.g., temperature, salinity, light, and the computation of BFM biogeochemi
-cal processes (
-\family typewriter
-EcologyDynamics
-\family default
-).
-\end_layout
-
-\begin_layout Standard
-The transport of BFM state variables is operated by 
-\family typewriter
-trc_trp_bfm
-\family default
- subroutine (Fig.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:BFM-NEMO_transport"
-
-\end_inset
-
-), which is derived from the general one of NEMO for passive tracers (namely,
- 
-\family typewriter
-trc_trp
-\family default
-).
- In fact, this subroutine also handles the application of external boundary
- conditions (
-\family typewriter
-trc_bc_bfm
-\family default
-), vertical sinking (
-\family typewriter
-trc_set_bfm
-\family default
-) and it prepares the model variables to perform the Euler Forward integration
- (
-\family typewriter
-trc_nxt_bfm
-\family default
-).
- 
-\end_layout
-
-\begin_layout Standard
-.
- 
-\end_layout
-
-\begin_layout Standard
-\begin_inset Float figure
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-\align center
-\begin_inset Graphics
-	filename Figures/trc_init.png
-	width 60page%
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Caption Standard
-
-\begin_layout Plain Layout
-\begin_inset CommandInset label
-LatexCommand label
-name "fig:NEMO_init_tracers"
-
-\end_inset
-
-Graph of the initialization routine for passive tracers.
- This routine is not the default TOP routine but it is substituted by the
- version contained in 
-\family typewriter
-$BFMDIR/src/nemo
-\family default
- that contains the call to the BFM routine 
-\family typewriter
-trc_ini_bfm
-\family default
-.
- 
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset Float figure
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-\align center
-\begin_inset Graphics
-	filename Figures/trc_ini_bfm.png
-	width 60page%
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Caption Standard
-
-\begin_layout Plain Layout
-\begin_inset CommandInset label
-LatexCommand label
-name "fig:BFM_init_in_NEMO"
-
-\end_inset
-
-Butterfly graph of the BFM initialization within NEMO.
- 
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset Float figure
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-\align center
-\begin_inset Graphics
-	filename Figures/trc_stp.png
-	width 60page%
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Caption Standard
-
-\begin_layout Plain Layout
-\begin_inset CommandInset label
-LatexCommand label
-name "fig:BFM-NEMO_Stepping"
-
-\end_inset
-
-Graph of the stepping routine 
-\family typewriter
-trc_stp
-\family default
- for passive tracers.
- This routine is not the default TOP routine but it is substituted by the
- version contained in 
-\family typewriter
-$BFMDIR/src/nemo
-\family default
- that contains the calls to the BFM routines
-\family typewriter
- trc_bfm
-\family default
-, 
-\family typewriter
-trc_trp_bfm
-\family default
- and 
-\family typewriter
-trc_dia_bfm
-\family default
-.
- 
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset Float figure
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-\align center
-\begin_inset Graphics
-	filename Figures/trc_trp_bfm.png
-	width 60page%
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Caption Standard
-
-\begin_layout Plain Layout
-\begin_inset CommandInset label
-LatexCommand label
-name "fig:BFM-NEMO_transport"
-
-\end_inset
-
-Call graph of the transport routine 
-\family typewriter
-trc_trp_bfm
-\family default
- for BFM tracers.
- 
-\end_layout
-
-\end_inset
-
-
 \end_layout
 
 \end_inset
@@ -2197,14 +2191,15 @@ ln_qsr_2bd=.true.
 \end_layout
 
 \begin_layout Standard
-In both of the cases above the BFM is not coupled to NEMO, that is the evolution
- of BFM chlorophyll does not feedback into the physical model to determine
- the vertical divergence of the shortwave field.
- When 
+The same cases are specifically handled by the BFM within the module 
 \family typewriter
-ln_qsr_bio=.true.
+$BFMDIR/src/nemo/trcopt_bfm.F90
 \family default
-, the control of light propagation is completely passed to the BFM (
+ that uses the parameter 
+\family typewriter
+ChlAttenFlag
+\family default
+ (see 
 \family typewriter
 PAR_parameters
 \family default
@@ -2212,7 +2207,15 @@ PAR_parameters
 \family typewriter
 Pelagic_Environment.nml
 \family default
-) and the namelist above is not considered.
+) to compute the vertical light penetration using a 2- (
+\family typewriter
+ChlAttenFlag=1
+\family default
+) or a 3- (
+\family typewriter
+ChlAttenFlag=2
+\family default
+) wavebands formulation and the namelist above is not considered.
  The infrared attenuation depth is substituted by the attenuation coefficient
  (
 \family typewriter
@@ -2246,6 +2249,16 @@ status open
 \begin_layout Plain Layout
 
 &PAR_parameters
+\end_layout
+
+\begin_layout Plain Layout
+
+...
+\end_layout
+
+\begin_layout Plain Layout
+
+    ChlAttenFlag       =  1
 \end_layout
 
 \begin_layout Plain Layout
@@ -2349,13 +2362,12 @@ Installation
 \begin_layout Standard
 Both the BFM and NEMO codes have to be downloaded from the respective distributi
 on sites.
- The present coupling is officially distributed for NEMO version 3.6 and
- BFM version 5.2.
+ The present coupling refers to NEMO version 4.2 and BFM version 5.3.
  Please contact the BFM System Team 
 \family typewriter
 (bfm_st@cmcc.it)
 \family default
- for information on the use of BFM with the stable version of NEMO 3.4.1.
+ for information on the use of BFM with previous stable version of NEMO.
  In the following, it is assumed that the NEMO code is found in a directory
  identified by the environmental variable 
 \family typewriter
@@ -2385,11 +2397,8 @@ reference "chap:Running-GYRE_BFM"
 \family typewriter
 GYRE_BFM
 \family default
- is already distributed with NEMO 3.6 in the directory 
-\family typewriter
-NEMOGCM/CONFIG
-\family default
-, while the global ocean configuration PELAGOS (see Chap.
+ is already distributed with NEMO in the configuration directory, while
+ the global ocean configuration PELAGOS (see Chap.
  
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -2408,7 +2417,7 @@ Refer to the NEMO web site for how to obtain the code and how to install
  without the BFM, in order to set up the necessary compilation environment.
  The same architecture file contained in the directory 
 \family typewriter
-NEMOGCM/ARCH
+<NEMODIR>/arch
 \family default
  will in fact be used by the BFM configuration script.
  The same software required for running NEMO is necessary for the coupled
@@ -2421,7 +2430,7 @@ perl
 \end_layout
 
 \begin_layout Standard
-Download the source code from the BFM website or through the git repository.
+Download the source code from the BFM website at www.bfm-community.eu.
  In the example below it is assumed that you downloaded the tarball.
  The downloaded file may have a different name based on the version.
  As a final step create the required basic environmental variables pointing
@@ -2446,12 +2455,7 @@ status open
 
 \begin_layout Plain Layout
 
-% gunzip bfm-release-<version>.tgz
-\end_layout
-
-\begin_layout Plain Layout
-
-% tar xvf bfm-release-<version>.tar
+% tar xzvf bfm-release-<version>.tgz
 \end_layout
 
 \begin_layout Plain Layout
@@ -2527,7 +2531,7 @@ status open
 where ARCHFILENAME must be substituted by the name of your specific architecture
  files that is found in 
 \family typewriter
-NEMOGMC/ARCH
+$NEMODIR/arch
 \family default
 .
  The generated namelists and model executable will be found in 
@@ -2606,12 +2610,17 @@ status open
 
 \begin_layout Plain Layout
 
-        QUEUE    = 'poe_short',
+        QUEUE    = 'p_short',
 \end_layout
 
 \begin_layout Plain Layout
 
-        EXPFILES = 'iodef.xml namelist_cfg namelist_top_cfg'
+        NEMOSUB  = 'OCE TOP',
+\end_layout
+
+\begin_layout Plain Layout
+
+        EXPFILES = 'namelist_cfg namelist_top_cfg iodef.xml context_nemo.xml'
 \end_layout
 
 \begin_layout Plain Layout
@@ -2655,9 +2664,9 @@ EXPFILES
  to be copied to the running directory.The configuration script also copies
  the reference configurations from the 
 \family typewriter
-CONFIG/SHARED
+$NEMODIR/cfgs/SHARED
 \family default
- directory of NEMO.
+ directory.
 \end_layout
 
 \begin_layout Subsubsection*
@@ -2743,7 +2752,7 @@ bfm_configure.sh
  creates an fcm file for the BFM source code that is then included in the
  compilation process by means of the 
 \family typewriter
-NEMOGCM/CONFIG/GYRE_BFM/cpp_GYRE_BFM.fcm
+$NEMODIR/cfgs/GYRE_BFM/cpp_GYRE_BFM.fcm
 \family default
  file (or any other 
 \family typewriter
@@ -2768,13 +2777,7 @@ status open
 
 \begin_layout Plain Layout
 
-bld::tool::fppkeys key_dynspg_flt key_ldfslp key_zdftke key_vectopt_loop
- 
-\end_layout
-
-\begin_layout Plain Layout
-
-           key_top key_my_trc key_mpp_mpi key_iomput
+bld::tool::fppkeys key_top key_xios key_linssh
 \end_layout
 
 \begin_layout Plain Layout
@@ -2811,7 +2814,7 @@ Finally, the compilation with makenemo is launched by prescribing the use
  of an external directory (option -e, introduced since version 3.5) that
  allows the substitution of the 
 \family typewriter
-TOP_SRC
+TOP
 \family default
  files with the ones containing the coupling with the BFM (see Chap.
  
@@ -2825,7 +2828,7 @@ reference "chap:Technical-coupling-NEMO"
  After the first generation with the bfm_configure.sh script it is also possible
  to compile the model from the standard 
 \family typewriter
-NEMOGCM/CONFIG
+$NEMODIR/cgfs
 \family default
  directory with the command
 \end_layout
@@ -2870,30 +2873,10 @@ GYRE_BFM is an analytical configuration of NEMO that simulates a warm and
 stry.
  The model output is in NetCDF.
  The default grid is 22 x 32 with 31 vertical levels.
-\end_layout
-
-\begin_layout Section
-Serial and parallel simulations
-\end_layout
-
-\begin_layout Standard
-GYRE_BFM is the simplest example to run as a single process on a desktop
- computer because the grid is rather coarse.
- However, the default GYRE configuration in NEMO is set up to use parallel
- computation and the advanced XIOS library (see chap.
- 11 of NEMO v3.6 manual).
- To compile in serial mode it is necessary to remove the macro 
-\family typewriter
-key_mpp_mpi
-\family default
- for parallel computation that is found in $NEMODIR/NEMOGCM/CONFIG/GYRE_BFM/cpp_
-GYRE_BFM.cpp.
- It is also possible to use the standard NEMO output instead of the XIOS
- library by removing the macro 
-\family typewriter
-key_iomput
-\family default
- in the cpp file of the configuration.
+ The system generates NetCDF output files through the XIOS library (see
+ chap.
+ 10 of NEMO manual) and NetCDF restart files trough the TOP interface.
+ 
 \end_layout
 
 \begin_layout Standard
@@ -2906,27 +2889,6 @@ i.org/) and use a NEMO ARCH file with the
 mpif90
 \family default
  compiler.
- When GYRE_BFM is run in parallel, the BFM netcdf output is produced for
- each sub-domain just like it happens for NEMO and the same naming convention
- is used.
- The output can be 
-\begin_inset Quotes eld
-\end_inset
-
-rebuilt
-\begin_inset Quotes erd
-\end_inset
-
-, that is all the tiles are combined together, to obtain the full domain
- using the tool described in Sec 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Rebuilding-the-output"
-
-\end_inset
-
-.
- 
 \end_layout
 
 \begin_layout Section
