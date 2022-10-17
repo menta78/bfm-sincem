@@ -109,7 +109,7 @@ CONTAINS
 
    SUBROUTINE execute_bfm(kt, Kmm, Krhs, ji, jj)
       !!----------------------------------------------------------------------
-      !!                 ***  environmental_conditions  ***
+      !!                 ***  execute_bfm  ***
       !!
       !! ** Purpose :  Fill BFM arrays of environmental conditions
       !!
