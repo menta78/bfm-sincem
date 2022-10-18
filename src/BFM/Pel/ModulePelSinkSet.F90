@@ -62,16 +62,11 @@
   ! p_rO5m         [m/d]   calcite sinking rate
   ! KSINK_rPPY      [m]    prescribe sinking rate for phytoplankton below this 
   !                        depth threshold to p_rR6m value. Use 0.0 to disable. 
-  ! AggregateSink  logic   use aggregation = true to enhance the sink rate
-  !                        and bypass the prescribed sinking
-  ! depth_factor    [m]    depth factor for aggregation method
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   real(RLEN)    :: p_rR6m = 0.0_RLEN
   real(RLEN)    :: p_rR3m = 0.0_RLEN
   real(RLEN)    :: p_rO5m = 0.0_RLEN
   real(RLEN)    :: KSINK_rPPY = 0.0_RLEN
-  logical       :: AggregateSink = .FALSE.
-  real(RLEN)    :: depth_factor = 2000.0_RLEN
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   !
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -105,10 +100,9 @@
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 #if ! defined INCLUDE_PELCO2
-  namelist /PelGlobal_parameters/ p_rR6m, p_rR3m,  KSINK_rPPY, AggregateSink, depth_factor
+  namelist /PelGlobal_parameters/ p_rR6m, p_rR3m,  KSINK_rPPY
 #else   
-  namelist /PelGlobal_parameters/ p_rR6m, p_rR3m, p_rO5m, KSINK_rPPY, AggregateSink, &
-                                  depth_factor
+  namelist /PelGlobal_parameters/ p_rR6m, p_rR3m, p_rO5m, KSINK_rPPY
 #endif
   namelist /Settling_parameters/ p_burvel_R6, p_burvel_R2, p_burvel_R3, p_burvel_PI, &
                                  p_burvel_O5, R6DeepBurial

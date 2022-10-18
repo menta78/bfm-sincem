@@ -734,16 +734,11 @@ p_N7fLigand = 0.6
 ! p_rO5m          [m/d]         calcite sinking rate
 ! KSINK_rPPY       [m]          prescribe sinking rate for phytoplankton below this
 !                               depth threshold to p_rR6m value. Use 0.0 to disable.
-! AggregateSink   logic         use aggregation = true to enhance the sink rate
-!                               and bypass the prescribed sinking
-! depth_factor     [m]          depth factor for aggregation method
 !-------------------------------------------------------------------------!
 &PelGlobal_parameters
   p_rR6m         = 5.0
   p_rO5m         = 30.0
   KSINK_rPPY     = 150.0
-  AggregateSink  = .FALSE.
-  depth_factor   = 2000.0
 	filename_nml_conf = 'Pelagic_Environment.nml',
 /
 
