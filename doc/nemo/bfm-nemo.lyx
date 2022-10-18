@@ -873,7 +873,7 @@ Code flow chart
 \begin_layout Standard
 In the present implementation, the BFM memory is allocated as a one dimensional
  array corresponding to the vertical water column and the biogeochemical
- computations are iterated over the horizonal dimensions of the 3D domain,
+ computations are iterated over the horizontal dimensions of the 3D domain,
  namely along 
 \family typewriter
 X
@@ -1879,7 +1879,7 @@ name "sec:Boundary-conditions-TOP"
 \end_layout
 
 \begin_layout Standard
-In version 3.6, NEMO allows to define different types of boundary conditions
+NEMO TOP interface allows to define different types of boundary conditions
  for biogeochemical tracers.
  For every single variable it is possible to define a field of surface boundary
  conditions, such as deposition of dust or nitrogen, which is then interpolated
@@ -1889,8 +1889,16 @@ fld_read
 \family default
  function.
  The same facility is available to include river inputs (coastal boundary
- conditions) and it is under development the treatment of open boundary
- conditions.
+ conditions) and the treatment of lateral open boundary conditions (see
+ also 
+\begin_inset CommandInset citation
+LatexCommand citealp
+key "nemo_top_1471700"
+literal "false"
+
+\end_inset
+
+).
 \end_layout
 
 \begin_layout Standard
@@ -2021,15 +2029,43 @@ status open
 
 \begin_layout Plain Layout
 
-   ln_dynsiw   =  .false.
-       !  parameterize the water flux from sea ice as virtual salt flux
- (T) or no flux (F)   
+...
 \end_layout
 
 \begin_layout Plain Layout
 
-   cn_dir       = './'          !  root directory for the location of the
- boundary condition files
+   cn_dir_sbc    =  './'      !  root directory for the location of SURFACE
+ data files
+\end_layout
+
+\begin_layout Plain Layout
+
+   cn_dir_cbc    =  './'      !  root directory for the location of COASTAL
+ data files
+\end_layout
+
+\begin_layout Plain Layout
+
+   cn_dir_obc    =  './'      !  root directory for the location of OPEN
+ data files
+\end_layout
+
+\begin_layout Plain Layout
+
+   ln_rnf_ctl    = .true.
+     !  Remove runoff dilution on tracers with absent river load
+\end_layout
+
+\begin_layout Plain Layout
+
+   rn_sbc_time   =  86400.
+    !  Time scaling factor for SBC data (seconds in a day)
+\end_layout
+
+\begin_layout Plain Layout
+
+   rn_cbc_time   =  3.1536e+7 !  Time scaling factor for CBC data (seconds
+ in a day)
 \end_layout
 
 \begin_layout Plain Layout
@@ -2201,8 +2237,8 @@ sn_chl
 ) and used to compute the attenuation coefficients for RGB and the shortwave
  radiation that is absorbed at every level.
  This information is used to compute the trend of ocean temperature.
- The alternative uncupled configuration is the standard formulation by Paulson
- and Simpson (
+ The alternative uncoupled configuration is the standard formulation by
+ Paulson and Simpson (
 \family typewriter
 ln_qsr_2bd=.true.
 \family default
@@ -2245,7 +2281,7 @@ p_epsIR=1/rn_si0
 \family typewriter
 p_PAR=1-rn_abs
 \family default
-: 
+.
 \begin_inset listings
 lstparams "basicstyle={\scriptsize\ttfamily},language=Fortran"
 inline false
@@ -2840,8 +2876,8 @@ BFM_NEMO
 
 \begin_layout Standard
 Finally, the compilation with makenemo is launched by prescribing the use
- of an external directory (option -e, introduced since version 3.5) that
- allows the substitution of the 
+ of an external directory (option -e) that allows the substitution of the
+ 
 \family typewriter
 TOP
 \family default
