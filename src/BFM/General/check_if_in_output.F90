@@ -28,7 +28,7 @@
 ! USES
   use global_mem, ONLY:RLEN
   use string_functions, ONLY: getseq_number
-  use api_bfm, only: var_names,var_ids,stPelRivE
+  use api_bfm, only: var_names,var_ids,stEnd
 
   IMPLICIT NONE
 
@@ -43,7 +43,7 @@
   integer            ::j
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-  j=getseq_number(text,var_names,stPelRivE,.TRUE.)
+  j=getseq_number(text,var_names,stEnd,.TRUE.)
   if ( j.gt.0) then
       in_list=var_ids(j).ne.0
   else

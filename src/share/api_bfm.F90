@@ -100,7 +100,6 @@
 
    integer,public                            :: stPelSurS=0
    integer,public                            :: stPelBotS=0
-   integer,public                            :: stPelRivS=0
 
    integer,public                            :: stPelStateE=0
    integer,public                            :: stPelDiagE=0
@@ -110,7 +109,6 @@
 
    integer,public                            :: stPelSurE=0
    integer,public                            :: stPelBotE=0
-   integer,public                            :: stPelRivE=0
 
    integer,public                            :: stPelStart=0
    integer,public                            :: stPelEnd=0    

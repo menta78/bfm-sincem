@@ -172,7 +172,7 @@
             !---------------------------------------------
             k=0
             j=0
-            do i=stPelDiag2dS,stPelRivE
+            do i=stPelDiag2dS,stPelBotE
                j=j+1
                if ( var_ave(i) ) then
                   k=k+1

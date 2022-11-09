@@ -45,9 +45,9 @@
         stBenStateS, stBenDiag2dS, stBenFlux2dS, stBenStateE, &
         stBenDiag2dE, stBenFlux2dE, stBenStart, stBenEnd,  &
         stStart, stEnd, stPelStateS, stPelDiagS, stPelFluxS, &
-        stPelDiag2dS, stPelSurS, stPelBotS, stPelRivS, &
+        stPelDiag2dS, stPelSurS, stPelBotS, &
         stPelStateE, stPelDiagE, stPelFluxE, stPelDiag2dE, &
-        stPelSurE, stPelBotE, stPelRivE, stPelStart, stPelEnd
+        stPelSurE, stPelBotE, stPelStart, stPelEnd
 
 
    use mem,     only: NO_BOXES,NO_BOXES_X,NO_BOXES_Y,NO_BOXES_Z,NO_BOXES_XY,Depth
@@ -1106,7 +1106,7 @@ end subroutine init_netcdf_rst_bfm
          end if 
       end do
 
-      do n=stPelDiag2dS,stPelRivE
+      do n=stPelDiag2dS,stPelBotE
          dims(1) = botpoint_dim 
          if ( n >= stPelDiag2dS .AND. n <= stPelSurE ) dims(1) = surfpoint_dim
 
@@ -1260,7 +1260,7 @@ end subroutine init_netcdf_rst_bfm
    ! Pelagic 2D variables
    !---------------------------------------------
    k=0
-   do n = stPelDiag2dS , stPelRivE
+   do n = stPelDiag2dS , stPelBotE
       if ( var_ids(n) > 0 ) then   
          IF ( .not. var_ave(n) ) THEN
             ! Store snapshot of pelagic 2D diagnostics
@@ -1274,7 +1274,7 @@ end subroutine init_netcdf_rst_bfm
                iret = store_data(ncid_bfm,var_ids(n),SURFT_SHAPE,NO_BOXES_XY,garray=D2DIAGNOS(:,idx_tmp))
             end if
             ! Store snapshot of pelagic 2D diagnostics at bottom
-            if ( n >= stPelBotS .AND. n <= stPelRivE) then
+            if ( n >= stPelBotS .AND. n <= stPelBotE) then
                idx_tmp=n-stPelDiag2dS+1
                iret = store_data(ncid_bfm,var_ids(n),BOTT_SHAPE,NO_BOXES_XY,garray=D2DIAGNOS(:,idx_tmp))
             end if

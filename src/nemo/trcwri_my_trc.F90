@@ -26,7 +26,7 @@ MODULE trcwri_my_trc
           &  stPelStart, stPelFluxE, stPelStateS, stPelStateE,      &
           & stPelDiagS, stPelDiagE, stPelFluxS, stPelFluxE,         &
           & stPelDiag2dS, stPelDiag2dE, stPelSurS, stPelSurE,       &
-          & stPelBotS, stPelRivE
+          & stPelBotS, stPelBotE
 #ifdef INCLUDE_PELCO2
    use mem_CO2, ONLY: CloseCO2
 #endif
@@ -149,7 +149,7 @@ CONTAINS
       !---------------------------------------------
       DO jn = 1 , jp_dia2d
          jl = id_dia2d(jn)
-         IF ( jl >= stPelDiag2dS .AND. jl <= stPelRivE ) THEN
+         IF ( jl >= stPelDiag2dS .AND. jl <= stPelBotE ) THEN
             idx = jl - stPelDiag2dS + 1
             trc2d(ji, jj, jn) = D2DIAGNOS(1,idx)
          ENDIF
@@ -200,7 +200,7 @@ CONTAINS
       pp_index(:,:) = .FALSE.
       DO jn = 1, stEnd
          IF (iom_use(TRIM(var_names(jn)))) THEN
-            IF ( (jn >= stPelDiag2dS .AND. jn <= stPelRivE) .OR. &
+            IF ( (jn >= stPelDiag2dS .AND. jn <= stPelBotE) .OR. &
 #if defined INCLUDE_SEAICE
                (jn >= stIceDiag2dS .AND. jn <= stIceFlux2dE) .OR. &
 #endif
