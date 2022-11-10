@@ -192,6 +192,7 @@ CONTAINS
 
       ! Initialise DATA output netcdf file(s)
       !-------------------------------------------------------
+      LEVEL1 ''
       IF ( bfm_iomput ) THEN
          LEVEL1 'BFM uses XIOS output system'
          ! Set var_ids values according to the XIOS file_def is done in trc_dia_bfm

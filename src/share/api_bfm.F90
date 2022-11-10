@@ -432,6 +432,8 @@ contains
    LEVEL3 'NO_BOXES_BEN   =',NO_BOXES_BEN
    LEVEL3 'NO_STATES_BEN  =',NO_STATES_BEN
    LEVEL1 ' '
+
+#ifndef BFM_NEMO
    LEVEL2 'EXPERIMENT INITIALIZATION :'
    select case (bfm_init)
       case (0)
@@ -443,6 +445,7 @@ contains
         LEVEL2 'Single restart file of the global domain (bfm_init=2)'
         LEVEL2 '(Required filename ',trim(in_rst_fname),')'
    end select
+#endif
 
 #ifndef BFM_STANDALONE
    LEVEL1 ' '
@@ -458,6 +461,7 @@ contains
    !                      & JuliandayEnd   step0  stepnow  stepEnd  timestep'
    !WRITE(LOGUNIT,'(a10,4x,a8,3x,a8,2x,f10.1,2x,f10.1,1x,i9,i9,i9,i9)') bfmtime
    !
+#ifndef BFM_NEMO
    LEVEL2 ' '
    LEVEL2 "OUTPUT SETTINGS "
    LEVEL3 "Output DATA filename is: ",trim(out_fname)
@@ -473,8 +477,7 @@ contains
    else
      LEVEL3 "Restart file(s) saved at the end of this experiment."
    endif
-   LEVEL1 ' '
-   LEVEL1 ' Step 1 ... DONE!'
+#endif
    LEVEL1 ' '
    LEVEL1 ' -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- '
    LEVEL1 ' '

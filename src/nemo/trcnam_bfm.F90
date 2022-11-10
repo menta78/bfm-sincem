@@ -113,15 +113,17 @@ SUBROUTINE trc_nam_bfm()
    CALL init_bfm
 #endif
 
-   ! Force NEMO restart
+   ! Force BFM restart with NEMO setting
    !-------------------------------------------------------
-   IF ( bfm_init == 1 ) THEN
-      ln_rsttr = .TRUE.
-      cn_trcrst_in = TRIM(in_rst_fname)
-      IF(lwp) WRITE(numout,*) 'trc_nam_bfm : force restart of NEMO TOP (ln_rsttr=T)'
-      IF(lwp) WRITE(numout,*) '              Restart file is '//TRIM(cn_trcrst_in)
-      IF(lwp) WRITE(numout,*) ''
+   IF ( ln_rsttr ) THEN
+      bfm_init = 1
+      in_rst_fname = TRIM(cn_trcrst_in)
+      LEVEL1 'Restart BFM from input file '//TRIM(cn_trcrst_in)
+   ELSE
+      bfm_init = 0
+      LEVEL1 'BFM start from initial conditions '
    ENDIF
+   LEVEL1 ''
 
    ! Initialise state variable names and diagnostics
    !-------------------------------------------------------
