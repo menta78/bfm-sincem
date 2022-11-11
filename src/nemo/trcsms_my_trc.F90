@@ -171,7 +171,7 @@ CONTAINS
       if (CalcPelagicFlag ) then
          do jn = 1, NO_D3_BOX_STATES
             if (var_map(jn) > 0) &
-               tr(ji,jj,1:bot,var_map(jn),Krhs) = D3SOURCE(1:bot,jn)
+               tr(ji,jj,1:bot,var_map(jn),Krhs) = tr(ji,jj,1:bot,var_map(jn),Krhs) + D3SOURCE(1:bot,jn)
          end do
 #ifdef INCLUDE_PELCO2
          ! ph for next iteration
