@@ -222,6 +222,8 @@ CONTAINS
          LEVEL1 'trc_ini_my_trc: Read fraction mask from bottom_fraction.nc (varname: btmfrac)'
          LEVEL1 '  Constant Iron flux from sediments: ', p_rN7fsed
          LEVEL1 '  Total iron load from Sediment [Gmol/y] : ', ztraf
+         ! Iron flux into pelagic (umolFe/m2/d to umolFe/m3/s)
+         ironsed = ironsed * p_rN7fsed / ( SEC_PER_DAY * e3t_0(:,:,:) )
       ENDIF
 #endif
 

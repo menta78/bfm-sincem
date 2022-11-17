@@ -63,7 +63,7 @@ SUBROUTINE trc_nam_bfm()
    ! Force Euler timestepping for TOP
    !-------------------------------------------------------
    ln_top_euler = .TRUE.
-   IF(lwp) WRITE(numout,*) 'trc_nam_bfm : force euler integration (ln_top_euler=T)'
+   IF(lwp) WRITE(numout,*) '              force euler integration (ln_top_euler=T)'
 
    ! Set ocean mask and bottom level
    !-------------------------------------------------------
@@ -118,7 +118,7 @@ SUBROUTINE trc_nam_bfm()
    IF ( ln_rsttr ) THEN
       bfm_init = 1
       in_rst_fname = TRIM(cn_trcrst_in)
-      LEVEL1 'Restart BFM from input file '//TRIM(cn_trcrst_in)
+      LEVEL1 'Restart BFM from input file '//TRIM(in_rst_fname)
    ELSE
       bfm_init = 0
       LEVEL1 'BFM start from initial conditions '

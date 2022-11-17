@@ -308,7 +308,7 @@ CONTAINS
       !
       INTEGER, INTENT(in) :: kt   ! ocean time-step index
       INTEGER, INTENT(in) :: Kbb, Kmm, Krhs ! time level indices
-      INTEGER             :: jk, jl
+      INTEGER             :: jk, jl, jn
       REAL(wp), DIMENSION(jpi,jpj,jpk) :: irondep
       REAL(wp), DIMENSION(jpi,jpj)     :: dustinp
       REAL(wp), DIMENSION(jpi,jpj,jpk) :: par_r, par_g, par_b
@@ -358,13 +358,13 @@ CONTAINS
       IF (p_rDust > 0. ) THEN
          irondep = ZERO
          ! surface input (rf_trsfac = Solub(0.01) * FeinDust(0.035) * g->ug (1e6) / Fe g->mol (55.85))
-         jl = n_trc_indsbc(ppN7f)
-         dustinp =  rf_trsfac(jl) * sf_trcsbc(jl)%fnow(:,:,1)
+         jn = n_trc_indsbc(ppN7f)
+         dustinp =  rf_trsfac(jn) * sf_trcsbc(jn)%fnow(:,:,1)
          ! dust sink length scale (1/m): dust assumed to be 0.01% (1/d) , sink speed p_rDust (m/d)
          dustsink =  0.01_wp * 1. / p_rDust
          DO jk = 2, jpkm1
             irondep(:,:,jk) = dustinp(:,:) * dustsink / SEC_PER_DAY * EXP( -gdept(:,:,jk,Kmm) / 540. )
-            tr(:,:,jk,ppN7f,Krhs) = tr(:,:,jk,ppN7f,Krhs) + irondep(:,:,jk)
+            tr(:,:,jk,jl,Krhs) = tr(:,:,jk,jl,Krhs) + irondep(:,:,jk)
          END DO
       ENDIF
 #endif
