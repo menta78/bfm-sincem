@@ -836,9 +836,8 @@ p_N7fLigand = 0.6
    ln_my_trc     =  .true.     !  Run MY_TRC BGC model
    ln_trcdta     =  .true.    !  Initialisation from data input file or not
    ln_trcbc      =  .true.  !  Surface, Lateral or Open Boundaries conditions
-!
-!                !    name   !           title of the field            !   units    ! initial data from file or not !
-   sn_tracer(1)   = 'DUMMY   ' , 'Dummy tracer      '                 ,  'dummy-units' ,  .false.
+   !              !    name   !         title of the field        !   units        ! initial data from file or not !
+   sn_tracer(1)  = 'DUMMY   ' , 'Dummy tracer      '              ,  'dummy-units' ,  .false.
         filename_nml_conf = 'namelist_top_cfg',
 /
 
