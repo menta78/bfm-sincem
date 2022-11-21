@@ -753,10 +753,6 @@ p_N7fLigand = 0.6
 ! p_rmnQ1x        [d-1]       Remineralization rate of Dissolved OM
 ! p_rmnQ6x        [d-1]       Remineralization rate of Particulate OM
 ! p_pQIN3          [-]        Partitioning coeff. between NO3 and NH4
-! p_depscale       [m]        Depth level to scale remin. rates (for BFM-NEMO)
-! p_q10            [-]        Q10 value for remineralization rate (=0 disable) 
-! p_qBT           [degC]      Base Temperature for Q10 remin
-! p_chdo        [mmol/m3]     Half-saturation Oxygen conc. for MM^2 (=0 disable)
 !-------------------------------------------------------------------------!
 &BenthicReturn_parameters
   p_rmnQ1c  =  0.1   
@@ -767,10 +763,6 @@ p_N7fLigand = 0.6
   p_rmnQ6p  =  0.05  
   p_rmnQ6s  =  0.05
   p_pQIN3    =  0.1   
-  p_depscale =  0.0
-  p_q10      = 0.0
-  p_qBT      = 20.0
-  p_chdo     = 0.0
         filename_nml_conf = 'Benthic_Environment.nml',
 /
 
@@ -802,9 +794,6 @@ p_N7fLigand = 0.6
    jp_bgc        =  1          !  Number of passive tracers of the BGC model
    ln_my_trc     =  .true.     !  Run MY_TRC BGC model
    ln_trcdta     =  .false.    !  Initialisation from data input file or not
-!
-!                !    name   !           title of the field            !   units    ! initial data from file or not !
-   sn_tracer(1)   = 'DUMMY   ' , 'Dummy tracer      '                 ,  'dummy-units' ,  .false.
         filename_nml_conf = 'namelist_top_cfg',
 /
 
