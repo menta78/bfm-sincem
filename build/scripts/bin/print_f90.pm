@@ -28,7 +28,6 @@ use Exporter;
 use F90Namelist;
 use List::Util qw[min max];
 use Data::Dumper;
-use Switch;
 
 use classes;
 
@@ -2232,7 +2231,7 @@ sub func_XMLFIELD  {
             my $group_name = $param->getQuota();
             my $unit       = $param->getUnit();
 
-            switch ($type) { case "diaggrp" {
+            if( $type eq "diaggrp" ) {
             # create diagnostics for groups
               foreach my $name2 ( sort { $$LST_PARAM{$a}->getIndex() <=> $$LST_PARAM{$b}->getIndex() } keys %$LST_PARAM ){
                   my $param2 = $$LST_PARAM{$name2};
@@ -2279,7 +2278,7 @@ sub func_XMLFIELD  {
                   }                
                   $line .= "${TAB6}<field id=\"${name}\"${TAB6}long_name=\"${comm}\"${TAB5}unit=\"${unit}\"/>\n";
               }
-            }}
+            }
         }
     }
 
