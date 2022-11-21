@@ -59,52 +59,41 @@
   ! Local Variables
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   integer   :: box, kbot
-  real(RLEN),dimension(NO_BOXES_XY)  :: rate, et, eo, fact
+  real(RLEN),dimension(NO_BOXES_XY)  :: rate
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
   if ( .NOT. AssignPelBenFluxesInBFMFlag ) return
 
-  et = ONE ; eo = ONE
-  ! temperature & oxygen dependence
-  do Box = 1,NO_BOXES_XY
-     kbot = BOTindices(Box)
-     if ( p_q10  .gt. ZERO ) et(box) = min (ONE, p_q10 ** (( ETW(kbot) - p_qBT) / 10.0_RLEN) )
-     if ( p_chdo .gt. ZERO ) eo(box) = MM_POWER(O2o(kbot), p_chdo, 2)
-  enddo
-
-  ! Aggregate control factors
-  fact = retfac* et* eo
-
   ! remineralization fluxes
-  rate  =   p_rmnQ6c* fact* Q6c(:)
+  rate  =   p_rmnQ6c* Q6c(:)
   call flux_vector( iiBen, ppQ6c,ppQ6c,-( rate) )
   jbotO2o(:)  = - rate / MW_C
   jbotO3c(:)  = rate
 
-  rate  =   p_rmnQ1c* fact* Q1c(:)
+  rate  =   p_rmnQ1c* Q1c(:)
   call flux_vector( iiBen, ppQ1c,ppQ1c,-( rate) )
   jbotO2o(:)  = jbotO2o(:) - rate / MW_C
   jbotO3c(:)  = jbotO3c(:) + rate
 
-  rate  =   p_rmnQ6p* fact* Q6p(:)
+  rate  =   p_rmnQ6p* Q6p(:)
   call flux_vector( iiBen, ppQ6p,ppQ6p,-( rate) )
   jbotN1p(:)  = rate
 
-  rate  =   p_rmnQ1p* fact* Q1p(:)
+  rate  =   p_rmnQ1p* Q1p(:)
   call flux_vector( iiBen, ppQ1p,ppQ1p,-( rate) )
   jbotN1p(:)  = jbotN1p(:)+ rate
 
-  rate  =   p_rmnQ6n* fact* Q6n(:)
+  rate  =   p_rmnQ6n* Q6n(:)
   call flux_vector( iiBen, ppQ6n,ppQ6n,-( rate) )
   jbotN3n(:)  = rate* p_pQIN3
   jbotN4n(:)  = rate*( ONE - p_pQIN3)
 
-  rate  =   p_rmnQ1n* fact* Q1n(:)
+  rate  =   p_rmnQ1n* Q1n(:)
   call flux_vector( iiBen, ppQ1n,ppQ1n,-( rate) )
   jbotN3n(:)  = jbotN3n(:)+ rate* p_pQIN3
   jbotN4n(:)  = jbotN4n(:)+ rate*( ONE - p_pQIN3)
 
-  rate  =   p_rmnQ6s* fact* Q6s(:)
+  rate  =   p_rmnQ6s* Q6s(:)
   call flux_vector( iiBen, ppQ6s,ppQ6s,-( rate) )
   jbotN5s(:)  = rate
 

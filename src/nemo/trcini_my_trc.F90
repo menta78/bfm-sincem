@@ -226,22 +226,7 @@ CONTAINS
          ironsed = ironsed * p_rN7fsed / ( SEC_PER_DAY * e3t_0(:,:,:) )
       ENDIF
 #endif
-
-      ! Scaling factor for benthic return coefficients !TODO move this into BFM
-      !-------------------------------------------------------
-      ! Depth dependence from Middelburg et al. (1996) metamodel (see par. 3.4)
-      ! if ( p_depscale > ZERO ) then
-      !    allocate(rtmp1D(NO_BOXES))
-      !    rtmp1D = pack(gdept_0,SEAmask)
-      !    DO i = 1, NO_BOXES_XY
-      !       j = BOTindices(i)
-      !       zexp  = MIN( 8.,( rtmp1D(j) / p_depscale )**(-1.5) )
-      !       zdexp = -0.9543 + 0.7662 * LOG( zexp ) - 0.235 * LOG( zexp )**2
-      !       RETFAC(i) = MIN( 1., EXP( zdexp ) / 0.5 )
-      !    END DO
-      !    deallocate(rtmp1D)
-      ! endif
-
+      !
       IF (bfm_lwp) THEN
             LEVEL1 ' '
             LEVEL1 '         BFM INITIALIZATION ... DONE!          '
