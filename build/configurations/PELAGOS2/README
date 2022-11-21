@@ -1,6 +1,6 @@
 # PELAGOS2: the global ocean BFM-NEMO coupling @ORCA2
 
-This version requires NEMO release >= 3.6 
+This version requires NEMO release >= 4.2
 This preset is not part of the official NEMO release but uses
 the NEMO makenemo tool to create the configuration in the CONFIG 
 directory to allow the compilation with FCM.
