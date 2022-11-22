@@ -342,12 +342,9 @@ contains
    ! restart output file
    out_rst_fname=TRIM(out_fname)
    !
-   ! restart input file
-   if (bfm_init == 1 ) then
+   ! restart input file 
+   if (bfm_init == 1 ) &
       in_rst_fname=TRIM(in_rst_fname)//'_'//str
-   elseif (bfm_init == 2 ) then
-      in_rst_fname=TRIM(in_rst_fname)
-   endif
 
    ! data output file
    thistime=outdeltalab(out_delta)
