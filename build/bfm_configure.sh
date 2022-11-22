@@ -288,17 +288,9 @@ echo "BFMDIR is ${BFMDIR}"
 # NEMO specific info
 if [[ "$MODE" == "NEMO" ]]; then 
     echo "NEMODIR is ${NEMODIR}"
-    if [ "x${VER}" == "x3" ] ; then
-       echo "use NEMO coupling for version 3.6"
-       cmd_mknemo="${NEMODIR}/NEMOGCM/CONFIG/${MKNEMO} -n ${PRESET}"
-       NEMODIRCFG="${NEMODIR}/NEMOGCM/CONFIG/"
-       cfgfile_nemo="cfg.txt"
-    else
-       echo "use NEMO coupling for version ${VER}"
-       cmd_mknemo="${NEMODIR}/${MKNEMO} -r ${PRESET}"
-       NEMODIRCFG="${NEMODIR}/cfgs"
-       cfgfile_nemo="work_cfgs.txt"
-    fi
+    cmd_mknemo="${NEMODIR}/${MKNEMO} -r ${PRESET}"
+    NEMODIRCFG="${NEMODIR}/cfgs"
+    cfgfile_nemo="work_cfgs.txt"
 fi
 echo ""
 
@@ -439,8 +431,7 @@ if [ ${GEN} ]; then
                     exit
                 fi
                 mkdir -p ${NEMODIRCFG}/${PRESET}
-                check=`grep ${PRESET} ${NEMODIRCFG}/${cfgfile_nemo}`
-                if [ "x${check}" == "x" ] ; then
+                if ! grep -q "${PRESET} " ${NEMODIRCFG}/${cfgfile_nemo} ; then
                     echo "add ${PRESET} to ${cfgfile_nemo}"
                     echo "${PRESET}    ${NEMOSUB}" >> ${NEMODIRCFG}/${cfgfile_nemo}
                 fi
@@ -614,13 +605,8 @@ if [[ ${DEP} && "$MODE" != "NEMO_CESM" ]]; then
 
         #link reference nemo files from the shared directory
         if [[ "$MODE" == "NEMO" || "$MODE" == "NEMO_3DVAR" ]] && [ -d ${NEMODIRCFG}/SHARED ]; then 
-           if [ "x${VER}" == "x" ] ; then
-               shared_files="namelist_ref namelist_top_ref axis_def_nemo.xml domain_def_nemo.xml grid_def_nemo.xml field_def_nemo-oce.xml"
-               [[ "${NEMOSUB}" == *"ICE"* ]] && shared_files="$shared_files namelist_ice_ref field_def_nemo-ice.xml"
-           else
-               shared_files="namelist_ref namelist_top_ref domain_def.xml field_def.xml"
-               [[ "${NEMOSUB}" == *"LIM_SRC_2"* ]] && ln -sf ${NEMODIRCFG}/SHARED/namelist_ice_lim2_ref namelist_ice_ref
-           fi
+           shared_files="namelist_ref namelist_top_ref axis_def_nemo.xml domain_def_nemo.xml grid_def_nemo.xml field_def_nemo-oce.xml"
+           [[ "${NEMOSUB}" == *"ICE"* ]] && shared_files="$shared_files namelist_ice_ref field_def_nemo-ice.xml"
            for ff in ${shared_files} ; do
                ln -sf ${NEMODIRCFG}/SHARED/${ff} ${exedir}/
            done
