@@ -1137,8 +1137,8 @@ bfm_configure.sh
 ./bfm_configure.sh -h
 \family default
 ).
- The default configuration is generated and the bfm library compiled with
- the command:
+ Inside builder_ogstm_bfm.sh there are these lines to generate the code and
+ compile the bfm library:
 \end_layout
 
 \begin_layout Standard
@@ -1154,7 +1154,7 @@ status open
 
 \begin_layout Plain Layout
 
-% ./bfm_configure.sh -gc -o ../lib/libbfm.a -p OGS_PELAGIC
+% ./bfm_configure.sh -gcv -o ../lib/libbfm.a -p OGS_PELAGIC
 \end_layout
 
 \end_inset
@@ -1234,48 +1234,6 @@ status open
 \end_inset
 
 
-\end_layout
-
-\begin_layout Subsubsection*
-
-\family typewriter
-layout:
-\family default
- memory layout configuration file
-\end_layout
-
-\begin_layout Standard
-This file contains the list of state variables and diagnostics defined in
- the BFM.
- This is independent of the coupled configuration and it is fully detailed
- in the BFM manual 
-\begin_inset CommandInset citation
-LatexCommand citep
-key "BFM-manual"
-literal "true"
-
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Subsubsection*
-
-\family typewriter
-namelists_bfm: parameter file
-\end_layout
-
-\begin_layout Standard
-This file contains all the parameters that characterize the biogeochemical
- processes and are fully detailed in the BFM manual 
-\begin_inset CommandInset citation
-LatexCommand citep
-key "BFM-manual"
-literal "true"
-
-\end_inset
-
-.
 \end_layout
 
 \begin_layout Chapter
@@ -2000,6 +1958,50 @@ status open
 
 \backslash
 twocolumn
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename Figures/TEST01_C_CF_m0.png
+	lyxscale 50
+	scale 50
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Hovmoeller diagrams of model output after one year of simulation.
+ Top left panel shows Photo-synthetical Available Radiation PAR.
+ Top right panel show Vertical eddy diffusivity.
+ Bottom left panel total chlorophyll derived as the sum of the four phytoplankto
+n functional types (TotChl=P1l+P2l+P3l+P4l) used in this BFM configuration.
+ Bottom right panel shows phosphate temporal evolution (N1p).
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
 \end_layout
 
 \end_inset
