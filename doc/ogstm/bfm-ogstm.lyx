@@ -902,7 +902,7 @@ Both the OGSTM and the BFM codes are under a GIT versioning systems.
  The installation phase starts with the downloading of the code.
  There is a public github repository (https://github.com/inogs/ModelBuild)
  designed to download the codes and build together.
- This can be done with the following steps
+ This can be done with the following steps:
 \end_layout
 
 \begin_layout Standard
@@ -1128,17 +1128,24 @@ name "sec:Configuring-BFM-OGSTM"
 \end_layout
 
 \begin_layout Standard
-The configuration of the model is done automatically by the script 
+Inside builder_ogstm_bfm.sh there are these lines to generate the code and
+ compile the bfm library.
+ The first one edits the file configuration to set the .inc file consitent
+ with compiler we want to use.
+\end_layout
+
+\begin_layout Standard
+Then, there is the actual automatic configuration of the model by using
+ the script
 \shape italic
-bfm_configure.sh
+ bfm_configure.sh
 \shape default
  (see the BFM manual for more information or simply run 
 \family typewriter
 ./bfm_configure.sh -h
 \family default
 ).
- Inside builder_ogstm_bfm.sh there are these lines to generate the code and
- compile the bfm library:
+ 
 \end_layout
 
 \begin_layout Standard
@@ -1146,6 +1153,12 @@ bfm_configure.sh
 lstparams "basicstyle={\ttfamily}"
 inline false
 status open
+
+\begin_layout Plain Layout
+
+% sed -i "s/.*ARCH.*/        ARCH    = '$INC_FILE'  /"  build/configurations/OGS_P
+ELAGIC/configuration
+\end_layout
 
 \begin_layout Plain Layout
 
@@ -1168,8 +1181,8 @@ Every time the layout is changed this procedure must be repeated in order
  recompiled.
 \end_layout
 
-\begin_layout Subsection
-The BFM1D preset
+\begin_layout Standard
+Here we display the content of build/configurations/OGS_PELAGIC/configuration
 \end_layout
 
 \begin_layout Subsubsection*
@@ -1208,7 +1221,7 @@ status open
 
 \begin_layout Plain Layout
 
-        ARCH    = 'gfortran.inc',
+        ARCH    = 'x86_64.LINUX.intel.inc',
 \end_layout
 
 \begin_layout Plain Layout
