@@ -576,13 +576,11 @@ The BFM1D_NO_BOXES() subroutine essentially tells to the BFM library that
  The BFM1D_INIT_IO_CHANNELS() initialize the IO for the ascii BFM files.
  The Initialize() subroutine allocates the internal memory of the BFM library.
  In the top call, the ogstm() subroutine, an 
-\begin_inset Quotes eld
-\end_inset
-
+\family sans
+\shape italic
 use
-\begin_inset Quotes erd
-\end_inset
-
+\family default
+\shape default
  statement including all the BFM modules (#include "BFM_module_list.h") is
  present in order to force the consistency of allocated memory in all the
  following subroutines called in the algorithm tree.
@@ -598,10 +596,10 @@ step
 \begin_inset Quotes erd
 \end_inset
 
- phase, in the trcbio.F subroutine, the following peaces of code are inside
- a loop on ji, jj, jk index (zonal, meridional and vertical indexes).
+ phase, in the src/BIO/trcbio.f90 subroutine, the following pieces of code
+ are inside a loop on ji, jj index (zonal and meridional indexes).
  As shown in the panel the loop on tracers index, jtr, put all the tracer
- state vector for a single cell in the 3D domain in the one dimensional
+ state vector for a single column of the 3D domain in the two dimensional
  vector a.
  Moreover the environmental regulator vector (er) is assigned with the values
  of the parameters needed by BFM.
@@ -761,21 +759,13 @@ enddo
 
 \begin_layout Standard
 the tracer state vector 
-\begin_inset Quotes eld
-\end_inset
-
+\shape italic
 a
-\begin_inset Quotes erd
-\end_inset
-
+\shape default
  and the vector 
-\begin_inset Quotes eld
-\end_inset
-
+\shape italic
 er
-\begin_inset Quotes erd
-\end_inset
-
+\shape default
  are transferred to the internal memory of the BFM library by means of the
  function BFM1D_Input_EcologyDynamics().
  The BFM1D_reset() subroutine reset all the derivatives in the BFM internal
@@ -848,41 +838,31 @@ END DO
 \end_inset
 
 Then the EcologyDynamics() updates the BFM SOURCE array and in the end the
- BFM1D_Output_EcologyDynamics() extracts the derivatives(
-\begin_inset Quotes eld
-\end_inset
-
+ BFM1D_Output_EcologyDynamics() extracts the derivatives (
+\shape italic
 b
-\begin_inset Quotes erd
-\end_inset
-
+\shape default
 ) and other parameters (like sinking velocity 
-\begin_inset Quotes eld
-\end_inset
-
+\shape italic
 c
-\begin_inset Quotes erd
-\end_inset
-
-) and diagnostics (d and d2 - for surface cells-) defined in the layout
- of the BFM.
- This procedure is performed for each computational cell of the model and
- in fact the derivatives contained in the vector 
-\begin_inset Quotes eld
-\end_inset
-
+\shape default
+) and diagnostics (
+\shape italic
+d
+\shape default
+ and
+\shape italic
+ d2
+\shape default
+ - for surface cells-) defined in the layout of the BFM.
+ The derivatives contained in the vector 
+\shape italic
 b
-\begin_inset Quotes erd
-\end_inset
-
- for that specific point are added to the tracer matrix 
-\begin_inset Quotes eld
-\end_inset
-
+\shape default
+ for the column are added to the tracer matrix 
+\shape slanted
 tra
-\begin_inset Quotes erd
-\end_inset
-
+\shape default
  to compute the cumulative derivative as required in the source splitting
  approach.
  We recall that all the coupling instructions are perfomed in a loop over
