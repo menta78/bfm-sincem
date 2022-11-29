@@ -3413,66 +3413,18 @@ iodef.xml
 .
 \end_layout
 
-\begin_layout Section
-Rebuilding the output and restart files
-\begin_inset CommandInset label
-LatexCommand label
-name "sec:Rebuilding-the-output"
-
-\end_inset
-
-
-\end_layout
-
 \begin_layout Standard
-The BFM is by construction defined only in the ocean grid points and the
- output file consists of a one-dimensional vector.
- It is therefore required to post-process the output to obtain the three-dimensi
-onal fields on the ocean model grid.
- 
-\end_layout
-
-\begin_layout Standard
-This operation is done with the tool 
+The restart is controlled through the logical key 
 \family typewriter
-bnmerge
+ln_rsttr
 \family default
- found in the 
+ in 
 \family typewriter
-$BFMDIR/tools
+namelist_top_cfg
 \family default
- directory that allows to merge together the individual output files per
- domain containing a vector with the ocean grid points of that specific
- domain only into the full 3D domain.
-\end_layout
-
-\begin_layout Standard
-The application is controlled with a namelist (see use details in 
-\family typewriter
-$BFMDIR/tools/README.md
-\family default
-), where it is possible to specify the list of variables to be remapped
- and the names of the files.
-\end_layout
-
-\begin_layout Standard
-In the case of restart files, it is also possible to use the tool 
-\family typewriter
-bnmerge
-\family default
- to build a single restart file which may turn to be useful in the case
- a user want to restart an experiment but with a different number of parallel
- processes.
- The reading of restart input files is controlled by the option 
-\family typewriter
-bfm_init 
-\family default
-in the 
-\family typewriter
-BFM_General.nml
-\family default
- namelist file, which can be set to 0 = no restart, 1 = multiple restart
- files (one per process), 2 = restart is a single merged file.
+ and restart files are generated for each processor by the TOP interface
+ ourpur procedure, which can be also rebuilt into a single file using the
+ REBUILD_NEMO tool of NEMO.
 \end_layout
 
 \begin_layout Section
