@@ -92,8 +92,11 @@ sub check_directive{
     trim($include);
     my @includes = split(/\s+/, $include);
     my $hasOR = 0 ; my $check = 0 ;
-    if ( "||" ~~ @includes ) { $hasOR = 1 ; };
+    for my $findor (@includes) {
+        if ($findor eq "||") { $hasOR = 1 ; };
+    };
     #print join("<>",@includes) . "\n";
+    #print ($hasOR . "\n");
     foreach my $inc (@includes){
         if ($inc eq "||") { next;};
         #print "\t$directives ----> $inc ----> return ";
