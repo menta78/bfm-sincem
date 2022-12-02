@@ -3240,7 +3240,7 @@ literal "true"
  The initial conditions of both physical and biogeochemical variables were
  set using the World Ocean Atlas 2018 climatological fields 
 \begin_inset CommandInset citation
-LatexCommand citet
+LatexCommand citep
 key "garcia2019oxygen,garcia2019nutrients"
 literal "false"
 

@@ -413,7 +413,15 @@ where
  of ordinary differential equations that express the transformation fluxes
  of biogeochemical properties in the marine environment.
  The BFM formualtion and the standalone implementation are described in
- full details in the BFM manual.
+ full details in the BFM manual 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "BFM-manual"
+literal "false"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
