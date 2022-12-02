@@ -2064,8 +2064,8 @@ status open
 
 \begin_layout Plain Layout
 
-   rn_cbc_time   =  3.1536e+7 !  Time scaling factor for CBC data (seconds
- in a day)
+   rn_cbc_time   =  86400.
+    !  Time scaling factor for CBC data (seconds in a day)
 \end_layout
 
 \begin_layout Plain Layout
@@ -2314,7 +2314,7 @@ status open
 
 \begin_layout Plain Layout
 
-    ChlAttenFlag       =  1
+    ChlAttenFlag       =  2
 \end_layout
 
 \begin_layout Plain Layout
@@ -3063,21 +3063,12 @@ literal "true"
  and it is a global ocean implementation of the BFM with NEMO using the
  family of ORCA grids.
  It was originally designed as a specific sub-set and integration of functional
- parameterizations that were required to address global ocean dynamics (see
- 
-\begin_inset CommandInset citation
-LatexCommand citet
-key "vichi07_part1"
-literal "true"
-
-\end_inset
-
-), but it is now intended to be just another configuration of the BFM.
+ parameterizations that were required to address global ocean dynamics and
+ it is now a reference configuration of the BFM.
  This implies that any BFM feature can be used with NEMO also in global
  ocean configurations.
  The PELAGOS family of configurations follows the ORCA family specifications,
- that is PELAGOS2 refers to the ORCA2 grid, PELAGOS1 to ORCA1 (see, e.g.,
- 
+ that is PELAGOS1 refers to the ORCA1 grid (see, e.g., 
 \begin_inset CommandInset citation
 LatexCommand citep
 key "lovato2022"
@@ -3085,28 +3076,26 @@ literal "false"
 
 \end_inset
 
-), and so forth.
+).
 \end_layout
 
 \begin_layout Standard
-PELAGOS2 is the coarsest global ocean resolution but still requires a parallel
+PELAGOS1 is the CMIP6 class global ocean resolution and it requires a parallel
  computing environment for its usage.
- One needs to have a fully functioning implementation of the ORCA2_ICE_PISCES
- reference configuration before attempting to run PELAGOS2.
- The default set up is the same as ORCA2_ICE_PISCES with the following features:
+ The default set up of PELAGOS1 accounts for the following main features:
 \end_layout
 
 \begin_layout Itemize
 sea ice model SI3 (
 \family typewriter
-key_
+key_si3
 \family default
-si3)
+)
 \end_layout
 
 \begin_layout Itemize
-Laplacian diffusion with isopycnal diffusion and coefficients for horizontal
- diffusion with 2-D variation 
+Laplacian diffusion and coefficients for horizontal diffusion with 2-D variation
+ 
 \end_layout
 
 \begin_layout Itemize
@@ -3115,19 +3104,11 @@ eddy-induced velocity parameterization of enhanced diffusion and related
 \end_layout
 
 \begin_layout Itemize
-coefficients for horizontal viscosity with 3-D variation
-\end_layout
-
-\begin_layout Itemize
 vertical turbulence TKE closure and vertical tidal mixing
 \end_layout
 
 \begin_layout Itemize
 bottom boundary layer parameterization 
-\end_layout
-
-\begin_layout Itemize
-double diffusion 
 \end_layout
 
 \begin_layout Standard
@@ -3140,17 +3121,17 @@ key_top
 \end_layout
 
 \begin_layout Standard
-By default, PELAGOS2 is compiled with the embedded I/O library XIOS (
+By default, PELAGOS1 is compiled with the embedded I/O library XIOS (
 \family typewriter
-key_
+key_xios
 \family default
-xios) which must be compiled as an external library.
+) which must be compiled as an external library.
  On a modern super-computer, 1 month of simulation takes about 5 minutes
- using 128 processors.
+ using 180 processors.
 \end_layout
 
 \begin_layout Section
-The PELAGOS2 preset
+The PELAGOS1 preset
 \end_layout
 
 \begin_layout Standard
@@ -3158,18 +3139,14 @@ This preset is not part of the official NEMO release but uses the
 \family typewriter
 makenemo
 \family default
- tool to create the configuration 
-\family typewriter
-PELAGOS2
-\family default
- in the 
+ tool to create the configuration PELAGOS1 in the 
 \family typewriter
 $NEMODIR/cfgs
 \family default
  directory to allow the compilation with FCM.
  Users should know that the file 
 \family typewriter
-cpp_PELAGOS2.fcm
+cpp_PELAGOS1.fcm
 \family default
  containing the preprocessing macros listed above is found in this directory,
  and once you have created the corresponding configuration directory in
@@ -3178,7 +3155,7 @@ cpp_PELAGOS2.fcm
 \end_layout
 
 \begin_layout Standard
-When the configuration script is called with the PELAGOS2 preset, 
+When the configuration script is called with the PELAGOS1 preset, 
 \family typewriter
 makenemo
 \family default
@@ -3193,7 +3170,7 @@ status open
 
 \begin_layout Plain Layout
 
-% ./bfm_configure.sh -gcd -a ARCHFILE -p PELAGOS2
+% ./bfm_configure.sh -gcd -a ARCHFILE -p PELAGOS1
 \end_layout
 
 \begin_layout Plain Layout
@@ -3203,12 +3180,12 @@ You are  installing a new configuration
 
 \begin_layout Plain Layout
 
-Creating PELAGOS2/WORK = OPA TOP ICE for PELAGOS2
+Creating PELAGOS1/WORK = OPA TOP ICE for PELAGOS1
 \end_layout
 
 \begin_layout Plain Layout
 
-MY_SRC directory is : PELAGOS2/MY_SRC
+MY_SRC directory is : PELAGOS1/MY_SRC
 \end_layout
 
 \begin_layout Plain Layout
@@ -3224,7 +3201,7 @@ MY_SRC directory is : PELAGOS2/MY_SRC
 \begin_layout Standard
 The run directory is created in 
 \family typewriter
-$BFMDIR_RUN/pelagos2
+$BFMDIR_RUN/pelagos1
 \family default
  just like all other BFM presets and the NEMO executable is linked to there.
 \end_layout
@@ -3234,56 +3211,60 @@ Results
 \end_layout
 
 \begin_layout Standard
-A 9 years-long simulation was performed with the PELAGOS2 configuration
- by using the normal year CORE II atmospheric forcing (
+A 9 years-long simulation was performed with the PELAGOS1 configuration
+ by using the normal year CORE II atmospheric forcing 
 \begin_inset CommandInset citation
-LatexCommand citet
+LatexCommand citep
 key "LargeYager2008"
 literal "true"
 
 \end_inset
 
-) and climatological river runoff (
+ and climatological river runoff 
 \begin_inset CommandInset citation
-LatexCommand citet
+LatexCommand citep
 key "DaiTren2002"
 literal "true"
 
 \end_inset
 
-) and nutrients loads (
+ and nutrients loads 
 \begin_inset CommandInset citation
-LatexCommand citet
-key "dacunha2007"
+LatexCommand citep
+key "mayorga2010"
 literal "true"
-
-\end_inset
-
-).
- Input data can be retrieved from NEMO Reference configurations inputs 
-\begin_inset CommandInset citation
-LatexCommand citet
-key "ORCA2_LIM_data"
-literal "false"
 
 \end_inset
 
 .
  The initial conditions of both physical and biogeochemical variables were
- set using the World Ocean Atlas 2009 climatological fields (
+ set using the World Ocean Atlas 2018 climatological fields 
 \begin_inset CommandInset citation
 LatexCommand citet
-key "WOA09"
-literal "true"
+key "garcia2019oxygen,garcia2019nutrients"
+literal "false"
 
 \end_inset
 
-).
- In Fig.
+ and GLODAPv2 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "lauvset2016"
+literal "false"
+
+\end_inset
+
+.
+ Input data can be retrieved from BFM website at www.bfm-community.eu.
+ 
+\end_layout
+
+\begin_layout Standard
+In Fig.
  
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "fig:Example-output-PELAGOS2"
+reference "fig:Example-output-PELAGOS1"
 
 \end_inset
 
@@ -3298,13 +3279,14 @@ reference "sec:Diagnostic-satellite-chl"
 \end_inset
 
 ) computed in the last year of simulation.
- PELAGOS2 is capable to reproduce the main distribution patterns of primary
+ PELAGOS1 is capable to reproduce the main distribution patterns of primary
  producers across the different oceanic regions, by preserving also the
  minimum concentration within the subtropical oceanic gyres.
 \end_layout
 
 \begin_layout Standard
 \begin_inset Float figure
+placement H
 wide false
 sideways false
 status open
@@ -3312,20 +3294,8 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename Figures/PELAGOS2_SST.png
-	lyxscale 20
-	scale 70
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\align center
-\begin_inset Graphics
-	filename Figures/PELAGOS2_Chlsat_01.png
-	lyxscale 20
+	filename Figures/PELAGOS1_core2_10yr_quad_panel.png
+	lyxscale 40
 	scale 70
 
 \end_inset
@@ -3339,13 +3309,16 @@ status open
 \begin_layout Plain Layout
 \begin_inset CommandInset label
 LatexCommand label
-name "fig:Example-output-PELAGOS2"
+name "fig:Example-output-PELAGOS1"
 
 \end_inset
 
-Example output from PELAGOS2 after 9 years of simulation.
- Mean annual surface temperature (top) and satellite-like chlorophyll at
- 1% light level (bottom).
+Example output from PELAGOS1 after 10 years of simulation under perpetual
+ CORE2 atmospheric forcings.
+ Satellite-like chlorophyll at 1% light level (a), 0–100 m concentrations
+ of dissolved inorganic nitrate (b), dissolved oxygen concentration between
+ 100 and 600 m (c), and 0–100 m concentrations of dissolved inorganic carbon
+ (d) .
  See Sec.
  
 \begin_inset CommandInset ref
@@ -3354,7 +3327,7 @@ reference "sec:Diagnostic-satellite-chl"
 
 \end_inset
 
- for satellite-like chlorophyll computation.
+ for details on satellite-like chlorophyll computation.
 \end_layout
 
 \end_inset
