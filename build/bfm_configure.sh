@@ -47,8 +47,8 @@ NMLLIST="";
 NEMOSUB="";
 
 #options
-OPTIONS=(     MODE     CPPDEFS     ARCH     CLEAN     EXP     EXPDIR     EXECMD     VALGRIND     PROC     QUEUE     BFMEXE     NEMOSUB     EXPFILES     FORCING     NMLLIST     RUNPROTO     )
-OPTIONS_USR=( mode_usr cppdefs_usr arch_usr clean_usr exp_usr expdir_usr execmd_usr valgrind_usr proc_usr queue_usr bfmexe_usr nemosub_usr expfiles_usr forcing_usr nmllist_usr runproto_usr )
+OPTIONS=(     MODE     CPPDEFS     ARCH     CLEAN     EXP     DIRFILES     EXECMD     VALGRIND     RUNDIR     QUEUE     BFMEXE     NEMOSUB     EXPFILES     FORCING     NMLLIST     RUNPROTO     )
+OPTIONS_USR=( mode_usr cppdefs_usr arch_usr clean_usr exp_usr DIRFILES_usr execmd_usr valgrind_usr rundir_usr queue_usr bfmexe_usr nemosub_usr expfiles_usr forcing_usr nmllist_usr runproto_usr )
 
 #error message
 ERROR_MSG="Execute $0 -h for help if you don't know what is going wrong. PLEASE read CAREFULLY before seeking help."
@@ -122,32 +122,28 @@ DESCRIPTION
        -x EXP
                   Name of the experiment for generation of the output folder (Default: "${EXP}")
        -F EXPFILES 
-                  files (generated or not)  to copy to experiment directory
+                  files (generated or not) to copy to experiment directory
        -i FORCING 
                   Necessary forcings to execute the model. To specify several files, separate them by colon ';' and surround all by quotes '"'.
                   (If the path is relative, the ROOT will be ${BFMDIR})
-       -D EXPDIR
+       -D DIRFILES
                   Input dir where are files to copy to experiment directory (Default: configurations/${PRESET}")
        -e EXECMD
                   Executable command to insert in runscript (Default for NEMO: "${MPICMD}", empty for others)
        -V VALGRIND
                   Executable valgrind command to insert in runscript
-       -r PROC
-                  Number of procs used for running. Default: 8
+       -r RUNDIR
+                  Path to folder where experiment will be created. (Default: "${BFMDIR}/run")
        -q QUEUE
                   Name of the queue number of procs used for running. Default
        -R RUNPROTO
                   Specify prototype for generating the experiment running script (Default: runscript)
 
 ENVIRONMENT VARIABLES
-       BFMDIR
-                  Path to the root directory of BFM. (Default: "${BFMDIR_DEFAULT}" if environment variable is not defined)
        NETCDF
                   Path to netcdf library and header files. (Default: "${NETCDF_DEFAULT}" if environment variable is not defined)
-       BFMDIR_RUN
-                  Path to folder where experiments will be created. (Default: "${BFMDIR}/run" if environment variable is not defined)
        NEMODIR
-                  Path to the root directory of NEMO. Must define this environment variable if you use NEMO
+                  Path to the root directory of NEMO code. Must define this environment variable if you use NEMO coupled presets
 EOF
 }
 
@@ -184,7 +180,7 @@ while getopts "hvgcdPp:m:k:N:S:a:fx:F:i:D:e:V:r:q:o:R:" opt; do
       D ) [ ${VERBOSE} ] && echo "inputdata dir $OPTARG"    ; expdir_usr=$OPTARG   ;;
       e ) [ ${VERBOSE} ] && echo "exe command $OPTARG"      ; execmd_usr=$OPTARG   ;;
       V ) [ ${VERBOSE} ] && echo "valgrind command $OPTARG" ; valgrind_usr=$OPTARG ;;
-      r ) [ ${VERBOSE} ] && echo "n. procs $OPTARG"         ; proc_usr=$OPTARG     ;;
+      r ) [ ${VERBOSE} ] && echo "run directory $OPTARG"    ; rundir_usr=$OPTARG   ;;
       q ) [ ${VERBOSE} ] && echo "queue name $OPTARG"       ; queue_usr=$OPTARG    ;;
       o ) [ ${VERBOSE} ] && echo "executable name $OPTARG"  ; bfmexe_usr=$OPTARG   ;;
       R ) [ ${VERBOSE} ] && echo "run proto  name $OPTARG"  ; runproto_usr=$OPTARG ;;
@@ -240,7 +236,7 @@ for option in "${OPTIONS[@]}"; do
     if [ "${value}" ]; then 
         [ ${VERBOSE} ] && echo "- replacing ${option}=${value}"
         eval ${option}=\"\${value}\"
-    if [ "${option}" == "EXPDIR" ] ; then EXPDIR=${BFMDIR}/${CONFDIR}/${PRESET}/${value} ; fi
+    if [ "${option}" == "DIRFILES" ] ; then DIRFILES=${BFMDIR}/${CONFDIR}/${PRESET}/${value} ; fi
     fi
 done
 
@@ -325,7 +321,7 @@ if [ ${GEN} ]; then
     if [ ! -d ${blddir} ]; then mkdir ${blddir}; fi
     cd ${blddir}
     rm -rf *
-    cp ${presetdir}/* ${blddir}
+    find ${presetdir} -maxdepth 1 -type f -execdir cp "{}" ${blddir} ";"
     
     #add -D to cppdefs
     cppdefs=`echo ${CPPDEFS} | sed -e 's/\([a-zA-Z_0-9]*\)/-D\1/g'`
@@ -564,8 +560,8 @@ if [[ ${DEP} && "$MODE" != "NEMO_CESM" ]]; then
     [ ${VERBOSE} ] && echo "creating Experiment ${PRESET}"
 
     #set run dir path
-    if [ ${BFMDIR_RUN} ]; then
-        exedir="${BFMDIR_RUN}/${EXP}"
+    if [ ${RUNDIR} ]; then
+        exedir="${RUNDIR}/${EXP}"
         [ ${VERBOSE} ] && echo "setting run dir path with environment variable: ${exedir}"
     else
         exedir="${BFMDIR}/run/${EXP}"
@@ -587,7 +583,7 @@ if [[ ${DEP} && "$MODE" != "NEMO_CESM" ]]; then
         cp *.nml ${exedir}/
         if [ "$MODE" == "OGS" ] ; then cp namelist* ${exedir}/; fi
         if [ "${EXPFILES}" ]; then cp ${EXPFILES} ${exedir}/; fi
-        if [ "${EXPDIR}"   ]; then cp -R ${EXPDIR} ${exedir}/; fi
+        if [ "${DIRFILES}" ]; then cp -R ${DIRFILES} ${exedir}/; fi
 
         #link forcing files to exedir
         if [ "${FORCING}" ]; then
