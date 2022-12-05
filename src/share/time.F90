@@ -61,6 +61,7 @@
    public                              :: time_diff
    public                              :: dayofyear
    public                              :: eomdays, yeardays, outdeltalab
+   public                              :: GetDelta
 !
 ! !PUBLIC DATA MEMBERS:
    character(len=19), public           :: timestr
@@ -549,6 +550,27 @@
      return
 
  end function outdeltalab
+
+!-----------------------------------------------------------------------
+
+ function GetDelta() result(Delta)
+!
+! DESCRIPTION
+!  Transfer the integration time step to the BFM
+!  Unit conversion from seconds to days
+!
+! USES
+     implicit none
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+     real(RLEN) :: Delta
+
+     Delta = timestep/SEC_PER_DAY
+
+     return
+
+end function GetDelta
 
    end module time
 

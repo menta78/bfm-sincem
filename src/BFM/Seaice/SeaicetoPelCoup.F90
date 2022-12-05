@@ -135,6 +135,7 @@
    use mem
    use api_bfm,    only: SRFindices, BOTindices 
    use mem_SeaiceAlgae, only: p_epsSAL
+   use time,       only: GetDelta
 
    IMPLICIT NONE
 
@@ -159,7 +160,6 @@
    real(RLEN), dimension(:), pointer  :: lcl_PelagicVar,lcl_SeaiceVar
    real(RLEN)                         :: tmpflux(NO_BOXES)
    real(RLEN)                         :: delta
-   real(RLEN), external               :: GetDelta
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
     delta = GetDelta()

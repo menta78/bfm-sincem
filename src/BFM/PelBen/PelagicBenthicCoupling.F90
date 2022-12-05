@@ -80,6 +80,7 @@
                   D1m, D6m, D7m, D8m, D9m, ppD6m, ppD7m, ppD8m, ppD9m
 #endif
  use api_bfm, ONLY: BOTindices
+ use time,    ONLY: GetDelta
 
    IMPLICIT NONE
  
@@ -95,7 +96,6 @@
    !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    integer  :: i, j, kbot, Box 
    real(RLEN) :: sedi, c, p, s, uptake, ruQc, ruQn, ruQp, ruQs, ruQf, ruQl, Delta
-   real(RLEN), external  :: GetDelta
    !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
    allocate(jbotR1PPY(NO_BOXES_XY,iiLastElement), jbotR2R1(NO_BOXES_XY),   &

@@ -39,6 +39,7 @@
   use mem_Param,  ONLY: p_small, p_poro
   use mem_Silt, ONLY: siltmethod
   use mem_globalfun,   ONLY: eTq
+  use time,       only: GetDelta
 
   IMPLICIT NONE
 
@@ -52,8 +53,6 @@
      REAL(RLEN),dimension(NO_BOXES)    :: rate
      REAL(RLEN)                        :: U, Hs, Tz, tau, uw, rate_1, R9x_new
      REAL(RLEN), PARAMETER             :: g=9.81, fw=0.1
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-     real(RLEN), external  :: GetDelta
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
      delta=GetDelta()
