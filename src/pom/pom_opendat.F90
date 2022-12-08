@@ -83,6 +83,7 @@
                         heat_input,     & ! Time varying (monthly) surface heat flux
                         surfNut_input,  & ! Time varying (monthly) surface nutrient
                         ism_input,      & ! Inorganic suspended matter Initial Conditions
+                        VERT_ADV,       & ! scheme for vertical advection: 0: sinking upwind, 1: centered. Default: 1
                         USE_O2_TNDC,    & ! true if a file with oxygen profiles was provided
                         USE_KH_EXT,     & ! true if KH is loaded from an external source
                         KH_FACTOR,      & ! scaling factor for KH_EXT
@@ -150,11 +151,16 @@
                           ASURF_NH4,      &
                           ASURF_SIO4,     &
                           SWR_FILE_STEP,  &
+                          VERT_ADV,       &
                           read_restart
 !
      open(namlst,file='pom_bfm_settings.nml',status='old',action='read',err=100)
      read(namlst,nml=pom_input, err=102)
      close(namlst)
+!
+     write(6,*) 'Loaded namelist:'
+     write(6,pom_input)
+!
 !
 !    -----OPEN WIND STRESS FILE-----
 !

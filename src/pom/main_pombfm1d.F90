@@ -300,7 +300,6 @@
 !
          IF (.NOT. USE_KH_EXT) THEN
 !            ----- MELLOR-YAMADA (1982) TURBULENCE CLOSURE-----
-             write(*,*) "turbo"
              Q2F(:)  = Q2B(:)
              Q2LF(:) = Q2LB(:)
 !
