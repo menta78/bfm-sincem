@@ -301,10 +301,6 @@
 !
    D2STATEB_BEN = ZERO
 !
-!  -----DEFINE BETTER INITIAL CONDITIONS-----
-!
-   !call set_initial_conditions
-!
 !  -----SAVE INITIAL CONDITIONS IN OUTPUT FILE-----
 !
    call init_save_bfm

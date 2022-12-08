@@ -47,11 +47,11 @@
 ! **************************************************************
 ! **************************************************************
 
-! !ROUTINE: vdiff_SOS
+! !ROUTINE: vert_transport
 !
 ! !INTERFACE
 !
-  SUBROUTINE vdiff_SOS
+  SUBROUTINE vert_transport
 !
 !
 !DESCRIPTION
@@ -425,7 +425,7 @@
 
    enddo ! loop over NO_D3_BOX_STATES
 !
-      end subroutine vdiff_sos
+      end subroutine vert_transport
 !
 !<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><
 !

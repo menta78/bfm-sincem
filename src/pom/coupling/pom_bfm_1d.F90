@@ -114,7 +114,7 @@
 !      *******************************************************************
 !      *******************************************************************
 !
-       call vdiff_SOS
+       call vert_transport
 !
 !      -----INTEGRATION OF SCALAR (BENTHIC) BFM STATE VAR'S WITH LEAPFROG SCHEME----
 !

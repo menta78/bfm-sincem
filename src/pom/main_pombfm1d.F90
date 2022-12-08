@@ -144,7 +144,7 @@
                get_rst,         &
                pom_ini_bfm_1d,  &
                pom_bfm_1d,      &
-               restart_BFM_inPOM
+               save_restart
 !
 !
 !     -----INTRINSIC FUNCTIONS-----
@@ -270,7 +270,7 @@
 !
 !                 -----READ RESTART-----
 !
-                  call get_rst
+                  call load_restart
 ! 
        end select 
 !
@@ -454,7 +454,7 @@
 #ifndef POM_only
 
 !
-      call restart_BFM_inPOM
+      call save_restart
 !
 #endif
 !
