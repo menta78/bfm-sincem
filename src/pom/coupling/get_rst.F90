@@ -97,22 +97,6 @@
 !
       integer,parameter  :: namlst=10
 !
-!     -----READ NAMELIST WITH RESTART FILE PATH-----
-!
-       namelist /pom_input/ wind_input,     &
-                            ism_input,      &
-                            Sal_input,      &
-                            Temp_input,     &
-                            Sprofile_input, &
-                            Tprofile_input, &
-                            heat_input,     &
-                            surfNut_input,  &
-                            read_restart
-!
-       open(namlst,file='pom_bfm_settings.nml',status='old',action='read',err=100)
-       read(namlst,nml=pom_input, err=102)
-       rewind(namlst)
-       close(namlst)
 !
 !    -----OPEN AND READ THE RESTART FILE FOR POM-----
 !

@@ -247,9 +247,13 @@
 !     -----ITERATIONS NEEDED TO CARRY OUT AN"IDAYS" SIMULATION-----
 !
       iend = idays*IFIX(SEC_PER_DAY)/IFIX(dti)
+
+!     opening the input files
+      call opendat
 !
 !     -----READ  T&S INITIAL CONDITIONS (IHOTST=0) OR RESTART FILE (IHOTST=1)-----
 !
+
       select case (ihotst)
 !
              case (0)
