@@ -70,7 +70,7 @@
 !
      use global_mem, ONLY:RLEN,ZERO
 !
-     use Service
+     use CPL_VARIABLES
 !
      use api_bfm, ONLY:D3STATEB
 !
@@ -389,7 +389,7 @@
                   LFLUX = LAMBDA*fbio ! estimating the lateral flux. Do it at the central time step!
                   do K=1,KB-1
 !            
-                   !ffbio(k)=fbbio(k)+DTI2*((ffbio(k)/H)+D3SOURCE(m,k))
+                   ! Integration in time: leap-frog of advection, lateral flux and reactive term
                     ffbio(k)=fbbio(k)+DTI2*(advtnd(k)+D3SOURCE(m,k)+LFLUX(K))
 !            
                   end do

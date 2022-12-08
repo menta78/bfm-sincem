@@ -81,7 +81,7 @@
 !
    use init_var_bfm_local
 !
-   use Service, ONLY: savef
+   use CPL_VARIABLES, ONLY: savef
 !
    use netcdf_bfm, ONLY: init_netcdf_bfm,     &
                          init_save_bfm,       &
@@ -144,7 +144,7 @@
    BOTmask = .TRUE.
    SRFmask = .TRUE.
 !
-!  -----ALLOCATE SERVICE ARRAY AND INITIALISE (ZEROING)-----
+!  -----ALLOCATE CPL_VARIABLES ARRAY AND INITIALISE (ZEROING)-----
 !
    allocate(ZEROS(NO_BOXES_X,NO_BOXES_Y,NO_BOXES_Z)) 
    ZEROS = ZERO

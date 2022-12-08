@@ -1,5 +1,5 @@
  !
-! !MODULE: Service
+! !MODULE: CPL_VARIABLES
 ! **************************************************************
 ! **************************************************************
 ! **                                                          **
@@ -54,7 +54,7 @@
 ! FOR THE BFM-POM COUPLING.
 !
 ! !INTERFACE
-  MODULE  Service
+  MODULE  CPL_VARIABLES
 !
 !     -----MODULES (USE OF ONLY IS STRONGLY ENCOURAGED)-----
 !
@@ -141,6 +141,6 @@
                                            surfNut_input,   &
                                            read_restart
 !
- end module Service
+ end module CPL_VARIABLES
 !
 !EOC

@@ -72,7 +72,7 @@
 !
     use global_mem,ONLY:RLEN,LOGUNIT,error_msg_prn,NML_OPEN,NML_READ
 !
-    use Service, only:  wind_input,     & ! Wind Stress
+    use CPL_VARIABLES, only:  wind_input,     & ! Wind Stress
                         Sal_input,      & ! Salinity Initial Conditions
                         Temp_input,     & ! Temperature Initial Conditions
                         Sprofile_input, & ! Time varying (monthly) salinity profiles

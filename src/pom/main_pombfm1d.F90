@@ -109,7 +109,7 @@
                      vonkarmann,                                          &
                      NC_OUT_STARTTIME
 !
-      use Service,ONLY: ilong, savef
+      use CPL_VARIABLES,ONLY: ilong, savef
 !
       use Forcing,ONLY: Forcing_manager
 !

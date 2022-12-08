@@ -99,7 +99,7 @@
       use global_mem, ONLY: ZERO,NML_OPEN,NML_READ,NMLUNIT,error_msg_prn
       use Mem 
       use POM
-      use Service 
+      use CPL_VARIABLES 
 !
 !     -----IMPLICIT TYPING IS NEVER ALLOWED-----
 !

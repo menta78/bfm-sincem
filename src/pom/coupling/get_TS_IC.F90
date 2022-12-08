@@ -65,7 +65,7 @@
 !
       use global_mem, ONLY: error_msg_prn, NML_OPEN, NML_READ
 !
-      use Service, ONLY: wind_input,     &
+      use CPL_VARIABLES, ONLY: wind_input,     &
                          ism_input,      &
                          Sal_input,      &
                          Temp_input,     &
