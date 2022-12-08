@@ -222,8 +222,7 @@ contains
 !
       use constants, ONLY: SEC_PER_DAY
 !
-      use POM, ONLY: IDIAGN,                                              &
-                     DTI,                                                 &
+      use POM, ONLY: DTI,                                                 &
                      INTT,                                                &
                      RCP,                                                 &
                      KB,                                                  &
@@ -335,19 +334,10 @@ contains
 !         **************************************************
 !
           IF (SWR_FILE_STEP .EQ. 0) THEN
-             select case (IDIAGN)
 !
-                    case(0)
+              READ (21,REC=ICOUNTF)   SWRAD1
+              READ (21,REC=ICOUNTF+1) SWRAD2
 !
-                       READ(21,REC=ICOUNTF)   SWRAD1,WTSURF1
-                       READ(21,REC=ICOUNTF+1) SWRAD2,WTSURF2
-!
-                    case(1)
-!
-                       READ (21,REC=ICOUNTF)   SWRAD1
-                       READ (21,REC=ICOUNTF+1) SWRAD2
-!
-             end select
           END IF
 !
 !         ***********************************************************
@@ -449,11 +439,6 @@ contains
 !
           SWRAD1  = SWRAD1*(-ONE)/rcp
           SWRAD2  = SWRAD2*(-ONE)/rcp
-!   
-          IF(IDIAGN==INT(ZERO)) THEN
-             WTSURF1 = WTSURF1*(-ONE)/rcp
-             WTSURF2 = WTSURF2*(-ONE)/rcp
-          ENDIF
 !
 !         -----UPDATE THE MONTH COUNTER-----
 !
@@ -486,22 +471,10 @@ contains
 !         -----HEAT FLUX CONVERTED TO POM UNITS(W/m2-->deg.C*m/s)-----
             SWRAD  = SWRAD*(-ONE)/rcp
          CASE DEFAULT
-            select case (IDIAGN)
+            ! loading monthly files
+!           -----DIAGNOSTIC RUN: INTERPOLATE SOLAR RADIATION ONLY-----
 !
-                   case (INT(ZERO))
-!
-!                       -----PROGNOSTIC RUN: INTERPOLATE TOTAL HEAT FLUX-----
-!
-                        WTSURF = WTSURF1 + RATIOF * (WTSURF2-WTSURF1)
-                        SWRAD  = SWRAD1  + RATIOF * (SWRAD2-SWRAD1)
-!
-                   case (INT(ONE))
-!
-!                        -----DIAGNOSTIC RUN: INTERPOLATE SOLAR RADIATION ONLY-----
-!
-                        SWRAD  = SWRAD1  + RATIOF * (SWRAD2-SWRAD1)
-!
-            end select
+            SWRAD  = SWRAD1  + RATIOF * (SWRAD2-SWRAD1)
       END SELECT
 !
 !     -----INTERPOLATE T&S PROFILES-----
@@ -523,23 +496,10 @@ contains
          END IF
       END IF
 !
-      select case (IDIAGN)
+!     -----DIAGNOSTIC RUN: THE WHOLE T&S PROFILES ARE PRESCRIBED-----
 !
-             case (INT(ZERO))
-!
-!                 -----PROGNOSTIC RUN: SAVE SST AND SSS FOR SURF. B.C.-----
-!
-                  TSURF = TSTAR(1)
-                  SSURF = SSTAR(1)
-!
-             case (INT(ONE))
-!
-!                 -----DIAGNOSTIC RUN: THE WHOLE T&S PROFILES ARE PRESCRIBED-----
-!
-                  TF(:) = TSTAR(:)
-                  SF(:) = SSTAR(:)
-!
-      end select
+      TF(:) = TSTAR(:)
+      SF(:) = SSTAR(:)
 !
 !     -----INTERPOLATE SUSPENDED INORGANIC MATTER-----
 !
@@ -575,7 +535,6 @@ contains
 !        -----....SHIFT THE MONTHLY DATA....-----
 !
          SWRAD1     = SWRAD2
-         if (IDIAGN==INT(ZERO)) WTSURF1 = WTSURF2
          WSU1       = WSU2
          WSV1       = WSV2
          NO3_1      = NO3_2
@@ -606,21 +565,9 @@ contains
              WSU1 = WSU1*(-ONE)/RHO0
              WSV1 = WSV1*(-ONE)/RHO0
 !
-             select case (IDIAGN)
-!                   
-                    case(INT(ZERO))
 !
-                         READ(21,REC=1) SWRAD1,WTSURF1
-!          
-!                        -----POM UNITS-----
+             READ(21,REC=1) SWRAD1
 !
-                         WTSURF1=WTSURF1*(-ONE)/rcp
-!
-                    case(INT(ONE))
-!
-                         READ(21,REC=1) SWRAD1
-!
-             end select
 !
 !            -----POM UNITS-----
 !
@@ -660,21 +607,7 @@ contains
 
          READ (11,REC=ICOUNTF) WSU2,WSV2
 !
-         select case (IDIAGN)
-!
-               case (INT(ZERO))
-!
-                     READ (21,REC=ICOUNTF) SWRAD2,WTSURF2
-!
-!                    -----POM UNITS-----
-!
-                     WTSURF2=WTSURF2*(-ONE)/rcp
-!
-               case (INT(ONE))
-!
-                     READ (21,REC=ICOUNTF) SWRAD2
-!
-         end select
+         READ (21,REC=ICOUNTF) SWRAD2
 !
          IF (USE_KH_EXT) THEN
             DO K = 1,KB-1

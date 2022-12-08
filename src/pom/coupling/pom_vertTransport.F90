@@ -404,7 +404,7 @@
 !     *******************************************************************
 !     *******************************************************************
 !
-      CALL PROFTS(ffbio,surflux,botflux,ZERO,ZERO,NBCBFM,DTI2,NTP,UMOLBFM)
+      CALL PROF_TRACERS(ffbio,surflux,botflux,ZERO,ZERO,NBCBFM,DTI2,NTP,UMOLBFM)
 !
 !     -----CLIPPING......IF NEEDED-----
 !
@@ -499,6 +499,7 @@
 !     -----MODULES (USE OF ONLY IS STRONGLY ENCOURAGED)-----
 !
       use POM, ONLY:KB, DZR, H
+      use CPL_VARIABLES
 !
       use global_mem, ONLY:RLEN
 !
@@ -512,26 +513,26 @@
      integer :: k
 !
      F(KB)=F(KB-1)
-!
-! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=
-! Calculate vertical advection. Mind downward velocities are negative!
-! Upwind scheme:
-! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=
-!
-!     FF(1)=DZR(1)*F(1)*W(2)
+     SELECT CASE (VERT_ADV)
+         CASE (VERT_ADV_SINKING_UPWIND)
+             !
+             ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=
+             ! Calculate vertical advection. Mind downward velocities are negative!
+             ! Upwind scheme:
+             ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=
+             !
+             ADVTND(1)=DZR(1)/H*F(1)*W(2)
+             do K=2,KB-1
+                ADVTND(K)=DZR(K)/H*(F(K)*W(K+1)-F(K-1)*W(K))
+             end do
+         CASE DEFAULT !(VERT_ADV_CENTERED)
+             ! centered scheme: Gordon & Stern 1982
 
-!     do K=2,KB-1
-!
-!        FF(K)=DZR(K)*(F(K)*W(K+1)-F(K-1)*W(K))
-!
-!     end do
-
-! scheme: Gordon & Stern 1982
-
-      ADVTND(1) = DZR(1)/H*(F(1)+F(2))/2*W(2)
-      do K=2,KB-1
-         ADVTND(K)= 0.5/H*( DZR(K)*W(K)*(F(K-1)-F(K)) + DZR(K+1)*W(K+1)*(F(K)-F(K+1)) )
-      end do
+             ADVTND(1) = DZR(1)/H*(F(1)+F(2))/2*W(2)
+             do K=2,KB-1
+                ADVTND(K)= 0.5/H*( DZR(K)*W(K)*(F(K-1)-F(K)) + DZR(K+1)*W(K+1)*(F(K)-F(K+1)) )
+             end do
+         END SELECT
 !
       return
 !

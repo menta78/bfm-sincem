@@ -128,7 +128,7 @@
 !
 !     -----THESE ARE THE PATHWAYS FOR THE IC, RESTART AND FORCING FILES (READ TROUGH NML)-----
 !
-     character(200)                     :: wind_input,      &
+      character(200)                     :: wind_input,      &
                                            ism_input,       &
                                            Sal_input,       &
                                            Temp_input,      &
@@ -140,6 +140,15 @@
                                            heat_input,      &
                                            surfNut_input,   &
                                            read_restart
+
+!
+!     ---- FLAGS FOR VERTICAL ADVECTION SCHEME:
+!          0: UPWIND SCHEME FOR SINING POM, NO POSITIVE VELOCITY
+!          1: CENTERED SCHEME: GORDON & STERN 1982
+!
+      INTEGER, PARAMETER      :: VERT_ADV_SINKING_UPWIND = 0
+      INTEGER, PARAMETER      :: VERT_ADV_CENTERED = 1
+      INTEGER                 :: VERT_ADV = VERT_ADV_CENTERED
 !
  end module CPL_VARIABLES
 !
