@@ -2954,6 +2954,7 @@ i.org/) and use a NEMO ARCH file with the
 mpif90
 \family default
  compiler.
+ This preset is part of the official NEMO release.
 \end_layout
 
 \begin_layout Section
@@ -3082,7 +3083,8 @@ literal "false"
 \begin_layout Standard
 PELAGOS1 is the CMIP6 class global ocean resolution and it requires a parallel
  computing environment for its usage.
- The default set up of PELAGOS1 accounts for the following main features:
+ The default set up of PELAGOS1 accounts for the following main physical
+ features:
 \end_layout
 
 \begin_layout Itemize
@@ -3135,7 +3137,7 @@ The PELAGOS1 preset
 \end_layout
 
 \begin_layout Standard
-This preset is not part of the official NEMO release but uses the 
+This preset is not part of the official BFM release but it uses the 
 \family typewriter
 makenemo
 \family default
@@ -3204,6 +3206,8 @@ The run directory is created in
 $BFMDIR_RUN/pelagos1
 \family default
  just like all other BFM presets and the NEMO executable is linked to there.
+ The preset and input files needed to reproduce the results shown below
+ are made available upon request to the BFM System Team.
 \end_layout
 
 \begin_layout Section
