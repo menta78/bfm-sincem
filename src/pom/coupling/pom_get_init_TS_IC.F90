@@ -65,14 +65,29 @@
 !
       use global_mem, ONLY: error_msg_prn, NML_OPEN, NML_READ
 !
-      use Service, ONLY: wind_input,     &
+      use CPL_VARIABLES, ONLY: wind_input,     &
                          ism_input,      &
                          Sal_input,      &
                          Temp_input,     &
                          Sprofile_input, &
                          Tprofile_input, &
+                         Oprofile_input, &
+                         Kprofile_input, &
+                         Wprofile_input, &
                          heat_input,     &
                          surfNut_input,  &
+                         NUTSBC_MODE,    &
+                         L_PO4,          &
+                         L_NO3,          &
+                         L_SIO4,         &
+                         L_O2,           &
+                         L_X,            &
+                         ASURF_PO4,      &
+                         ASURF_NO3,      &
+                         ASURF_NH4,      &
+                         ASURF_SIO4,     &
+                         KH_FACTOR,      &
+                         SWR_FILE_STEP,  &
                          read_restart
 !    
       use pom, ONLY: KB,T,TB,S,SB
@@ -92,23 +107,6 @@
 !     -----NAMELIST READING UNIT-----
 !
       integer,parameter  :: namlst=10
-!
-!    -----OPEN AND READ NAMELIST WITH T&S I.C. FILE PATH-----
-!
-       namelist /pom_input/ wind_input,     &
-                            ism_input,      &
-                            Sal_input,      &
-                            Temp_input,     &
-                            Sprofile_input, &
-                            Tprofile_input, &
-                            heat_input,     &
-                            surfNut_input,  &
-                            read_restart
-!
-       open(namlst,file='pom_bfm_settings.nml',status='old',action='read',err=100)
-       read(namlst,nml=pom_input, err=102)
-       rewind(namlst)
-       close(namlst)
 !
 !    -----OPEN FILE WITH SALINITY I.C.----
 !

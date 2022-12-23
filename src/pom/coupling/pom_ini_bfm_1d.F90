@@ -71,7 +71,8 @@
                   ihotst,  &
                   ALAT,    &
                   ZZ,      &
-                  DZZ
+                  DZZ,     &
+                  NC_OUT_STARTTIME
 !
    use global_mem, ONLY:ZERO, &
                         RLEN
@@ -80,7 +81,7 @@
 !
    use init_var_bfm_local
 !
-   use Service, ONLY: savef
+   use CPL_VARIABLES, ONLY: savef
 !
    use netcdf_bfm, ONLY: init_netcdf_bfm,     &
                          init_save_bfm,       &
@@ -143,7 +144,7 @@
    BOTmask = .TRUE.
    SRFmask = .TRUE.
 !
-!  -----ALLOCATE SERVICE ARRAY AND INITIALISE (ZEROING)-----
+!  -----ALLOCATE CPL_VARIABLES ARRAY AND INITIALISE (ZEROING)-----
 !
    allocate(ZEROS(NO_BOXES_X,NO_BOXES_Y,NO_BOXES_Z)) 
    ZEROS = ZERO
@@ -266,7 +267,7 @@
 !  -----INITIALISE NETCDF OUTPUT-----
 !
    call init_netcdf_bfm(title=out_title,                      &
-                        start_time='01-01-0000',              &
+                        start_time=TRIM(NC_OUT_STARTTIME),              &
                         expinfo="BFM_POM",                    &
                         time_unit=0,                          &
                         lat=alat,                             &
@@ -300,10 +301,6 @@
 !
    D2STATEB_BEN = ZERO
 !
-!  -----DEFINE BETTER INITIAL CONDITIONS-----
-!
-   !call set_initial_conditions
-!
 !  -----SAVE INITIAL CONDITIONS IN OUTPUT FILE-----
 !
    call init_save_bfm
@@ -323,7 +320,7 @@ if (bfm_init == 1) call read_rst_bfm(in_rst_fname)
 !      -----INITIALISE BFM RESTART FILE-----
 !
        call init_netcdf_rst_bfm(out_rst_fname,                            &
-                                start_time='01-01-0000',              &
+                                start_time=TRIM(NC_OUT_STARTTIME),              &
                                 time_unit=0,                          &
                                 lat=alat,                             &
                                 lon=alon,                             &

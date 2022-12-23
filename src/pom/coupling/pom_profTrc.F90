@@ -1,5 +1,5 @@
 !
-! !ROUTINE: profTS
+! !ROUTINE: PROF_TRACERS
 !
 ! **************************************************************
 ! **************************************************************
@@ -53,7 +53,7 @@
 !
 ! !INTERFACE
 !
-      Subroutine PROFTS(FF,WFSURF,WFBOT,SWRAD,FSURF,NBC,DT2,NTP,UMOL)
+      Subroutine PROF_TRACERS(FF,WFSURF,WFBOT,SWRAD,FSURF,NBC,DT2,NTP,UMOL)
 !
 ! DESCRIPTION
 !
@@ -279,7 +279,7 @@
 !
       RETURN
 !
-     end subroutine PROFTS
+     end subroutine PROF_TRACERS
 
 !EOC
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

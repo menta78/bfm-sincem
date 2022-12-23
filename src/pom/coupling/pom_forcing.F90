@@ -57,7 +57,7 @@
 !
 ! -----MODULES (USE OF ONLY IS STRONGLY ENCOURAGED)-----
 !
-  use POM,ONLY: KB, ilong
+  use POM,ONLY: KB, ilong, DZ
 !
   use global_mem, ONLY:RLEN
 !
@@ -126,14 +126,23 @@
 !
       REAL (RLEN),SAVE                       :: SIO4_1,SIO4_2
 !
+!     -----MONTHLY PROFILES OF O2, used only if NUTSBC_MODE == 1 and if file is present
+      REAL (RLEN), DIMENSION(KB-1)             :: O2_1,O2_2 = 0
+!
 !     -----VERTICAL PROFILES OF INORGANIC SUSPENDED MATTER DATA-----
 !
       real(RLEN),public,dimension(KB-1),SAVE :: ISM1,ISM2
 !
 !     -----VERTICAL PROFILES OF T & S-----
 !
-      real(RLEN),public,dimension(KB),SAVE :: TCLIM1,TCLIM2
-      real(RLEN),public,dimension(KB),SAVE :: SCLIM1,SCLIM2
+      real(RLEN),public,dimension(KB-1),SAVE :: TCLIM1,TCLIM2
+      real(RLEN),public,dimension(KB-1),SAVE :: SCLIM1,SCLIM2
+!
+!     -----MONTHLY PROFILES OF KH, used only if provided, otherwise POM will do the job
+      REAL (RLEN), DIMENSION(KB-1)             :: KH_1,KH_2 = 0
+!
+!     -----MONTHLY PROFILES OF W mean and variance
+      REAL (RLEN), DIMENSION(KB)             :: WMN1,WMN2,WVR1,WVR2,W_MEAN_PR,W_VRNC_PR = 0
 
 !
 !     -----INTERPOLATORS AND COUNTERS-----
@@ -213,8 +222,7 @@ contains
 !
       use constants, ONLY: SEC_PER_DAY
 !
-      use POM, ONLY: IDIAGN,                                              &
-                     DTI,                                                 &
+      use POM, ONLY: DTI,                                                 &
                      INTT,                                                &
                      RCP,                                                 &
                      KB,                                                  &
@@ -228,7 +236,11 @@ contains
                      ilong,                                               &
                      RHO0
 !
-      use Service,ONLY: ISM,PO4SURF,NO3SURF,NH4SURF,SIO4SURF
+      USE MONTECARLO
+      use CPL_VARIABLES,ONLY: ISM,PO4SURF,NO3SURF,NH4SURF,SIO4SURF,&
+              USE_W_PROFILE, W_PROFILE, &
+              USE_O2_TNDC,O2_TNDC,USE_KH_EXT,KH_EXT,NUTSBC_MODE,&
+              SWR_FILE_STEP, DAY_OF_SIMULATION, MONTH_OF_SIMULATION
 !
 ! -----IMPLICIT TYPING IS NEVER ALLOWED-----
 !
@@ -236,7 +248,7 @@ contains
 !
 !     -----LOOP COUNTER-----
 !
-      integer(ilong)               :: K
+      integer(ilong)               :: K, IHOUR, IDAY
 !
 !     -------INITIALISATION AND FIRST FORCING READING-----
 !
@@ -260,6 +272,10 @@ contains
         NH4_2        =ZERO
         SIO4_1       =ZERO
         SIO4_2       =ZERO
+        O2_1         =ZERO
+        O2_2         =ZERO
+        KH_1         =ZERO
+        KH_2         =ZERO
         TCLIM1(:)    =ZERO
         TCLIM2(:)    =ZERO
         SCLIM1(:)    =ZERO
@@ -292,7 +308,6 @@ contains
 !
 !         -----OPEN DATA FILES-----
 !
-          CALL opendat
 !
 !         *************************************************
 !         *************************************************
@@ -318,19 +333,12 @@ contains
 !         **************************************************
 !         **************************************************
 !
-          select case (IDIAGN)
+          IF (SWR_FILE_STEP .EQ. 0) THEN
 !
-                 case(0)
+              READ (21,REC=ICOUNTF)   SWRAD1
+              READ (21,REC=ICOUNTF+1) SWRAD2
 !
-                    READ(21,REC=ICOUNTF)   SWRAD1,WTSURF1
-                    READ(21,REC=ICOUNTF+1) SWRAD2,WTSURF2
-!
-                 case(1)
-!
-                    READ (21,REC=ICOUNTF)   SWRAD1
-                    READ (21,REC=ICOUNTF+1) SWRAD2
-!
-           end select
+          END IF
 !
 !         ***********************************************************
 !         ***********************************************************
@@ -362,10 +370,6 @@ contains
 !         ***********************************************************
 !
           DO K = 1,KB
-             READ (20,REC=(ICOUNTF-1)*KB+K) SCLIM1(K)
-             READ (15,REC=(ICOUNTF-1)*KB+K) TCLIM1(K)
-             READ (20,REC=ICOUNTF*KB+K)     SCLIM2(K)
-             READ (15,REC=ICOUNTF*KB+K)     TCLIM2(K)
           END DO
 !
 !         -----SUSPENDED INORGANIC MATTER PROFILES-----
@@ -373,12 +377,46 @@ contains
           DO K = 1,KB-1
              READ (19,REC=(ICOUNTF-1)*(KB-1)+K) ISM1(K)
              READ (19,REC=ICOUNTF*(KB-1)+K)     ISM2(K)
+             READ (20,REC=(ICOUNTF-1)*(KB-1)+K) SCLIM1(K)
+             READ (15,REC=(ICOUNTF-1)*(KB-1)+K) TCLIM1(K)
+             READ (20,REC=ICOUNTF*(KB-1)+K)     SCLIM2(K)
+             READ (15,REC=ICOUNTF*(KB-1)+K)     TCLIM2(K)
+             IF (USE_W_PROFILE) THEN
+                READ (35, REC=(ICOUNTF-1)*(KB-1)+K) WMN1(K),WVR1(K)
+                READ (35, REC=(ICOUNTF)*(KB-1)+K) WMN2(K),WVR2(K)
+             END IF
           END DO
 !
 !         -----SURFACE NUTRIENTS-----
 !
+          ! reading the surface concentration
           READ(18,REC=ICOUNTF)   NO3_1,NH4_1,PO4_1,SIO4_1
           READ(18,REC=ICOUNTF+1) NO3_2,NH4_2,PO4_2,SIO4_2
+
+
+!
+!            -----PROFILES OF KH IF NEEDED
+!
+          IF (USE_KH_EXT) THEN
+             DO K = 1,KB-1
+                 READ (34,REC=(ICOUNTF-1)*(KB-1)+K) KH_1(K)
+                 READ (34,REC=ICOUNTF*(KB-1)+K)     KH_2(K)
+             END DO
+          END IF
+
+
+          IF (NUTSBC_MODE .EQ. 1) THEN
+             DO K = 1,KB-1
+                IF (USE_O2_TNDC) THEN
+!
+!                  -----PROFILES OF OXYGEN
+!
+                   READ (36,REC=(ICOUNTF-1)*(KB-1)+K) O2_1(K)
+                   READ (36,REC=ICOUNTF*(KB-1)+K)     O2_2(K)
+                END IF
+             END DO
+          END IF
+
 #ifdef SAVEFORCING
           write(400,'(1i8, 8e18.8)') ICOUNTF, WSU1,WSV1,SWRAD1,NO3_1,NH4_1,PO4_1,SIO4_1
           write(401,'(1i8,40e18.8)') ICOUNTF, ISM1
@@ -401,11 +439,6 @@ contains
 !
           SWRAD1  = SWRAD1*(-ONE)/rcp
           SWRAD2  = SWRAD2*(-ONE)/rcp
-!   
-          IF(IDIAGN==INT(ZERO)) THEN
-             WTSURF1 = WTSURF1*(-ONE)/rcp
-             WTSURF2 = WTSURF2*(-ONE)/rcp
-          ENDIF
 !
 !         -----UPDATE THE MONTH COUNTER-----
 !
@@ -430,45 +463,43 @@ contains
       WUSURF = WSU1 + RATIOF * (WSU2-WSU1)
       WVSURF = WSV1 + RATIOF * (WSV2-WSV1)
 !
-      select case (IDIAGN)
+      SELECT CASE (SWR_FILE_STEP)
+         CASE (1)
+            ! loading hourly data
+            IHOUR = MOD(FLOOR(INTT*DTI/3600), 360*24) + 1
+            READ (21,REC=IHOUR) SWRAD
+!         -----HEAT FLUX CONVERTED TO POM UNITS(W/m2-->deg.C*m/s)-----
+            SWRAD  = SWRAD*(-ONE)/rcp
+         CASE DEFAULT
+            ! loading monthly files
+!           -----DIAGNOSTIC RUN: INTERPOLATE SOLAR RADIATION ONLY-----
 !
-             case (INT(ZERO))
-!
-!                 -----PROGNOSTIC RUN: INTERPOLATE TOTAL HEAT FLUX-----
-!
-                  WTSURF = WTSURF1 + RATIOF * (WTSURF2-WTSURF1)
-                  SWRAD  = SWRAD1  + RATIOF * (SWRAD2-SWRAD1)
-!
-             case (INT(ONE))
-!
-!                  -----DIAGNOSTIC RUN: INTERPOLATE SOLAR RADIATION ONLY-----
-!
-                  SWRAD  = SWRAD1  + RATIOF * (SWRAD2-SWRAD1)
-!
-      end select
+            SWRAD  = SWRAD1  + RATIOF * (SWRAD2-SWRAD1)
+      END SELECT
 !
 !     -----INTERPOLATE T&S PROFILES-----
 !
-      TSTAR(:) = TCLIM1(:) + RATIOF * (TCLIM2(:)-TCLIM1(:))
-      SSTAR(:) = SCLIM1(:) + RATIOF * (SCLIM2(:)-SCLIM1(:))
+      TSTAR(:KB-1) = TCLIM1(:) + RATIOF * (TCLIM2(:)-TCLIM1(:))
+      TSTAR(KB) = TSTAR(KB-1)
+      SSTAR(:KB-1) = SCLIM1(:) + RATIOF * (SCLIM2(:)-SCLIM1(:))
+      SSTAR(KB) = SSTAR(KB-1)
+
+      IDAY = MOD(FLOOR(INTT*DTI/86400), 360) + 1
+      IF (IDAY .NE. DAY_OF_SIMULATION) THEN
+         DAY_OF_SIMULATION = IDAY
+         MONTH_OF_SIMULATION = MIN(FLOOR(DAY_OF_SIMULATION/30.0) + 1, 12)
+         IF (USE_W_PROFILE) THEN
+            ! montecarlo for w on a daily basis
+            W_MEAN_PR = WMN1 + RATIOF * (WMN2-WMN1)
+            W_VRNC_PR = WVR1 + RATIOF * (WVR2-WVR1)
+            CALL PROFILE_MONTECARLO_NORMAL(W_MEAN_PR, W_VRNC_PR, W_PROFILE)
+         END IF
+      END IF
 !
-      select case (IDIAGN)
+!     -----DIAGNOSTIC RUN: THE WHOLE T&S PROFILES ARE PRESCRIBED-----
 !
-             case (INT(ZERO))
-!
-!                 -----PROGNOSTIC RUN: SAVE SST AND SSS FOR SURF. B.C.-----
-!
-                  TSURF = TSTAR(1)
-                  SSURF = SSTAR(1)
-!
-             case (INT(ONE))
-!
-!                 -----DIAGNOSTIC RUN: THE WHOLE T&S PROFILES ARE PRESCRIBED-----
-!
-                  TF(:) = TSTAR(:)
-                  SF(:) = SSTAR(:)
-!
-      end select
+      TF(:) = TSTAR(:)
+      SF(:) = SSTAR(:)
 !
 !     -----INTERPOLATE SUSPENDED INORGANIC MATTER-----
 !
@@ -480,6 +511,8 @@ contains
       NH4SURF  = NH4_1  + RATIOF * (NH4_2-NH4_1)
       PO4SURF  = PO4_1  + RATIOF * (PO4_2-PO4_1)
       SIO4SURF = SIO4_1 + RATIOF * (SIO4_2-SIO4_1)
+      O2_TNDC  = O2_1 + RATIOF * (O2_2 - O2_1)
+      KH_EXT   = KH_1 + RATIOF * (KH_2 - KH_1)
 !
 !     -----END OF INTERPOLATION SECTION-----
 !
@@ -493,6 +526,7 @@ contains
 !
          ICOUNTF = ICOUNTF + 1
          PRINT *, 'ICOUNTF', ICOUNTF
+         PRINT *, '    MONTH_OF_SIMULATION, DAY_OF_SIMULATION', MONTH_OF_SIMULATION, DAY_OF_SIMULATION
 !
 !        -----....RESET INTERPOLATION COUNTER....-----
 !
@@ -501,16 +535,20 @@ contains
 !        -----....SHIFT THE MONTHLY DATA....-----
 !
          SWRAD1     = SWRAD2
-         if (IDIAGN==INT(ZERO)) WTSURF1 = WTSURF2
          WSU1       = WSU2
          WSV1       = WSV2
          NO3_1      = NO3_2
          NH4_1      = NH4_2
          PO4_1      = PO4_2
          SIO4_1     = SIO4_2
+         O2_1       = O2_2
+         KH_1       = KH_2
          ISM1(:)    = ISM2(:)
          TCLIM1(:)  = TCLIM2(:)
          SCLIM1(:)  = SCLIM2(:)
+         WMN1       = WMN2
+         WVR1       = WVR2
+
 !
 !            -----IF 12 MONTHS HAVE GONE.... -----
 !
@@ -527,60 +565,63 @@ contains
              WSU1 = WSU1*(-ONE)/RHO0
              WSV1 = WSV1*(-ONE)/RHO0
 !
-             select case (IDIAGN)
-!                   
-                    case(INT(ZERO))
 !
-                         READ(21,REC=1) SWRAD1,WTSURF1
-!          
-!                        -----POM UNITS-----
+             READ(21,REC=1) SWRAD1
 !
-                         WTSURF1=WTSURF1*(-ONE)/rcp
-!
-                    case(INT(ONE))
-!
-                         READ(21,REC=1) SWRAD1
-!
-             end select
 !
 !            -----POM UNITS-----
 !
              SWRAD1=SWRAD1*(-ONE)/rcp
 !
+             ! reading the surface concentration
              READ(18,REC=1) NO3_1,NH4_1,PO4_1,SIO4_1
-!
-             DO K = 1,KB
-                READ (20,REC=K) SCLIM1(K)
-                READ (15,REC=K) TCLIM1(K)
-             END DO
 !
              DO K = 1, KB-1
                 READ (19,REC=K) ISM1(K)
+                READ (20,REC=K) SCLIM1(K)
+                READ (15,REC=K) TCLIM1(K)
+                IF (USE_W_PROFILE) THEN
+                   READ (35,REC=K) WMN1(K),WVR1(K)
+                END IF
              END DO
+
+             IF (USE_KH_EXT) THEN
+                DO K = 1,KB-1
+                   READ (34,REC=K) KH_1(K)
+                END DO
+             END IF
+
+             IF (NUTSBC_MODE .EQ. 1) THEN
+                DO K = 1,KB-1
+                   IF (USE_O2_TNDC) THEN
+                      READ (36,REC=K) O2_1(K)
+                   END IF
+                END DO
+             END IF
 !
          END IF
 !
 !        -----READ FOLLOWING MONTH-----
 !
          READ(18,REC=ICOUNTF) NO3_2,NH4_2,PO4_2,SIO4_2
-!
+
          READ (11,REC=ICOUNTF) WSU2,WSV2
 !
-         select case (IDIAGN)
+         READ (21,REC=ICOUNTF) SWRAD2
 !
-               case (INT(ZERO))
-!
-                     READ (21,REC=ICOUNTF) SWRAD2,WTSURF2
-!
-!                    -----POM UNITS-----
-!
-                     WTSURF2=WTSURF2*(-ONE)/rcp
-!
-               case (INT(ONE))
-!
-                     READ (21,REC=ICOUNTF) SWRAD2
-!
-        end select
+         IF (USE_KH_EXT) THEN
+            DO K = 1,KB-1
+                READ (34,REC=(ICOUNTF-1)*(KB-1)+K) KH_2(K)
+            END DO
+         END IF
+
+         IF (NUTSBC_MODE .EQ. 1) THEN
+            DO K = 1,KB-1
+               IF (USE_O2_TNDC) THEN
+                  READ (36,REC=(ICOUNTF-1)*(KB-1)+K) O2_2(K)
+               END IF
+            END DO
+         END IF
 !
 #ifdef SAVEFORCING
           write(400,'(1i8, 8e18.8)') ICOUNTF, WSU2,WSV2,SWRAD2,NO3_2,NH4_2,PO4_2,SIO4_2
@@ -591,14 +632,14 @@ contains
         WSU2 = WSU2*(-ONE)/RHO0
         WSV2 = WSV2*(-ONE)/RHO0
         SWRAD2=SWRAD2*(-ONE)/rcp
-!
-         DO K = 1,KB
-             READ (20,REC=(ICOUNTF-1)*KB+K) SCLIM2(K)
-             READ (15,REC=(ICOUNTF-1)*KB+K) TCLIM2(K)
-         END DO
 
          DO K = 1,KB-1
              READ (19,REC=(ICOUNTF-1)*(KB-1)+K) ISM2(K)
+             READ (20,REC=(ICOUNTF-1)*(KB-1)+K) SCLIM2(K)
+             READ (15,REC=(ICOUNTF-1)*(KB-1)+K) TCLIM2(K)
+             IF (USE_W_PROFILE) THEN
+                READ (35,REC=(ICOUNTF-1)*(KB-1)+K) WMN2(K),WVR2(K)
+             END IF
          END DO
 !
 #ifdef SAVEFORCING

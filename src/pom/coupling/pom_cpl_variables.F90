@@ -1,5 +1,5 @@
  !
-! !MODULE: Service
+! !MODULE: CPL_VARIABLES
 ! **************************************************************
 ! **************************************************************
 ! **                                                          **
@@ -54,7 +54,7 @@
 ! FOR THE BFM-POM COUPLING.
 !
 ! !INTERFACE
-  MODULE  Service
+  MODULE  CPL_VARIABLES
 !
 !     -----MODULES (USE OF ONLY IS STRONGLY ENCOURAGED)-----
 !
@@ -66,30 +66,90 @@
 !
       IMPLICIT NONE
 ! 
-!     -----SURFACE NUTRIENTS-----
+!     -----SURFACE NUTRIENTS AND RUNOFF (ONLY USED IF NUTSBC_MODE == 1)-----
 !
       real(RLEN)                        :: PO4SURF,NO3SURF,NH4SURF,SIO4SURF
+!
+!     -----USE_KH_EXT==.TRUE. if the vertical diffusion coefficient is loaded from an external file
+!
+      logical                           :: USE_KH_EXT = .FALSE.
+!
+!     -----vertical diffusion coefficient from an external source and scaling constat
+!
+      real(RLEN)                        :: KH_EXT(KB-1) = 0
+      real(RLEN)                        :: KH_FACTOR = 1
+!
+!     ----- USE_O2_TNDC==.TRUE. if an O2 profile file was provided
+!
+      logical                           :: USE_O2_TNDC = .FALSE.
+!
+!     ----- Profiles of oxygen (ONLY USED IF NUTBC_MODE == 1)----
+!
+      real(RLEN)                        :: O2_TNDC(KB-1) ! tendency O2 profile. Used if NUTSBC_MODE == 1
+!
+!     ----- USE_W_PROFILE == .TRUE. if daily profiles of W are provided ----
+!
+      logical                           :: USE_W_PROFILE = .FALSE.
+!
+!     ----- vertical profiles of W -----
+!
+      real(RLEN)                        :: W_MEAN_PR(KB) ! vert. prof. of w mean
+      real(RLEN)                        :: W_VRNC_PR(KB) ! vert. prof. of w variance
+      real(RLEN)                        :: W_PROFILE(KB)
 !
 !     -----SUSPENDED INORGANIC MATTER PROFILE-----
 !
       real(RLEN),public,dimension(KB-1) :: ISM
 !
+!     ----- relaxation coefficients for: PO4, NO3, SiO4, O2, anything else
+!
+      INTEGER, PARAMETER                :: N_MONTHS = 12
+      real(RLEN), DIMENSION(N_MONTHS)   :: L_PO4=0, L_NO3=0, L_SIO4=0, L_O2=0, L_X=0
+!
+!     -----NUTRIENT SURFACE BOUNDARY CONDITIONS MODE:
+!     -----    0: surface flux is computed applying the relaxation time NRT (default)
+!     -----    1: surface flux is computed applying the nutrient concentration to a river runoff
+!
+      INTEGER                  :: NUTSBC_MODE=0
+!     -----SCALING FACTOR FOR SURFACE FLUXES IF NUTSBC_MODE == 1
+      real(RLEN)                        :: ASURF_PO4=1, ASURF_NO3=1, ASURF_NH4=1, ASURF_SIO4=1
+!
+!     ! short wave radiation stepping: if 1 shortwave radiation is loaded hourly if 0 monthly
+!
+      INTEGER                  :: SWR_FILE_STEP=0
+
+!
 !     ------FREQUENCY OF OUTPUT AVERAGING (IN HOURS)-----
 !
       integer(ilong)                    :: savef
+
+      integer(ilong)                    :: DAY_OF_SIMULATION = -999999
+      integer(ilong)                    :: MONTH_OF_SIMULATION = -999999
 !
 !     -----THESE ARE THE PATHWAYS FOR THE IC, RESTART AND FORCING FILES (READ TROUGH NML)-----
 !
-     character(200)                     :: wind_input,      &
+      character(200)                     :: wind_input,      &
                                            ism_input,       &
                                            Sal_input,       &
                                            Temp_input,      &
                                            Sprofile_input,  &
                                            Tprofile_input,  &
+                                           Oprofile_input,  & ! file with O2 profile, used if NUTSBC_MODE == 1
+                                           Kprofile_input,  & ! file with vertical diffusion coeff. profile, if available
+                                           Wprofile_input,  & ! file with daily profile of W, if available
                                            heat_input,      &
                                            surfNut_input,   &
                                            read_restart
+
 !
- end module Service
+!     ---- FLAGS FOR VERTICAL ADVECTION SCHEME:
+!          0: UPWIND SCHEME FOR SINING POM, NO POSITIVE VELOCITY
+!          1: CENTERED SCHEME: GORDON & STERN 1982
+!
+      INTEGER, PARAMETER      :: VERT_ADV_SINKING_UPWIND = 0
+      INTEGER, PARAMETER      :: VERT_ADV_CENTERED = 1
+      INTEGER                 :: VERT_ADV = VERT_ADV_SINKING_UPWIND
+!
+ end module CPL_VARIABLES
 !
 !EOC

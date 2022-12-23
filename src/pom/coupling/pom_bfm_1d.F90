@@ -68,7 +68,7 @@
 !     -----MODULES (USE OF ONLY IS STRONGLY ENCOURAGED)-----
 !
        use api_bfm,ONLY           :out_delta
-       use Service,ONLY           :savef
+       use CPL_VARIABLES,ONLY           :savef
        use constants,ONLY         :SEC_PER_DAY
        use POM,ONLY               :time,time0,dti,intt,ilong
 !
@@ -114,12 +114,12 @@
 !      *******************************************************************
 !      *******************************************************************
 !
-       call vdiff_SOS
+       call vert_transport
 !
 !      -----INTEGRATION OF SCALAR (BENTHIC) BFM STATE VAR'S WITH LEAPFROG SCHEME----
 !
 !
-      call lf1d
+       call lf1d
 !
 !
 !      -----DEFINE AND UPDATE TIME FOR OUTPUT WRITING-----
