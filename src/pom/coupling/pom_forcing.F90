@@ -371,25 +371,25 @@ contains
 !
 
 !
-!         -----VERTICAL PROFILES OF T, S, VERTICAL VELOCITY -----
+!         -----VERTICAL PROFILES OF T, S -----
 !
           DO K = 1,KB
              READ (20,REC=(ICOUNTF-1)*KB+K) SCLIM1(K)
              READ (15,REC=(ICOUNTF-1)*KB+K) TCLIM1(K)
              READ (20,REC=ICOUNTF*KB+K)     SCLIM2(K)
              READ (15,REC=ICOUNTF*KB+K)     TCLIM2(K)
-             IF (USE_W_PROFILE) THEN
-                READ (35, REC=(ICOUNTF-1)*KB+K) WMN1(K),WVR1(K)
-                READ (35, REC=(ICOUNTF)*KB+K) WMN2(K),WVR2(K)
-             END IF
           END DO
 
 !
-!         -----SUSPENDED INORGANIC MATTER PROFILES-----
+!         -----SUSPENDED INORGANIC MATTER PROFILES, VERTICAL VELOCITY-----
 !
           DO K = 1,KB-1
              READ (19,REC=(ICOUNTF-1)*(KB-1)+K) ISM1(K)
              READ (19,REC=ICOUNTF*(KB-1)+K)     ISM2(K)
+             IF (USE_W_PROFILE) THEN
+                READ (35, REC=(ICOUNTF-1)*(KB-1)+K) WMN1(K),WVR1(K)
+                READ (35, REC=(ICOUNTF)*(KB-1)+K) WMN2(K),WVR2(K)
+             END IF
           END DO
 !
 !         -----SURFACE NUTRIENTS-----
@@ -581,10 +581,13 @@ contains
              ! reading the surface concentration
              READ(18,REC=1) NO3_1,NH4_1,PO4_1,SIO4_1
 !
-             DO K = 1, KB-1
-                READ (19,REC=K) ISM1(K)
+             DO K = 1, KB
                 READ (20,REC=K) SCLIM1(K)
                 READ (15,REC=K) TCLIM1(K)
+             END DO
+
+             DO K = 1, KB-1
+                READ (19,REC=K) ISM1(K)
                 IF (USE_W_PROFILE) THEN
                    READ (35,REC=K) WMN1(K),WVR1(K)
                 END IF
@@ -638,10 +641,13 @@ contains
         WSV2 = WSV2*(-ONE)/RHO0
         SWRAD2=SWRAD2*(-ONE)/rcp
 
+         DO K = 1,KB
+             READ (20,REC=(ICOUNTF-1)*KB+K) SCLIM2(K)
+             READ (15,REC=(ICOUNTF-1)*KB+K) TCLIM2(K)
+         END DO
+
          DO K = 1,KB-1
              READ (19,REC=(ICOUNTF-1)*(KB-1)+K) ISM2(K)
-             READ (20,REC=(ICOUNTF-1)*(KB-1)+K) SCLIM2(K)
-             READ (15,REC=(ICOUNTF-1)*(KB-1)+K) TCLIM2(K)
              IF (USE_W_PROFILE) THEN
                 READ (35,REC=(ICOUNTF-1)*(KB-1)+K) WMN2(K),WVR2(K)
              END IF
