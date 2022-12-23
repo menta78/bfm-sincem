@@ -135,8 +135,8 @@
 !
 !     -----VERTICAL PROFILES OF T & S-----
 !
-      real(RLEN),public,dimension(KB-1),SAVE :: TCLIM1,TCLIM2
-      real(RLEN),public,dimension(KB-1),SAVE :: SCLIM1,SCLIM2
+      real(RLEN),public,dimension(KB),SAVE :: TCLIM1,TCLIM2
+      real(RLEN),public,dimension(KB),SAVE :: SCLIM1,SCLIM2
 !
 !     -----MONTHLY PROFILES OF KH, used only if provided, otherwise POM will do the job
       REAL (RLEN), DIMENSION(KB-1)             :: KH_1,KH_2 = 0
@@ -369,22 +369,27 @@ contains
 !         ***********************************************************
 !         ***********************************************************
 !
+
+!
+!         -----VERTICAL PROFILES OF T, S, VERTICAL VELOCITY -----
+!
           DO K = 1,KB
+             READ (20,REC=(ICOUNTF-1)*KB+K) SCLIM1(K)
+             READ (15,REC=(ICOUNTF-1)*KB+K) TCLIM1(K)
+             READ (20,REC=ICOUNTF*KB+K)     SCLIM2(K)
+             READ (15,REC=ICOUNTF*KB+K)     TCLIM2(K)
+             IF (USE_W_PROFILE) THEN
+                READ (35, REC=(ICOUNTF-1)*KB+K) WMN1(K),WVR1(K)
+                READ (35, REC=(ICOUNTF)*KB+K) WMN2(K),WVR2(K)
+             END IF
           END DO
+
 !
 !         -----SUSPENDED INORGANIC MATTER PROFILES-----
 !
           DO K = 1,KB-1
              READ (19,REC=(ICOUNTF-1)*(KB-1)+K) ISM1(K)
              READ (19,REC=ICOUNTF*(KB-1)+K)     ISM2(K)
-             READ (20,REC=(ICOUNTF-1)*(KB-1)+K) SCLIM1(K)
-             READ (15,REC=(ICOUNTF-1)*(KB-1)+K) TCLIM1(K)
-             READ (20,REC=ICOUNTF*(KB-1)+K)     SCLIM2(K)
-             READ (15,REC=ICOUNTF*(KB-1)+K)     TCLIM2(K)
-             IF (USE_W_PROFILE) THEN
-                READ (35, REC=(ICOUNTF-1)*(KB-1)+K) WMN1(K),WVR1(K)
-                READ (35, REC=(ICOUNTF)*(KB-1)+K) WMN2(K),WVR2(K)
-             END IF
           END DO
 !
 !         -----SURFACE NUTRIENTS-----
@@ -479,9 +484,9 @@ contains
 !
 !     -----INTERPOLATE T&S PROFILES-----
 !
-      TSTAR(:KB-1) = TCLIM1(:) + RATIOF * (TCLIM2(:)-TCLIM1(:))
+      TSTAR(:) = TCLIM1(:) + RATIOF * (TCLIM2(:)-TCLIM1(:))
       TSTAR(KB) = TSTAR(KB-1)
-      SSTAR(:KB-1) = SCLIM1(:) + RATIOF * (SCLIM2(:)-SCLIM1(:))
+      SSTAR(:) = SCLIM1(:) + RATIOF * (SCLIM2(:)-SCLIM1(:))
       SSTAR(KB) = SSTAR(KB-1)
 
       IDAY = MOD(FLOOR(INTT*DTI/86400), 360) + 1
