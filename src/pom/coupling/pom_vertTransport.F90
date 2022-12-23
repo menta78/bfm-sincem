@@ -525,7 +525,7 @@
              do K=2,KB-1
                 ADVTND(K)=DZR(K)/H*(F(K)*W(K+1)-F(K-1)*W(K))
              end do
-         CASE DEFAULT (VERT_ADV_CENTERED)
+         CASE DEFAULT !(VERT_ADV_CENTERED)
              ! centered scheme: Gordon & Stern 1982
 
              ADVTND(1) = DZR(1)/H*(F(1)+F(2))/2*W(2)
