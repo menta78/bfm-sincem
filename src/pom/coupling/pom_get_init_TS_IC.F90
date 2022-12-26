@@ -65,30 +65,8 @@
 !
       use global_mem, ONLY: error_msg_prn, NML_OPEN, NML_READ
 !
-      use CPL_VARIABLES, ONLY: wind_input,     &
-                         ism_input,      &
-                         Sal_input,      &
-                         Temp_input,     &
-                         Sprofile_input, &
-                         Tprofile_input, &
-                         Oprofile_input, &
-                         Kprofile_input, &
-                         Wprofile_input, &
-                         heat_input,     &
-                         surfNut_input,  &
-                         NUTSBC_MODE,    &
-                         L_PO4,          &
-                         L_NO3,          &
-                         L_SIO4,         &
-                         L_O2,           &
-                         L_X,            &
-                         ASURF_PO4,      &
-                         ASURF_NO3,      &
-                         ASURF_NH4,      &
-                         ASURF_SIO4,     &
-                         KH_FACTOR,      &
-                         SWR_FILE_STEP,  &
-                         read_restart
+      use CPL_VARIABLES, ONLY: Sprofile_input, &
+                         Tprofile_input
 !    
       use pom, ONLY: KB,T,TB,S,SB
 !

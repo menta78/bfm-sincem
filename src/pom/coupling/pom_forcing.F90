@@ -126,9 +126,6 @@
 !
       REAL (RLEN),SAVE                       :: SIO4_1,SIO4_2
 !
-!     -----MONTHLY PROFILES OF O2, used only if NUTSBC_MODE == 1 and if file is present
-      REAL (RLEN), DIMENSION(KB-1)             :: O2_1,O2_2 = 0
-!
 !     -----VERTICAL PROFILES OF INORGANIC SUSPENDED MATTER DATA-----
 !
       real(RLEN),public,dimension(KB-1),SAVE :: ISM1,ISM2
@@ -239,7 +236,7 @@ contains
       USE MONTECARLO
       use CPL_VARIABLES,ONLY: ISM,PO4SURF,NO3SURF,NH4SURF,SIO4SURF,&
               USE_W_PROFILE, W_PROFILE, &
-              USE_O2_TNDC,O2_TNDC,USE_KH_EXT,KH_EXT,NUTSBC_MODE,&
+              USE_KH_EXT,KH_EXT,NUTSBC_MODE,&
               SWR_FILE_STEP, DAY_OF_SIMULATION, MONTH_OF_SIMULATION
 !
 ! -----IMPLICIT TYPING IS NEVER ALLOWED-----
@@ -272,8 +269,6 @@ contains
         NH4_2        =ZERO
         SIO4_1       =ZERO
         SIO4_2       =ZERO
-        O2_1         =ZERO
-        O2_2         =ZERO
         KH_1         =ZERO
         KH_2         =ZERO
         TCLIM1(:)    =ZERO
@@ -409,19 +404,6 @@ contains
              END DO
           END IF
 
-
-          IF (NUTSBC_MODE .EQ. 1) THEN
-             DO K = 1,KB-1
-                IF (USE_O2_TNDC) THEN
-!
-!                  -----PROFILES OF OXYGEN
-!
-                   READ (36,REC=(ICOUNTF-1)*(KB-1)+K) O2_1(K)
-                   READ (36,REC=ICOUNTF*(KB-1)+K)     O2_2(K)
-                END IF
-             END DO
-          END IF
-
 #ifdef SAVEFORCING
           write(400,'(1i8, 8e18.8)') ICOUNTF, WSU1,WSV1,SWRAD1,NO3_1,NH4_1,PO4_1,SIO4_1
           write(401,'(1i8,40e18.8)') ICOUNTF, ISM1
@@ -516,7 +498,6 @@ contains
       NH4SURF  = NH4_1  + RATIOF * (NH4_2-NH4_1)
       PO4SURF  = PO4_1  + RATIOF * (PO4_2-PO4_1)
       SIO4SURF = SIO4_1 + RATIOF * (SIO4_2-SIO4_1)
-      O2_TNDC  = O2_1 + RATIOF * (O2_2 - O2_1)
       KH_EXT   = KH_1 + RATIOF * (KH_2 - KH_1)
 !
 !     -----END OF INTERPOLATION SECTION-----
@@ -546,7 +527,6 @@ contains
          NH4_1      = NH4_2
          PO4_1      = PO4_2
          SIO4_1     = SIO4_2
-         O2_1       = O2_2
          KH_1       = KH_2
          ISM1(:)    = ISM2(:)
          TCLIM1(:)  = TCLIM2(:)
@@ -598,14 +578,6 @@ contains
                    READ (34,REC=K) KH_1(K)
                 END DO
              END IF
-
-             IF (NUTSBC_MODE .EQ. 1) THEN
-                DO K = 1,KB-1
-                   IF (USE_O2_TNDC) THEN
-                      READ (36,REC=K) O2_1(K)
-                   END IF
-                END DO
-             END IF
 !
          END IF
 !
@@ -620,14 +592,6 @@ contains
          IF (USE_KH_EXT) THEN
             DO K = 1,KB-1
                 READ (34,REC=(ICOUNTF-1)*(KB-1)+K) KH_2(K)
-            END DO
-         END IF
-
-         IF (NUTSBC_MODE .EQ. 1) THEN
-            DO K = 1,KB-1
-               IF (USE_O2_TNDC) THEN
-                  READ (36,REC=(ICOUNTF-1)*(KB-1)+K) O2_2(K)
-               END IF
             END DO
          END IF
 !

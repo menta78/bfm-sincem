@@ -77,14 +77,12 @@
                         Temp_input,     & ! Temperature Initial Conditions
                         Sprofile_input, & ! Time varying (monthly) salinity profiles
                         Tprofile_input, & ! Time varying (monthly) temperature profiles
-                        Oprofile_input, & ! Time varying (monthly) oxygen profiles
                         Kprofile_input, & ! Time varying (monthly) KH profiles
                         Wprofile_input, & ! Time varying (monthly) vertical velocity profiles
                         heat_input,     & ! Time varying (monthly) surface heat flux
                         surfNut_input,  & ! Time varying (monthly) surface nutrient
                         ism_input,      & ! Inorganic suspended matter Initial Conditions
                         VERT_ADV,       & ! scheme for vertical advection: 0: sinking upwind, 1: centered. Default: 1
-                        USE_O2_TNDC,    & ! true if a file with oxygen profiles was provided
                         USE_KH_EXT,     & ! true if KH is loaded from an external source
                         KH_FACTOR,      & ! scaling factor for KH_EXT
                         USE_W_PROFILE,  &
@@ -110,7 +108,6 @@
                         SWRAD1, WTSURF1,           &
                         NO3_1,NH4_1,PO4_1, SIO4_1, & 
                         KH_1,                      &
-                        O2_1,                      &
                         WMN1, WVR1,                &
                         QCORR1                     ! NO MORE IN USE!!!!!
 !
@@ -134,7 +131,6 @@
                           Temp_input,     &
                           Sprofile_input, &
                           Tprofile_input, &
-                          Oprofile_input, &
                           Kprofile_input, &
                           Wprofile_input, &
                           heat_input,     &
@@ -219,7 +215,7 @@
      inquire(FILE=Kprofile_input, EXIST=USE_KH_EXT)
      IF (USE_KH_EXT) THEN
          inquire(IOLENGTH=rlength) KH_1(1)
-         write(6,*) 'KH profile file exists, opening it :',Oprofile_input
+         write(6,*) 'KH profile file exists, opening it :',Kprofile_input
          open(34, file=Kprofile_input, form='unformatted',access='direct',recl=rlength)
          write(6,*) 'open 34 done'
      ELSE
@@ -237,23 +233,8 @@
      ELSE
          write(6,*) 'W profile file ',Wprofile_input,' does not exist, setting USE_W_PROFILE=.FALSE.'
      END IF
-     
-!
-!    -----OPEN O2 PROFILE----
-!    ------(only if NUTSBC_MODE==1)
-     IF (NUTSBC_MODE .EQ. 1) THEN
-        inquire(FILE=Oprofile_input, EXIST=USE_O2_TNDC)
-        IF (USE_O2_TNDC) THEN
-            inquire(IOLENGTH=rlength) O2_1(1)
-            write(6,*) 'O2 profile file exists, opening it :',Oprofile_input
-            open(36, file=Oprofile_input, form='unformatted',access='direct',recl=rlength)
-            write(6,*) 'open 36 done'
-        ELSE
-            write(6,*) 'O2 profile file ',Oprofile_input,' does not exist, setting USE_O2_TNDC=.FALSE.'
-        END IF
-     END IF
 
-      write(6,*) 'open units done'
+     write(6,*) 'open units done'
 !
 #ifdef SAVEFORCING
      open(400,file="surface_forcing.txt")

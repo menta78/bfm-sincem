@@ -79,14 +79,6 @@
       real(RLEN)                        :: KH_EXT(KB-1) = 0
       real(RLEN)                        :: KH_FACTOR = 1
 !
-!     ----- USE_O2_TNDC==.TRUE. if an O2 profile file was provided
-!
-      logical                           :: USE_O2_TNDC = .FALSE.
-!
-!     ----- Profiles of oxygen (ONLY USED IF NUTBC_MODE == 1)----
-!
-      real(RLEN)                        :: O2_TNDC(KB-1) ! tendency O2 profile. Used if NUTSBC_MODE == 1
-!
 !     ----- USE_W_PROFILE == .TRUE. if daily profiles of W are provided ----
 !
       logical                           :: USE_W_PROFILE = .FALSE.
@@ -134,7 +126,6 @@
                                            Temp_input,      &
                                            Sprofile_input,  &
                                            Tprofile_input,  &
-                                           Oprofile_input,  & ! file with O2 profile, used if NUTSBC_MODE == 1
                                            Kprofile_input,  & ! file with vertical diffusion coeff. profile, if available
                                            Wprofile_input,  & ! file with daily profile of W, if available
                                            heat_input,      &
