@@ -3149,7 +3149,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="26" columns="3">
+<lyxtabular version="3" rows="25" columns="3">
 <features tabularvalignment="middle">
 <column alignment="center" valignment="top" width="4cm">
 <column alignment="center" valignment="top" width="3cm">
@@ -3308,7 +3308,7 @@ POMModule.F90
 
 \family typewriter
 \size footnotesize
-Service
+CPL_VARIABLES
 \end_layout
 
 \end_inset
@@ -3332,7 +3332,7 @@ coupling
 
 \family typewriter
 \size footnotesize
-ModuleService.F90
+pom_cpl_variables.F90
 \end_layout
 
 \end_inset
@@ -3370,7 +3370,7 @@ coupling
 
 \family typewriter
 \size footnotesize
-ModuleForcing.F90
+pom_forcing.F90
 \end_layout
 
 \end_inset
@@ -3440,7 +3440,7 @@ phys
 
 \family typewriter
 \size footnotesize
-vdiff_SOS.F90
+pom_vert_integration.F90
 \end_layout
 
 \end_inset
@@ -3530,7 +3530,7 @@ dens.F90
 
 \family typewriter
 \size footnotesize
-env_forcing_pom_bfm_1d 
+pom_env_forcing_1d 
 \end_layout
 
 \end_inset
@@ -3554,7 +3554,7 @@ coupling
 
 \family typewriter
 \size footnotesize
-env_forcing_pom_bfm_1d.F90
+pom_env_forcing_1d.F90
 \end_layout
 
 \end_inset
@@ -3592,7 +3592,7 @@ coupling
 
 \family typewriter
 \size footnotesize
-ModuleForcing.F90
+pom_forcing.F90
 \end_layout
 
 \end_inset
@@ -3606,7 +3606,7 @@ ModuleForcing.F90
 
 \family typewriter
 \size footnotesize
-get_RST
+load_restart
 \end_layout
 
 \end_inset
@@ -3630,7 +3630,7 @@ coupling
 
 \family typewriter
 \size footnotesize
-get_rst.F90
+pom_restart.F90
 \end_layout
 
 \end_inset
@@ -3644,7 +3644,7 @@ get_rst.F90
 
 \family typewriter
 \size footnotesize
-get_TS_IC
+get_init_TS_IC
 \end_layout
 
 \end_inset
@@ -3668,7 +3668,7 @@ coupling
 
 \family typewriter
 \size footnotesize
-get_TS_IC.F90
+pom_get_init_TS_IC.F90
 \end_layout
 
 \end_inset
@@ -3682,7 +3682,7 @@ get_TS_IC.F90
 
 \family typewriter
 \size footnotesize
-lf1d
+scheme_benthic_lf1d
 \end_layout
 
 \end_inset
@@ -3706,7 +3706,7 @@ coupling
 
 \family typewriter
 \size footnotesize
-LF1D.F90
+pom_scheme_benthic_lf1d.F90
 \end_layout
 
 \end_inset
@@ -3948,7 +3948,7 @@ profq1d.F90
 
 \family typewriter
 \size footnotesize
-PROFTS
+PROF_TRACERS
 \end_layout
 
 \end_inset
@@ -4024,7 +4024,7 @@ profu.F90
 
 \family typewriter
 \size footnotesize
-restart_BFM_inPOM
+save_restart
 \end_layout
 
 \end_inset
@@ -4048,7 +4048,7 @@ coupling
 
 \family typewriter
 \size footnotesize
-restart_BFM_inPOM.F90
+pom_restart.F90
 \end_layout
 
 \end_inset
@@ -4062,45 +4062,7 @@ restart_BFM_inPOM.F90
 
 \family typewriter
 \size footnotesize
-set_initial_conditions
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\family typewriter
-\size footnotesize
-coupling
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\family typewriter
-\size footnotesize
-set_initial_conditions.F90
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\family typewriter
-\size footnotesize
-Routine vdiff_SOS
+Routine vert_integration
 \end_layout
 
 \end_inset
@@ -4124,7 +4086,7 @@ coupling
 
 \family typewriter
 \size footnotesize
-vdiff_SOS.F90
+pom_vert_integration.F90
 \end_layout
 
 \end_inset
@@ -4436,7 +4398,7 @@ cold
 
  start ), subroutine
 \family typewriter
- get_TS_IC
+ get_init_TS_IC
 \family default
  (sec.
  
@@ -4486,13 +4448,13 @@ hot
 
  start) subroutine
 \family typewriter
- get_rst 
+ load_restart 
 \family default
 (sec.
  
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:get_rst"
+reference "subsec:load_restart"
 
 \end_inset
 
@@ -4891,13 +4853,13 @@ The computation of the final
 
  forward in time vertical profiles is then closed by the call to 
 \family typewriter
-subroutine PROFTS
+subroutine PROF_TRACERS
 \family default
  (sec.
  
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:PROFTS"
+reference "subsec:PROF_TRACERS"
 
 \end_inset
 
@@ -6053,13 +6015,13 @@ reference "eq:NutSurflux"
 
 ) in subroutine
 \family typewriter
- PROFTS
+ PROF_TRACERS
 \family default
  (sec.
  
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:PROFTS"
+reference "subsec:PROF_TRACERS"
 
 \end_inset
 
@@ -6117,7 +6079,7 @@ reference "eq:NutSurflux"
  
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:vdiff_SOS"
+reference "subsec:vert_integration"
 
 \end_inset
 
@@ -6162,13 +6124,13 @@ literal "true"
 
  water type in subroutine
 \family typewriter
- PROFTS
+ PROF_TRACERS
 \family default
  (sec.
  
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:PROFTS"
+reference "subsec:PROF_TRACERS"
 
 \end_inset
 
@@ -7354,13 +7316,13 @@ surface salinity flux
  see eq.
  It is used in subroutine
 \family typewriter
- PROFTS
+ PROF_TRACERS
 \family default
  (sec.
  
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:PROFTS"
+reference "subsec:PROF_TRACERS"
 
 \end_inset
 
@@ -7629,9 +7591,9 @@ The bottom roughness length
 \end_layout
 
 \begin_layout Subsection
-Module Service (
+Module CPL_VARIABLES (
 \family typewriter
-coupling/ModuleService.F90
+coupling/pom_cpl_variables.F90
 \family default
 )
 \begin_inset CommandInset label
@@ -7650,7 +7612,7 @@ $BFMdir/pom/coupling
 \family default
  with the filename 
 \family typewriter
-ModuleService.F90)
+pom_cpl_variables.F90)
 \family default
  contains additional parameters, arrays and scalars necessary to accomplish
  the online direct coupling between POM1D and BFM.
@@ -7831,7 +7793,7 @@ reference "sec:BFM-POM1D-subroutines"
 \begin_layout Subsection
 Module Forcing 
 \family typewriter
-(coupling/ModuleForcing.F90
+(coupling/pom_forcing.F90
 \family default
 )
 \begin_inset CommandInset label
@@ -8205,7 +8167,7 @@ reference "tab:CodesLIsting-1"
 \begin_layout Subsection
 ADVERTE 
 \family typewriter
-(phys/vdiff_SOS.F90)
+(coupling/pom_vert_integration.F90)
 \begin_inset CommandInset label
 LatexCommand label
 name "subsec:adverte"
@@ -8218,13 +8180,13 @@ name "subsec:adverte"
 \begin_layout Standard
 This subroutine is called by subroutine 
 \family typewriter
-vdiff_SOS 
+vert_integration 
 \family default
 (sec.
  
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:vdiff_SOS"
+reference "subsec:vert_integration"
 
 \end_inset
 
@@ -8564,13 +8526,13 @@ reference "sec:modulePOM"
 \end_layout
 
 \begin_layout Subsection
-env_forcing_pom_bfm_1d
+pom_env_forcing_1d
 \family typewriter
  
 \family default
 (
 \family typewriter
-coupling/env_forcing_pom_bfm_1d .F90)
+coupling/pom_env_forcing_1d.F90)
 \begin_inset CommandInset label
 LatexCommand label
 name "subsec:env_forcing_pom_bfm_1"
@@ -8662,7 +8624,7 @@ FORCING_MANAGER
 \family default
 (
 \family typewriter
-coupling/ModuleForcing.F90
+coupling/pom_forcing.F90
 \family default
 )
 \begin_inset CommandInset label
@@ -9257,11 +9219,11 @@ TSURF
 SSURF
 \family default
  scalars), for (possible) use as surface boundary condition in prognostic
- mode (see description of subroutine PROFTS, sec.
+ mode (see description of subroutine PROF_TRACERS, sec.
  
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:PROFTS"
+reference "subsec:PROF_TRACERS"
 
 \end_inset
 
@@ -9996,18 +9958,18 @@ status open
 \end_layout
 
 \begin_layout Subsection
-get_rst
+load_restart
 \family typewriter
  
 \family default
 (
 \family typewriter
-coupling/get_rst.F90
+coupling/pom_restart.F90
 \family default
 )
 \begin_inset CommandInset label
 LatexCommand label
-name "subsec:get_rst"
+name "subsec:load_restart"
 
 \end_inset
 
@@ -10070,13 +10032,13 @@ reference "sec:program-MAIN"
 \end_layout
 
 \begin_layout Subsection
-get_TS_IC
+get_init_TS_IC
 \family typewriter
  
 \family default
 (
 \family typewriter
-coupling/get_TS_IC.F90
+coupling/pom_get_init_TS_IC.F90
 \family default
 )
 \begin_inset CommandInset label
@@ -10129,13 +10091,13 @@ cold
 start.
  As for subroutine
 \family typewriter
- get_rst
+ load_restart
 \family default
  (sec.
  
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:get_rst"
+reference "subsec:load_restart"
 
 \end_inset
 
@@ -10224,18 +10186,18 @@ subroutine error_msg_prn.
 \end_layout
 
 \begin_layout Subsection
-LF1D
+SCHEME_BENTHIC_LF1D
 \family typewriter
  
 \family default
 (
 \family typewriter
-coupling/LF1D.F90
+coupling/pom_scheme_benthic_lf1d.F90
 \family default
 )
 \begin_inset CommandInset label
 LatexCommand label
-name "subsec; LF1D"
+name "subsec; SCHEME_BENTHIC_LF1D"
 
 \end_inset
 
@@ -10485,7 +10447,7 @@ opendat
 \lang american
  (
 \family typewriter
-phys/opendat.F90
+pom_opendat.F90
 \family default
 )
 \begin_inset CommandInset label
@@ -10553,14 +10515,14 @@ reference "subsec:FORCING_MANAGER"
 \family default
  
 \family typewriter
-get_rst (
+load_restart (
 \family default
 sec.
 \family typewriter
 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:get_rst"
+reference "subsec:load_restart"
 
 \end_inset
 
@@ -10568,7 +10530,7 @@ reference "subsec:get_rst"
 \family default
  and
 \family typewriter
- get_TS_IC (
+ get_init_TS_IC (
 \family default
 sec.
 \family typewriter
@@ -10626,7 +10588,7 @@ program main
 The passage, from POM1D to BFM, of the information about the physical environmen
 t (subroutine
 \family typewriter
- env_forcing_pom_bfm_1d
+ pom_env_forcing_1d
 \family default
 , sec.
  
@@ -10664,13 +10626,13 @@ The computation of the physics dependent (vertical diffusion and sinking)
  of the pelagic BFM state Variables, with source splitting coupling method
  and leapfrog numerical scheme (subroutine
 \family typewriter
- vdiff_SOS
+ vert_integration
 \family default
 , sec.
  
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:vdiff_SOS"
+reference "subsec:vert_integration"
 
 \end_inset
 
@@ -10681,14 +10643,14 @@ reference "subsec:vdiff_SOS"
 The forward in time integration of the benthic state variables with a leapfrog
  numerical scheme (subroutine
 \family typewriter
- LF1D
+ SCHEME_BENTHIC_LF1D
 \family default
 .
  see sec.
  
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec; LF1D"
+reference "subsec; SCHEME_BENTHIC_LF1D"
 
 \end_inset
 
@@ -12609,13 +12571,13 @@ reference "eq:implicitLF"
 
 ) The numerical procedure is the same described for subroutine 
 \family typewriter
-PROFTS
+PROF_TRACERS
 \family default
  (sec.
  
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:PROFTS"
+reference "subsec:PROF_TRACERS"
 
 \end_inset
 
@@ -12810,9 +12772,9 @@ reference "subsec:DENS"
 \end_layout
 
 \begin_layout Subsection
-PROFTS 
+PROF_TRACERS 
 \family typewriter
-(phys/profts.F90)
+(coupling/pom_profTrc.F90)
 \begin_inset Foot
 status open
 
@@ -12833,7 +12795,7 @@ literal "true"
 
 \begin_inset CommandInset label
 LatexCommand label
-name "subsec:PROFTS"
+name "subsec:PROF_TRACERS"
 
 \end_inset
 
@@ -12857,13 +12819,13 @@ reference "sec:program-MAIN"
 
 ) in order to compute temperature and salinity, and by subroutine 
 \family typewriter
-vdiff_SOS 
+vert_integration 
 \family default
 (sec.
  
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:vdiff_SOS"
+reference "subsec:vert_integration"
 
 \end_inset
 
@@ -13381,7 +13343,7 @@ is then discretized as follows:
 \begin_layout Standard
 and the corresponding code in 
 \family typewriter
-subroutine PROFTS
+subroutine PROF_TRACERS
 \family default
  is:
 \begin_inset VSpace defskip
@@ -13925,7 +13887,7 @@ AD2
 \begin_layout Plain Layout
 The 
 \family typewriter
-subroutine PROFTS 
+subroutine PROF_TRACERS 
 \family default
 parameters specifying the 
 \begin_inset CommandInset citation
@@ -13987,7 +13949,7 @@ NBC
 \family default
  parameter when calling 
 \family typewriter
-subroutine PROFTS
+subroutine PROF_TRACERS
 \family default
 : 
 \begin_inset VSpace defskip
@@ -14157,13 +14119,13 @@ reference "eq:OSurflux"
 
 ) is computed in subroutine
 \family typewriter
- vdiff_SOS
+ vert_integration
 \family default
  (sec.
  
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:vdiff_SOS"
+reference "subsec:vert_integration"
 
 \end_inset
 
@@ -14466,13 +14428,13 @@ reference "sec:program-MAIN"
  components.
  The solution method applied is the one described for subroutine
 \family typewriter
- PROFTS
+ PROF_TRACERS
 \family default
  (sec.
  
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:PROFTS"
+reference "subsec:PROF_TRACERS"
 
 \end_inset
 
@@ -14531,9 +14493,9 @@ BSTRESS
 \end_layout
 
 \begin_layout Subsection
-restart_BFM_inPOM 
+save_restart 
 \family typewriter
-(coupling/restart_BFM_inPOM.F90)
+(coupling/pom_restart.F90)
 \end_layout
 
 \begin_layout Standard
@@ -14628,124 +14590,12 @@ status open
 \end_layout
 
 \begin_layout Subsection
-set_initial_conditions 
+vert_integration 
 \family typewriter
-(coupling/set_initial_conditions.F90)
+(coupling/pom_vert_integration.F90)
 \begin_inset CommandInset label
 LatexCommand label
-name "subsec:Subroutine-set_initial_condition"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-This routine (called by subroutine
-\family typewriter
- pom_ini_BFM,
-\family default
- sec 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:pom_ini_BFM"
-
-\end_inset
-
-) assigns initial conditions of biogeochemical variables in POM.
- The initial conditions definition for the LFG's and the organic CFF's is
- based on the carbon content.
- The nitrogen, phosphorus and silicon content is obtained by applying a
- constant 
-\begin_inset Quotes eld
-\end_inset
-
-Redfield
-\begin_inset Quotes erd
-\end_inset
-
-ratio with respect to carbon.
-\end_layout
-
-\begin_layout Standard
-Note that the version proposed here is a 
-\begin_inset Quotes eld
-\end_inset
-
-default version
-\begin_inset Quotes erd
-\end_inset
-
-, where The BFM state variables are assigned the values set in the namelists
- 
-\family typewriter
-bfm_general
-\family default
- and
-\family typewriter
- BFM_init_nml_ben
-\family default
- (see 
-\begin_inset CommandInset citation
-LatexCommand citet
-key "BFM-manual"
-literal "true"
-
-\end_inset
-
-), but (obviously) this subroutine could/should be tailored by users according
- to the implementation characteristics and the data available.
-\end_layout
-
-\begin_layout Standard
-If users have a data file to be read, the reading statement could be located
- inside this routine in substitution of the 
-\begin_inset Quotes eld
-\end_inset
-
-hardwired
-\begin_inset Quotes erd
-\end_inset
-
- initial conditions
-\end_layout
-
-\begin_layout Standard
-The Initial conditions data that are specified in this 
-\begin_inset Quotes eld
-\end_inset
-
-default
-\begin_inset Quotes erd
-\end_inset
-
- version of the subroutine are those used in 
-\begin_inset CommandInset citation
-LatexCommand citet
-key "mussap1,mussap3"
-literal "true"
-
-\end_inset
-
- and 
-\begin_inset CommandInset citation
-LatexCommand citet
-key "mussap2"
-literal "true"
-
-\end_inset
-
-.
- 
-\end_layout
-
-\begin_layout Subsection
-vdiff_SOS 
-\family typewriter
-(coupling/vdiff_SOS.F90)
-\begin_inset CommandInset label
-LatexCommand label
-name "subsec:vdiff_SOS"
+name "subsec:vert_integration"
 
 \end_inset
 
@@ -15493,10 +15343,10 @@ ffbio:
 \family default
 and passed to the 
 \family typewriter
-subroutine PROFTS 
+subroutine PROF_TRACERS 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:PROFTS"
+reference "subsec:PROF_TRACERS"
 
 \end_inset
 
@@ -16094,13 +15944,13 @@ reference "subsec:FORCING_MANAGER"
 \family default
 subroutine
 \family typewriter
- get_TS_IC 
+ get_init_TS_IC 
 \family default
 (sec.
  
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:get-TS-IC"
+reference "subsec:get_init_TS_IC"
 
 \end_inset
 
@@ -16110,13 +15960,13 @@ reference "subsec:get-TS-IC"
 \family default
 subroutine
 \family typewriter
- get_rst
+ load_restart
 \family default
  (sec.
  
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:get_rst"
+reference "subsec:load_restart"
 
 \end_inset
 
