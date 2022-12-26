@@ -1323,123 +1323,6 @@ adiabatic
 \end_layout
 
 \begin_layout Section
-The parameterisation of lateral advection.
-\begin_inset CommandInset label
-LatexCommand label
-name "subsec:LatAdv"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-When run in prognostic mode, POM1D allows for the parameterisation (
-\begin_inset CommandInset citation
-LatexCommand citealp
-key "VIchi03"
-literal "true"
-
-\end_inset
-
-) of lateral advection, by specifying a lateral temperature and salinity
- flux based on prescribed time varying temperature and salinity climatological
- profiles.
- The lateral temperature (
-\begin_inset Formula $\Phi_{T}$
-\end_inset
-
-) and salinity (
-\begin_inset Formula $\Phi_{S}$
-\end_inset
-
-) advective fluxes are added to eqs.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "eq:Teq"
-
-\end_inset
-
-and 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "eq:Seq"
-
-\end_inset
-
- and are defined as:
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset Formula 
-\begin{equation}
-\begin{cases}
-\begin{array}{c}
-\left[\Phi_{T}(z,t),\Phi_{S}(z,t)\right]=0\\
-\left[\Phi_{T}(z,t),\Phi_{S}(z,t)\right]=\left(\beta_{T},\beta_{S}\right)\left[T^{*}(z,t),S^{*}(z,t)\right]
-\end{array} & \begin{array}{c}
-\mid z\mid<z_{h}\\
-\mid z\mid\geq z_{h}
-\end{array}\end{cases}\label{eq:LTS}
-\end{equation}
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-where 
-\begin_inset Formula $\beta_{T}$
-\end_inset
-
- and
-\begin_inset Formula $\beta_{S}$
-\end_inset
-
- are relaxation times (
-\begin_inset Formula $s)$
-\end_inset
-
-.
- The temperature and salinity fluxes act to modify the temperature and salinity
- vertical profiles only at depths larger than 
-\begin_inset Formula $z_{h}.$
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The specification of a lateral temperature and salinity flux allows for
- the control of the possible model drifts related to the application of
- 
-\begin_inset Quotes eld
-\end_inset
-
-non zero
-\begin_inset Quotes erd
-\end_inset
-
- surface fluxes.
- However, if the user has at hand reliable time varying climatological profiles,
- the modeling system allows also for performing diagnostic simulations as
- described in the following section.
-\end_layout
-
-\begin_layout Section
 Diagnostic mode
 \begin_inset CommandInset label
 LatexCommand label
@@ -4542,11 +4425,11 @@ literal "true"
 \end_inset
 
  2.5 turbulence closure that outputs the vertical turbulent diffusion coefficient
-s 
+ 
 \begin_inset Formula $K_{M}$
 \end_inset
 
-, 
+
 \begin_inset Formula $K_{H}$
 \end_inset
 
@@ -4556,322 +4439,6 @@ s
 
  to be used to compute the vertical distribution of all the state variables
  that are prognostically treated.
-\end_layout
-
-\begin_layout Standard
-The program flows then branches according to the user choice to perform
- (with respect to the physical variables) a prognostic or diagnostic simulation.
- The choice is finalised by the (0/1) value of the parameter
-\family typewriter
- IDIAGN
-\family default
-.
-\end_layout
-
-\begin_layout Itemize
-if 
-\family typewriter
-IDIAGN=0
-\family default
- the run is prognostical.
- Before proceeding to the computation of the 
-\begin_inset Formula $T$
-\end_inset
-
- and 
-\begin_inset Formula $S$
-\end_inset
-
- vertical profiles the program computes the lateral 
-\begin_inset Formula $T$
-\end_inset
-
- and 
-\begin_inset Formula $S$
-\end_inset
-
- advective fluxes 
-\family typewriter
-
-\begin_inset Formula $\varPhi_{T}$
-\end_inset
-
-, 
-\begin_inset Formula $\varPhi_{S}$
-\end_inset
-
-, 
-\family default
-(coded as
-\family typewriter
- wtadv and wsadv
-\family default
-) according to eq.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "eq:LTS"
-
-\end_inset
-
- and applies them to the vertical 
-\begin_inset Formula $T$
-\end_inset
-
- and 
-\begin_inset Formula $S$
-\end_inset
-
- profiles via a leapfrog integration (eq.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "eq:IntermedTS"
-
-\end_inset
-
-) that provides an intermediate temperature and salinity profile 
-\begin_inset Formula $\widetilde{T}$
-\end_inset
-
-, 
-\begin_inset Formula $\widetilde{S}$
-\end_inset
-
- (stored in the 
-\family typewriter
-TF
-\family default
- and 
-\family typewriter
-SF
-\family default
- arrays).
- Below it is reported the procedure applied to the temperature profile.
- The salinity procedure is identical.
- Note that the computation of 
-\family typewriter
-wtadv
-\family default
- and 
-\family typewriter
-swadv
-\family default
- can be avoided simply by setting 
-\begin_inset Formula $(TRT,SRT)=0$
-\end_inset
-
- (sec.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:pom_bfm_settings-namelist"
-
-\end_inset
-
-).
-\end_layout
-
-\begin_layout Standard
-\begin_inset listings
-lstparams "basicstyle={\tiny\ttfamily}"
-inline false
-status open
-
-\begin_layout Plain Layout
-
-!
-\end_layout
-
-\begin_layout Plain Layout
-
-!            -----COMPUTE LATERAL ADVECTION TERM FOR T&S----- 
-\end_layout
-
-\begin_layout Plain Layout
-
-              wtadv(:) = ZERO              
-\end_layout
-
-\begin_layout Plain Layout
-
-              wsadv(:) = ZERO 
-\end_layout
-
-\begin_layout Plain Layout
-
-              IF(TRT.ne.ZERO) THEN 
-\end_layout
-
-\begin_layout Plain Layout
-
-                 do K = 1, KB
-\end_layout
-
-\begin_layout Plain Layout
-
-                     if((-ZZ(K)*H).ge.upperH)   &
-\end_layout
-
-\begin_layout Plain Layout
-
-                     wtadv(K) = (tstar(k)-T(k))/(TRT*SEC_PER_DAY) 
-\end_layout
-
-\begin_layout Plain Layout
-
-                 enddo 
-\end_layout
-
-\begin_layout Plain Layout
-
-              ENDIF
-\end_layout
-
-\begin_layout Plain Layout
-
-!             -----COMPUTE TEMPERATURE----- 
-\end_layout
-
-\begin_layout Plain Layout
-
-              TF(:) = TB(:) + (WTADV(:) * DT2)
-\end_layout
-
-\begin_layout Plain Layout
-
-!
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset VSpace defskip
-\end_inset
-
-in the above code 
-\family typewriter
-tstar
-\family default
- is the (time interpolated) temperature profile computed (along with the
- corresponding inteerpolated salinity 
-\family typewriter
-sstar
-\family default
-) by the subroutine FORCING_MANAGER (sec.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:FORCING_MANAGER"
-
-\end_inset
-
-)
-\end_layout
-
-\begin_layout Standard
-Before proceeding to the final computation of the 
-\begin_inset Formula $T$
-\end_inset
-
-and 
-\begin_inset Formula $S$
-\end_inset
-
- forward in time vertical profiles the main program accomplishes the computation
- of the virtual surface salinity flux 
-\family typewriter
-wssurf
-\family default
- according to eq.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "eq:SBC"
-
-\end_inset
-
-:
-\end_layout
-
-\begin_layout Standard
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset listings
-lstparams "basicstyle={\tiny\ttfamily}"
-inline false
-status open
-
-\begin_layout Plain Layout
-
-!
-\end_layout
-
-\begin_layout Plain Layout
-
-!            -----COMPUTE SURFACE SALINITY FLUX----- 
-\end_layout
-
-\begin_layout Plain Layout
-
-             wssurf = -(ssurf-S(1))*SSRT/SEC_PER_DAY
-\end_layout
-
-\begin_layout Plain Layout
-
-!
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The computation of the final 
-\begin_inset Formula $T$
-\end_inset
-
- and 
-\begin_inset Formula $S$
-\end_inset
-
- forward in time vertical profiles is then closed by the call to 
-\family typewriter
-subroutine PROF_TRACERS
-\family default
- (sec.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:PROF_TRACERS"
-
-\end_inset
-
-) 
-\end_layout
-
-\begin_layout Itemize
-if 
-\family typewriter
-IDIAGN=1 
-\family default
-the run is diagnostical.
  The vertical 
 \begin_inset Formula $T$
 \end_inset
@@ -4897,15 +4464,7 @@ reference "subsec:FORCING_MANAGER"
 \end_layout
 
 \begin_layout Standard
-The two 
-\family typewriter
-IDIAGN
-\family default
- branches of program 
-\family typewriter
-main
-\family default
- converge then towards the computation of the Coriolis terms 
+The computation of the Coriolis terms 
 \begin_inset Formula $fu$
 \end_inset
 
@@ -4921,7 +4480,7 @@ reference "eq:UVeq"
 
 \end_inset
 
-.
+ is carried out.
  The Coriolis terms are then used to compute (via explicit leapfrog integration)
  the intermediate, forward in time, 
 \begin_inset Formula $\widetilde{u}$
@@ -5567,46 +5126,7 @@ reference "sec:pom_bfm_settings-namelist"
 \end_layout
 
 \begin_layout Standard
-\begin_inset VSpace defskip
-\end_inset
 
-
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-integer(ilong) ::IDIAGN
-\end_layout
-
-\begin_layout Standard
-This is the switch for the prognostic/diagnostic mode (
-\family typewriter
-IDIAGN=0
-\family default
-: prognostic mode; 
-\family typewriter
-IDIAGN=1
-\family default
-: diagnostic mode).
- See sec.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:Diagnostic-mode"
-
-\end_inset
-
-.
- Value is provided trough namelist (sec.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:pom_bfm_settings-namelist"
-
-\end_inset
-
-).
 \end_layout
 
 \begin_layout Standard
@@ -7974,27 +7494,8 @@ The, adjacent in time, solar radiation data (
 \end_inset
 
 ).
- These data are needed in both the diagnostic and prognostic mode.
- In prognostic mode (
-\family typewriter
-IDIAGN=0
-\family default
-) contribute to the formulation of the surface heat flux (temperature surface
- boundary condition, eq.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "TBC"
-
-\end_inset
-
-).
- in diagnostic mode (
-\family typewriter
-IDIAGN=1
-\family default
-) they provide the total solar radiation (to be converted into Photosyntheticall
-y Available Radiation, PAR) to the BFM code describing primary production.
+ These data provide the total solar radiation (to be converted into Photosynthet
+ically Available Radiation, PAR) to the BFM code describing primary production.
 \begin_inset VSpace defskip
 \end_inset
 
@@ -8035,17 +7536,7 @@ SCLIM#
 \end_inset
 
 ) profiles.
- they are used in both modes.
- In prognostic mode (
-\family typewriter
-IDIAGN=0
-\family default
-) are used to compute the lateral advective temperature and salinity fluxes.
- in diagnostic mode (
-\family typewriter
-IDIAGN=1
-\family default
-) provide the full 
+ They provide the full 
 \begin_inset Formula $T$
 \end_inset
 
@@ -8054,54 +7545,6 @@ IDIAGN=1
 \end_inset
 
  profiles used by BFM-POM1D.
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-REAL (RLEN),SAVE :: WTSURF1,WTSURF2
-\end_layout
-
-\begin_layout Standard
-The, adjacent in time, sum of the surface heat flux 
-\begin_inset Quotes eld
-\end_inset
-
-loss
-\begin_inset Quotes erd
-\end_inset
-
- terms (
-\begin_inset Formula $Q_{b}+Q_{h}+Q_{e}$
-\end_inset
-
- in 
-\begin_inset Formula $W/m^{2}$
-\end_inset
-
-) for the temperature surface boundary condition, eq.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "TBC"
-
-\end_inset
-
-.
- These data are needed only when the model is run in prognostic mode (
-\family typewriter
-IDIAGN=0
-\family default
-).
- In diagnostic mode (
-\family typewriter
-IDIAGN=1
-\family default
-) they have no use.
 \end_layout
 
 \begin_layout Standard
@@ -9136,15 +8579,6 @@ WSU2
 \end_layout
 
 \begin_layout Standard
-The 
-\family typewriter
-IDIAGN
-\family default
- value determines whether or not the surface heat flux loss term are interpolate
-d.
-\end_layout
-
-\begin_layout Standard
 Arrays: The interpolated temperature and salinity profiles are initially
  loaded into the 
 \family typewriter
@@ -9190,158 +8624,6 @@ status open
 \begin_layout Plain Layout
 
 !
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-the 
-\family typewriter
-IDIAGN
-\family default
- value determines then if only the surface temperature and salinity values
- are retained (and stored into the 
-\family typewriter
-TSURF
-\family default
- and 
-\family typewriter
-SSURF
-\family default
- scalars), for (possible) use as surface boundary condition in prognostic
- mode (see description of subroutine PROF_TRACERS, sec.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:PROF_TRACERS"
-
-\end_inset
-
-).
- If the vertical profiles are entirely prescribed (diagnostic mode) then
- the interpolated profiles are stored into the the 
-\family typewriter
-TF
-\family default
- and 
-\family typewriter
-SF
-\family default
- state variables, containing the forward in time temperature and salinity
- profiles.
- 
-\begin_inset VSpace defskip
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset listings
-lstparams "basicstyle={\tiny\ttfamily}"
-inline false
-status open
-
-\begin_layout Plain Layout
-
-!
-\end_layout
-
-\begin_layout Plain Layout
-
-      select case (IDIAGN) 
-\end_layout
-
-\begin_layout Plain Layout
-
-!
-\end_layout
-
-\begin_layout Plain Layout
-
-             case (INT(ZERO)) 
-\end_layout
-
-\begin_layout Plain Layout
-
-! 
-\end_layout
-
-\begin_layout Plain Layout
-
-!                 -----PROGNOSTIC RUN: SAVE SST AND SSS FOR SURF.
- B.C.----- 
-\end_layout
-
-\begin_layout Plain Layout
-
-!
-\end_layout
-
-\begin_layout Plain Layout
-
-                  TSURF = TSTAR(1)
-\end_layout
-
-\begin_layout Plain Layout
-
-                  SSURF = SSTAR(1) 
-\end_layout
-
-\begin_layout Plain Layout
-
-!
-\end_layout
-
-\begin_layout Plain Layout
-
-             case (INT(ONE)) 
-\end_layout
-
-\begin_layout Plain Layout
-
-!
-\end_layout
-
-\begin_layout Plain Layout
-
-!                 -----DIAGNOSTIC RUN: THE WHOLE T&S PROFILES ARE PRESCRIBED----
--
-\end_layout
-
-\begin_layout Plain Layout
-
-!
-\end_layout
-
-\begin_layout Plain Layout
-
-                  TF(:) = TSTAR(:)
-\end_layout
-
-\begin_layout Plain Layout
-
-                  SF(:) = SSTAR(:) 
-\end_layout
-
-\begin_layout Plain Layout
-
-!
-\end_layout
-
-\begin_layout Plain Layout
-
-      end select
 \end_layout
 
 \end_inset
@@ -15644,12 +14926,7 @@ status open
 
 \begin_layout Plain Layout
 
-! IDIAGN                    [-]           1 = Diagnostic mode 
-\end_layout
-
-\begin_layout Plain Layout
-
-!                                         0 = Prognostic mode 
+! IDIAGN                    legacy, the runs are now only diagnostic
 \end_layout
 
 \begin_layout Plain Layout
