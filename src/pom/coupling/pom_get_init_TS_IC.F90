@@ -47,11 +47,11 @@
 ! **************************************************************
 ! **************************************************************
 !
-! !ROUTINE: get_TS_IC
+! !ROUTINE: get_init_TS_IC
 !
 ! !INTERFACE
 !
-     subroutine get_TS_IC
+     subroutine get_init_TS_IC
 !
 !DESCRIPTION
 !
@@ -117,10 +117,10 @@
 !
 !    -----PRINT IF PROBLEMS WITH NML OPENING-----
 !
-100   call error_msg_prn(NML_OPEN,"get_TS_IC.F90","problem opening pom_bfm_settings.nml")
+100   call error_msg_prn(NML_OPEN,"get_init_TS_IC.F90","problem opening pom_bfm_settings.nml")
 !
 !    -----PRINT IF PROBLEMS WITH NML READING-----
 !
-102   call error_msg_prn(NML_READ,"get_TS_IC.F90","pom_input in pom_bfm_settings.nml")
+102   call error_msg_prn(NML_READ,"get_init_TS_IC.F90","pom_input in pom_bfm_settings.nml")
 !
-      end subroutine get_TS_IC
+      end subroutine get_init_TS_IC

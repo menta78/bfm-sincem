@@ -47,11 +47,11 @@
 ! **************************************************************
 ! **************************************************************
 
-! !ROUTINE: vert_transport
+! !ROUTINE: vert_integration
 !
 ! !INTERFACE
 !
-  SUBROUTINE vert_transport
+  SUBROUTINE vert_integration
 !
 !
 !DESCRIPTION
@@ -425,7 +425,7 @@
 
    enddo ! loop over NO_D3_BOX_STATES
 !
-      end subroutine vert_transport
+      end subroutine vert_integration
 !
 !<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><
 !

@@ -48,12 +48,12 @@
 ! **************************************************************
 ! **************************************************************
 !
-! !ROUTINE: LF1D
+! !ROUTINE: SCHEME_BENTHIC_LF1D
 !
 !
 ! !INTERFACE
 !
-  SUBROUTINE LF1D
+  SUBROUTINE SCHEME_BENTHIC_LF1D
 !
 !DESCRIPTION
 !
@@ -133,4 +133,4 @@
 !
     return
 !
-      end subroutine LF1D
+      end subroutine SCHEME_BENTHIC_LF1D

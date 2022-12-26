@@ -63,7 +63,7 @@
 !
 ! !INTERFACE
 !
-    SUBROUTINE env_forcing_pom_bfm_1d 
+    SUBROUTINE pom_env_forcing_1d 
 !
       IMPLICIT NONE
 !
@@ -81,6 +81,6 @@
 !
       return
 !
-      end subroutine env_forcing_pom_bfm_1d
+      end subroutine pom_env_forcing_1d
 
 

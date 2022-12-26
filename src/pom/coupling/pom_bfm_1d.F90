@@ -97,7 +97,7 @@
 !      ********************************************
 !      ********************************************
 
-       call env_forcing_pom_bfm_1d
+       call pom_env_forcing_1d
 !
 !      -----EXECUTE BFM CORE-----
 !
@@ -114,12 +114,12 @@
 !      *******************************************************************
 !      *******************************************************************
 !
-       call vert_transport
+       call vert_integration
 !
 !      -----INTEGRATION OF SCALAR (BENTHIC) BFM STATE VAR'S WITH LEAPFROG SCHEME----
 !
 !
-       call lf1d
+       call SCHEME_BENTHIC_LF1D
 !
 !
 !      -----DEFINE AND UPDATE TIME FOR OUTPUT WRITING-----

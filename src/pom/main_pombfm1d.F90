@@ -138,7 +138,7 @@
       EXTERNAL DENS,            &
                PROFQ,           &
                CALCDEPTH,       &
-               get_TS_IC,       &
+               get_init_TS_IC,       &
                load_restart,    &
                pom_ini_bfm_1d,  &
                pom_bfm_1d,      &
@@ -258,7 +258,7 @@
 !
                   time0=ZERO
 !
-                  call get_TS_IC
+                  call get_init_TS_IC
 !       
 !                 -----DEFINE INITIAL DENSITY FIELD----
 !    
