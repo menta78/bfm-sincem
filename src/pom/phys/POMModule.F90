@@ -279,10 +279,6 @@ real(RLEN)               :: CBC
 !     **                                     **
 !     *****************************************
 !     *****************************************
-!
-!     -----LOSS TERM OF THE SURFACE HEAT FLUX-----
-!
-      real(RLEN)               :: WTSURF
 ! 
 !     ------PRESCRIBED T & S VERTICAL PROFILES-----
 !

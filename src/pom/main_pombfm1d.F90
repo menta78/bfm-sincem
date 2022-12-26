@@ -98,7 +98,6 @@
                      WUSURF,WVSURF,                                       &
                      WUBOT,WVBOT,                                         &
                      SWRAD,                                               &
-                     WTSURF,                                              &
                      TSURF, SSURF,                                        &
                      TSTAR, SSTAR,                                        &
                      WSSURF,                                              &
@@ -214,7 +213,6 @@
           WVSURF         = ZERO
           WUBOT          = ZERO
           WVBOT          = ZERO
-          WTSURF         = ZERO
           SWRAD          = ZERO 
           WSSURF         = ZERO
           TSURF          = ZERO

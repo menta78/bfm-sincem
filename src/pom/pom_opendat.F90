@@ -105,7 +105,7 @@
                         ISM1,                      &
                         SCLIM1,                    &
                         TCLIM1,                    &
-                        SWRAD1, WTSURF1,           &
+                        SWRAD1,                    &
                         NO3_1,NH4_1,PO4_1, SIO4_1, & 
                         KH_1,                      &
                         WMN1, WVR1,                &
@@ -199,7 +199,7 @@
            open(21, file=heat_input, form='unformatted', access='direct', recl=rlength)
            write(6,*) 'open 21 done'
         CASE DEFAULT ! the file contains monthly means
-           inquire(IOLENGTH=rlength) SWRAD1,WTSURF1,QCORR1
+           inquire(IOLENGTH=rlength) SWRAD1,SWRAD1,QCORR1
            open(21, file=heat_input, form='unformatted', access='direct', recl=rlength)
            write(6,*) 'open 21 done'
      END SELECT

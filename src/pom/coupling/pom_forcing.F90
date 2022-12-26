@@ -90,9 +90,6 @@
 !     ***************************************
 !     ***************************************
 !    
-!     -----LOSS TERM OF THE SURFACE HEAT FLUX DATA-----
-
-       REAL (RLEN),SAVE                     :: WTSURF1,WTSURF2
 !
 !     -----HEAT FLUX CORRECTION TERM (NO MORE IN USE)------
 !
@@ -227,7 +224,7 @@ contains
                      SF ,                                                 &
                      WUSURF,WVSURF,                                       &
                      SWRAD,                                               &
-                     WTSURF,WSSURF,                                       &
+                     WSSURF,                                              &
                      TSURF,SSURF,                                         &
                      TSTAR,SSTAR,                                         &
                      ilong,                                               &
@@ -255,8 +252,6 @@ contains
 !   
         SWRAD1       =ZERO
         SWRAD2       =ZERO
-        WTSURF1      =ZERO
-        WTSURF2      =ZERO
         WSU1         =ZERO
         WSU2         =ZERO
         WSV1         =ZERO
@@ -334,21 +329,6 @@ contains
               READ (21,REC=ICOUNTF+1) SWRAD2
 !
           END IF
-!
-!         ***********************************************************
-!         ***********************************************************
-!         **                                                       **
-!         ** ELIMINATE SOLAR RADIATION from TOTAL HEAT FLUX        **
-!         ** N.B.: THE FOLLOWING TWO LINES SHOULD BE ACTIVE IF     **
-!         **       (AND ONLY IF!) IN WTSURF# THERE IS THE TOTAL    **
-!         **       HEAT FLUX AND NOT ONLY THE LOSS TERMS           **
-!         **                                                       **
-!         ***********************************************************
-!         ***********************************************************
-!
-!         WTSURF1 = WTSURF1-SWRAD1
-!         WTSURF2 = WTSURF2-SWRAD2
-!
 !
 !         -----CLIMATOLOGICAL T&S PROFILES-------
 !
