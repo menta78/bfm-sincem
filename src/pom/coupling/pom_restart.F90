@@ -26,6 +26,7 @@
 ! ** Giulia Mussap and Nadia Pinardi. However, previous       **
 ! ** significant contributions were provided also by          **
 ! ** Momme Butenschoen and Marcello Vichi.                    **
+! ** Subsequent maintance by Lorenzo Mentaschi.               **
 ! ** Thanks are due to Prof. George L. Mellor that allowed us **
 ! ** to modify use and distribute the one dimensional         **
 ! ** version of the Princeton Ocean Model.                    **
