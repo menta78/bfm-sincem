@@ -148,8 +148,8 @@
 !
 !         -----LOAD BFM STATE VAR.-----
 !
-          fbio(:)  = D3STATE(:,m)
-          fbbio(:) = D3STATEB(:,m)
+          fbio(:KB-1)  = D3STATE(:,m)
+          fbbio(:KB-1) = D3STATEB(:,m)
 !
 !         -----ZEROING SINKING VELOCITY-----
 ! 
@@ -302,7 +302,7 @@
 !
                          do k = 1 , KB - 1
 !
-                            sink(k) = -sediPPY(n,k)/SEC_PER_DAY
+                            sink(k) = -sediPPY(k,n)/SEC_PER_DAY
 !
                          enddo
 !
@@ -342,7 +342,7 @@
 !
       do K=1,KB-1
 !
-        ffbio(k)=fbbio(k)+DTI2*((ffbio(k)/H)+D3SOURCE(m,k))
+        ffbio(k)=fbbio(k)+DTI2*((ffbio(k)/H)+D3SOURCE(k,m))
 !
       end do
 !
