@@ -380,6 +380,16 @@ contains
    LEVEL2 'EXPERIMENT SETUP :'
    select case (bio_setup)
       case (0)
+        LEVEL2 "Using a SeaIce-Pelagic-Benthic coupled setup (bio_setup=0)"
+        LEVEL3 'pelagic variables =',NO_D3_BOX_STATES
+        LEVEL3 'pelagic transported variables ='
+        LEVEL3 'pelagic diagnostic variables =', NO_D3_BOX_DIAGNOSS
+#ifdef INCLUDE_SEAICE
+        LEVEL3 'seaice variables =',NO_D2_BOX_STATES_ICE
+        LEVEL3 'seaice diagnostic variables=', NO_D2_BOX_DIAGNOSS_ICE
+#endif
+        LEVEL3 'benthic variables =',NO_D2_BOX_STATES_BEN
+        LEVEL3 'benthic diagnostic variables=', NO_D2_BOX_DIAGNOSS_BEN
       case (1) ! Pelagic only
         LEVEL2 "Using only Pelagic component (bio_setup=1)"
         LEVEL3 'pelagic variables =',NO_D3_BOX_STATES
