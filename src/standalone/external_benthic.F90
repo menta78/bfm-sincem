@@ -21,6 +21,8 @@
 !   See the GNU General Public License for more details.
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 !
+! INCLUDE
+#include "cppdefs.h"
 !
 ! INTERFACE
    subroutine external_benthic
