@@ -221,7 +221,7 @@
     end do
 
     ! fluxes to the BAL from atmosphere, flooding and pelagic
-    where (EHB(:) > ZERO)
+    where (EHB(:) > p_small)
        ! volume concentration
        I1p_tilde(:) = I1p(:)/EHB(:)
        I3n_tilde(:) = I3n(:)/EHB(:)
@@ -243,7 +243,7 @@
                            + min(ZERO, EDH(:)*I1p_tilde(:))
        flux_pel_ice_N3(:)= max(ZERO,EDH(:)*I3n_star(:)) &
                            + min(ZERO, EDH(:)*I3n_tilde(:))
-        flux_pel_ice_N4(:)= max(ZERO,EDH(:)*I4n_star(:)) &
+       flux_pel_ice_N4(:)= max(ZERO,EDH(:)*I4n_star(:)) &
                            + min(ZERO, EDH(:)*I4n_tilde(:))
        flux_pel_ice_N5(:)= max(ZERO,EDH(:)*I5s_star(:)) &
                            + min(ZERO, EDH(:)*I5s_tilde(:))
@@ -300,10 +300,6 @@
     tmpflux(SRFindices) = jsurN1p(:) / Depth(SRFindices)
     call flux_vector(iiPel,ppN1p,ppN1p, tmpflux(:) )
 
-    jbotN1p(:)=jbotN1p(:) + flux_bott_pel_n1(:)
-    tmpflux(BOTindices) = jbotN1p(:)/Depth(BOTindices)
-    call flux_vector( iiPel, ppN1p, ppN1p, tmpflux )
-
     jsurN3n(:)=jsurN3n(:) - flux_pel_ice_N3(:)
     tmpflux(SRFindices) = jsurN3n(:) / Depth(SRFindices)
     call flux_vector(iiPel,ppN3n,ppN3n, tmpflux(:) )
@@ -326,7 +322,7 @@
           lcl_SeaiceVar => SeaiceAlgae(j,i)
           lcl_PelagicVar => PhytoPlankton(PPY(j),i)
           if( associated(lcl_SeaiceVar) .AND. associated(lcl_PelagicVar) ) then
-             where (EHB(:)>ZERO)
+             where (EHB(:)>p_small)
                 flux_pel_ice(:) = max(ZERO, EDH(:)*lcl_PelagicVar(SRFindices)*EVB(:))  &
                      + min(ZERO, EDH(:)*lcl_SeaiceVar(:)/EHB(:))
              elsewhere
@@ -355,7 +351,7 @@
          lcl_SeaiceVar => SeaiceDetritus(j,i)
          lcl_PelagicVar => PelDetritus(DET(j),i)
          if( associated(lcl_SeaiceVar) .AND. associated(lcl_PelagicVar) ) then
-            where (EHB(:)>ZERO)
+            where (EHB(:)>p_small)
                flux_pel_ice(:)= max(ZERO, EDH(:)*lcl_PelagicVar(SRFindices)*EVB(:))  &
                     + min(ZERO, EDH(:)*lcl_SeaiceVar(:)/EHB(:))
             elsewhere
@@ -384,7 +380,7 @@
            lcl_SeaiceVar => SeaiceBacteria(j,i)
            lcl_PelagicVar => PelBacteria(BAC(j),i)
            if( associated(lcl_SeaiceVar) .AND. associated(lcl_PelagicVar) ) then
-              where (EHB(:)>ZERO)
+              where (EHB(:)>p_small)
                  flux_pel_ice(:)= max(ZERO, EDH(:)*lcl_PelagicVar(SRFindices)*EVB(:))  &
                       + min(ZERO, EDH(:)*lcl_SeaiceVar(:)/EHB(:))
               elsewhere
@@ -414,7 +410,7 @@
            lcl_SeaiceVar => SeaiceZoo(j,i)
            lcl_PelagicVar => MicroZooPlankton(ZOO(j),i)
            if( associated(lcl_SeaiceVar) .AND. associated(lcl_PelagicVar) ) then
-              where (EHB(:)>ZERO)
+              where (EHB(:)>p_small)
                  flux_pel_ice(:)= max(ZERO, EDH(:)*lcl_PelagicVar(SRFindices)*EVB(:))  &
                       + min(ZERO, EDH(:)*lcl_SeaiceVar(:)/EHB(:))
               elsewhere
