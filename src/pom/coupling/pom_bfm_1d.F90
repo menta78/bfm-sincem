@@ -24,6 +24,7 @@
 ! ** Giulia Mussap and Nadia Pinardi. However, previous       **
 ! ** significant contributions were provided also by          **
 ! ** Momme Butenschoen and Marcello Vichi.                    **
+! ** Subsequent maintance by Lorenzo Mentaschi.               **
 ! ** Thanks are due to Prof. George L. Mellor that allowed us **
 ! ** to modify, use and distribute the one dimensional        **
 ! ** version of the Princeton Ocean Model.                    **
@@ -68,7 +69,7 @@
 !     -----MODULES (USE OF ONLY IS STRONGLY ENCOURAGED)-----
 !
        use api_bfm,ONLY           :out_delta
-       use Service,ONLY           :savef
+       use CPL_VARIABLES,ONLY           :savef
        use constants,ONLY         :SEC_PER_DAY
        use POM,ONLY               :time,time0,dti,intt,ilong
 !
@@ -97,7 +98,7 @@
 !      ********************************************
 !      ********************************************
 
-       call env_forcing_pom_bfm_1d
+       call pom_env_forcing_1d
 !
 !      -----EXECUTE BFM CORE-----
 !
@@ -114,12 +115,12 @@
 !      *******************************************************************
 !      *******************************************************************
 !
-       call vdiff_SOS
+       call vert_integration
 !
 !      -----INTEGRATION OF SCALAR (BENTHIC) BFM STATE VAR'S WITH LEAPFROG SCHEME----
 !
 !
-      call lf1d
+       call SCHEME_BENTHIC_LF1D
 !
 !
 !      -----DEFINE AND UPDATE TIME FOR OUTPUT WRITING-----

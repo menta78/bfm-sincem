@@ -26,6 +26,7 @@
 ! ** Giulia Mussap and Nadia Pinardi. However, previous       **
 ! ** significant contributions were provided also by          **
 ! ** Momme Butenschoen and Marcello Vichi.                    **
+! ** Subsequent maintance by Lorenzo Mentaschi.               **
 ! ** Thanks are due to Prof. George L. Mellor that allowed us **
 ! ** to modify use and distribute the one dimensional         **
 ! ** version of the Princeton Ocean Model.                    **
@@ -59,7 +60,7 @@
 !
 ! !INTERFACE
 !
-   subroutine restart_BFM_inPOM
+subroutine save_restart
 !
 !
 !     -----MODULES (USE OF ONLY IS STRONGLY ENCOURAGED)-----
@@ -96,5 +97,83 @@
  write (6,*) 'NETCDF RESTART WRITTEN, TIME--> ', time
 !
    return
-   end subroutine restart_BFM_inPOM
+end subroutine save_restart
 !
+
+
+
+subroutine load_restart
+!
+! DESCRIPTION
+!
+! This subroutine opens and reads the ".fort" file containing the
+! restart data for the POM component of the BFM-POM1D modeling system
+!
+! The input path to the restart file is specified in pom_input.nml
+! The output is handled via module POM
+!
+!***********************************************************************
+!
+
+!     -----MODULES (USE OF ONLY IS STRONGLY ENCOURAGED)-----
+!
+      use global_mem, ONLY: error_msg_prn, NML_OPEN, NML_READ
+!
+      use CPL_VARIABLES, only: wind_input,     &
+                         ism_input,      &
+                         Sal_input,      &
+                         Temp_input,     &
+                         Sprofile_input, &
+                         Tprofile_input, &
+                         heat_input,     &
+                         surfNut_input,  &
+                         read_restart
+!
+      use POM, ONLY: time0,       &
+                     u,ub,        &
+                     v,vb,        &
+                     t,tb,        &
+                     s,sb,        &
+                     q2,q2b,      &
+                     q2l,q2lb,    &
+                     kh,km,kq,    &
+                     l,           &
+                     wubot,wvbot, &
+                     rho
+!
+!     -----IMPLICIT TYPING IS NEVER ALLOWED-----
+!
+      IMPLICIT NONE 
+!
+!     -----NAMELIST READING UNIT-----
+!
+      integer,parameter  :: namlst=10
+!
+!
+!    -----OPEN AND READ THE RESTART FILE FOR POM-----
+!
+       open(70,file=read_restart,form='unformatted',status='old')
+!
+       read(70) time0,       &
+                u,ub,        &
+                v,vb,        &
+                t,tb,        &
+                s,sb,        &
+                q2,q2b,      &
+                q2l,q2lb,    &
+                kh,km,kq,    &
+                l,           &
+                wubot,wvbot, &
+                rho
+!
+      return
+!
+!     -----PRINT IF SOMETHING IS WRONG WITH NAMELIST OPENING-----
+!
+100   call error_msg_prn(NML_OPEN,"get_rst.F90","pom_bfm_settings.nml")
+!
+!     -----PRINT IF SOMETHING IS WRONG WITH NAMELIST READING-----
+!
+102   call error_msg_prn(NML_READ,"get_rst.F90","pom_input in pom_bfm_settings.nml")
+!
+end subroutine load_restart

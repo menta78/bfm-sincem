@@ -1,4 +1,3 @@
-#include "INCLUDE.h"
 !
 ! **************************************************************
 ! **************************************************************
@@ -7,7 +6,7 @@
 ! **                                                          **
 ! ** The modeling system originate from the direct on-line    **
 ! ** coupling of the 1D Version of the Princeton Ocean model  **
-! ** "POM" and the Biogeochemical Flux Model "BFM".           **
+! ** "POM" and the Biological Flux Model "BFM".               **
 ! **                                                          **
 ! ** The whole modelling system and its documentation are     **
 ! ** available for download from the BFM web site:            **
@@ -25,8 +24,9 @@
 ! ** Giulia Mussap and Nadia Pinardi. However, previous       **
 ! ** significant contributions were provided also by          **
 ! ** Momme Butenschoen and Marcello Vichi.                    **
+! ** Subsequent maintance by Lorenzo Mentaschi.               **
 ! ** Thanks are due to Prof. George L. Mellor that allowed us **
-! ** to modify, use and distribute the one dimensional        **
+! ** to modify use and distribute the one dimensional         **
 ! ** version of the Princeton Ocean Model.                    **
 ! **                                                          **
 ! **                            Marco.Zavatarelli@unibo.it    **
@@ -48,89 +48,80 @@
 ! **************************************************************
 ! **************************************************************
 !
-! !ROUTINE: LF1D
-!
+! !ROUTINE: get_init_TS_IC
 !
 ! !INTERFACE
 !
-  SUBROUTINE LF1D
+     subroutine get_init_TS_IC
 !
 !DESCRIPTION
 !
-!  This routine calculates and solves for the leap-frog time step
-!  applied to the BFM scalar state variables (the benthic state variables)
+! This subroutine opens and reads files containing the T&S initial conditions
+! Files are read in direct access mode
+! The path to the T&S I.C. file specified in namelist pom_input.
 !
-!***************************************************************************
+!***********************************************************************************
 !
-!   -----MODULES (USE OF ONLY IS STRONGLY ENCOURAGED)-----
+!     -----MODULES (USE OF ONLY IS STRONGLY ENCOURAGED)-----
 !
-    use mem_Param, ONLY: p_small
+      use global_mem, ONLY: error_msg_prn, NML_OPEN, NML_READ
 !
-    use global_mem, ONLY:RLEN,ZERO
+      use CPL_VARIABLES, ONLY: Sprofile_input, &
+                         Tprofile_input
+!    
+      use pom, ONLY: KB,T,TB,S,SB
 !
-    use Pom, ONLY: smoth,dti, ilong
+!     -----IMPLICIT TYPING IS NEVER ALLOWED-----
 !
-    use Mem, ONLY:D2STATE_BEN,NO_D2_BOX_STATES_BEN,D2SOURCE_BEN,NO_BOXES_BEN
+      IMPLICIT NONE
 !
-    use api_bfm, ONLY:D2STATEB_BEN
+!     -----LOOP COUNTER-----
 !
-!    -----IMPLICIT TYPING IS NEVER ALLOWED----
+      INTEGER :: K
 !
-     IMPLICIT NONE
+!      -----RECORD LENGTH-----
 !
-!    ----- LOOP COUNTER-----
+      INTEGER :: RLENGTH
 !
-     integer(ilong) ::  n
+!     -----NAMELIST READING UNIT-----
 !
-!    -----TWICE THE TIME STEP-----
+      integer,parameter  :: namlst=10
 !
-     real(RLEN) :: dti2
+!    -----OPEN FILE WITH SALINITY I.C.----
 !
-!    -----TEMPORARY STORAGE FOR STATE VARIABLES COMPUTED @ t+dt-----
+       inquire(IOLENGTH=rlength) SB(1)
+       open(29,file=Sprofile_input,form='unformatted',access='direct',recl=rlength)
 !
-     real(RLEN) :: tempo(NO_D2_BOX_STATES_BEN)
 !
-!    -----ZEROING-----
+!    -----OPEN FILE WITH TEMPERATURE I.C.----
 !
-     tempo = ZERO
 !
-!    -----TWICE THE TIME STEP-----
+       inquire(IOLENGTH=rlength) TB(1)
+       open(10,file=Tprofile_input,form='unformatted',access='direct',recl=rlength)
 !
-     dti2 = dti*2.0_RLEN
 !
-!    -----COMPUTE SOURCE/SINKS TREND-----
+!    -----READ T&S INITIAL CONDITIONS-----
 !
-     do n = 1, NO_D2_BOX_STATES_BEN
-        tempo(n) = tempo(n) + D2SOURCE_BEN(1,n)
-     end do 
+     DO K = 1,KB
 !
-!-----LEAP FROG INTEGRATION-----
+           READ (29,REC=K) SB(K)
+           READ (10,REC=K) TB(K)
 !
-     tempo=D2STATEB_BEN(1,:)+(tempo*dti2)
-!         
-!    -----CLIPPING (IF NEEDED....)-----
+     END DO
 !
-    do  n = 1,NO_D2_BOX_STATES_BEN
+!    -----COLD START: T@(t)=T@(t-dt)-----
 !
-            tempo(n)=max(p_small,tempo(n))
+     T(:)=TB(:)
+     S(:)=SB(:)
 !
-    end do
+     return
 !
-!    -----ASSELIN FILTER-----
+!    -----PRINT IF PROBLEMS WITH NML OPENING-----
 !
-     D2STATE_BEN(1,:)=D2STATE_BEN(1,:)          + &
-                      0.5_RLEN*smoth            * &
-                      (                           &
-                       tempo(:)                 + &
-                       D2STATEB_BEN(1,:)        - &
-                       2.0_RLEN*D2STATE_BEN(1,:)  &
-                      )
+100   call error_msg_prn(NML_OPEN,"get_init_TS_IC.F90","problem opening pom_bfm_settings.nml")
 !
-!    -----RESTORE TIME SEQUENCE-----
+!    -----PRINT IF PROBLEMS WITH NML READING-----
 !
-     D2STATEB_BEN(1,:)=D2STATE_BEN(1,:)
-     D2STATE_BEN(1,:)=tempo(:)
+102   call error_msg_prn(NML_READ,"get_init_TS_IC.F90","pom_input in pom_bfm_settings.nml")
 !
-    return
-!
-      end subroutine LF1D
+      end subroutine get_init_TS_IC

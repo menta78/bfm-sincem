@@ -24,6 +24,7 @@
 ! ** Giulia Mussap and Nadia Pinardi. However, previous       **
 ! ** significant contributions were provided also by          **
 ! ** Momme Butenschoen and Marcello Vichi.                    **
+! ** Subsequent maintance by Lorenzo Mentaschi.               **
 ! ** Thanks are due to Prof. George L. Mellor that allowed us **
 ! ** to modify, use and distribute the one dimensional        **
 ! ** version of the Princeton Ocean Model.                    **
@@ -47,11 +48,11 @@
 ! **************************************************************
 ! **************************************************************
 
-! !ROUTINE: vdiff_SOS
+! !ROUTINE: vert_integration
 !
 ! !INTERFACE
 !
-  SUBROUTINE vdiff_SOS
+  SUBROUTINE vert_integration
 !
 !
 !DESCRIPTION
@@ -70,7 +71,7 @@
 !
      use global_mem, ONLY:RLEN,ZERO
 !
-     use Service
+     use CPL_VARIABLES
 !
      use api_bfm, ONLY:D3STATEB
 !
@@ -99,7 +100,7 @@
                    jbotN1p,jbotN4n,jbotN3n,                               &
                    jbotO2o,jbotO3c
 !
-     use POM, ONLY:SMOTH,KB,H,DTI,DZR,NRT,NBCBFM,UMOLBFM,NTP,GRAV,RHO
+     use POM, ONLY:SMOTH,KB,H,DTI,DZ,DZR,NRT,KH,NBCBFM,UMOLBFM,NTP,GRAV,RHO
 
 !     -----IMPLICIT TYPING IS NEVER ALLOWED-----
 !
@@ -112,7 +113,7 @@
 !
 !-----BFM STATE VAR. @ time t,  t+DTI, T-DTI RESPECTIVELY-----
 !
- real(RLEN)               :: fbio(KB), ffbio(KB), fbbio(KB) 
+ real(RLEN)               :: fbio(KB), ffbio(KB), fbbio(KB), advtnd(KB) 
 !
 !-----SURFACE FLUX STORAGE-----
 !
@@ -134,6 +135,10 @@
 !
  real(RLEN)               :: dti2  
 !
+!-----lateral relaxation and flux
+!
+ real(RLEN)               :: LAMBDA, LFLUX(KB)
+!
 !
     dti2 = DTI*2.
 
@@ -144,6 +149,11 @@
 !
 !-----LOOP OVER BFM STATE VAR'S-----
 !
+
+  IF (USE_KH_EXT) THEN
+      KH(:KB-1) = KH_EXT*KH_FACTOR
+  END IF
+
   do m = 1 , NO_D3_BOX_STATES
 !
 !         -----LOAD BFM STATE VAR.-----
@@ -184,15 +194,26 @@
 !
                  case (ppN1p)
 !
-                      surflux = -(PO4SURF-n1p(1))*vrelax
+                      SELECT CASE (NUTSBC_MODE)
+                           CASE (1)
+                              surflux = -PO4SURF*ASURF_PO4    ! the input file provides the fluxes. units: mmol/s/m^2
+                           CASE DEFAULT
+                              surflux = -(PO4SURF-n1p(1))*vrelax ! units: mmol/s/m^2
+                      END SELECT 
+
 !
-                      botflux = jbotN1p(1)/SEC_PER_DAY
+                      botflux = jbotN1p(1)/SEC_PER_DAY   
 !
 !                -----NITRATE-----
 !
                  case (ppN3n)
 !
-                      surflux = -(NO3SURF-n3n(1))*vrelax
+                      SELECT CASE (NUTSBC_MODE)
+                           CASE (1)
+                              surflux = -NO3SURF*ASURF_NO3    ! the input file provides the fluxes. units: mmol/s/m^2
+                           CASE DEFAULT
+                              surflux = -(NO3SURF-n3n(1))*vrelax ! units: mmol/s/m^2
+                      END SELECT 
 
                       botflux = jbotN3n(1)/SEC_PER_DAY
 !
@@ -200,7 +221,12 @@
 !
                  case (ppN4n)
 !
-                      surflux = -(NH4SURF-n4n(1))*vrelax
+                      SELECT CASE (NUTSBC_MODE)
+                           CASE (1)
+                              surflux = -NH4SURF*ASURF_NH4    ! the input file provides the fluxes. units: mmol/s/m^2
+                           CASE DEFAULT
+                              surflux = -(NH4SURF-n4n(1))*vrelax ! units: mmol/s/m^2
+                      END SELECT 
 !
                       botflux = jbotN4n(1)/SEC_PER_DAY
 !
@@ -208,7 +234,12 @@
 !
                  case (ppN5s)
 !
-                      surflux = -(SIO4SURF-n5s(1))*vrelax
+                      SELECT CASE (NUTSBC_MODE)
+                           CASE (1)
+                              surflux = -SIO4SURF*ASURF_SIO4    ! the input file provides the fluxes. units: mmol/s/m^2
+                           CASE DEFAULT
+                              surflux = -(SIO4SURF-n5s(1))*vrelax ! units: mmol/s/m^2
+                      END SELECT 
 !
 !               ***************************************************
 !               ***************************************************
@@ -336,15 +367,34 @@
 !                 *******************************************************
 !                 *******************************************************
 !
-                  call adverte(fbio,ffbio,sink)
+                  IF (USE_W_PROFILE) THEN
+                     sink = sink + W_PROFILE
+                  END IF
+                  call adverte(fbio,advtnd,sink) ! computing the advection tendency on the central time step
 !
 !                 -----SOURCE SPLITTING LEAPFROG INTEGRATION-----
 !
-      do K=1,KB-1
-!
-        ffbio(k)=fbbio(k)+DTI2*((ffbio(k)/H)+D3SOURCE(k,m))
-!
-      end do
+
+                  SELECT CASE (m)
+                     CASE (ppN1p)
+                        LAMBDA = L_PO4(MONTH_OF_SIMULATION)
+                     CASE (ppN3n)
+                        LAMBDA = L_NO3(MONTH_OF_SIMULATION)
+                     CASE (ppN5s)
+                        LAMBDA = L_SIO4(MONTH_OF_SIMULATION)
+                     CASE (ppO2o)
+                        LAMBDA = L_O2(MONTH_OF_SIMULATION)
+                     CASE DEFAULT
+                        LAMBDA = L_X(MONTH_OF_SIMULATION)
+                  END SELECT
+                  LFLUX = LAMBDA*fbio ! estimating the lateral flux. Do it at the central time step!
+                  do K=1,KB-1
+!            
+                   ! Integration in time: leap-frog of advection, lateral flux and reactive term
+                    ffbio(k)=fbbio(k)+DTI2*(advtnd(k)+D3SOURCE(k,m)+LFLUX(K))
+!            
+                  end do
+
 !
 !     *******************************************************************
 !     *******************************************************************
@@ -355,14 +405,13 @@
 !     *******************************************************************
 !     *******************************************************************
 !
-       CALL PROFTS(ffbio,surflux,botflux,ZERO,ZERO,NBCBFM,DTI2,NTP,UMOLBFM)
+      CALL PROF_TRACERS(ffbio,surflux,botflux,ZERO,ZERO,NBCBFM,DTI2,NTP,UMOLBFM)
 !
 !     -----CLIPPING......IF NEEDED-----
 !
       do k=1, KB-1
 !
             ffbio(k)=max(p_small,ffbio(k))
-!
       end do
 !
 !     ---MIX SOLUTIONS AND RESTORE TIME SEQUENCE-----
@@ -377,7 +426,7 @@
 
    enddo ! loop over NO_D3_BOX_STATES
 !
-      end subroutine vdiff_sos
+      end subroutine vert_integration
 !
 !<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><
 !
@@ -433,7 +482,7 @@
 !
 ! !INTERFACE
 !
-  SUBROUTINE adverte(F,FDWDT,W)
+  SUBROUTINE adverte(F,ADVTND,W)
 !
 !DESCRIPTION
 !
@@ -451,33 +500,41 @@
 !     -----MODULES (USE OF ONLY IS STRONGLY ENCOURAGED)-----
 !
       use POM, ONLY:KB, DZR, H
+      use CPL_VARIABLES
 !
       use global_mem, ONLY:RLEN
 !
 !    -----IMPLICIT TYPING IS NEVER ALLOWED----
 !
      IMPLICIT NONE
-!
-!    -----DUMMY ARGUMENTS-----
-!
-     real(RLEN) :: F(KB),    &  !STATE VAR. AT TIME=t
-                   FDWDT(KB)    !SINKING RATE
-!
-     real(RLEN) :: W(KB)     ! SINKING VELOCITY
-!
-!    -----LOOP COUNTER-----
-!
+
+     real(RLEN) :: F(KB),ADVTND(KB)
+     real(RLEN) :: W(KB)
+     real(RLEN) :: DTI2
      integer :: k
 !
-!    -----VERTICAL ADVECTION: UPSTREAM SCHEME-----
-!
-     FDWDT(1)=DZR(1)*F(1)*W(2)
+     F(KB)=F(KB-1)
+     SELECT CASE (VERT_ADV)
+         CASE (VERT_ADV_SINKING_UPWIND)
+             !
+             ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=
+             ! Calculate vertical advection. Mind downward velocities are negative!
+             ! Upwind scheme:
+             ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=
+             !
+             ADVTND(1)=DZR(1)/H*F(1)*W(2)
+             do K=2,KB-1
+                ADVTND(K)=DZR(K)/H*(F(K)*W(K+1)-F(K-1)*W(K))
+             end do
+         CASE DEFAULT !(VERT_ADV_CENTERED)
+             ! centered scheme: Gordon & Stern 1982
 
-     do K=2,KB-1
-!
-        FDWDT(K)=DZR(K)*(F(K)*W(K+1)-F(K-1)*W(K))
-!
-     end do
+             ADVTND(1) = DZR(1)/H*(F(1)+F(2))/2*W(1)
+             do K=2,KB-1
+                ADVTND(K)= 0.5/H*( DZR(K-1)*W(K-1)*(F(K-1)-F(K)) + DZR(K)*W(K)*(F(K)-F(K+1)) )
+             end do
+             ADVTND(KB) = DZR(KB)/H*(F(KB-1)+F(KB))/2*W(KB-1)
+         END SELECT
 !
       return
 !

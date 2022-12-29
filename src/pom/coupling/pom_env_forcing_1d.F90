@@ -1,4 +1,4 @@
-!  ROUTINE: get_rst
+#include "INCLUDE.h"
 !
 ! **************************************************************
 ! **************************************************************
@@ -25,6 +25,7 @@
 ! ** Giulia Mussap and Nadia Pinardi. However, previous       **
 ! ** significant contributions were provided also by          **
 ! ** Momme Butenschoen and Marcello Vichi.                    **
+! ** Subsequent maintance by Lorenzo Mentaschi.               **
 ! ** Thanks are due to Prof. George L. Mellor that allowed us **
 ! ** to modify use and distribute the one dimensional         **
 ! ** version of the Princeton Ocean Model.                    **
@@ -47,97 +48,40 @@
 ! **                                                          **
 ! **************************************************************
 ! **************************************************************
+!
+!DESCRIPTION    
 ! 
-! INTERFACE
+!  This subroutine is called from subroutine pom_bfm_1d  and 
+!  calls the routines that provides BFM with all the needed information 
+!  about the physical environment:
 !
-      subroutine get_rst
+!   pom_to_bfm: Transfers the  POM state variables into the correspondent
+!               BFM's.
+! 
+!   CalcVerticalExtinction: computes the light vertical extinction coefficients.
 !
-! DESCRIPTION
+!   CalcLightDistribution: define the irradiance vertical profile.
 !
-! This subroutine opens and reads the ".fort" file containing the
-! restart data for the POM component of the BFM-POM1D modeling system
+! !INTERFACE
 !
-! The input path to the restart file is specified in pom_input.nml
-! The output is handled via module POM
+    SUBROUTINE pom_env_forcing_1d 
 !
-!***********************************************************************
+      IMPLICIT NONE
 !
-
-!     -----MODULES (USE OF ONLY IS STRONGLY ENCOURAGED)-----
+!        -----TRANSFER PHYSICAL VARIABLES INTO BFM-----
 !
-      use global_mem, ONLY: error_msg_prn, NML_OPEN, NML_READ
+         call pom_to_bfm
 !
-      use Service, only: wind_input,     &
-                         ism_input,      &
-                         Sal_input,      &
-                         Temp_input,     &
-                         Sprofile_input, &
-                         Tprofile_input, &
-                         heat_input,     &
-                         surfNut_input,  &
-                         read_restart
+!        -----COMPUTE VERTICAL EXTINCTION COEFFICIENTS-----
 !
-      use POM, ONLY: time0,       &
-                     u,ub,        &
-                     v,vb,        &
-                     t,tb,        &
-                     s,sb,        &
-                     q2,q2b,      &
-                     q2l,q2lb,    &
-                     kh,km,kq,    &
-                     l,           &
-                     wubot,wvbot, &
-                     rho
+         call CalcVerticalExtinction
 !
-!     -----IMPLICIT TYPING IS NEVER ALLOWED-----
+!        -----COMPUTE THE IRRADIANCE VERTICAL PROFILE-----
 !
-      IMPLICIT NONE 
-!
-!     -----NAMELIST READING UNIT-----
-!
-      integer,parameter  :: namlst=10
-!
-!     -----READ NAMELIST WITH RESTART FILE PATH-----
-!
-       namelist /pom_input/ wind_input,     &
-                            ism_input,      &
-                            Sal_input,      &
-                            Temp_input,     &
-                            Sprofile_input, &
-                            Tprofile_input, &
-                            heat_input,     &
-                            surfNut_input,  &
-                            read_restart
-!
-       open(namlst,file='pom_bfm_settings.nml',status='old',action='read',err=100)
-       read(namlst,nml=pom_input, err=102)
-       rewind(namlst)
-       close(namlst)
-!
-!    -----OPEN AND READ THE RESTART FILE FOR POM-----
-!
-       open(70,file=read_restart,form='unformatted',status='old')
-!
-       read(70) time0,       &
-                u,ub,        &
-                v,vb,        &
-                t,tb,        &
-                s,sb,        &
-                q2,q2b,      &
-                q2l,q2lb,    &
-                kh,km,kq,    &
-                l,           &
-                wubot,wvbot, &
-                rho
+         call CalcLightDistribution
 !
       return
 !
-!     -----PRINT IF SOMETHING IS WRONG WITH NAMELIST OPENING-----
-!
-100   call error_msg_prn(NML_OPEN,"get_rst.F90","pom_bfm_settings.nml")
-!
-!     -----PRINT IF SOMETHING IS WRONG WITH NAMELIST READING-----
-!
-102   call error_msg_prn(NML_READ,"get_rst.F90","pom_input in pom_bfm_settings.nml")
-!
-      end subroutine get_rst
+      end subroutine pom_env_forcing_1d
+
+

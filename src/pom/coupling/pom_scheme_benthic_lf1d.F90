@@ -1,3 +1,4 @@
+#include "INCLUDE.h"
 !
 ! **************************************************************
 ! **************************************************************
@@ -6,7 +7,7 @@
 ! **                                                          **
 ! ** The modeling system originate from the direct on-line    **
 ! ** coupling of the 1D Version of the Princeton Ocean model  **
-! ** "POM" and the Biological Flux Model "BFM".               **
+! ** "POM" and the Biogeochemical Flux Model "BFM".           **
 ! **                                                          **
 ! ** The whole modelling system and its documentation are     **
 ! ** available for download from the BFM web site:            **
@@ -24,8 +25,9 @@
 ! ** Giulia Mussap and Nadia Pinardi. However, previous       **
 ! ** significant contributions were provided also by          **
 ! ** Momme Butenschoen and Marcello Vichi.                    **
+! ** Subsequent maintance by Lorenzo Mentaschi.               **
 ! ** Thanks are due to Prof. George L. Mellor that allowed us **
-! ** to modify use and distribute the one dimensional         **
+! ** to modify, use and distribute the one dimensional        **
 ! ** version of the Princeton Ocean Model.                    **
 ! **                                                          **
 ! **                            Marco.Zavatarelli@unibo.it    **
@@ -47,104 +49,89 @@
 ! **************************************************************
 ! **************************************************************
 !
-! !ROUTINE: get_TS_IC
+! !ROUTINE: SCHEME_BENTHIC_LF1D
+!
 !
 ! !INTERFACE
 !
-     subroutine get_TS_IC
+  SUBROUTINE SCHEME_BENTHIC_LF1D
 !
 !DESCRIPTION
 !
-! This subroutine opens and reads files containing the T&S initial conditions
-! Files are read in direct access mode
-! The path to the T&S I.C. file specified in namelist pom_input.
+!  This routine calculates and solves for the leap-frog time step
+!  applied to the BFM scalar state variables (the benthic state variables)
 !
-!***********************************************************************************
+!***************************************************************************
 !
-!     -----MODULES (USE OF ONLY IS STRONGLY ENCOURAGED)-----
+!   -----MODULES (USE OF ONLY IS STRONGLY ENCOURAGED)-----
 !
-      use global_mem, ONLY: error_msg_prn, NML_OPEN, NML_READ
+    use mem_Param, ONLY: p_small
 !
-      use Service, ONLY: wind_input,     &
-                         ism_input,      &
-                         Sal_input,      &
-                         Temp_input,     &
-                         Sprofile_input, &
-                         Tprofile_input, &
-                         heat_input,     &
-                         surfNut_input,  &
-                         read_restart
-!    
-      use pom, ONLY: KB,T,TB,S,SB
+    use global_mem, ONLY:RLEN,ZERO
 !
-!     -----IMPLICIT TYPING IS NEVER ALLOWED-----
+    use Pom, ONLY: smoth,dti, ilong
 !
-      IMPLICIT NONE
+    use Mem, ONLY:D2STATE_BEN,NO_D2_BOX_STATES_BEN,D2SOURCE_BEN,NO_BOXES_BEN
 !
-!     -----LOOP COUNTER-----
+    use api_bfm, ONLY:D2STATEB_BEN
 !
-      INTEGER :: K
+!    -----IMPLICIT TYPING IS NEVER ALLOWED----
 !
-!      -----RECORD LENGTH-----
+     IMPLICIT NONE
 !
-      INTEGER :: RLENGTH
+!    ----- LOOP COUNTER-----
 !
-!     -----NAMELIST READING UNIT-----
+     integer(ilong) ::  n
 !
-      integer,parameter  :: namlst=10
+!    -----TWICE THE TIME STEP-----
 !
-!    -----OPEN AND READ NAMELIST WITH T&S I.C. FILE PATH-----
+     real(RLEN) :: dti2
 !
-       namelist /pom_input/ wind_input,     &
-                            ism_input,      &
-                            Sal_input,      &
-                            Temp_input,     &
-                            Sprofile_input, &
-                            Tprofile_input, &
-                            heat_input,     &
-                            surfNut_input,  &
-                            read_restart
+!    -----TEMPORARY STORAGE FOR STATE VARIABLES COMPUTED @ t+dt-----
 !
-       open(namlst,file='pom_bfm_settings.nml',status='old',action='read',err=100)
-       read(namlst,nml=pom_input, err=102)
-       rewind(namlst)
-       close(namlst)
+     real(RLEN) :: tempo(NO_D2_BOX_STATES_BEN)
 !
-!    -----OPEN FILE WITH SALINITY I.C.----
+!    -----ZEROING-----
 !
-       inquire(IOLENGTH=rlength) SB(1)
-       open(29,file=Sprofile_input,form='unformatted',access='direct',recl=rlength)
+     tempo = ZERO
 !
+!    -----TWICE THE TIME STEP-----
 !
-!    -----OPEN FILE WITH TEMPERATURE I.C.----
+     dti2 = dti*2.0_RLEN
 !
+!    -----COMPUTE SOURCE/SINKS TREND-----
 !
-       inquire(IOLENGTH=rlength) TB(1)
-       open(10,file=Tprofile_input,form='unformatted',access='direct',recl=rlength)
+     do n = 1, NO_D2_BOX_STATES_BEN
+        tempo(n) = tempo(n) + D2SOURCE_BEN(1,n)
+     end do 
 !
+!-----LEAP FROG INTEGRATION-----
 !
-!    -----READ T&S INITIAL CONDITIONS-----
+     tempo=D2STATEB_BEN(1,:)+(tempo*dti2)
+!         
+!    -----CLIPPING (IF NEEDED....)-----
 !
-     DO K = 1,KB
+    do  n = 1,NO_D2_BOX_STATES_BEN
 !
-           READ (29,REC=K) SB(K)
-           READ (10,REC=K) TB(K)
+            tempo(n)=max(p_small,tempo(n))
 !
-     END DO
+    end do
 !
-!    -----COLD START: T@(t)=T@(t-dt)-----
+!    -----ASSELIN FILTER-----
 !
-     T(:)=TB(:)
-     S(:)=SB(:)
+     D2STATE_BEN(1,:)=D2STATE_BEN(1,:)          + &
+                      0.5_RLEN*smoth            * &
+                      (                           &
+                       tempo(:)                 + &
+                       D2STATEB_BEN(1,:)        - &
+                       2.0_RLEN*D2STATE_BEN(1,:)  &
+                      )
 !
-     return
+!    -----RESTORE TIME SEQUENCE-----
 !
-!    -----PRINT IF PROBLEMS WITH NML OPENING-----
+     D2STATEB_BEN(1,:)=D2STATE_BEN(1,:)
+     D2STATE_BEN(1,:)=tempo(:)
 !
-100   call error_msg_prn(NML_OPEN,"get_TS_IC.F90","problem opening pom_bfm_settings.nml")
+    return
 !
-!    -----PRINT IF PROBLEMS WITH NML READING-----
-!
-102   call error_msg_prn(NML_READ,"get_TS_IC.F90","pom_input in pom_bfm_settings.nml")
-!
-      end subroutine get_TS_IC
+      end subroutine SCHEME_BENTHIC_LF1D

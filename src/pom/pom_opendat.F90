@@ -24,6 +24,7 @@
 ! ** Giulia Mussap and Nadia Pinardi. However, previous       **
 ! ** significant contributions were provided also by          **
 ! ** Momme Butenschoen and Marcello Vichi.                    **
+! ** Subsequent maintance by Lorenzo Mentaschi.               **
 ! ** Thanks are due to Prof. George L. Mellor that allowed us **
 ! ** to modify, use and distribute the one dimensional        **
 ! ** version of the Princeton Ocean Model.                    **
@@ -72,14 +73,31 @@
 !
     use global_mem,ONLY:RLEN,LOGUNIT,error_msg_prn,NML_OPEN,NML_READ
 !
-    use Service, only:  wind_input,     & ! Wind Stress
+    use CPL_VARIABLES, only:  wind_input,     & ! Wind Stress
                         Sal_input,      & ! Salinity Initial Conditions
                         Temp_input,     & ! Temperature Initial Conditions
                         Sprofile_input, & ! Time varying (monthly) salinity profiles
                         Tprofile_input, & ! Time varying (monthly) temperature profiles
+                        Kprofile_input, & ! Time varying (monthly) KH profiles
+                        Wprofile_input, & ! Time varying (monthly) vertical velocity profiles
                         heat_input,     & ! Time varying (monthly) surface heat flux
                         surfNut_input,  & ! Time varying (monthly) surface nutrient
                         ism_input,      & ! Inorganic suspended matter Initial Conditions
+                        VERT_ADV,       & ! scheme for vertical advection: 0: sinking upwind, 1: centered. Default: 1
+                        USE_KH_EXT,     & ! true if KH is loaded from an external source
+                        KH_FACTOR,      & ! scaling factor for KH_EXT
+                        USE_W_PROFILE,  &
+                        NUTSBC_MODE,    & ! NUTRIENT SURFACE BOUNDARY CONDITIONS: 0 (default): concentrations. 1: fluxes
+                        L_PO4,          &
+                        L_NO3,          &
+                        L_SIO4,         &
+                        L_O2,           &
+                        L_X,            &
+                        ASURF_PO4,      &
+                        ASURF_NO3,      &
+                        ASURF_NH4,      &
+                        ASURF_SIO4,     &
+                        SWR_FILE_STEP,  & ! if 1 shortwave radiation is loaded hourly if 0 monthly
                         read_restart      ! Model restart file
 !
      use pom, ONLY :    TB, SB, ZZ, H
@@ -88,8 +106,10 @@
                         ISM1,                      &
                         SCLIM1,                    &
                         TCLIM1,                    &
-                        SWRAD1, WTSURF1,           &
-                        NO3_1,NH4_1,PO4_1, SIO4_1, &
+                        SWRAD1,                    &
+                        NO3_1,NH4_1,PO4_1, SIO4_1, & 
+                        KH_1,                      &
+                        WMN1, WVR1,                &
                         QCORR1                     ! NO MORE IN USE!!!!!
 !
 !    -----IMPLICIT TYPING IS NEVER ALLOWED----
@@ -112,13 +132,32 @@
                           Temp_input,     &
                           Sprofile_input, &
                           Tprofile_input, &
+                          Kprofile_input, &
+                          Wprofile_input, &
                           heat_input,     &
                           surfNut_input,  &
+                          NUTSBC_MODE,    &
+                          KH_FACTOR,      &
+                          L_PO4,          &
+                          L_NO3,          &
+                          L_SIO4,         &
+                          L_O2,           &
+                          L_X,            &
+                          ASURF_PO4,      &
+                          ASURF_NO3,      &
+                          ASURF_NH4,      &
+                          ASURF_SIO4,     &
+                          SWR_FILE_STEP,  &
+                          VERT_ADV,       &
                           read_restart
 !
      open(namlst,file='pom_bfm_settings.nml',status='old',action='read',err=100)
      read(namlst,nml=pom_input, err=102)
      close(namlst)
+!
+     write(6,*) 'Loaded namelist:'
+     write(6,pom_input)
+!
 !
 !    -----OPEN WIND STRESS FILE-----
 !
@@ -143,6 +182,7 @@
      inquire(IOLENGTH=rlength) TCLIM1(1)
      open(15, file=Temp_input, form='unformatted', access='direct', recl=rlength)
      write(6,*) 'open 15 done'
+
 !
 !    -----OPEN HEAT FLUX FILE-----
 !
@@ -154,17 +194,48 @@
 !    ****************************************
 !    ****************************************
 !
-     inquire(IOLENGTH=rlength) SWRAD1,WTSURF1,QCORR1
-     open(21, file=heat_input, form='unformatted', access='direct', recl=rlength)
-     write(6,*) 'open 21 done'
+     SELECT CASE (SWR_FILE_STEP)
+        CASE (1) ! the file contains hourly data
+           inquire(IOLENGTH=rlength) SWRAD1
+           open(21, file=heat_input, form='unformatted', access='direct', recl=rlength)
+           write(6,*) 'open 21 done'
+        CASE DEFAULT ! the file contains monthly means
+           inquire(IOLENGTH=rlength) SWRAD1,SWRAD1,QCORR1
+           open(21, file=heat_input, form='unformatted', access='direct', recl=rlength)
+           write(6,*) 'open 21 done'
+     END SELECT
 !
-!    -----OPEN INORGANIC SUSPENDED MATTER FILE-----
+!    -----OPEN NUTRIENTS FILE-----
 !
      inquire(IOLENGTH=rlength) NO3_1,NH4_1,PO4_1,SIO4_1
      open(18, file=surfNut_input, form='unformatted',access='direct',recl=rlength)
      write(6,*) 'open 18 done'
+!
+!    -----OPEN KH PROFILES, IF PROVIDED---
+!
+     inquire(FILE=Kprofile_input, EXIST=USE_KH_EXT)
+     IF (USE_KH_EXT) THEN
+         inquire(IOLENGTH=rlength) KH_1(1)
+         write(6,*) 'KH profile file exists, opening it :',Kprofile_input
+         open(34, file=Kprofile_input, form='unformatted',access='direct',recl=rlength)
+         write(6,*) 'open 34 done'
+     ELSE
+         write(6,*) 'KH profile file ',Kprofile_input,' does not exist, setting USE_KH_EXT=.FALSE.'
+     END IF
+!
+!    -----OPEN W PROFILE, IF PROVIDED----
+!
+     inquire(FILE=Wprofile_input, EXIST=USE_W_PROFILE)
+     IF (USE_W_PROFILE) THEN
+         inquire(IOLENGTH=rlength) WMN1(1),WVR1(1)
+         write(6,*) 'W profile file exists, opening it :',Wprofile_input
+         open(35, file=Wprofile_input, form='unformatted',access='direct',recl=rlength)
+         write(6,*) 'open 35 done'
+     ELSE
+         write(6,*) 'W profile file ',Wprofile_input,' does not exist, setting USE_W_PROFILE=.FALSE.'
+     END IF
 
-      write(6,*) 'open units done'
+     write(6,*) 'open units done'
 !
 #ifdef SAVEFORCING
      open(400,file="surface_forcing.txt")

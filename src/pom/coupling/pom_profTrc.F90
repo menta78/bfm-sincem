@@ -1,5 +1,5 @@
 !
-! !ROUTINE: profTS
+! !ROUTINE: PROF_TRACERS
 !
 ! **************************************************************
 ! **************************************************************
@@ -26,6 +26,7 @@
 ! ** Giulia Mussap and Nadia Pinardi. However, previous       **
 ! ** significant contributions were provided also by          **
 ! ** Momme Butenschoen and Marcello Vichi.                    **
+! ** Subsequent maintance by Lorenzo Mentaschi.               **
 ! ** Thanks are due to Prof. George L. Mellor that allowed us **
 ! ** to modify, use and distribute the one dimensional        **
 ! ** version of the Princeton Ocean Model.                    **
@@ -53,7 +54,7 @@
 !
 ! !INTERFACE
 !
-      Subroutine PROFTS(FF,WFSURF,WFBOT,SWRAD,FSURF,NBC,DT2,NTP,UMOL)
+      Subroutine PROF_TRACERS(FF,WFSURF,WFBOT,SWRAD,FSURF,NBC,DT2,NTP,UMOL)
 !
 ! DESCRIPTION
 !
@@ -279,7 +280,7 @@
 !
       RETURN
 !
-     end subroutine PROFTS
+     end subroutine PROF_TRACERS
 
 !EOC
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
