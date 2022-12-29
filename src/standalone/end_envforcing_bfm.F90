@@ -49,10 +49,17 @@
        end if
     case (3) ! interactive air-sea fluxes
     end select
+    if ( use_benthic_data ) then
+       LEVEL2 'Closing benthic forcing data file:'
+       LEVEL2 trim(benthic_file)
+       close(unit_benthic)
+    endif
 #ifdef INCLUDE_SEAICE
-    LEVEL2 'Closing sea-ice forcing data file:'
-    LEVEL2 trim(seaice_file)
-    close(unit_seaice)
+    if ( use_seaice_data ) then
+       LEVEL2 'Closing sea-ice forcing data file:'
+       LEVEL2 trim(seaice_file)
+       close(unit_seaice)
+    endif
 #endif
 
    return

@@ -39,8 +39,12 @@ subroutine analytical_forcing
    use mem,        only: iiC,iiN,iiP,iiS
    use mem_param,  only: p_small
 #ifdef INCLUDE_SEAICE
-   ! seaice forcings
+   ! seaice environment
    use mem,        only: EVB,ETB,ESB,EIB,EHB,ESI
+#endif
+#if defined BENTHIC_BIO || defined BENTHIC_FULL
+   ! benthic environment
+   use mem,        only: ETW_Ben,ESW_Ben,ERHO_Ben
 #endif
 #endif
    use mem_PAR,    only: ChlAttenFlag, P_PARRGB, P_PAR, &
@@ -148,16 +152,22 @@ subroutine analytical_forcing
    if (botdep_p>ZERO) jbotR6p(:) = -deposition(dyear,dfrac,botdep_p,iiP)
    if (botdep_si>ZERO) jbotR6s(:) = -deposition(dyear,dfrac,botdep_si,iiS)
 
+#if defined BENTHIC_BIO || defined BENTHIC_FULL
+   ETW_Ben(:)  =   ETW(BOTindices)
+   ESW_Ben(:)  =   ESW(BOTindices)
+   ERHO_Ben(:) =   ERHO(BOTindices)
+#endif
+
 #ifdef INCLUDE_SEAICE
-! sea-ice environmental forcings
-! overwritten by the seaice data file, if present
-  EVB(:) = ONE
-  ETB(:) = ONE
-  ESB(:) = ONE
-  ! convert from irradiance to PAR in uE/m2/s
-  EIB(:) = ONE/E2W
-  EHB(:) = ONE
-  ESI(:) = ONE
+   ! sea-ice environmental forcings
+   ! overwritten by the seaice data file, if present
+   EVB(:) = ONE
+   ETB(:) = ONE
+   ESB(:) = ONE
+   ! convert from irradiance to PAR in uE/m2/s
+   EIB(:) = ONE/E2W
+   EHB(:) = ONE
+   ESI(:) = ONE
 #endif
 
 end subroutine analytical_forcing

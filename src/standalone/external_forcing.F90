@@ -33,6 +33,7 @@
 !
 ! USES
    use global_mem, only: RLEN,ZERO
+   use api_bfm,    only: BOTindices
    use mem_PAR,    only: ChlAttenFlag, P_PARRGB, P_PAR, &
                          R_EPS, B_EPS, G_EPS,           &
                          EIRR, EIRB, EIRG
@@ -45,6 +46,10 @@
                          EICE,ERHO,Depth,xEPS
 #ifdef INCLUDE_PELCO2
    use mem,        only: EPCO2air
+#endif
+#if defined BENTHIC_BIO || defined BENTHIC_FULL
+   ! benthic environment
+   use mem,        only: ETW_Ben,ESW_Ben,ERHO_Ben
 #endif
 #endif
    use time,       only: julianday, secondsofday, time_diff, &
@@ -156,6 +161,13 @@
    SUNQ=daylength(real(dyear,RLEN),latitude,ylength=365.0_RLEN)
    ! Compute density at the middle of the layer with simplified equation of state
    ERHO(:) = density(ETW(:),ESW(:),Depth(:)/2.0_RLEN)
+
+#if defined BENTHIC_BIO || defined BENTHIC_FULL
+   ETW_Ben(:)  =   ETW(BOTindices)
+   ESW_Ben(:)  =   ESW(BOTindices)
+   ERHO_Ben(:) =   ERHO(BOTindices)
+#endif
+
 #ifdef DEBUG
    LEVEL2 'ETW=',ETW(:)
    LEVEL2 'ESW=',ESW(:)

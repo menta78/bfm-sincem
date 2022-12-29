@@ -49,6 +49,7 @@
     case (2) ! input data
       call analytical_forcing
       call external_forcing
+      if ( use_benthic_data ) call external_benthic
     case (3) ! interactive air-sea fluxes
 !      call do_air_sea(timesec,startime)
     end select
@@ -57,7 +58,7 @@
     ! Assign external event data
     call event_data
 #ifdef INCLUDE_SEAICE
-    call external_seaice
+    if ( use_seaice_data ) call external_seaice
 #endif
     if (init_forcing_vars) init_forcing_vars=.false.
 

@@ -38,12 +38,11 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Local Variables
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-   logical :: use_seaice_data
-
    namelist /forcings_nml/ forcing_method,ltype,lw,ls,sw,ss,tw,ts,tde, & 
             ww,ws,CO2inc,botdep_c,botdep_n,botdep_p,botdep_si,botox_o,  &
             forcing_file, &
             use_seaice_data, seaice_file, &
+            use_benthic_data, benthic_file, &
             use_external_data, data_file, &
             use_event_data, event_file
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -82,6 +81,13 @@
     case (3) ! interactive air-sea fluxes
       !call init_air_sea(data_file,latitude, longitude)
     end select
+    if (use_benthic_data) then
+       LEVEL2 'Reading benthic forcing data from:'
+       LEVEL3 trim(benthic_file)
+       open(unit_benthic,file=benthic_file,action='read',status='old',err=110)
+    else
+       LEVEL2 'Skipping benthic forcing data'
+    end if
 #ifdef INCLUDE_SEAICE
     if (use_seaice_data) then
        LEVEL2 'Reading sea-ice forcing data from:'
@@ -112,6 +118,7 @@
 107   call error_msg_prn(NML_OPEN,"init_envforcing_bfm.f90",trim(data_file))
 108   call error_msg_prn(NML_OPEN,"init_envforcing_bfm.f90",trim(seaice_file))
 109   call error_msg_prn(NML_OPEN,"init_envforcing_bfm.f90",trim(event_file))
+110   call error_msg_prn(NML_OPEN,"init_envforcing_bfm.f90",trim(benthic_file))
 
    end subroutine init_envforcing_bfm
 
