@@ -225,11 +225,11 @@ CONTAINS
       j_3d = 1
       !
       DO jn = 1, stEnd
-         IF (pp_index(jn,1) == .TRUE.) THEN
+         IF (pp_index(jn,1) .eqv. .TRUE.) THEN
             id_dia3d(j_3d) = jn
             j_3d = j_3d + 1
          ENDIF
-         IF (pp_index(jn,2) == .TRUE.) THEN
+         IF (pp_index(jn,2) .eqv. .TRUE.) THEN
             id_dia2d(j_2d) = jn
             j_2d = j_2d + 1
          ENDIF
