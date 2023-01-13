@@ -529,9 +529,10 @@
          CASE DEFAULT !(VERT_ADV_CENTERED)
              ! centered scheme: Gordon & Stern 1982
              ADVTND(1) = 0.5/(H*DZZ(1)) * W(2) * (F(1)-F(2))
-             do K=2,KB-1
+             do K=2,KB-2
                 ADVTND(K)= 0.5/H*( W(K)*(F(K-1)-F(K))/DZZ(K-1) + W(K+1)*(F(K)-F(K+1))/DZZ(K) )
              end do
+             ADVTND(KB-1)= 0.5/H*( W(KB-1)*(F(KB-2)-F(KB-1))/DZZ(KB-2) )
          END SELECT
          ! there are only KB-1 reactors
          ADVTND(KB) = 0
