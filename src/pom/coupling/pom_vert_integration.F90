@@ -499,7 +499,7 @@
 !
 !     -----MODULES (USE OF ONLY IS STRONGLY ENCOURAGED)-----
 !
-      use POM, ONLY:KB, DZR, H
+      use POM, ONLY:KB, DZR, DZZ, H
       use CPL_VARIABLES
 !
       use global_mem, ONLY:RLEN
@@ -528,13 +528,13 @@
              end do
          CASE DEFAULT !(VERT_ADV_CENTERED)
              ! centered scheme: Gordon & Stern 1982
-
-             ADVTND(1) = DZR(1)/H*(F(1)+F(2))/2*W(1)
+             ADVTND(1) = 0.5/(H*DZZ(1)) * W(2) * (F(1)-F(2))
              do K=2,KB-1
-                ADVTND(K)= 0.5/H*( DZR(K-1)*W(K-1)*(F(K-1)-F(K)) + DZR(K)*W(K)*(F(K)-F(K+1)) )
+                ADVTND(K)= 0.5/H*( W(K)*(F(K-1)-F(K))/DZZ(K-1) + W(K+1)*(F(K)-F(K+1))/DZZ(K) )
              end do
-             ADVTND(KB) = DZR(KB)/H*(F(KB-1)+F(KB))/2*W(KB-1)
          END SELECT
+         ! there are only KB-1 reactors
+         ADVTND(KB) = 0
 !
       return
 !
