@@ -27,7 +27,7 @@ MODULE par_my_trc
    INTEGER, PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::  bottom_level          !: deepest level of water column
 
    !! boundary forcings
-   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:) :: ironsed   ! Seabed supply of iron
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:) :: fesed   ! Seabed supply of iron
 
    !! support arrays
    REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:) :: chl_a
