@@ -31,7 +31,7 @@
 
 
 
-#if defined INCLUDE_BENCO2 && (!defined BENTHIC_BIO || !defined BENTHIC_FULL)
+#if defined INCLUDE_BENCO2 && !defined BENTHIC_FULL
 #undef INCLUDE_BENCO2
 #endif
 #if defined INCLUDE_BENPROFILES && !defined BENTHIC_FULL

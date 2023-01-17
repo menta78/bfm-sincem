@@ -109,6 +109,10 @@
   real(RLEN),dimension(NO_BOXES_XY)  :: sm
   real(RLEN),dimension(NO_BOXES_XY)  :: ren
   real(RLEN),dimension(NO_BOXES_XY)  :: rep
+
+#ifndef INCLUDE_BENCO2
+  integer,parameter :: ppG3c = 0
+#endif
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
