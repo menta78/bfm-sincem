@@ -489,105 +489,6 @@ end
     G4n       : N2 sink for benthic system : mmol N/m2
 end
 
-2d-variable-ben -if-exist BENTHIC_FULL
-
-  #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  # Control of benthic organism on diagenetic processes
-  #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-  shiftD2m      : Rate of change of D2m: m/d
-
-  #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  # Variables in the benthic nurient model which represent the concentration
-  # of the macro nutr. in the porewater of the different layers.
-  #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-    M1p         : phosphate in oxic layer (pore-waters):mmol P/m3
-    M11p        : phosphate in denitrification layer (pore-waters):mmol P/m3
-    M21p        : phosphate in anoxic layer (pore-waters):mmol P/m3
-    M4n         : ammonium in oxic layer (pore-waters):mmol N/m3
-    M14n        : ammonium in denitrification layer (pore-waters):mmol N/m3
-    M24n        : ammonium in anoxic layer (pore-waters) :mmol N/m3
-    M3n         : nitrate in porewater (pore-waters):mmol N/m3
-    M5s         : silicate in oxic_denitrification layer (pore-waters):mmol Si/m3
-    M6r         : reduction equivalent in porewater (pore-waters):mmol S--/m3
-
-  #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  # Fluxes calculated in benthic nutrient model
-  #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-  jK4K3n :   nitrification flux : mmol/m2/d
-  jK3G4n :   denitrification flux : mmol/m2/d
-  jK31K21p : flux of phosphate at lower benthic boundary : mmol/m2/d
-  jK34K24n : flux of ammonium at lower benthic boundary : mmol/m2/d
-  jK13K3n :  flux of nitrate at lower benthic boundary : mmol/m2/d
-  jK15K5s :  flux of silicate at lower benthic boundary : mmol/m2/d
-  jK36K26r :  flux of read. equivalent at lower benthic boundary : mmol S--/m2/d
-
-end
-
-2d-intvar-ben -if-exist BENTHIC_FULL
-    #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    # Profile sequence numbers needed in benthic nutrient model
-    #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-      KPO4
-      KPO4_2
-      KNH4
-      KNO3
-      KRED
-      KSIO3
-      KSIO3E
-      KQ1
-end
-
-3d-variable-ben -if-exist INCLUDE_BENPROFILES -Z seddepth=0.30:Sediment Depth:m
-    PrM1p : PO4--- in sediment: mmol/m3 pw
-    Pr2M1p : PO4--- in sediment: mmol/m3 pw
-    PrM3n : NO3- in sediment: mmol/m3 pw
-    PrM4n : NH4+ in sediment: mmol/m3 pw
-    PrM5s : SiO3-- in sediment: mmol/m3 pw
-    PrM6r : S-- in sediment: mmol/m3 pw
-    PrQ1c : Dissolved Org.Carbon: mgC/m3 pw
-end
-
-   #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-   #       Benthic carbonate system
-   #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-2d-state-ben  -if-exist INCLUDE_BENCO2
-    group BenthicCO2[ch] (BNC) :mgC/m2:mmol eq/m2
-          G3  : TCO2 in aerobic layer  : alkalinity in aerobic layer
-          G13 : TCO2 in denitrification layer: alkalinity in denitrification layer
-          G23 : TCO2 in anaerobic layer: alkalinity in anaerobic layer
-    end
-end
-
-2d-variable-ben -if-exist INCLUDE_BENCO2
-      DICae :DIC in aerobic sediment (pore-waters): umol/kg
-      DICan :concentration in anaerobic sediment (pore-waters): umol/kg
-      O3c_Ben    : DIC at the pelagic-benthic interface :mg C/m3
-      O3h_Ben    : alkalinity at the pelagic-benthic interface :mmol eq/m3
-      Acae : Alkalinity in aerobic sediment : umol eq/kg
-      Acan :  Alkalinity in anaerobic sediment : umol eq/kg
-      pHae : pH in aerobic layer : -
-      pHan : pH in anaerobic layer : -
-      pCO2ae : CO2 partial pressure in aerobic layer : uatm
-      pCO2an : CO2 partial pressure in anaerobic layer : uatm
-end
-
-2d-intvar-ben -if-exist INCLUDE_BENCO2
-    #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    # Profile sequence numbers needed in benthic model
-    #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-      KCO2
-      KALK
-end
-
-3d-variable-ben -if-exist INCLUDE_BENCO2 INCLUDE_BENPROFILES -Z seddepth=0.30:Sediment Depth:m
-    PrDIC : DIC in sediment        : mgC/m3 pw
-    PrAc  : Alkalinity in sediment : mmol/m3 pw
-    PrpH  : Ph in sediment         : -
-end
-
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 # TOTAL MASS CONSERVATION variables for C N P Si within BFM systems
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -602,7 +503,7 @@ end
 #                       DIAGNOSTIC RATES
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-3d-flux-pel -if-exist INCLUDE_DIAG INCLUDE_PELCO2
+3d-flux-pel -if-exist INCLUDE_PELCO2
   ruPPYc=P.c  <- O3c : Gross Primary Production    : mg C/m3/d
   resPPYc=P.c -> O3c : Phytoplankton Respiration   : mg C/m3/d
   resPBAc=B.c -> O3c : Bacterial Respiration       : mg C/m3/d
@@ -610,7 +511,7 @@ end
   rcalCARc=O5c <- O3c: Calcification rate          : mg C/m3/d
 end
 
-3d-flux-pel -if-exist INCLUDE_DIAG
+3d-flux-pel
   ruPPYn=P.n <- N3n+N4n: Net Nitrogen Uptake:mmol N/m3/d
   ruPPYp=P.p <- N1p : Net Phosphate Uptake : mmol P/m3/d
   ruPPYs=P.s <- N5s : Net Silicate Uptake : mmol Si/m3/d
@@ -625,11 +526,6 @@ end
   remN5s=(N5s<-R6s): Si Remineralization : mmol Si/m3/d
 end
 
-2d-flux-ice -if-exist INCLUDE_DIAG INCLUDE_SEAICE
+2d-flux-ice -if-exist INCLUDE_SEAICE
   ruSALc=S.c  <- F3c : Gross Primary Production in Sea ice   : mg C/m2/d
-end
-
-2d-flux-ben -if-exist INCLUDE_DIAG INCLUDE_BEN
-   ruYYc=(Y.c <- H.c+Y.c): Gross Macrofaunal Secondary Production:mg C/m2/d
-   resYYc=Y.c -> G3c : Macrofaunal  Respiration     : mg C/m2/d
 end

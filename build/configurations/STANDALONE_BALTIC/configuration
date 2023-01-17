@@ -29,7 +29,7 @@
 
 &BFM_conf
         MODE      = 'STANDALONE',
-        CPPDEFS   = 'BFM_STANDALONE INCLUDE_PELCO2 INCLUDE_DIAG INCLUDE_SEAICE BENTHIC_BIO INCLUDE_BENCO2',
+        CPPDEFS   = 'BFM_STANDALONE INCLUDE_PELCO2 INCLUDE_SEAICE BENTHIC_BIO',
         ARCH      = 'gfortran.inc',
         PROC      = 4,
         EXP       = 'standalone.baltic',

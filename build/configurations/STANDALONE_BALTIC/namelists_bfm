@@ -257,15 +257,8 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
    K11p0 =  20.0,      !80.0 !  calibrated 
    K4n0  =  16.0,      !calibrated
    K14n0 =  200.0,     !1.0838474 !  calibrated
-   !K24n0 =  100.0,     !calibrated for benthic return 2      
    K6r0  =  100.0,      
    G2o0  =  0.008879,
-   G3c0  =  120.15,     
-   G13c0 =  440.8475,   
-   G23c0 =  11920.0,    
-   G3h0  =  10.35,
-   G13h0 =  50.0,       
-   G23h0 =  1192.0, 
    H1c0  =  300.0,     ! prev 165.0      
    H2c0  =  1000.0,    ! prev 45.0 
    Y1c0  =  750.0,     ! prev 160.0      
@@ -293,23 +286,20 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
    var_save = ''
      ave_save   =  'ETW'  'ETW_Ben'  'O2o' 'ESW'  'ESW_Ben'  'DIC'  'EIR'  'Chla'
   'N1p'  'N3n'  'N4n'  'N5s'  'N6r'  'B1c'  'P1c'  'P2c'  'P3c'  'P4c'  'P1l'  'P2l'  'P3l'  'P4l'
-   'Z3c'  'Z4c'  'Z5c'  'Z6c'  'R1c'  'R2c'  'R6c'  'R1n'  'R6n'  'R1p'  'R6p'  'P1s'  'R6s' 
+  'Z3c'  'Z4c'  'Z5c'  'Z6c'  'R1c'  'R2c'  'R6c'  'R1n'  'R6n'  'R1p'  'R6p'  'P1s'  'R6s' 
   'EICE'  'ETB'  'ESI'  'EHB'  'S1c'  'S1l'  'S2c'  'S2l'  'U1c'  'U1n'  'U1p'  'U6c'  'U6n'
-   'U6p'  'U6s'  'X1c'  'T1c'  'I1p'  'I3n'  'I4n'  'I5s'  'F2o'  'F3c'  'sunPPY_iiP1'  'sunPPY_iiP2'
-   'sunPPY_iiP3'  'sunPPY_iiP4'  'ruSALc' 'ruPPYc'  'resPPYc'  'resZT'  'ruPTn'  'ruPTp' 
-   'exPP'  'ruZTc'  'ruZOOc'  'remZOOn'  'remZOOp'  'remPBAn'  'remPBAp'  'netZTc' 
-   'H1c' 'H2c' 'K1p' 'K11p' 'K21p' 'K4n' 'K14n' 'K24n' 'K3n' 'K5s' 
-   'D1m' 'D2m' 'D6m' 'D7m' 'D8m' 'D9m' 'Q6c' 'Q6n' 'Q6p' 'Q6s'
-   'Q1c' 'Q1p' 'Q1n' 'Q11c' 'Q11p' 'Q11n' 
-  'G2o'  'G3c'  'G13c'  'G4n' 
-  'jK4K3n'  'jK3G4n'  'jK31K21p'  'jK34K24n'  'jK13K3n'  'jK36K26r' 
-   'rrBTo'  'jPIY3c'  'jRIY3c' 'ruYYc' 'resYYc'  
+  'U6p'  'U6s'  'X1c'  'T1c'  'I1p'  'I3n'  'I4n'  'I5s'  'F2o'  'F3c'  'sunPPY_iiP1'  'sunPPY_iiP2'
+  'sunPPY_iiP3'  'sunPPY_iiP4'  'ruSALc' 'ruPPYc'  'resPPYc'
+  'ruZOOc'  'remZOOn'  'remZOOp'  'remPBAn'  'remPBAp'  
+  'H1c' 'H2c' 'K1p' 'K11p' 'K4n' 'K14n' 
+  'D1m' 'D2m' 'D6m' 'D7m' 'D8m' 'D9m' 'Q6c' 'Q6n' 'Q6p' 'Q6s'
+  'Q1c' 'Q1p' 'Q1n' 'Q11c' 'Q11p' 'Q11n' 
+  'G2o' 
+  'rrBTo'  'jPIY3c'  'jRIY3c' 'ruYYc' 'resYYc'  
   'jbotN1p' 'jbotN3n' 'jbotN4n' 'jbotN5s' 'jbotN6r' 'Depth_Ben' 
   'jbotO3h' 'jbotO3c' 'jbotO2o' 
-  'jK1N1p' 'jK11K1p' 'jK4N3n' 'jK4N4n' 'jK14K4n' 
   'jbotR1c' 'jbotR1p' 'jbotR1n' 'jbotR6c' 'jbotR6p' 'jbotR6n' 'jbotR6s'
-  'jG2O2o'  'jQ6N5s' 'jG2K7o'
-  'flN3O4n' 'flN4N3n' 'flPTN6r'
+  'jG2K7o' 'flN3O4n' 'flN4N3n' 'flPTN6r'
 	filename_nml_conf = 'BFM_General.nml',
 /
 
@@ -1404,7 +1394,7 @@ p_alpha_chl = 1.4e-4,	1.6e-5,
    use_seaice_data   = .TRUE.,
    use_benthic_data  = .TRUE.,
    use_external_data = .FALSE.,
-   data_file         = 'forcing/InputLoadsKarjaajoki_SYKEmonthlymonit_clim20y.dat',
+   data_file         = '',
    use_event_data    = .FALSE.,
    event_file        = '',
    botdep_c          = 0.0,  ! 350.0,
