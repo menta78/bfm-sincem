@@ -258,7 +258,7 @@
 !    -----SET THE THICKNESS OF THE WATER COLUMN LAYERS-----
 !
     do k = 1 , NO_BOXES_Z
-       Depth(k) = abs(zz(k)*h)
+       Depth(k) = abs(dz(k)*h)
     end do
 !
 !  -----INITIALISE THE OUTPUT TIME AVERAGING PROCEDURE-----
