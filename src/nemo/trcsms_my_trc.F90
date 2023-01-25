@@ -351,7 +351,7 @@ CONTAINS
       ! Iron flux from sediments (time-invariant)
       !-------------------------------------------------------
       jl = var_map(ppN7f)
-      tr(:,:,:,jl,Krhs) = tr(:,:,:,jl,Krhs) + ironsed
+      tr(:,:,:,jl,Krhs) = tr(:,:,:,jl,Krhs) + fesed
 
       ! Iron dust deposition below the surface (surface layer applied in trcbc)
       !-------------------------------------------------------
