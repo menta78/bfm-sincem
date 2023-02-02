@@ -258,7 +258,6 @@
 !
 !     -----APPLY A NON ADIABATIC BOTTOM BOUNDARY CONDITION-----
 !
-      WFBOT=ZERO  ! Giulia
       FF(KB-1) = (C(KB-1)*VHP(KB-2)-FF(KB-1)+(WFBOT*DT2/(DZ(KB-1)*H)))/ &
                  (C(KB-1)* (ONE-VH(KB-2))-ONE)
 !
