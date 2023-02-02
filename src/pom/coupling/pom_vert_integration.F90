@@ -98,7 +98,7 @@
                    Depth,                                                 &
                    iiPhytoPlankton,                                       &
                    jbotN1p,jbotN4n,jbotN3n,                               &
-                   jbotO2o,jbotO3c
+                   jbotO2o,jbotO3c,jbotN5s
 !
      use POM, ONLY:SMOTH,KB,H,DTI,DZ,DZR,NRT,KH,NBCBFM,UMOLBFM,NTP,GRAV,RHO
 
@@ -251,7 +251,7 @@
 !               ***************************************************
 !               ***************************************************
 !
-                    botflux=ZERO
+                    botflux = jbotN5s(1)/SEC_PER_DAY
 !
                 case default
 !
@@ -369,6 +369,11 @@
 !
                   IF (USE_W_PROFILE) THEN
                      sink = sink + W_PROFILE
+                  END IF
+                  IF (AssignPelBenFluxesInBFMFlag) THEN
+                     ! the fluxes at the bottom are already accounted for in D3SOURCE and D2SOURCE_BEN
+                     botflux = 0
+                     sink(KB-1:) = 0
                   END IF
                   call adverte(fbio,advtnd,sink) ! computing the advection tendency on the central time step
 !
@@ -499,7 +504,7 @@
 !
 !     -----MODULES (USE OF ONLY IS STRONGLY ENCOURAGED)-----
 !
-      use POM, ONLY:KB, DZR, DZZ, H
+      use POM, ONLY:KB, DZR, DZ, DZZ, H
       use CPL_VARIABLES
 !
       use global_mem, ONLY:RLEN
@@ -510,29 +515,44 @@
 
      real(RLEN) :: F(KB),ADVTND(KB)
      real(RLEN) :: W(KB)
-     real(RLEN) :: DTI2
+     real(RLEN) :: DTI2, GRDFTRM, GRDWTRM
      integer :: k
 !
-     F(KB)=F(KB-1)
+     !
+     ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=
+     ! Calculate vertical advection. Mind downward velocities are negative!
+     ! Upwind scheme:
+     ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=
+     !
+     F(KB)=F(KB-1) ! there are KB-1 boxes, F(KB) set in order to have a 0-gradient at the bottom
      SELECT CASE (VERT_ADV)
          CASE (VERT_ADV_SINKING_UPWIND)
-             !
-             ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=
-             ! Calculate vertical advection. Mind downward velocities are negative!
-             ! Upwind scheme:
-             ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=
-             !
              ADVTND(1)=DZR(1)/H*F(1)*W(2)
              do K=2,KB-1
                 ADVTND(K)=DZR(K)/H*(F(K)*W(K+1)-F(K-1)*W(K))
              end do
          CASE DEFAULT !(VERT_ADV_CENTERED)
-             ! centered scheme: Gordon & Stern 1982
-             ADVTND(1) = 0.5/(H*DZZ(1)) * W(2) * (F(1)-F(2))
-             do K=2,KB-2
-                ADVTND(K)= 0.5/H*( W(K)*(F(K-1)-F(K))/DZZ(K-1) + W(K+1)*(F(K)-F(K+1))/DZZ(K) )
+          !  ! centered scheme: Gordon & Stern 1982
+             !   --- W(K-1)   ---
+             !    |            |
+             !    |  F(K-1)    |  H*DZ(K-1) ---
+             !    |            |             |
+             !   --- W(K)     ---            |  H*DZZ(K-1)
+             !    |            |             |
+             !    |  F(K)      |  H*DZ(K)   ---
+             !    |            |             |
+             !   --- W(K+1)   ---            |  H*DZZ(K)
+             !                               |
+             !                              ---
+          !  de F/de t = - grad(W*F) = - W*grad(F) - F*grad(W)
+             GRDFTRM = 0.5*(H*DZZ(1)) * W(2) * (F(2)-F(1))
+             GRDWTRM = F(1) * 0.5*W(2)/(H*DZ(1))
+             ADVTND(1) = GRDFTRM + GRDWTRM
+             do K=2,KB-1
+                GRDFTRM = 0.5/H*( W(K)*(F(K)-F(K-1))/DZZ(K-1) + W(K+1)*(F(K+1)-F(K))/DZZ(K) )
+                GRDWTRM = F(K) * (W(K+1) - W(K)) / (H*DZ(K))
+                ADVTND(K) = GRDFTRM + GRDWTRM
              end do
-             ADVTND(KB-1)= 0.5/H*( W(KB-1)*(F(KB-2)-F(KB-1))/DZZ(KB-2) )
          END SELECT
          ! there are only KB-1 reactors
          ADVTND(KB) = 0
