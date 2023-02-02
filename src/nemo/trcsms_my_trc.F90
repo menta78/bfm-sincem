@@ -240,10 +240,10 @@ CONTAINS
       BOTindices(1) = bottom_level(ji, jj)
       bot = BOTindices(1)
 
-      ! Depth & pressure
+      ! Cell Tickness (Depth) & Water Pressure levels (EPR)
       !-------------------------------------------------------
-      Depth(:) =  gdept(ji,jj,:,Kmm)
-      EPR(:)   = gsw_p_from_z(-Depth(:), gphit(ji,jj))
+      Depth(:) =  e3t(ji,jj,:,Kmm)
+      EPR(:)   = gsw_p_from_z(-gdept(ji,jj,:,Kmm), gphit(ji,jj))
 
       ! Environmental conditions
       !-------------------------------------------------------
@@ -351,7 +351,7 @@ CONTAINS
       ! Iron flux from sediments (time-invariant)
       !-------------------------------------------------------
       jl = var_map(ppN7f)
-      tr(:,:,:,jl,Krhs) = tr(:,:,:,jl,Krhs) + ironsed
+      tr(:,:,:,jl,Krhs) = tr(:,:,:,jl,Krhs) + fesed
 
       ! Iron dust deposition below the surface (surface layer applied in trcbc)
       !-------------------------------------------------------

@@ -204,26 +204,26 @@ CONTAINS
 #ifdef INCLUDE_PELFE
       ! Iron supply from sediments (see Aumont & Bopp, 2005)
       !-------------------------------------------------------
-      ALLOCATE (ironsed(jpi,jpj,jpk))
-      ironsed = ZERO
+      ALLOCATE (fesed(jpi,jpj,jpk))
+      fesed = ZERO
       IF ( p_rN7fsed > 0. ) THEN
          CALL iom_open ( TRIM( "bottom_fraction.nc" ), numfld )
-         CALL iom_get  ( numfld, 1, TRIM( "btmfrac" ), ironsed(:,:,:), 1 )
+         CALL iom_get  ( numfld, 1, TRIM( "btmfrac" ), fesed(:,:,:), 1 )
          CALL iom_close( numfld )
          ! iron release dependence on depth (metamodel of Middelburg et al.,1996)
          DO_3D( nn_hls, nn_hls, nn_hls, nn_hls, 1, jpk )
               zexp  = MIN( 8.,( gdept(ji,jj,jk,Kmm) / 500. )**(-1.5) )
               zdexp = -0.9543 + 0.7662 * LOG( zexp ) - 0.235 * LOG( zexp )**2
-              ironsed(ji,jj,jk) = ironsed(ji,jj,jk) * MIN( 1., EXP( zdexp ) / 0.5 )
+              fesed(ji,jj,jk) = fesed(ji,jj,jk) * MIN( 1., EXP( zdexp ) / 0.5 )
          END_3D
          ! total supply (TODO this is killing execution .. need to check)
-         ztraf = glob_sum('ironsed', ironsed * spread(e1e2t,3,jpk) * p_rN7fsed * 365. * 1.e-15 * tmask )
+         ztraf = glob_sum('fesed', fesed * spread(e1e2t,3,jpk) * p_rN7fsed * 365. * 1.e-15 * tmask )
          LEVEL1 ''
          LEVEL1 'trc_ini_my_trc: Read fraction mask from bottom_fraction.nc (varname: btmfrac)'
          LEVEL1 '  Constant Iron flux from sediments: ', p_rN7fsed
          LEVEL1 '  Total iron load from Sediment [Gmol/y] : ', ztraf
          ! Iron flux into pelagic (umolFe/m2/d to umolFe/m3/s)
-         ironsed = ironsed * p_rN7fsed / ( SEC_PER_DAY * e3t_0(:,:,:) )
+         fesed = fesed * p_rN7fsed / ( SEC_PER_DAY * e3t_0(:,:,:) )
       ENDIF
 #endif
       !
