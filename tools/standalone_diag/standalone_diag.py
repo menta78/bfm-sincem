@@ -89,7 +89,7 @@ def diagnostics():
     }
 
     layout['ben'] = {
-        'inorganic': ['K1', 'K11', 'K4', 'K14'],
+        'inorganic': ['K1', 'K11', 'K4', 'K14', 'G2'],
         'living': ['Y1', 'Y2', 'Y3', 'Y4', 'Y5', 'H1', 'H2'],
         'detritus': ['Q1', 'Q6'],
         'quotas': ['detritus']
