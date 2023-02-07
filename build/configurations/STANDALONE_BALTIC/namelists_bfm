@@ -828,7 +828,7 @@ p_paMEZ(2,:)=   0.0,    1.0
 !  p_K14K4n  	 [1/d]      Spec. N flux at the denit. layer
 !-------------------------------------------------------------------------!
 &BenthicRemin_parameters
-!    p_reminO2             =  0.1
+  p_reminO2  =  0.1
   p_reminN1  = 0.001,
   p_reminN4  = 0.1,
   p_pQIN3    = 0.5,

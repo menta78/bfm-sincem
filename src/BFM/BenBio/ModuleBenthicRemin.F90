@@ -38,6 +38,7 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! BenthicReturn2 PARAMETERS (read from nml)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  real(RLEN)  :: p_reminO2  ! Spec. oxygen consumption (d-1)
   real(RLEN)  :: p_reminN1  ! Spec. P release in the water (d-1)
   real(RLEN)  :: p_reminN4  ! Spec. N release in the water  (d-1)
   real(RLEN)  :: p_pQIN3  ! Partitioning coeff. between NO3 and NH4
@@ -54,7 +55,7 @@
   subroutine InitBenthicRemin()
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  namelist /BenthicRemin_parameters/ p_reminN1, p_reminN4, p_pQIN3, &
+  namelist /BenthicRemin_parameters/ p_reminO2, p_reminN1, p_reminN4, p_pQIN3, &
     p_reminQ6s, p_K11K1p, p_K14K4n
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 

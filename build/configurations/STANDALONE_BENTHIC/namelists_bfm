@@ -32,6 +32,7 @@
 !                        1. from restart
 ! bfm_rstctl     logical Save initial state of bfm in the output file.
 ! bio_setup      integer BFM configuration:
+!                        0. full model (sea ice, pelagic, benthic)
 !                        1. pelagic
 !                        2. benthic
 !                        3. pelagic and benthic
@@ -788,6 +789,7 @@ p_paMEZ(2,:)=   0.0,    1.0
 ! NAMELIST BenthicRemin_parameters
 !-------------------------------------------------------------------------!
 ! NAME         [UNIT]/KIND            DESCRIPTION
+!  p_reminO2     [1/d]      Spec. oxygen consumption
 !  p_reminN1     [1/d]      Spec. P release in the water 
 !  p_reminN4  	 [1/d]      Spec. N release in the water 
 !  p_pQIN3  	            Partitioning coeff. between NO3 and NH4
@@ -796,6 +798,7 @@ p_paMEZ(2,:)=   0.0,    1.0
 !  p_K14K4n  	 [1/d]      Spec. N flux at the denit. layer
 !-------------------------------------------------------------------------!
 &BenthicRemin_parameters
+  p_reminO2  =  0.1
   p_reminN1  = 0.001,
   p_reminN4  = 0.1,
   p_pQIN3    = 0.5,
