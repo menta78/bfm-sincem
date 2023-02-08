@@ -108,8 +108,8 @@ end
    group PhytoPlankton[cnpls] (PPY) :  mg C/m3 : mmol N/m3 : mmol P/m3 : mg Chl/m3 : mmol Si/m3
 	   P1	        : Diatoms
 	   P2[-s]	: Flagellates (after Neumann, 2003)
-	   P3[-s]	: Cyanobacteria (generic, after Neumann, 2003)
-	   P4[-s]	: Cold adapted dinoflagellates (after Spilling, 2007)
+	   P5[-s]	: Cyanobacteria (generic, after Neumann, 2003)
+	   P6[-s]	: Cold adapted dinoflagellates (after Spilling, 2007)
    end
                
   #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
