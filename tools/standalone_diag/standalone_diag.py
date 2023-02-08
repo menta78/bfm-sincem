@@ -77,8 +77,8 @@ def diagnostics():
     layout = {}
     layout['pel'] = {
         'inorganic': ['O3', 'O2', 'N1', 'N3', 'N5'],
-        'phytoplankton': ['P1', 'P2', 'P3', 'P4'],
-        'zooplankton': ['Z3', 'Z4', 'Z5', 'Z6'],
+        'phytoplankton': ['P'+str(x) for x in range(1,10)],
+        'zooplankton': ['Z'+str(x) for x in range(1,10)],
         'bacteria': ['B1'],
         'detritus': ['R1', 'R6'],
         'gross production': ['ruPPY', 'ruZOO'],
