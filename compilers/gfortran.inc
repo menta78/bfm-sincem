@@ -14,5 +14,11 @@
   ARFLAGS=-r
 
   CPPFLAGS=
+
+  # production
   FFLAGS= -O3 -fdefault-real-8 -funroll-all-loops -fcray-pointer -ftree-vectorize -ffree-line-length-256 ${NCDF_INC}
-  LDFLAGS= ${NCDF_INC} ${NCDF_LIB} 
+
+  # debug
+  # FFLAGS= -g -fdefault-real-8 -funroll-all-loops -fcray-pointer -ftree-vectorize -ffree-line-length-256 -ffpe-trap=invalid,zero,overflow -fbounds-check -Wall -Wuninitialized ${NCDF_INC}
+  
+LDFLAGS= ${NCDF_INC} ${NCDF_LIB} 
