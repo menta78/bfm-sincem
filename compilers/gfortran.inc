@@ -1,4 +1,4 @@
-# Include file for compilation with gfortran 4.2-4.6
+# Include file for compilation with gfortran
 # Note that the debugging option -g is default and can be removed
 # you may also need the following netcdf libraries 
 # -L/usr/local/lib -lhdf5_hl -lhdf5 -lz
