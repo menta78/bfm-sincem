@@ -20,6 +20,7 @@
 !   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 !   See the GNU General Public License for more details.
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+#if defined BENTHIC_BIO || defined BENTHIC_FULL
 !
 ! INCLUDE
 #include "cppdefs.h"
@@ -108,6 +109,8 @@
   return
 
    end subroutine external_benthic
+
+#endif
 
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model

@@ -380,7 +380,10 @@
    use netcdf_bfm, only: save_bfm
    use mem
    use api_bfm, only: out_delta, save_delta , time_delta, update_save_delta
-   use api_bfm, only: stPelStateS, stIceStateS, stBenStateS, var_names
+   use api_bfm, only: stPelStateS, stBenStateS, var_names
+#if defined INCLUDE_SEAICE
+   use api_bfm, only: stIceStateS
+#endif
    use global_mem, only: RLEN, bfm_lwp, LOGUNIT
    use time
 

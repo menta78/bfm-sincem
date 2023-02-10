@@ -49,7 +49,9 @@
     case (2) ! input data
       call analytical_forcing
       call external_forcing
+#if defined BENTHIC_BIO || defined BENTHIC_FULL
       if ( use_benthic_data ) call external_benthic
+#endif
     case (3) ! interactive air-sea fluxes
 !      call do_air_sea(timesec,startime)
     end select
