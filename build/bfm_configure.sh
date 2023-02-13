@@ -516,7 +516,7 @@ if [[ ${CMP} && "$MODE" != "NEMO_CESM" ]]; then
         echo "Starting ${PRESET} compilation..."
         rm -rf ${BFMDIR}/bin/${BFMEXE}
         [ ${VERBOSE} ] && echo "Command: ${cmd_gmake}"
-        ${cmd_gmake}
+        ${cmd_gmake} -j 4
         if [ ! -f ${BFMDIR}/bin/${BFMEXE} ]; then 
             echo "ERROR in ${PRESET} compilation!" ; 
             exit 1; 
