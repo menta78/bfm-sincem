@@ -112,7 +112,7 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Dissolution of biogenic silicate
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  fR6N5s  =   p_sR6N5* eTa(  ETW(:),  p_q10R6N5)* R6s(:)
+  fR6N5s  =   p_sR6N5* eTa(  ETW(:),  p_aeR6N5)* R6s(:)
   call flux_vector( iiPel, ppR6s,ppN5s, fR6N5s )
 
 #ifdef INCLUDE_PELFE

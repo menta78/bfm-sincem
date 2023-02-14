@@ -59,7 +59,7 @@
   ! p_clN6r     [mmolHS/m3]      Half-saturation concentration of
   !                              reduction equivalents for denitrification
   ! p_rPAo      [mmolO2/m3/d]    Reference anoxic mineralization rate
-  ! p_q10R6N5   [-]              Q10 factor for biogenic silica
+  ! p_aeR6N5    [kJ/mol]         Arrhenius activation energy for biogenic silica
   ! p_sR6N5     [1/d]            Specific remineralization rate of
   !                              biogenic silica
   real(RLEN)  :: p_q10N4N3
@@ -69,7 +69,7 @@
   real(RLEN)  :: p_sN3O4n
   real(RLEN)  :: p_clN6r
   real(RLEN)  :: p_rPAo
-  real(RLEN)  :: p_q10R6N5
+  real(RLEN)  :: p_aeR6N5
   real(RLEN)  :: p_sR6N5
 #ifdef INCLUDE_PELFE
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -95,7 +95,7 @@
   subroutine InitPelChem()
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  namelist /PelChem_parameters/ p_sN4N3, p_q10N4N3, p_q10R6N5, p_rOS, p_clO2o, &
+  namelist /PelChem_parameters/ p_sN4N3, p_q10N4N3, p_aeR6N5, p_rOS, p_clO2o, &
     p_clN6r, p_sN3O4n, p_rPAo, p_sR6N5
 #ifdef INCLUDE_PELFE
   namelist /PelChem_parameters_iron/ p_q10R6N7, p_sR6N7, p_sR1N7, p_scavOrg, &
