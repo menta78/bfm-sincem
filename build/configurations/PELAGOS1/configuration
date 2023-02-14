@@ -18,16 +18,15 @@
 #
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 #  Currently available macros (cppdefs) are:
-#  BFM_STANDALONE   : mandatory when using the STANDALONE model
+#  BFM_NEMO         : use the NEMO coupling interface
 #  BFM_PARALLEL     : activate parallel coupling with BFM
 #  INCLUDE_PELFE    : add Iron component to the pelagic system
 #  INCLUDE_PELCO2   : activate Pelagic Carbonate System and CO2 dynamics 
 #  BENTHIC_BIO      : use Intermediate complexity Benthic system
-#  EXPLICIT_SINK    : use of D3SOURCE and D3SINK
 
 &BFM_conf
         MODE     = 'NEMO',
-        CPPDEFS  = 'BFM_PARALLEL INCLUDE_PELCO2 INCLUDE_PELFE INCLUDE_DIAG',
+        CPPDEFS  = 'BFM_NEMO BFM_NOPOINTERS BFM_PARALLEL INCLUDE_PELCO2 INCLUDE_PELFE',
         ARCH     = 'X64_ZEUS',
         PROC     = 16,
         EXP      = 'pelagos1',

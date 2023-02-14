@@ -284,7 +284,7 @@ end
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 #                       DIAGNOSTIC RATES
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-3d-flux-pel -if-exist INCLUDE_DIAG INCLUDE_PELCO2
+3d-flux-pel -if-exist INCLUDE_PELCO2
   ruPPYc=P.c  <- O3c  : Gross Primary Production    : mg C/m3/d
   ruPPYc1=P1c  <- O3c : Diatoms GPP           : mg C/m3/d
   ruPPYc2=P2c  <- O3c : Flagellates GPP           : mg C/m3/d
@@ -298,7 +298,7 @@ end
   prdO5c=O3c -> O5c : Calcite production : mgC/m3/d
 end
 
-3d-flux-pel -if-exist INCLUDE_DIAG
+3d-flux-pel
   exPPYc=(P.c -> R1c+R2c+R3c+R6c) : C excretion from Phytoplankton : mg C/m3/d
   exPPYc1=(P1c -> R1c+R2c+R3c+R6c) : Diatoms excretion : mg C/m3/d
   exPPYc2=(P2c -> R1c+R2c+R3c+R6c) : Flagellates excretion : mg C/m3/d

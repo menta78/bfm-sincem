@@ -18,7 +18,7 @@
 #
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 #  Currently available macros (cppdefs) are:
-#  BFM_STANDALONE   : mandatory when using the STANDALONE model
+#  BFM_NEMO         : use the NEMO coupling interface
 #  BFM_PARALLEL     : activate parallel coupling with BFM
 #  INCLUDE_PELFE    : add Iron component to the pelagic system
 #  INCLUDE_PELCO2   : activate Carbonate System and CO2 dynamics
@@ -26,7 +26,7 @@
 
 &BFM_conf
         MODE     = 'NEMO',
-        CPPDEFS  = 'INCLUDE_PELCO2 INCLUDE_PELFE INCLUDE_DIAG',
+        CPPDEFS  = 'BFM_NEMO BFM_NOPOINTERS INCLUDE_PELCO2 INCLUDE_PELFE',
         ARCH     = 'gfortran',
         PROC     = 1,
         EXP      = 'nemo1d_papa_bfm',

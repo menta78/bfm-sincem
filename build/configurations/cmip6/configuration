@@ -18,7 +18,6 @@
 #
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 #  Currently available macros (cppdefs) are:
-#  BFM_STANDALONE   : mandatory when using the STANDALONE model
 #  BFM_PARALLEL     : activate parallel coupling with BFM
 #  INCLUDE_PELFE    : add Iron component to the pelagic system
 #  INCLUDE_PELCO2   : activate Pelagic Carbonate System and CO2 dynamics 
@@ -26,7 +25,7 @@
 
 &BFM_conf
         MODE     = 'NEMO_CESM',
-        CPPDEFS  = 'BFM_PARALLEL INCLUDE_PELCO2 INCLUDE_PELFE INCLUDE_DIAG',
+        CPPDEFS  = 'BFM_NOPOINTERS BFM_PARALLEL INCLUDE_PELCO2 INCLUDE_PELFE',
         EXP      = 'tn1v3',
         EXPFILES = 'file_def_bfm.xml',
 /
