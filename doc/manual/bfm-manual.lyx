@@ -252,7 +252,7 @@ The BFM System Team
 
 \begin_layout Standard
 \align center
-Release 1.3, October 2022
+Release 1.3, Ferbuary 2023
 \begin_inset Newline newline
 \end_inset
 
@@ -13515,7 +13515,7 @@ Specific rate of nutrients and carbon excretion
 \begin_layout Plain Layout
 
 \size footnotesize
-\begin_inset Formula $d_{0_{Z}}$
+\begin_inset Formula $d_{_{Z}}^{dns}$
 \end_inset
 
 
@@ -13555,68 +13555,7 @@ d
 \begin_layout Plain Layout
 
 \size footnotesize
-Specific mortality rate 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size footnotesize
-\begin_inset Formula $d_{_{Z}}^{dns}$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size footnotesize
-p_sdo
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size footnotesize
-m
-\begin_inset Formula $^{3}$
-\end_inset
-
- mgC
-\begin_inset Formula $^{-1}$
-\end_inset
-
- d
-\begin_inset Formula $^{-1}$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size footnotesize
-Density-dependent specific mortality rate
+Density-dependent specific mortality rate 
 \end_layout
 
 \end_inset
@@ -13666,6 +13605,67 @@ p_sds
 
 \size footnotesize
 Exponent for density dependent mortality
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size footnotesize
+\begin_inset Formula $d_{_{Z}}^{o}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size footnotesize
+p_sdo
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size footnotesize
+m
+\begin_inset Formula $^{3}$
+\end_inset
+
+ mgC
+\begin_inset Formula $^{-1}$
+\end_inset
+
+ d
+\begin_inset Formula $^{-1}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size footnotesize
+Oxygen-dependent specific mortality rate
 \end_layout
 
 \end_inset
@@ -14050,7 +14050,7 @@ for mesozooplankton the carbon loss term reads:
 \begin_layout Standard
 \begin_inset Formula 
 \begin{align}
-\left.\frac{dZ_{c}}{dt}\right|_{R_{c}^{(6)}}^{rel} & =\beta_{_{Z}}I_{c}+(d_{0_{Z}}+doxy_{0_{Z}}(1-f_{Z}^{o}))\,f_{_{Z}}^{T}\,Z_{c}+\nonumber \\
+\left.\frac{dZ_{c}}{dt}\right|_{R_{c}^{(6)}}^{rel} & =\beta_{_{Z}}I_{c}+(d_{_{Z}}^{o}(1-f_{Z}^{o}))\,f_{_{Z}}^{T}\,Z_{c}+\nonumber \\
  & +d_{_{Z}}^{dns}\,Z_{c}^{\gamma_{_{Z}}}+Q_{Z}^{c}\label{eq:zooplankton_out-3}
 \end{align}
 
@@ -16268,7 +16268,7 @@ Specific reoxidation rate of reduction equivalents
 \begin_layout Plain Layout
 
 \size footnotesize
-\begin_inset Formula $A_{N5}$
+\begin_inset Formula $AE_{N5}$
 \end_inset
 
 
@@ -16282,7 +16282,7 @@ Specific reoxidation rate of reduction equivalents
 \begin_layout Plain Layout
 
 \size footnotesize
-p_q10R6N5
+p_aeR6N5
 \end_layout
 
 \end_inset
@@ -16293,7 +16293,7 @@ p_q10R6N5
 \begin_layout Plain Layout
 
 \size footnotesize
-J mol
+kJ mol
 \begin_inset Formula $^{-1}$
 \end_inset
 
@@ -16916,7 +16916,7 @@ literal "false"
 \end_inset
 
  is represented as 
-\begin_inset Formula $f_{_{R^{(6)}}}^{T}=exp\left(\frac{A_{N5}}{R}\left(\frac{1}{10}-\frac{1}{T}\right)\right)$
+\begin_inset Formula $f_{_{R^{(6)}}}^{T}=exp\left(\frac{AE_{N5}}{R}\left(\frac{1}{10}-\frac{1}{T}\right)\right)$
 \end_inset
 
  .
