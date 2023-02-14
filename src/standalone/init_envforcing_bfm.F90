@@ -113,12 +113,12 @@
    return
 
 100   call error_msg_prn(NML_OPEN,"init_envforcing_bfm.f90","standalone.nml")
-102   call error_msg_prn(NML_READ,"init_envforcing_bfm.f90","anforcings_nml")
-106   call error_msg_prn(NML_OPEN,"init_envforcing_bfm.f90",trim(forcing_file))
-107   call error_msg_prn(NML_OPEN,"init_envforcing_bfm.f90",trim(data_file))
-108   call error_msg_prn(NML_OPEN,"init_envforcing_bfm.f90",trim(seaice_file))
-109   call error_msg_prn(NML_OPEN,"init_envforcing_bfm.f90",trim(event_file))
-110   call error_msg_prn(NML_OPEN,"init_envforcing_bfm.f90",trim(benthic_file))
+102   call error_msg_prn(NML_READ,"init_envforcing_bfm.f90","forcings_nml")
+106   call error_msg_prn(NML_OPEN,"init_envforcing_bfm.f90","forcing_file: "//trim(forcing_file))
+107   call error_msg_prn(NML_OPEN,"init_envforcing_bfm.f90","data_file: "//trim(data_file))
+108   call error_msg_prn(NML_OPEN,"init_envforcing_bfm.f90","seaice_file: "//trim(seaice_file))
+109   call error_msg_prn(NML_OPEN,"init_envforcing_bfm.f90","event_file: "//trim(event_file))
+110   call error_msg_prn(NML_OPEN,"init_envforcing_bfm.f90","benthic_file: "//trim(benthic_file))
 
    end subroutine init_envforcing_bfm
 
