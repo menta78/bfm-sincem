@@ -1204,7 +1204,7 @@ status open
 
 \begin_layout Plain Layout
 
-        CPPDEFS = 'BFM_STANDALONE INCLUDE_PELCO2 INCLUDE_DIAG BFM_OGS',
+        CPPDEFS = 'BFM_STANDALONE INCLUDE_PELCO2 BFM_OGS',
 \end_layout
 
 \begin_layout Plain Layout

@@ -23527,7 +23527,7 @@ status open
 
 \begin_layout Plain Layout
 
-  CPPDEFS = 'BFM_STANDALONE INCLUDE_PELCO2 INCLUDE_DIAG',         
+  CPPDEFS = 'BFM_STANDALONE INCLUDE_PELCO2',         
 \end_layout
 
 \begin_layout Plain Layout
@@ -23683,23 +23683,6 @@ INCLUDE_PELCO2:
 INCLUDE_PELFE:
 \family default
  Add iron component and activate the related dynamics in the system.
-\end_layout
-
-\begin_layout Description
-
-\family typewriter
-INCLUDE_DIAG:
-\family default
- Activate the computation and storage of user-defined diagnostics described
- in Chap.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "chap:Model_outputs"
-
-\end_inset
-
-.
 \end_layout
 
 \begin_layout Description
@@ -31335,11 +31318,7 @@ D3(D2)SINK
 \family typewriter
 STANDALONE_PELAGIC/layout
 \family default
- file and are activated with the compilation macros 
-\family typewriter
-INCLUDE_DIAG
-\family default
-:
+ file:
 \begin_inset listings
 lstparams "basicstyle={\small\ttfamily},breaklines=true,language=sh"
 inline false
@@ -31362,7 +31341,7 @@ status open
 
 \begin_layout Plain Layout
 
-3d-flux-pel -if-exist INCLUDE_DIAG INCLUDE_PELCO2
+3d-flux-pel -if-exist INCLUDE_PELCO2
 \end_layout
 
 \begin_layout Plain Layout
@@ -31396,7 +31375,7 @@ end
 
 \begin_layout Plain Layout
 
-3d-flux-pel -if-exist INCLUDE_DIAG
+3d-flux-pel
 \end_layout
 
 \begin_layout Plain Layout
