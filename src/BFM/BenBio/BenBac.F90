@@ -114,6 +114,10 @@
   real(RLEN),dimension(NO_BOXES_XY)  :: rupp
   real(RLEN),dimension(NO_BOXES_XY)  :: rupn
   integer,dimension(NO_BOXES_XY)  :: i
+
+#ifndef INCLUDE_BENCO2
+  integer,parameter :: ppG3c = 0, ppG13c = 0
+#endif
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -305,10 +309,8 @@
   select case ( hx)
 
     case ( iiH1 )
-#ifdef INCLUDE_BENCO2
-      call flux_vector( iiBen, pphxc,ppG3c,rrc )
-#endif
-      call flux_vector(iiBen, ppG2o,ppG2o,-( rrc/ MW_C))
+      call flux_vector(iiBen, pphxc, ppG3c, rrc)
+      call flux_vector(iiBen, ppG2o, ppG2o, -( rrc/ MW_C))
 
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
       ! Add respiration and excretion to benthic totals:
@@ -318,9 +320,7 @@
       reBTp(:)  =   reBTp(:)+ rep
 
     case ( iiH2 )
-#ifdef INCLUDE_BENCO2
-      call flux_vector( iiBen, pphxc,ppG13c,rrc )
-#endif
+      call flux_vector(iiBen, pphxc, ppG13c, rrc)
 
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
       ! Respiration in anoxic circumstances produces reduced material

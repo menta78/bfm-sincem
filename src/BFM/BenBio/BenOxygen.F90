@@ -35,6 +35,7 @@
 ! INCLUDE
 #include "DEBUG.h"
 #include "INCLUDE.h"
+#include "cppdefs.h"
 !
 ! INTERFACE
   subroutine BenOxygenDynamics
@@ -79,8 +80,8 @@
   ! Oxygen diffusion from pelagic to benthic pore water [m2/d]
   ! Empirical equation from Broecker and Peng (1974, Table 2 note a)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  Do = SEC_PER_DAY* 1.0e-9_RLEN* (10.0_RLEN)**((- 984.26_RLEN/(ETW_Ben(:)- &
-    ZERO_KELVIN)+ 3.672_RLEN)) * p_exsaf
+  Do = SEC_PER_DAY* 1.0e-9_RLEN* (10.0_RLEN)**((- 984.26_RLEN/( 273.0_RLEN+ &
+    ETW_Ben(:))+ 3.672_RLEN))* p_poro* irrenh(:)* p_exsaf
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Calculate total respiration in pore water from /m2 to /m3:
@@ -104,9 +105,8 @@
   ! Damping the change of D1m in case of large changes
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   if ( InitializeModel== 0) then
-
-     shiftD1m(:) = shiftD1m(:)* (( D1m(:)+ shiftD1m(:)) / D1m(:) )**(p_xdampingD1m) &
-                 *( p_chD1m/( p_chD1m+ D1m(:)))
+     shiftD1m(:) = shiftD1m(:)* (D1m(:)/( D1m(:)+ &
+      abs(shiftD1m(:))))**(p_xdampingD1m)*( p_chD1m/( p_chD1m+ D1m(:)))
 #if defined BENTHIC_FULL
      do BoxNumberXY_ben = 1,NO_BOXES_XY
         r(1) = CalculateFromSet( KNO3(BoxNumberXY_ben), EQUATION, &
@@ -132,9 +132,10 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! calculate the new pore water oxygen concentration at D1mNew
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  p = mG2o / Do
-  G2oNew = D1mNew * O2o_Ben(:) - p* D1m(:)* ( D1mNew**2 / 2.0_RLEN) &
-         + p/ 2.0_RLEN * ( D1mNew**3 / 3.0_RLEN)
+  p =  ( 2.0_RLEN* Do* O2o_Ben(:))/( D1mNew* D1mNew)
+
+  G2oNew = D1mNew*( O2o_Ben(:)- 0.66667_RLEN* p * D1mNew* D1mNew/( 2.0_RLEN* &
+    Do))* p_poro
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! flux to pelagic: correct flux for rate of change of G2o

@@ -298,21 +298,14 @@
      call flux_vector( iiIce, ppI5s,ppalgs, runs)  ! source/sink.c
      ! The fixed loss rate for basal respiration is maintained to have 
      ! constant Si:C quota in the absence of production
-     flS1U6s(:)  =   flS1U6s(:)+ srs*algs
+     flS1U6s(:)  =   srs*algs
               
     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     ! Losses of Si
     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     rr6s  =   sdo* algs  ! Lysis, particulate
-
-    ! Collect first all fluxes of P-->silica
     flS1U6s(:)  =   flS1U6s(:)+ rr6s
 
-!MAV: check this
-    ! fluxes to biogenic particulate silica are assigned here.
-    ! In the pelagic this is done in PelChem since the predation of zooplankton
-    ! also release biogenic particulate silica
-    ! Since there is no zooplankton here, we need to assign the flux
     call flux_vector( iiIce, ppalgs,ppU6s, flS1U6s(:) )
   endif
 

@@ -55,12 +55,15 @@
    logical,public              :: init_forcing_vars=.true.
    logical,public              :: use_external_data=.false.
    logical,public              :: use_event_data=.false.
+   logical,public              :: use_seaice_data=.false.
+   logical,public              :: use_benthic_data=.false.
    integer,parameter,public    :: unit_forcing=201
    integer,parameter,public    :: unit_data=202
    integer,parameter,public    :: unit_seaice=203
    integer,parameter,public    :: unit_event=204
+   integer,parameter,public    :: unit_benthic=205
    character(len=128),public   :: forcing_file,seaice_file, &
-                                  data_file, event_file
+                                  data_file, event_file, benthic_file
 !
 ! !PRIVATE DATA MEMBERS:
    real(RLEN),parameter :: RFACTOR=PI/180._RLEN

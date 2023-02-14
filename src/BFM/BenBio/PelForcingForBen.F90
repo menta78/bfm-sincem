@@ -165,11 +165,13 @@ use mem_Settling
       !Oxygen Forcing:
       O2o_Ben(:)  =   max(p_small,O2o(BOTindices))
 
+#ifndef BFM_STANDALONE
       ! Physical environment in the benthos is equal to the one in the
       ! adjacent level (layer) of the pelagic
       ETW_Ben(:)  =   ETW(BOTindices)
       ESW_Ben(:)  =   ESW(BOTindices)
       ERHO_Ben(:) =   ERHO(BOTindices)
+#endif
 
 #ifdef INCLUDE_BENCO2
       O3c_Ben(:)  =   O3c(BOTindices)

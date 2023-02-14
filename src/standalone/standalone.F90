@@ -380,6 +380,10 @@
    use netcdf_bfm, only: save_bfm
    use mem
    use api_bfm, only: out_delta, save_delta , time_delta, update_save_delta
+   use api_bfm, only: stPelStateS, stBenStateS, var_names
+#if defined INCLUDE_SEAICE
+   use api_bfm, only: stIceStateS
+#endif
    use global_mem, only: RLEN, bfm_lwp, LOGUNIT
    use time
 
@@ -445,6 +449,15 @@
       call update_time(ntime)
 #ifdef DEBUG
       LEVEL2 'julian, seconds=',julianday,secondsofday
+      LEVEL2 ('                       '//trim(var_names(stPelStateS+i-1)), i=1,NO_D3_BOX_STATES)
+      LEVEL2 'PELAGIC', D3STATE
+      LEVEL2 ('                       '//trim(var_names(stIceStateS+i-1)), i=1,NO_D2_BOX_STATES_ICE)
+#if defined INCLUDE_SEAICE
+      LEVEL2 'SEAICE', D2STATE_ICE
+      LEVEL2 ('                       '//trim(var_names(stBenStateS+i-1)), i=1,NO_D2_BOX_STATES_BEN)
+#endif
+      LEVEL2 'BENTHIC', D2STATE_BEN
+      LEVEL2 ''
 #endif
    end do
 

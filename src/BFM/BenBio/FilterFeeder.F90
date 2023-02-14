@@ -138,6 +138,10 @@
   real(RLEN),dimension(NO_BOXES_XY)  :: fsat ! filtering saturation : at high feed levels less filtering
                                              ! is necessairy
   real(RLEN),dimension(NO_BOXES_XY)  :: netto
+
+#ifndef INCLUDE_BENCO2
+  integer,parameter :: ppG3c = 0
+#endif
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 
@@ -448,9 +452,7 @@
   rrc  =   rrc+ p_pur*( rgu- retR6c- retQ6c)
 
   call flux_vector(iiBen, ppY3c,ppY3c, -rrc*p_pePel )
-#ifdef INCLUDE_BENCO2
-  call flux_vector( iiBen, ppY3c,ppG3c, rrc*(ONE-p_pePel) )
-#endif
+  call flux_vector(iiBen, ppY3c,ppG3c, rrc*(ONE-p_pePel) )
   call flux_vector(iiBen, ppG2o,ppG2o,-( rrc/ MW_C)* ( ONE-p_pePel))
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

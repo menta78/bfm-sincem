@@ -2,23 +2,11 @@
 ! MODEL  BFM - Biogeochemical Flux Model
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 !
-! ROUTINE: external_seaice
+! ROUTINE: external_benthic
 !
-! DESCRIPTION
-!   Read seaice data, interpolate in time
-!   Coupling of sea ice processes for Kobbefjord site
-!   Required input fields:
-!      EICE : Seaice cover                   : --
-!      EHB  : Sea-ice biotic layer thickness : m
-!      EVB  : Brine volume fraction          : --
-!      ETB  : Brine temperature              : C
-!      ESB  : Brine salinity                 : --
-!      EIB  : Brine irradiance               : uE/m2/s
-!      ESI  : Sea-ice bulk salinity          : --
-!      EDH  : Sea-ice growth rate at bottom  : m/s
-!      EDS  : Snow growth rate at surface    : m/s
-!      EDM  : Snow ice layer growth rate     : m/s
-!      EIR  : Irradiance                     : uE/m2/s
+! DESCRIPTION:
+!   Read benthic data, interpolate in time
+!   Coupling of benthic processes 
 !
 ! COPYING
 !
@@ -32,27 +20,23 @@
 !   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 !   See the GNU General Public License for more details.
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+#if defined BENTHIC_BIO || defined BENTHIC_FULL
 !
 ! INCLUDE
 #include "cppdefs.h"
 !
 ! INTERFACE
-   subroutine external_seaice
-
-#ifdef INCLUDE_SEAICE
+   subroutine external_benthic
 !
 ! USES
    use global_mem, only: RLEN,ZERO,ONE
-   use constants,  only: E2W, SEC_PER_DAY
-   use mem_PAR,    only: p_PAR
-   ! seaice forcings
-   use mem,        only: EICE,EVB,ETB,ESB,EIB,EHB,ESI,EDH,EDS
-   use mem,        only: ESW,EIR
+   use constants,  only: SEC_PER_DAY
+   ! benthic forcings
+   use mem,        only: ETW_Ben,ESW_Ben,ERHO_Ben, Depth
    use time,       only: julianday, secondsofday, time_diff, &
                          julian_day,calendar_date
-   use envforcing, only: init_forcing_vars, daylength, density, &
-                         unit_seaice, read_obs, END_OF_FILE, READ_ERROR
-   use standalone, only: latitude
+   use envforcing, only: init_forcing_vars, density, &
+                         unit_benthic, read_obs, END_OF_FILE, READ_ERROR
    use bfm_error_msg
 
    IMPLICIT NONE
@@ -60,13 +44,13 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Local Variables
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-   integer,parameter                  :: NSI=9
+   integer,parameter                  :: NOBS_Ben=2
    integer                            :: yy,mm,dd,hh,minutes,ss
    real(RLEN)                         :: t,alpha,jday
    real(RLEN), save                   :: dt
    integer, save                      :: data_jul1,data_secs1
    integer, save                      :: data_jul2=0,data_secs2=0
-   real(RLEN), save                   :: obs1(NSI),obs2(NSI)=0.
+   real(RLEN), save                   :: obs1(NOBS_Ben),obs2(NOBS_Ben)=0.
    integer                            :: ierr,jh,jn
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
@@ -76,19 +60,16 @@
    LEVEL2 'Calendar day:',yy,mm,dd
 #endif
 
-   ! constant sea-ice fraction (changed below if Sea-ice model is used)
-   EICE = ZERO
-
    if (init_forcing_vars) then
      data_jul2=0
      data_secs2=0
      obs2(:)=ZERO
      ! check consistency of initial date
-     call read_obs(unit_seaice,yy,mm,dd,hh,minutes,ss,NSI,obs2,ierr)
+     call read_obs(unit_benthic,yy,mm,dd,hh,minutes,ss,NOBS_Ben,obs2,ierr)
      call julian_day(yy,mm,dd,0,0,jday)
      if (jday > julianday )  &
-        call bfm_error('external_seaice','Model start date is earlier than start date of sea ice data')
-     rewind(unit_seaice)
+        call bfm_error('external_benthic','Model start date is earlier than start date of sea ice data')
+     rewind(unit_benthic)
    end if
 !  This part initialise and read in new values if necessary.
    if(time_diff(data_jul2,data_secs2,julianday,secondsofday) .lt. 0) then
@@ -96,12 +77,12 @@
          data_jul1 = data_jul2
          data_secs1 = data_secs2
          obs1 = obs2
-         call read_obs(unit_seaice,yy,mm,dd,hh,minutes,ss,NSI,obs2,ierr)
+         call read_obs(unit_benthic,yy,mm,dd,hh,minutes,ss,NOBS_Ben,obs2,ierr)
          select case (ierr)
            case (READ_ERROR)
-              call bfm_error('external_forcing','Error reading forcing data')
+              call bfm_error('external_benthic','Error reading forcing data')
            case (END_OF_FILE)
-              call bfm_error('external_forcing','Model end date is beyond forcing data')
+              call bfm_error('external_benthic','Model end date is beyond forcing data')
          end select
          call julian_day(yy,mm,dd,0,0,jday)
          data_jul2 = int(jday)
@@ -114,42 +95,24 @@
 !  Do the time interpolation
    t  = time_diff(julianday,secondsofday,data_jul1,data_secs1)
    alpha = (obs2(1)-obs1(1))/dt
-   EICE(:) = obs1(1) + t*alpha
+   ETW_Ben(:) = obs1(1) + t*alpha
    alpha = (obs2(2)-obs1(2))/dt
-   EHB(:) = obs1(2) + t*alpha
-   alpha = (obs2(3)-obs1(3))/dt
-   EVB(:) = obs1(3) + t*alpha
-   alpha = (obs2(4)-obs1(4))/dt
-   ETB(:) = obs1(4) + t*alpha
-   alpha = (obs2(5)-obs1(5))/dt
-   ESB(:) = obs1(5) + t*alpha
-   ! E2W converts from irradiance units (W/m2) to PAR units (uE/m2/s)
-   ! p_PAR converts to visibile light only
-   alpha = (obs2(6)-obs1(6))/dt
-   EIB(:) = ((obs1(6) + t*alpha)*p_PAR/E2W)
-   alpha = (obs2(7)-obs1(7))/dt
-   ESI(:) = obs1(7) + t*alpha
-   alpha = (obs2(8)-obs1(8))/dt
-   EDH(:)=(obs1(8) + t*alpha)*SEC_PER_DAY
-   alpha = (obs2(9)-obs1(9))/dt
-   EDS(:)=(obs1(9) + t*alpha)*SEC_PER_DAY
+   ESW_Ben(:) = obs1(2) + t*alpha
+!   alpha = (obs2(3)-obs1(3))/dt
+   ERHO_Ben(:) = density(ETW_Ben(:),ESW_Ben(:),Depth(:))
 
 #ifdef DEBUG
-   LEVEL2 'EICE=',EICE
-   LEVEL2 'EHB=',EHB
-   LEVEL2 'EVB=',EVB
-   LEVEL2 'ETB=',ETB
-   LEVEL2 'ESB=',ESB
-   LEVEL2 'EIB=',EIB
-   LEVEL2 'ESI=',ESI
-   LEVEL2 'EDH=',EDH
-   LEVEL2 'EDS=',EDS
+   LEVEL2 'ETW_Ben=',ETW_Ben
+   LEVEL2 'ESW_Ben=',ESW_Ben
+   LEVEL2 'ERHO_Ben=',ERHO_Ben
 #endif
   return
-#endif
 
-   end subroutine external_seaice
+   end subroutine external_benthic
+
+#endif
 
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
