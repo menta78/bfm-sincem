@@ -215,8 +215,8 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
    O4n0 = 200.0,
    P1c0 = 1.0, 
    P2c0 = 1.0, 
-   P3c0 = 1.0, 
-   P4c0 = 1.0, 
+   P5c0 = 1.0, 
+   P6c0 = 1.0, 
    Z3c0 = 0.1 
    Z4c0 = 0.1, 
    Z5c0 = 0.1, 
@@ -285,11 +285,11 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
 &bfm_save_nml
    var_save = ''
      ave_save   =  'ETW'  'ETW_Ben'  'O2o' 'ESW'  'ESW_Ben'  'DIC'  'EIR'  'Chla'
-  'N1p'  'N3n'  'N4n'  'N5s'  'N6r'  'B1c'  'P1c'  'P2c'  'P3c'  'P4c'  'P1l'  'P2l'  'P3l'  'P4l'
+  'N1p'  'N3n'  'N4n'  'N5s'  'N6r'  'B1c'  'P1c'  'P2c'  'P5c'  'P6c'  'P1l'  'P2l'  'P5l'  'P6l'
   'Z3c'  'Z4c'  'Z5c'  'Z6c'  'R1c'  'R2c'  'R6c'  'R1n'  'R6n'  'R1p'  'R6p'  'P1s'  'R6s' 
   'EICE'  'ETB'  'ESI'  'EHB'  'S1c'  'S1l'  'S2c'  'S2l'  'U1c'  'U1n'  'U1p'  'U6c'  'U6n'
   'U6p'  'U6s'  'X1c'  'T1c'  'I1p'  'I3n'  'I4n'  'I5s'  'F2o'  'F3c'  'sunPPY_iiP1'  'sunPPY_iiP2'
-  'sunPPY_iiP3'  'sunPPY_iiP4'  'ruSALc' 'ruPPYc'  'resPPYc'
+  'sunPPY_iiP5'  'sunPPY_iiP6'  'ruSALc' 'ruPPYc'  'resPPYc'
   'ruZOOc'  'remZOOn'  'remZOOp'  'remPBAn'  'remPBAp'  
   'H1c' 'H2c' 'K1p' 'K11p' 'K4n' 'K14n' 
   'D1m' 'D2m' 'D6m' 'D7m' 'D8m' 'D9m' 'Q6c' 'Q6n' 'Q6p' 'Q6s'
@@ -492,7 +492,7 @@ AssignAirPelFluxesInBFMFlag = .TRUE.
 !  p_rPIm      [m/d]          Phytoplankton background sinking rate
 !-------------------------------------------------------------------------!
 &Phyto_parameters
-!               P1      P2      P3      P4
+!               P1      P2      P5      P6
         p_q10 = 2.0,    2.0,    2.0,    2.0
        p_temp = 0.0,    0.0,    0.0,    0.0
         p_sum = 2.0,    1.5,    1.5,    1.5
@@ -735,8 +735,8 @@ p_paMEZ(2,:)=   0.0,    1.0
    p_sN3O4n = 0.35
     p_clN6r = 1.0
      p_rPAo = 1.0
-  p_q10R6N5 = 1.49
-    p_sR6N5 = 0.02
+  p_q10R6N5 = 60.0
+    p_sR6N5 = 0.001
 	filename_nml_conf = 'Pelagic_Environment.nml',
 /
 
