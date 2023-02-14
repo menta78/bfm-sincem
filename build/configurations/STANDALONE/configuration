@@ -25,7 +25,7 @@
 
 &BFM_conf
         MODE     = 'STANDALONE',
-        CPPDEFS  = 'BFM_STANDALONE INCLUDE_PELCO2 INCLUDE_DIAG',
+        CPPDEFS  = 'BFM_STANDALONE INCLUDE_PELCO2',
         ARCH     = 'gfortran.inc',
         PROC     = 4,
         EXP      = 'standalone',

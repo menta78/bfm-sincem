@@ -279,7 +279,7 @@ end
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 #                       DIAGNOSTIC RATES
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-3d-flux-pel -if-exist INCLUDE_DIAG INCLUDE_PELCO2
+3d-flux-pel -if-exist INCLUDE_PELCO2
   ruPPYc=P.c  <- O3c : Gross Primary Production    : mg C/m3/d
   resPPYc=P.c -> O3c : Phytoplankton Respiration   : mg C/m3/d
   #netPPYc=(P.c <- O3c) - (P.c -> O3c)  :  net primary production  : mg C/m3/d
@@ -288,7 +288,7 @@ end
   #rcalCARc=O5c <- O3c: Calcification rate          : mg C/m3/d
 end
 
-3d-flux-pel -if-exist INCLUDE_DIAG
+3d-flux-pel
 #  ruPPYn=P.n <- N3n+N4n: Net Nitrogen Uptake:mmol N/m3/d
 #  ruPPYp=P.p <- N1p : Net Phosphate Uptake : mmol P/m3/d
 #  ruPPYs=P.s <- N5s : Net Silicate Uptake : mmol Si/m3/d
@@ -303,7 +303,7 @@ end
 #  remPBAp=(N1p<-B.p): bacterial P Uptake/Remineralization : mmol P/m3/d
 end
 
-3d-flux-pel -if-exist INCLUDE_DIAG INCLUDE_PELCO2 BFM_OGS
+3d-flux-pel -if-exist INCLUDE_PELCO2 BFM_OGS
   #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   # OGS diagnostic rates
   #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

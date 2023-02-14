@@ -22,11 +22,10 @@
 #  BFM_PARALLEL     : activate parallel coupling with BFM
 #  INCLUDE_PELFE    : add Iron component to the pelagic system
 #  INCLUDE_PELCO2   : activate Carbonate System and CO2 dynamics
-#  INCLUDE_DIAG   : activate flux diagnostics defined in .mem file
 
 &BFM_conf
         MODE      = 'POM1D',
-        CPPDEFS   = 'BFM_STANDALONE INCLUDE_PELCO2 INCLUDE_DIAG BFM_POM BFM_NOPOINTERS',
+        CPPDEFS   = 'BFM_STANDALONE INCLUDE_PELCO2 BFM_POM BFM_NOPOINTERS',
         ARCH      = 'gfortran.inc',
         PROC      = 4,
         EXP       = 'bfm_pom1d',
