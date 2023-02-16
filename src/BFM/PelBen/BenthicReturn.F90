@@ -1,12 +1,8 @@
-#include "DEBUG.h"
-#include "INCLUDE.h"
-
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model 
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-!BOP
 !
-! !ROUTINE: BenthicReturn
+! ROUTINE: BenthicReturn
 !
 ! DESCRIPTION
 !   This process is a very simple parameterisation of benthic 
@@ -20,16 +16,27 @@
 !   Fluxes are then used as boundary conditions for pelagic variables
 !   in PelagicBenthicCoupling.F90
 !
+! COPYING
 !
-! !INTERFACE
+!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU General Public License for more details.
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! INCLUDE
+#include "DEBUG.h"
+#include "INCLUDE.h"
+!
+! INTERFACE
   subroutine BenthicReturnDynamics
 !
-! !USES:
-
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! Modules (use of ONLY is strongly encouraged!)
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-
+! USES
   use global_mem, ONLY:RLEN, ONE, bfm_lwp
 #ifdef NOPOINTERS
   use mem,  ONLY: D2STATE_BEN, D2DIAGNOS, D3STATE, D3DIAGNOS
@@ -44,101 +51,54 @@
   use mem_Param, ONLY: CalcConservationFlag, AssignPelBenFluxesInBFMFlag
   use constants, ONLY: MW_C
   use mem_globalfun, ONLY: MM_POWER
-#ifdef BFM_GOTM
- use bio_var, ONLY: BOTindices
-#else
- use api_bfm, ONLY: BOTindices
-#endif
-!  
-!
-! !AUTHORS
-!   Piet Ruardij 
-!
-!
-!
-! !REVISION_HISTORY
-!   Created at Fri Apr 30 21:30:27 CEST 2004
-!
-!
-!
-! COPYING
-!   
-!   Copyright (C) 2020 BFM System Team (bfm_st@cmcc.it)
-!   Copyright (C) 2006 P. Ruardij, the BFM team
-!   (rua@nioz.nl, vichi@bo.ingv.it)
-!
-!   This program is free software; you can redistribute it and/or modify
-!   it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation;
-!   This program is distributed in the hope that it will be useful,
-!   but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-!   GNU General Public License for more details.
-!
-!EOP
-!-------------------------------------------------------------------------!
-!BOC
-!
-!
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! Implicit typing is never allowed
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  use api_bfm, ONLY: BOTindices
+
   IMPLICIT NONE
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Local Variables
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   integer   :: box, kbot
-  real(RLEN),dimension(NO_BOXES_XY)  :: rate, et, eo, fact
+  real(RLEN),dimension(NO_BOXES_XY)  :: rate
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
   if ( .NOT. AssignPelBenFluxesInBFMFlag ) return
 
-  et = ONE ; eo = ONE
-  ! temperature & oxygen dependence
-  do Box = 1,NO_BOXES_XY
-     kbot = BOTindices(Box)
-     if ( p_q10  .gt. ZERO ) et(box) = min (ONE, p_q10 ** (( ETW(kbot) - p_qBT) / 10.0_RLEN) )
-     if ( p_chdo .gt. ZERO ) eo(box) = MM_POWER(O2o(kbot), p_chdo, 2)
-  enddo
-
-  ! Aggregate control factors
-  fact = retfac* et* eo
-
   ! remineralization fluxes
-  rate  =   p_rmnQ6c* fact* Q6c(:)
+  rate  =   p_rmnQ6c* Q6c(:)
   call flux_vector( iiBen, ppQ6c,ppQ6c,-( rate) )
   jbotO2o(:)  = - rate / MW_C
   jbotO3c(:)  = rate
 
-  rate  =   p_rmnQ1c* fact* Q1c(:)
+  rate  =   p_rmnQ1c* Q1c(:)
   call flux_vector( iiBen, ppQ1c,ppQ1c,-( rate) )
   jbotO2o(:)  = jbotO2o(:) - rate / MW_C
   jbotO3c(:)  = jbotO3c(:) + rate
 
-  rate  =   p_rmnQ6p* fact* Q6p(:)
+  rate  =   p_rmnQ6p* Q6p(:)
   call flux_vector( iiBen, ppQ6p,ppQ6p,-( rate) )
   jbotN1p(:)  = rate
 
-  rate  =   p_rmnQ1p* fact* Q1p(:)
+  rate  =   p_rmnQ1p* Q1p(:)
   call flux_vector( iiBen, ppQ1p,ppQ1p,-( rate) )
   jbotN1p(:)  = jbotN1p(:)+ rate
 
-  rate  =   p_rmnQ6n* fact* Q6n(:)
+  rate  =   p_rmnQ6n* Q6n(:)
   call flux_vector( iiBen, ppQ6n,ppQ6n,-( rate) )
   jbotN3n(:)  = rate* p_pQIN3
   jbotN4n(:)  = rate*( ONE - p_pQIN3)
 
-  rate  =   p_rmnQ1n* fact* Q1n(:)
+  rate  =   p_rmnQ1n* Q1n(:)
   call flux_vector( iiBen, ppQ1n,ppQ1n,-( rate) )
   jbotN3n(:)  = jbotN3n(:)+ rate* p_pQIN3
   jbotN4n(:)  = jbotN4n(:)+ rate*( ONE - p_pQIN3)
 
-  rate  =   p_rmnQ6s* fact* Q6s(:)
+  rate  =   p_rmnQ6s* Q6s(:)
   call flux_vector( iiBen, ppQ6s,ppQ6s,-( rate) )
   jbotN5s(:)  = rate
 
   end subroutine BenthicReturnDynamics
-!EOC
+
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model 
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

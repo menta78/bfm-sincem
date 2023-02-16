@@ -1,12 +1,8 @@
-#include "DEBUG.h"
-#include "INCLUDE.h"
-
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model 
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-!BOP
 !
-! !ROUTINE: BenOxygen
+! ROUTINE: BenOxygen
 !
 ! DESCRIPTION
 !   Description of first order oxic processes in the sediment and computation 
@@ -23,14 +19,28 @@
 !      GOeq = O2o - p * D1m *z + p/2 * z^2
 !   where p=( Mo(bt) + Mo(nit) + Mo(rox) ) / Do
 !
-! !INTERFACE
+! COPYING
+!
+!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU General Public License for more details.
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! INCLUDE
+#include "DEBUG.h"
+#include "INCLUDE.h"
+#include "cppdefs.h"
+!
+! INTERFACE
   subroutine BenOxygenDynamics
 !
-! !USES:
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! Modules (use of ONLY is strongly encouraged!)
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-
+! USES
   use global_mem, ONLY:RLEN,LOGUNIT
 #ifdef NOPOINTERS
   use mem
@@ -51,34 +61,6 @@
   use mem_Param,  ONLY: p_d_tot, p_clD1D2m
   use time,       ONLY: bfmtime
 
-!  
-!
-! !AUTHORS
-!   P. Ruardij
-!
-!
-! COPYING
-!   
-!   Copyright (C) 2020 BFM System Team (bfm_st@cmcc.it)
-!   Copyright (C) 2006 P. Ruardij & M.Vichi
-!   (rua@nioz.nl, vichi@bo.ingv.it)
-!
-!   This program is free software; you can redistribute it and/or modify
-!   it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation;
-!   This program is distributed in the hope that it will be useful,
-!   but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-!   GNU General Public License for more details.
-!
-!EOP
-!-------------------------------------------------------------------------!
-!BOC
-!
-!
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! Implicit typing is never allowed
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   IMPLICIT NONE
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -98,8 +80,8 @@
   ! Oxygen diffusion from pelagic to benthic pore water [m2/d]
   ! Empirical equation from Broecker and Peng (1974, Table 2 note a)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  Do = SEC_PER_DAY* 1.0e-9_RLEN* (10.0_RLEN)**((- 984.26_RLEN/(ETW_Ben(:)- &
-    ZERO_KELVIN)+ 3.672_RLEN)) * p_exsaf
+  Do = SEC_PER_DAY* 1.0e-9_RLEN* (10.0_RLEN)**((- 984.26_RLEN/( 273.0_RLEN+ &
+    ETW_Ben(:))+ 3.672_RLEN))* p_poro* irrenh(:)* p_exsaf
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Calculate total respiration in pore water from /m2 to /m3:
@@ -123,9 +105,8 @@
   ! Damping the change of D1m in case of large changes
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   if ( InitializeModel== 0) then
-
-     shiftD1m(:) = shiftD1m(:)* (( D1m(:)+ shiftD1m(:)) / D1m(:) )**(p_xdampingD1m) &
-                 *( p_chD1m/( p_chD1m+ D1m(:)))
+     shiftD1m(:) = shiftD1m(:)* (D1m(:)/( D1m(:)+ &
+      abs(shiftD1m(:))))**(p_xdampingD1m)*( p_chD1m/( p_chD1m+ D1m(:)))
 #if defined BENTHIC_FULL
      do BoxNumberXY_ben = 1,NO_BOXES_XY
         r(1) = CalculateFromSet( KNO3(BoxNumberXY_ben), EQUATION, &
@@ -151,9 +132,10 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! calculate the new pore water oxygen concentration at D1mNew
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  p = mG2o / Do
-  G2oNew = D1mNew * O2o_Ben(:) - p* D1m(:)* ( D1mNew**2 / 2.0_RLEN) &
-         + p/ 2.0_RLEN * ( D1mNew**3 / 3.0_RLEN)
+  p =  ( 2.0_RLEN* Do* O2o_Ben(:))/( D1mNew* D1mNew)
+
+  G2oNew = D1mNew*( O2o_Ben(:)- 0.66667_RLEN* p * D1mNew* D1mNew/( 2.0_RLEN* &
+    Do))* p_poro
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! flux to pelagic: correct flux for rate of change of G2o
@@ -179,7 +161,7 @@
   endif
 
   end subroutine BenOxygenDynamics
-!EOC
+
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model 
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

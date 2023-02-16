@@ -1,16 +1,11 @@
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-! MODEL
-!	   BFM - Biogeochemical Flux Model
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 !
-! MODULE
-!   ModuleMem
-!
-! FILE
-!   ModuleMem
+! MODULE: ModuleMem
 !
 ! DESCRIPTION
 !   Definition of Global Shared Memory
-!  
 !   This module contains all the structural definitions of the BFM
 !   and sets up the memory layout.
 !   It is automatically generated from the prototype file 
@@ -19,40 +14,27 @@
 !   Do not directly edit this code because changes will be lost at
 !   any new compilation.
 !
-! AUTHORS
-!   Piet Ruardij & Marcello Vichi
-!
-! CHANGE_LOG
-!   ---
-!
-! COPYING
-!   
-!   Copyright (C) 2020 BFM System Team (bfm_st@cmcc.it)
-!   Copyright (C) 2006 P. Ruardij, M. Vichi
-!   (rua@nioz.nl, vichi@bo.ingv.it)
-!
-!   This program is free software; you can redistribute it and/or modify
-!   it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation;
-!   This program is distributed in the hope that it will be useful,
-!   but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-!   GNU General Public License for more details.
-!
-!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-!
-!
-!
 !! IMPORTANT NOTE:
 !! Do not change the lines starting with two comment characters "!" 
 !! These lines are used by the parser to generate the final module file
-
 !
-
+! COPYING
+!
+!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU General Public License for more details.
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! INCLUDE
 #include"cppdefs.h"
-
 #include "DEBUG.h"
-
+!
       module mem
         !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
         ! Modules can optionally use (import) other modules
@@ -94,21 +76,12 @@
         
         real(RLEN),public,pointer,dimension(:,:) :: D3STATE
 
-#ifndef EXPLICIT_SINK
         real(RLEN),public,pointer,dimension(:,:)   :: D3SOURCE
-#else
-        real(RLEN),public,pointer,dimension(:,:,:) :: D3SOURCE
-        real(RLEN),public,pointer,dimension(:,:,:) :: D3SINK
-#endif
 
         integer,public,pointer,dimension(:) :: D3STATETYPE
-#ifdef BFM_NEMO
-       integer,public,pointer,dimension(:)  :: D3STATEOBC
-#endif
 
         real(RLEN),public,pointer,dimension(:,:) :: %pel-field-array surface
         real(RLEN),public,pointer,dimension(:,:) :: %pel-field-array bottom
-        real(RLEN),public,pointer,dimension(:,:) :: %pel-field-array river
 
         real(RLEN),public,pointer,dimension(:,:) :: D3DIAGNOS
         real(RLEN),public,pointer,dimension(:,:) :: D2DIAGNOS
@@ -124,17 +97,9 @@
 #ifdef INCLUDE_SEAICE
         real(RLEN),public,pointer,dimension(:,:) :: D2STATE_ICE
 
-#ifndef EXPLICIT_SINK
         real(RLEN),public,pointer,dimension(:,:)   :: D2SOURCE_ICE
-#else
-        real(RLEN),public,pointer,dimension(:,:,:) :: D2SOURCE_ICE
-        real(RLEN),public,pointer,dimension(:,:,:) :: D2SINK_ICE
-#endif
 
         integer,public,pointer,dimension(:) :: D2STATETYPE_ICE
-#ifdef BFM_NEMO
-       integer,public,pointer,dimension(:)  :: D2STATEOBC_ICE
-#endif
 
         real(RLEN),public,pointer,dimension(:,:) :: D2DIAGNOS_ICE
 
@@ -146,17 +111,9 @@
 
         real(RLEN),public,pointer,dimension(:,:) :: D2STATE_BEN
 
-#ifndef EXPLICIT_SINK
         real(RLEN),public,pointer,dimension(:,:)   :: D2SOURCE_BEN
-#else
-        real(RLEN),public,pointer,dimension(:,:,:) :: D2SOURCE_BEN
-        real(RLEN),public,pointer,dimension(:,:,:) :: D2SINK_BEN
-#endif
 
         integer,public,pointer,dimension(:) :: D2STATETYPE_BEN
-#ifdef BFM_NEMO
-       integer,public,pointer,dimension(:)  :: D2STATEOBC_BEN
-#endif
 
         real(RLEN),public,pointer,dimension(:,:) :: D2DIAGNOS_BEN
 
@@ -370,7 +327,6 @@
 
         real(RLEN),public,dimension(:),pointer  :: %pel-field-pointer surface
         real(RLEN),public,dimension(:),pointer  :: %pel-field-pointer bottom
-        real(RLEN),public,dimension(:),pointer  :: %pel-field-pointer river
 
         !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
         !  Other 3d-Global Variables 
@@ -452,13 +408,7 @@
 %2d-groupfunctions-ben
 
 
-#ifdef BFM_ROMS
-#include "FluxFunctions.h"
-#elif defined EXPLICIT_SINK
-#include "FluxFunctions_sourcesink.h90"
-#else
 #include "FluxFunctions.h90"
-#endif
 
     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     ! end of contain section
@@ -466,3 +416,6 @@
 
   end module mem
 
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

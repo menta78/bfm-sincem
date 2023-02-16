@@ -13,20 +13,18 @@ MODULE trcrst
    !!   'key_top'                                                TOP models
    !!----------------------------------------------------------------------
    !!----------------------------------------------------------------------
-   !!   trc_rst :   Restart for passive tracer
-   !!----------------------------------------------------------------------
-   !!----------------------------------------------------------------------
-   !!   'key_top'                                                TOP models
-   !!----------------------------------------------------------------------
+   !!   trc_rst        : Restart for passive tracer
    !!   trc_rst_opn    : open  restart file
    !!   trc_rst_read   : read  restart file
    !!   trc_rst_wri    : write restart file
    !!----------------------------------------------------------------------
+   USE par_trc        ! need jptra, number of passive tracers
    USE oce_trc
    USE trc
-   USE trcnam_trp
    USE iom
    USE daymod
+   USE lib_mpp
+   
    IMPLICIT NONE
    PRIVATE
 
@@ -35,9 +33,12 @@ MODULE trcrst
    PUBLIC   trc_rst_wri       ! called by ???
    PUBLIC   trc_rst_cal
 
-   !! * Substitutions
-#  include "top_substitute.h90"
-   
+#  include "domzgr_substitute.h90"
+   !!----------------------------------------------------------------------
+   !! NEMO/TOP 4.0 , NEMO Consortium (2018)
+   !! $Id: trcrst.F90 14239 2020-12-23 08:57:16Z smasson $
+   !! Software governed by the CeCILL license (see ./LICENSE)
+   !!----------------------------------------------------------------------
 CONTAINS
    
    SUBROUTINE trc_rst_opn( kt )
@@ -51,32 +52,35 @@ CONTAINS
       CHARACTER(LEN=20)   ::   clkt     ! ocean time-step define as a character
       CHARACTER(LEN=50)   ::   clname   ! trc output restart file name
       CHARACTER(LEN=256)  ::   clpath   ! full path to ocean output restart file
+      CHARACTER(LEN=50)   ::   clpname  ! trc output restart file name including AGRIF
       !!----------------------------------------------------------------------
       !
-      IF( lk_offline ) THEN
+      IF( l_offline ) THEN
          IF( kt == nittrc000 ) THEN
             lrst_trc = .FALSE.
             IF( ln_rst_list ) THEN
                nrst_lst = 1
-               nitrst = nstocklist( nrst_lst )
+               nitrst = nn_stocklist( nrst_lst )
             ELSE
                nitrst = nitend
             ENDIF
          ENDIF
 
-         IF( .NOT. ln_rst_list .AND. MOD( kt - 1, nstock ) == 0 ) THEN
+         IF( .NOT. ln_rst_list .AND. MOD( kt - 1, nn_stock ) == 0 ) THEN
             ! we use kt - 1 and not kt - nittrc000 to keep the same periodicity from the beginning of the experiment
-            nitrst = kt + nstock - 1                  ! define the next value of nitrst for restart writing
+            nitrst = kt + nn_stock - 1                  ! define the next value of nitrst for restart writing
             IF( nitrst > nitend )   nitrst = nitend   ! make sure we write a restart at the end of the run
          ENDIF
       ELSE
          IF( kt == nittrc000 ) lrst_trc = .FALSE.
       ENDIF
 
+      IF( .NOT. ln_rst_list .AND. nn_stock == -1 )   RETURN   ! we will never do any restart
+
       ! to get better performances with NetCDF format:
-      ! we open and define the tracer restart file one tracer time step before writing the data (-> at nitrst - 2*nn_dttrc + 1)
-      ! except if we write tracer restart files every tracer time step or if a tracer restart file was writen at nitend - 2*nn_dttrc + 1
-      IF( kt == nitrst - 2*nn_dttrc .OR. nstock == nn_dttrc .OR. ( kt == nitend - nn_dttrc .AND. .NOT. lrst_trc ) ) THEN
+      ! we open and define the tracer restart file one tracer time step before writing the data (-> at nitrst - 1)
+      ! except if we write tracer restart files every tracer time step or if a tracer restart file was writen at nitend - 1
+      IF( kt == nitrst - 1 .OR. nn_stock == 1 .OR. ( kt == nitend - 1 .AND. .NOT. lrst_trc ) ) THEN
          ! beware of the format used to write kt (default is i8.8, that should be large enough)
          IF( nitrst > 1.0e9 ) THEN   ;   WRITE(clkt,*       ) nitrst
          ELSE                        ;   WRITE(clkt,'(i8.8)') nitrst
@@ -88,18 +92,34 @@ CONTAINS
          IF( clpath(LEN_TRIM(clpath):) /= '/' ) clpath = TRIM(clpath) // '/'
          IF(lwp) WRITE(numout,*) &
              '             open trc restart.output NetCDF file: ',TRIM(clpath)//clname
-         CALL iom_open( TRIM(clpath)//TRIM(clname), numrtw, ldwrt = .TRUE., kiolib = jprstlib )
+         IF(.NOT.lwxios) THEN
+            CALL iom_open( TRIM(clpath)//TRIM(clname), numrtw, ldwrt = .TRUE. )
+         ELSE
+#if defined key_xios
+            cw_toprst_cxt = "rstwt_"//TRIM(ADJUSTL(clkt))
+            IF( TRIM(Agrif_CFixed()) == '0' ) THEN
+               clpname = clname
+            ELSE
+               clpname = TRIM(Agrif_CFixed())//"_"//clname
+            ENDIF
+            numrtw = iom_xios_setid(TRIM(clpath)//TRIM(clpname))
+            CALL iom_init( cw_toprst_cxt, kdid = numrtw, ld_closedef = .FALSE. )
+#else
+            CALL ctl_stop( 'Can not use XIOS in trc_rst_opn' )
+#endif
+         ENDIF
          lrst_trc = .TRUE.
       ENDIF
       !
    END SUBROUTINE trc_rst_opn
 
-   SUBROUTINE trc_rst_read
+   SUBROUTINE trc_rst_read( Kbb, Kmm )
       !!----------------------------------------------------------------------
       !!                    ***  trc_rst_opn  ***
       !!
       !! ** purpose  :   read passive tracer fields in restart files
       !!----------------------------------------------------------------------
+      INTEGER, INTENT( in ) ::   Kbb, Kmm  ! time level indices
       INTEGER  ::  jn     
 
       !!----------------------------------------------------------------------
@@ -109,48 +129,80 @@ CONTAINS
       IF(lwp) WRITE(numout,*) '~~~~~~~~~~~~'
 
       ! READ prognostic variables and computes diagnostic variable
-      DO jn = jp_cfc0, jp_age1
-         CALL iom_get( numrtr, jpdom_autoglo, 'TRN'//ctrcnm(jn), trn(:,:,:,jn) )
+      DO jn = 1, jptra
+         CALL iom_get( numrtr, jpdom_auto, 'TRN'//ctrcnm(jn), tr(:,:,:,jn,Kmm) )
       END DO
 
-      DO jn = jp_cfc0, jp_age1
-         CALL iom_get( numrtr, jpdom_autoglo, 'TRB'//ctrcnm(jn), trb(:,:,:,jn) )
+      IF ( ln_top_euler ) THEN
+         tr(:,:,:,:,Kbb) = tr(:,:,:,:,Kmm)
+      ELSE
+         DO jn = 1, jptra
+            CALL iom_get( numrtr, jpdom_auto, 'TRB'//ctrcnm(jn), tr(:,:,:,jn,Kbb) )
+         END DO
+      ENDIF
+
+      ! ugly patch for benthic vars
+      DO jn = 1, jp_bgc_b
+         CALL iom_get( numrtr, jpdom_auto, 'TRN'//ctrcnm_b(jn), tr_b(:,:,1,jn) )
       END DO
+
+      ! ph
+      CALL iom_get( numrtr, jpdom_auto, 'ph', ph(:,:,:) )
+
       !
+      IF(.NOT.lrxios) CALL iom_delay_rst( 'READ', 'TOP', numrtr )   ! read only TOP delayed global communication variables
    END SUBROUTINE trc_rst_read
 
-   SUBROUTINE trc_rst_wri( kt )
+   SUBROUTINE trc_rst_wri( kt, Kbb, Kmm, Krhs )
       !!----------------------------------------------------------------------
       !!                    ***  trc_rst_wri  ***
       !!
       !! ** purpose  :   write passive tracer fields in restart files
       !!----------------------------------------------------------------------
-      INTEGER, INTENT( in ) ::   kt    ! ocean time-step index
+      INTEGER, INTENT( in ) ::   kt              ! ocean time-step index
+      INTEGER, INTENT( in ) ::   Kbb, Kmm, Krhs  ! time level indices
       !!
       INTEGER  :: jn
-      REAL(wp) :: zarak0
       !!----------------------------------------------------------------------
       !
-      CALL iom_rstput( kt, nitrst, numrtw, 'rdttrc1', rdttrc(1) )   ! surface passive tracer time step
+      CALL iom_rstput( kt, nitrst, numrtw, 'rdttrc1', rn_Dt )   ! passive tracer time step (= ocean time step)
       ! prognostic variables 
       ! -------------------- 
-      DO jn = jp_cfc0, jp_age1
-         CALL iom_rstput( kt, nitrst, numrtw, 'TRN'//ctrcnm(jn), trn(:,:,:,jn) )
+      DO jn = 1, jptra
+         CALL iom_rstput( kt, nitrst, numrtw, 'TRN'//ctrcnm(jn), tr(:,:,:,jn,Kmm) )
       END DO
 
-      DO jn = jp_cfc0, jp_age1
-         CALL iom_rstput( kt, nitrst, numrtw, 'TRB'//ctrcnm(jn), trb(:,:,:,jn) )
+      IF ( .NOT. ln_top_euler ) THEN
+         DO jn = 1, jptra
+            CALL iom_rstput( kt, nitrst, numrtw, 'TRB'//ctrcnm(jn), tr(:,:,:,jn,Kmm) )
+         END DO
+      ENDIF
+
+      ! ugly patch for benthic vars
+      DO jn = 1, jp_bgc_b
+         CALL iom_rstput( kt, nitrst, numrtw, 'TRN'//ctrcnm_b(jn), tr_b(:,:,1,jn) )
       END DO
-      !
+
+      ! ph
+      CALL iom_rstput( kt, nitrst, numrtw, 'ph', ph(:,:,:) )
+
+      IF( .NOT. lwxios ) CALL iom_delay_rst( 'WRITE', 'TOP', numrtw )   ! save only TOP delayed global communication variables
+    
       IF( kt == nitrst ) THEN
-          CALL trc_rst_stat            ! statistics
-          CALL iom_close( numrtw )     ! close the restart file (only at last time step)
+          CALL trc_rst_stat( Kmm, Krhs )             ! statistics
+          IF(lwxios) THEN
+             CALL iom_context_finalize(      cw_toprst_cxt          )
+             iom_file(numrtw)%nfid       = 0
+             numrtw = 0
+          ELSE
+             CALL iom_close( numrtw )     ! close the restart file (only at last time step)
+          ENDIF
 #if ! defined key_trdmxl_trc
           lrst_trc = .FALSE.
 #endif
-          IF( lk_offline .AND. ln_rst_list ) THEN
+          IF( l_offline .AND. ln_rst_list ) THEN
              nrst_lst = nrst_lst + 1
-             nitrst = nstocklist( nrst_lst )
+             nitrst = nn_stocklist( nrst_lst )
           ENDIF
       ENDIF
       !
@@ -176,7 +228,7 @@ CONTAINS
       !!                   time step of previous run + 1.
       !!       In both those options, the  exact duration of the experiment
       !!       since the beginning (cumulated duration of all previous restart runs)
-      !!       is not stored in the restart and is assumed to be (nittrc000-1)*rdt.
+      !!       is not stored in the restart and is assumed to be (nittrc000-1)*rn_Dt.
       !!       This is valid is the time step has remained constant.
       !!
       !!       nn_rsttr = 2  the duration of the experiment in days (adatrj)
@@ -185,10 +237,10 @@ CONTAINS
       INTEGER         , INTENT(in) ::   kt         ! ocean time-step
       CHARACTER(len=*), INTENT(in) ::   cdrw       ! "READ"/"WRITE" flag
       !
-      INTEGER  ::  jlibalt = jprstlib
       LOGICAL  ::  llok
-      REAL(wp) ::  zkt, zrdttrc1
-      REAL(wp) ::  zndastp
+      REAL(wp) ::  zrdttrc1, zkt, zndastp, zdayfrac, ksecs, ktime
+      INTEGER  ::   ihour, iminute
+      CHARACTER(len=82) :: clpname
 
       ! Time domain : restart
       ! ---------------------
@@ -199,15 +251,20 @@ CONTAINS
          IF(lwp) WRITE(numout,*) 'trc_rst_cal : read the TOP restart file for calendar'
          IF(lwp) WRITE(numout,*) '~~~~~~~~~~~~'
 
-         IF ( jprstlib == jprstdimg ) THEN
-           ! eventually read netcdf file (monobloc)  for restarting on different number of processors
-           ! if {cn_trcrst_in}.nc exists, then set jlibalt to jpnf90 
-           INQUIRE( FILE = TRIM(cn_trcrst_indir)//'/'//TRIM(cn_trcrst_in)//'.nc', EXIST = llok )
-           IF ( llok ) THEN ; jlibalt = jpnf90  ; ELSE ; jlibalt = jprstlib ; ENDIF
-         ENDIF
-
          IF( ln_rsttr ) THEN
-            CALL iom_open( TRIM(cn_trcrst_indir)//'/'//cn_trcrst_in, numrtr, kiolib = jlibalt )
+            lxios_sini = .FALSE.
+            CALL iom_open( TRIM(cn_trcrst_indir)//'/'//cn_trcrst_in, numrtr )
+            IF( lrxios) THEN
+                cr_toprst_cxt = 'top_rst'
+                IF(lwp) WRITE(numout,*) 'Enable restart reading by XIOS for TOP'
+!               IF( TRIM(Agrif_CFixed()) == '0' ) THEN
+!                  clpname = cn_trcrst_in
+!               ELSE
+!                  clpname = TRIM(Agrif_CFixed())//"_"//cn_trcrst_in   
+!               ENDIF
+                CALL iom_init( cr_toprst_cxt, kdid = numrtr, ld_closedef = .TRUE. )
+            ENDIF
+
             CALL iom_get ( numrtr, 'kt', zkt )   ! last time-step of previous run
 
             IF(lwp) THEN
@@ -222,32 +279,64 @@ CONTAINS
                WRITE(numout,*)
             ENDIF
             ! Control of date 
-            IF( nittrc000  - NINT( zkt ) /= nn_dttrc .AND.  nn_rsttr /= 0 )                                  &
+            IF( nittrc000  - NINT( zkt ) /= 1 .AND.  nn_rsttr /= 0 )                                  &
                &   CALL ctl_stop( ' ===>>>> : problem with nittrc000 for the restart',                 &
                &                  ' verify the restart file or rerun with nn_rsttr = 0 (namelist)' )
          ENDIF
          !
-         IF( lk_offline ) THEN    
+         IF( l_offline ) THEN    
             !                                          ! set the date in offline mode
             IF( ln_rsttr .AND. nn_rsttr == 2 ) THEN
-               CALL iom_get( numrtr, 'ndastp', zndastp ) 
+               CALL iom_get( numrtr, 'ndastp', zndastp )
                ndastp = NINT( zndastp )
                CALL iom_get( numrtr, 'adatrj', adatrj  )
+               CALL iom_get( numrtr, 'ntime' , ktime   )
+               nn_time0=INT(ktime)
+               ! calculate start time in hours and minutes
+               zdayfrac=adatrj-INT(adatrj)
+               ksecs = NINT(zdayfrac*86400)            ! Nearest second to catch rounding errors in adatrj
+               ihour = INT(ksecs/3600)
+               iminute = ksecs/60-ihour*60
+                
+               ! Add to nn_time0
+               nhour   =   nn_time0 / 100
+               nminute = ( nn_time0 - nhour * 100 )
+               nminute=nminute+iminute
+               
+               IF( nminute >= 60 ) THEN
+                  nminute=nminute-60
+                  nhour=nhour+1
+               ENDIF
+               nhour=nhour+ihour
+               IF( nhour >= 24 ) THEN
+                  nhour=nhour-24
+                  adatrj=adatrj+1
+               ENDIF           
+               nn_time0 = nhour * 100 + nminute
+               adatrj = INT(adatrj)                    ! adatrj set to integer as nn_time0 updated            
              ELSE
-               ndastp = ndate0 - 1     ! ndate0 read in the namelist in dom_nam
-               adatrj = ( REAL( nittrc000-1, wp ) * rdttra(1) ) / rday
+               ndt05 = NINT( 0.5 * rn_Dt  )   !  --- WARNING --- not defined yet are we did not go through day_init
+               ! parameters corresponding to nit000 - 1 (as we start the step
+               ! loop with a call to day)
+               ndastp = ndate0        ! ndate0 read in the namelist in dom_nam
+               nhour   =   nn_time0 / 100
+               nminute = ( nn_time0 - nhour * 100 )
+               IF( nhour*3600+nminute*60-ndt05 .lt. 0 )  ndastp=ndastp-1      ! Start hour is specified in the namelist (default 0)
+               adatrj = ( REAL( nit000-1, wp ) * rn_Dt ) / rday
                ! note this is wrong if time step has changed during run
             ENDIF
+            IF( ABS(adatrj  - REAL(NINT(adatrj),wp)) < 0.1 / rday )   adatrj = REAL(NINT(adatrj),wp)   ! avoid truncation error
             !
             IF(lwp) THEN
               WRITE(numout,*) ' *** Info used values : '
               WRITE(numout,*) '   date ndastp                                      : ', ndastp
               WRITE(numout,*) '   number of elapsed days since the begining of run : ', adatrj
+              WRITE(numout,*) '   nn_time0                                         : ', nn_time0
               WRITE(numout,*)
             ENDIF
             !
-            IF( ln_rsttr )  THEN   ;    neuler = 1
-            ELSE                   ;    neuler = 0
+            IF( ln_rsttr )  THEN   ;    l_1st_euler = .false.
+            ELSE                   ;    l_1st_euler = .true.
             ENDIF
             !
             CALL day_init          ! compute calendar
@@ -261,21 +350,23 @@ CONTAINS
             IF(lwp) WRITE(numout,*) 'trc_wri : write the TOP restart file (NetCDF) at it= ', kt, ' date= ', ndastp
             IF(lwp) WRITE(numout,*) '~~~~~~~'
          ENDIF
-         CALL iom_rstput( kt, nitrst, numrtw, 'kt'     , REAL( kt    , wp) )   ! time-step
-         CALL iom_rstput( kt, nitrst, numrtw, 'ndastp' , REAL( ndastp, wp) )   ! date
-         CALL iom_rstput( kt, nitrst, numrtw, 'adatrj' , adatrj            )   ! number of elapsed days since
+         CALL iom_rstput( kt, nitrst, numrtw, 'kt'     , REAL( kt    , wp)   )   ! time-step
+         CALL iom_rstput( kt, nitrst, numrtw, 'ndastp' , REAL( ndastp, wp)   )   ! date
+         CALL iom_rstput( kt, nitrst, numrtw, 'adatrj' , adatrj              )   ! number of elapsed days since
          !                                                                     ! the begining of the run [s]
+         CALL iom_rstput( kt, nitrst, numrtw, 'ntime'  , REAL( nn_time0, wp) ) ! time
       ENDIF
 
    END SUBROUTINE trc_rst_cal
 
 
-   SUBROUTINE trc_rst_stat
+   SUBROUTINE trc_rst_stat( Kmm, Krhs )
       !!----------------------------------------------------------------------
       !!                    ***  trc_rst_stat  ***
       !!
       !! ** purpose  :   Compute tracers statistics
       !!----------------------------------------------------------------------
+      INTEGER, INTENT( in ) ::   Kmm, Krhs  ! time level indices
       INTEGER  :: jk, jn
       REAL(wp) :: ztraf, zmin, zmax, zmean, zdrift
       REAL(wp), DIMENSION(jpi,jpj,jpk) :: zvol
@@ -288,16 +379,16 @@ CONTAINS
       ENDIF
       !
       DO jk = 1, jpk
-         zvol(:,:,jk) = e1e2t(:,:) * fse3t_a(:,:,jk) * tmask(:,:,jk)
+         zvol(:,:,jk) = e1e2t(:,:) * e3t(:,:,jk,Krhs) * tmask(:,:,jk)
       END DO
       !
       DO jn = 1, jptra
-         ztraf = glob_sum( trn(:,:,:,jn) * zvol(:,:,:) )
-         zmin  = MINVAL( trn(:,:,:,jn), mask= ((tmask*SPREAD(tmask_i,DIM=3,NCOPIES=jpk).NE.0.)) )
-         zmax  = MAXVAL( trn(:,:,:,jn), mask= ((tmask*SPREAD(tmask_i,DIM=3,NCOPIES=jpk).NE.0.)) )
+         ztraf = glob_sum( 'trcrst', tr(:,:,:,jn,Kmm) * zvol(:,:,:) )
+         zmin  = MINVAL( tr(:,:,:,jn,Kmm), mask= ((tmask*SPREAD(tmask_i,DIM=3,NCOPIES=jpk).NE.0.)) )
+         zmax  = MAXVAL( tr(:,:,:,jn,Kmm), mask= ((tmask*SPREAD(tmask_i,DIM=3,NCOPIES=jpk).NE.0.)) )
          IF( lk_mpp ) THEN
-            CALL mpp_min( zmin )      ! min over the global domain
-            CALL mpp_max( zmax )      ! max over the global domain
+            CALL mpp_min( 'trcrst', zmin )      ! min over the global domain
+            CALL mpp_max( 'trcrst', zmax )      ! max over the global domain
          END IF
          zmean  = ztraf / areatot
          zdrift = ( ( ztraf - trai(jn) ) / ( trai(jn) + 1.e-12 )  ) * 100._wp
@@ -314,17 +405,19 @@ CONTAINS
    !!  Dummy module :                                     No passive tracer
    !!----------------------------------------------------------------------
 CONTAINS
-   SUBROUTINE trc_rst_read                      ! Empty routines
+   SUBROUTINE trc_rst_read( Kbb, Kmm)                      ! Empty routines
+      INTEGER, INTENT( in ) :: Kbb, Kmm  ! time level indices
    END SUBROUTINE trc_rst_read
-   SUBROUTINE trc_rst_wri( kt )
-      INTEGER, INTENT ( in ) :: kt
+   SUBROUTINE trc_rst_wri( kt, Kbb, Kmm, Krhs )
+      INTEGER, INTENT( in ) :: kt
+      INTEGER, INTENT( in ) :: Kbb, Kmm, Krhs  ! time level indices
       WRITE(*,*) 'trc_rst_wri: You should not have seen this print! error?', kt
    END SUBROUTINE trc_rst_wri   
 #endif
 
    !!----------------------------------------------------------------------
-   !! NEMO/TOP 3.3 , NEMO Consortium (2010)
-   !! $Id$
-   !! Software governed by the CeCILL licence (NEMOGCM/NEMO_CeCILL.txt)
+   !! NEMO/TOP 4.0 , NEMO Consortium (2018)
+   !! $Id: trcrst.F90 14239 2020-12-23 08:57:16Z smasson $
+   !! Software governed by the CeCILL license (see ./LICENSE)
    !!======================================================================
 END MODULE trcrst

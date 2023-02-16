@@ -1,48 +1,42 @@
-#include "cppdefs.h"
-
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-!BOP
 !
-! !ROUTINE: Air-Sea flux Exchange
+! ROUTINE: Air-Sea flux Exchange
 !
 ! DESCRIPTION
-!   ! compute Air-Sea CO2 Exchange
-
-! !INTERFACE
-Module AirSeaExchange
+!   Compute Air-Sea CO2 exchanges
 !
-! !USES:
+! COPYING
+!
+!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU General Public License for more details.
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! INCLUDE
+#include "cppdefs.h"
+!
+! INTERFACE
+  module AirSeaExchange
+!
+! USES
   use global_mem, ONLY: RLEN,ONE,ZERO
   use constants,  ONLY: HOURS_PER_DAY,ZERO_KELVIN
 
   IMPLICIT NONE
-!
-! !AUTHORS
-!   T. Lovato (CMCC) 2017
-!
-! !REVISION_HISTORY
-!
-! COPYING
-!   
-!   Copyright (C) 2020 BFM System Team (bfm_st@cmcc.it)
-!
-!   This program is free software; you can redistribute it and/or modify
-!   it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation;
-!   This program is distributed in the hope that it will be useful,
-!   but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-!   GNU General Public License for more details.
-!
-!EOP
-!-------------------------------------------------------------------------!
-!BOC
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   public AirSeaCO2, AirpGas
 
  contains
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
   elemental function AirSeaCO2(xco2,patm,temp,salt,rho,wind,Fice,co2ocn)
   ! 
     implicit none
@@ -150,7 +144,7 @@ Module AirSeaExchange
   end function AirpGas
 
 end module AirSeaExchange
-!EOC
+
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model 
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

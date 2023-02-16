@@ -26,6 +26,7 @@
 ! ** Giulia Mussap and Nadia Pinardi. However, previous       **
 ! ** significant contributions were provided also by          **
 ! ** Momme Butenschoen and Marcello Vichi.                    **
+! ** Subsequent maintance by Lorenzo Mentaschi.               **
 ! ** Thanks are due to Prof. George L. Mellor that allowed us **
 ! ** to modify, use and distribute the one dimensional        **
 ! ** version of the Princeton Ocean Model.                    **
@@ -71,7 +72,8 @@
                   ihotst,  &
                   ALAT,    &
                   ZZ,      &
-                  DZZ
+                  DZZ,     &
+                  NC_OUT_STARTTIME
 !
    use global_mem, ONLY:ZERO, &
                         RLEN
@@ -80,7 +82,7 @@
 !
    use init_var_bfm_local
 !
-   use Service, ONLY: savef
+   use CPL_VARIABLES, ONLY: savef
 !
    use netcdf_bfm, ONLY: init_netcdf_bfm,     &
                          init_save_bfm,       &
@@ -143,7 +145,7 @@
    BOTmask = .TRUE.
    SRFmask = .TRUE.
 !
-!  -----ALLOCATE SERVICE ARRAY AND INITIALISE (ZEROING)-----
+!  -----ALLOCATE CPL_VARIABLES ARRAY AND INITIALISE (ZEROING)-----
 !
    allocate(ZEROS(NO_BOXES_X,NO_BOXES_Y,NO_BOXES_Z)) 
    ZEROS = ZERO
@@ -256,7 +258,7 @@
 !    -----SET THE THICKNESS OF THE WATER COLUMN LAYERS-----
 !
     do k = 1 , NO_BOXES_Z
-       Depth(k) = dz(k)*h
+       Depth(k) = abs(dz(k)*h)
     end do
 !
 !  -----INITIALISE THE OUTPUT TIME AVERAGING PROCEDURE-----
@@ -266,7 +268,7 @@
 !  -----INITIALISE NETCDF OUTPUT-----
 !
    call init_netcdf_bfm(title=out_title,                      &
-                        start_time='01-01-0000',              &
+                        start_time=TRIM(NC_OUT_STARTTIME),              &
                         expinfo="BFM_POM",                    &
                         time_unit=0,                          &
                         lat=alat,                             &
@@ -288,21 +290,17 @@
 !  *******************************************************************
 !  *******************************************************************
 !
-   allocate(D3STATEB(NO_D3_BOX_STATES,NO_BOXES)) !PELAGIC
+   allocate(D3STATEB(NO_BOXES,NO_D3_BOX_STATES)) !PELAGIC
 !
 !  -----ZEROING-----
 !
    D3STATEB = ZERO
 !
-   allocate(D2STATEB_BEN(NO_D2_BOX_STATES_BEN,NO_BOXES_XY)) ! BENTHIC
+   allocate(D2STATEB_BEN(NO_BOXES_XY,NO_D2_BOX_STATES_BEN)) ! BENTHIC
 !
 !  -----ZEROING-----
 !
    D2STATEB_BEN = ZERO
-!
-!  -----DEFINE BETTER INITIAL CONDITIONS-----
-!
-   !call set_initial_conditions
 !
 !  -----SAVE INITIAL CONDITIONS IN OUTPUT FILE-----
 !
@@ -323,7 +321,7 @@ if (bfm_init == 1) call read_rst_bfm(in_rst_fname)
 !      -----INITIALISE BFM RESTART FILE-----
 !
        call init_netcdf_rst_bfm(out_rst_fname,                            &
-                                start_time='01-01-0000',              &
+                                start_time=TRIM(NC_OUT_STARTTIME),              &
                                 time_unit=0,                          &
                                 lat=alat,                             &
                                 lon=alon,                             &

@@ -6,7 +6,7 @@
 #
 # COPYING
 #   
-#   Copyright (C) 2020 BFM System Team (bfm_st@cmcc.it)
+#   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
 #                                                                                                     
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -25,12 +25,11 @@
 #  BENTHIC_BIO      : use Intermediate complexity Benthic system
 #  BENTHIC_FULL     : use High-level complexity Benthic system
 #  INCLUDE_BENCO2   : activate Benthic Carbonate System and CO2 dynamics 
-#  EXPLICIT_SINK    : use of D3SOURCE and D3SINK
 #  INCLUDE_BENPROFILES : Compute vertical proiles of benthic states
 
 &BFM_conf
         MODE    = 'STANDALONE',
-        CPPDEFS = 'BFM_STANDALONE INCLUDE_PELCO2 INCLUDE_DIAG BENTHIC_BIO',
+        CPPDEFS = 'BFM_STANDALONE INCLUDE_PELCO2 BENTHIC_BIO',
         ARCH    = 'gfortran.inc',
         PROC    = 4,
         EXP     = 'standalone.benthic',

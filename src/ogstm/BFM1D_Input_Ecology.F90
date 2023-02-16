@@ -1,6 +1,29 @@
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! ROUTINE: BFM1D_Input_EcologyDynamics
+!
+! DESCRIPTION
+!   Interface to receive inputs from ogstm
+!
+! COPYING
+!
+!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU General Public License for more details.
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+
 #include"cppdefs.h"
 !
-subroutine BFM1D_Input_EcologyDynamics(bot,BFM1D_trn,dim_BFM1D_trn,BFM1D_er)
+subroutine BFM1D_Input_EcologyDynamics(bot,BFM1D_er)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -11,20 +34,17 @@ subroutine BFM1D_Input_EcologyDynamics(bot,BFM1D_trn,dim_BFM1D_trn,BFM1D_er)
   use mem
   use mem_CO2
 
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! Implicit typing is never allowed
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   IMPLICIT NONE
 
   integer   , intent(in) :: bot
   integer dim_BFM1D_trn
-!  real(RLEN), intent(in) :: BFM1D_trn(dim_BFM1D_trn,NO_BOXES),BFM1D_er(NO_BOXES,10)
-  real(RLEN), intent(in) :: BFM1D_trn(NO_BOXES,dim_BFM1D_trn),BFM1D_er(NO_BOXES,10)
+  real(RLEN), intent(in) :: BFM1D_er(NO_BOXES,11)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Local Variables
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   integer i,ib
+  real(RLEN) bottom
 
 
  !      BOTindices(:) = 0
@@ -39,36 +59,33 @@ subroutine BFM1D_Input_EcologyDynamics(bot,BFM1D_trn,dim_BFM1D_trn,BFM1D_er)
 !  ENDDO
 
 
-  DO ib=1,NO_BOXES
-  DO i=1,dim_BFM1D_trn
-      D3STATE(i,ib)=BFM1D_trn(ib,i)
-  END DO
+!  DO ib=1,NO_BOXES
+!  DO i=1,dim_BFM1D_trn
+!      D3STATE(ib,i)=BFM1D_trn(ib,i)
+!  END DO
 !       LEVEL1
 !       'BFM1D_Input_EcologyDynamics:D3STATE(',i,')=',D3STATE(i,1) 
-  END DO
+!  END DO
 
   ! Environmental regulating factors
   ETW(:)    = BFM1D_er(:,1)
-! LEVEL1 'BFM1D_Input_EcologyDynamics:ETW', ETW
-  ESW(:)   = BFM1D_er(:,2)
-! LEVEL1 'BFM1D_Input_EcologyDynamics:ESW', ESW
+  ESW(:)    = BFM1D_er(:,2)
   ERHO(:)   = BFM1D_er(:,3)
-! LEVEL1 'BFM1D_Input_EcologyDynamics:ERHO', ERHO
-  EICE(:)   = BFM1D_er(:,4)
-! LEVEL1 'BFM1D_Input_EcologyDynamics:EICE', EICE
+  EICE(:)   = BFM1D_er(1,4)
 #ifdef INCLUDE_PELCO2
-  AtmCO2%fnow(:) = BFM1D_er(:,5)
-! LEVEL1 'BFM1D_Input_EcologyDynamics:EPCO2air', EPCO2air
+  AtmCO2%fnow(:) = BFM1D_er(1,5)
 #endif
   EIR(:)    = BFM1D_er(:,6)
-! LEVEL1 'BFM1D_Input_EcologyDynamics:EIR', EIR
-  SUNQ(:)   = BFM1D_er(:,7)
-! LEVEL1 'BFM1D_Input_EcologyDynamics:DL', SUNQ
+  SUNQ(:)   = BFM1D_er(1,7)
   DEPTH(:)  = BFM1D_er(:,8)
-! LEVEL1 'BFM1D_Input_EcologyDynamics:DEPTH', DEPTH
-  EWIND(:)  = BFM1D_er(:,9)
-! LEVEL1 'BFM1D_Input_EcologyDynamics:EWIND,', EWIND
+  EWIND(:)  = BFM1D_er(1,9)
   ph(:)     = BFM1D_er(:,10)
-! LEVEL1 'BFM1D_Input_EcologyDynamics:PH,', ph
+  BAC_ACT_FACT(:) = BFM1D_er(:,11)
 
+  bottom=0
+  DO ib=1,NO_BOXES
+     bottom = bottom + DEPTH(ib)
+     EPR(ib) = bottom - DEPTH(ib)/2
+  ENDDO
+  ! LEVEL1 'BFM1D_Input_EcologyDynamics:ETW', ETW
 end subroutine BFM1D_Input_EcologyDynamics

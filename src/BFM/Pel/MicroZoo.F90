@@ -1,23 +1,33 @@
-#include "DEBUG.h"
-#include "INCLUDE.h"
-
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-!BOP
 !
-! !ROUTINE: MicroZoo
+! ROUTINE: MicroZoo
 !
 ! DESCRIPTION
 !  Microzooplankton dynamics
 !
-! !INTERFACE
+! COPYING
+!
+!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU General Public License for more details.
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! INCLUDE
+#include "DEBUG.h"
+#include "INCLUDE.h"
+!
+! INTERFACE
   subroutine MicroZooDynamics(zoo)
 !
-! !USES:
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! Modules (use of ONLY is strongly encouraged!)
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+! USES
   use global_mem, ONLY:RLEN,ZERO,ONE
   use constants,  ONLY:MW_C,C2ALK
 #ifdef NOPOINTERS
@@ -40,48 +50,14 @@
   use mem_Param,     ONLY: p_pe_R1c, p_pe_R1n, p_pe_R1p, p_small
   use bfm_error_msg, ONLY: bfm_error
   use mem_MicroZoo
-
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! The following vector functions are used
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   use mem_globalfun,   ONLY: eTq, MM, fixratio
 
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! Implicit typing is never allowed
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   IMPLICIT NONE
-! !INPUT:
+
+  ! INPUT
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   integer,intent(IN)  :: zoo
-!
-!
-! !AUTHORS
-!   First ERSEM version by H. Baretta-Bekker and J.W. Baretta
-!   Additional parametrizations by P. Ruardij and M. Vichi 
-!   Dynamical allocation by G. Mattia 
-!
-! !REVISION_HISTORY
-!   !
-!
-! COPYING
-!   
-!   Copyright (C) 2020 BFM System Team (bfm_st@cmcc.it)
-!   Copyright (C) 2006 P. Ruardij, M. Vichi
-!   (rua@nioz.nl, vichi@bo.ingv.it)
-!
-!   This program is free software; you can redistribute it and/or modify
-!   it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation;
-!   This program is distributed in the hope that it will be useful,
-!   but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-!   GNU General Public License for more details.
-!
-!EOP
-!-------------------------------------------------------------------------!
-!BOC
-!
-!
+
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Local Variables
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -133,7 +109,7 @@
   ppzooc = ppMicroZooPlankton(zoo,iiC)
   ppzoon = ppMicroZooPlankton(zoo,iiN)
   ppzoop = ppMicroZooPlankton(zoo,iiP)
-  zooc = D3STATE(ppzooc,:)
+  zooc = D3STATE(:,ppzooc)
 
   ! Quota collectors
   tfluxC = ZERO
@@ -190,30 +166,30 @@
   do i = 1, iiPelBacteria
     ruPBAc = sut*PBAc(:,i)
     call quota_flux(iiPel, ppzooc, ppPelBacteria(i,iiC), ppzooc, ruPBAc            , tfluxC)
-    call quota_flux(iiPel, ppzoon, ppPelBacteria(i,iiN), ppzoon, ruPBAc*qncPBA(i,:), tfluxN)
-    call quota_flux(iiPel, ppzoop, ppPelBacteria(i,iiP), ppzoop, ruPBAc*qpcPBA(i,:), tfluxP)
-    rugn = rugn + ruPBAc*qncPBA(i,:)
-    rugp = rugp + ruPBAc*qpcPBA(i,:)
+    call quota_flux(iiPel, ppzoon, ppPelBacteria(i,iiN), ppzoon, ruPBAc*qncPBA(:,i), tfluxN)
+    call quota_flux(iiPel, ppzoop, ppPelBacteria(i,iiP), ppzoop, ruPBAc*qpcPBA(:,i), tfluxP)
+    rugn = rugn + ruPBAc*qncPBA(:,i)
+    rugp = rugp + ruPBAc*qpcPBA(:,i)
   end do
   ! Phytoplankton
   do i = 1, iiPhytoPlankton
     ruPPYc = sut*PPYc(:,i)
     call quota_flux(iiPel, ppzooc, ppPhytoPlankton(i,iiC), ppzooc, ruPPYc            , tfluxC)
-    call quota_flux(iiPel, ppzoon, ppPhytoPlankton(i,iiN), ppzoon, ruPPYc*qncPPY(i,:), tfluxN)
-    call quota_flux(iiPel, ppzoop, ppPhytoPlankton(i,iiP), ppzoop, ruPPYc*qpcPPY(i,:), tfluxP)
-    rugn = rugn + ruPPYc*qncPPY(i,:)
-    rugp = rugp + ruPPYc*qpcPPY(i,:)
+    call quota_flux(iiPel, ppzoon, ppPhytoPlankton(i,iiN), ppzoon, ruPPYc*qncPPY(:,i), tfluxN)
+    call quota_flux(iiPel, ppzoop, ppPhytoPlankton(i,iiP), ppzoop, ruPPYc*qpcPPY(:,i), tfluxP)
+    rugn = rugn + ruPPYc*qncPPY(:,i)
+    rugp = rugp + ruPPYc*qpcPPY(:,i)
     ! Chl is transferred to the infinite sink
     call flux_vector(iiPel, ppPhytoPlankton(i,iiL), &
-               ppPhytoPlankton(i,iiL), -ruPPYc*qlcPPY(i,:))
+               ppPhytoPlankton(i,iiL), -ruPPYc*qlcPPY(:,i))
     ! silicon constituent is transferred to biogenic silicate
     if ( ppPhytoPlankton(i,iiS) .gt. 0 ) & 
-       call flux_vector(iiPel, ppPhytoPlankton(i,iiS), ppR6s, ruPPYc*qscPPY(i,:))
+       call flux_vector(iiPel, ppPhytoPlankton(i,iiS), ppR6s, ruPPYc*qscPPY(:,i))
                               
 #ifdef INCLUDE_PELFE
     ! Fe constituent is transferred to particulate iron
     if ( ppPhytoPlankton(i,iiF) .gt. 0 ) & 
-       call flux_vector(iiPel, ppPhytoPlankton(i,iiF), ppR6f, ruPPYc*qfcPPY(i,:))
+       call flux_vector(iiPel, ppPhytoPlankton(i,iiF), ppR6f, ruPPYc*qfcPPY(:,i))
 #endif
 
 #if defined INCLUDE_PELCO2
@@ -224,8 +200,8 @@
     ! that only a portion is egested
     ! Calcite production is parameterized as a flux between DIC and PIC
     ! that affects alkalinity
-    call flux_vector( iiPel, ppO3c,ppO5c, p_pecaco3(zoo)*ruPPYc*qccPPY(i,:))
-    call flux_vector( iiPel, ppO3h,ppO3h, -C2ALK*p_pecaco3(zoo)*ruPPYc*qccPPY(i,:))
+    call flux_vector( iiPel, ppO3c,ppO5c, p_pecaco3(zoo)*ruPPYc*qccPPY(:,i))
+    call flux_vector( iiPel, ppO3h,ppO3h, -C2ALK*p_pecaco3(zoo)*ruPPYc*qccPPY(:,i))
 #endif
 
   end do
@@ -235,11 +211,11 @@
     ! Note that intra-group predation (cannibalism) is not added as a flux
     if ( i/= zoo) then
        call quota_flux(iiPel, ppzooc, ppMicroZooPlankton(i,iiC), ppzooc, ruMIZc            , tfluxC)
-       call quota_flux(iiPel, ppzoon, ppMicroZooPlankton(i,iiN), ppzoon, ruMIZc*qncMIZ(i,:), tfluxN)
-       call quota_flux(iiPel, ppzoop, ppMicroZooPlankton(i,iiP), ppzoop, ruMIZc*qpcMIZ(i,:), tfluxP)
+       call quota_flux(iiPel, ppzoon, ppMicroZooPlankton(i,iiN), ppzoon, ruMIZc*qncMIZ(:,i), tfluxN)
+       call quota_flux(iiPel, ppzoop, ppMicroZooPlankton(i,iiP), ppzoop, ruMIZc*qpcMIZ(:,i), tfluxP)
     end if
-    rugn = rugn + ruMIZc*qncMIZ(i,:)
-    rugp = rugp + ruMIZc*qpcMIZ(i,:)
+    rugn = rugn + ruMIZc*qncMIZ(:,i)
+    rugp = rugp + ruMIZc*qpcMIZ(:,i)
   end do
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -280,7 +256,7 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Organic Nitrogen dynamics
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  rrin = rugn*p_pu_ea(zoo) + rdc*qncMIZ(zoo,:)
+  rrin = rugn*p_pu_ea(zoo) + rdc*qncMIZ(:,zoo)
   rr1n = rrin*p_pe_R1n
   rr6n = rrin - rr1n
   call quota_flux(iiPel, ppzoon, ppzoon, ppR1n, rr1n, tfluxN)
@@ -289,7 +265,7 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Organic Phosphorus dynamics
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  rrip = rugp*p_pu_ea(zoo) + rdc*qpcMIZ(zoo,:)
+  rrip = rugp*p_pu_ea(zoo) + rdc*qpcMIZ(:,zoo)
   rr1p = rrip*p_pe_R1p
   rr6p = rrip - rr1p
   call quota_flux(iiPel, ppzoop, ppzoop, ppR1p, rr1p, tfluxP)
@@ -300,8 +276,8 @@
   ! Compare the quota of the net growth rates with the optimal quota
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   runc = max(ZERO, rugc*(ONE - p_pu_ea(zoo)) - rrac)
-  runn = max(ZERO, rugn*(ONE - p_pu_ea(zoo)) + rrsc*qncMIZ(zoo,:))
-  runp = max(ZERO, rugp*(ONE - p_pu_ea(zoo)) + rrsc*qpcMIZ(zoo,:))
+  runn = max(ZERO, rugn*(ONE - p_pu_ea(zoo)) + rrsc*qncMIZ(:,zoo))
+  runp = max(ZERO, rugp*(ONE - p_pu_ea(zoo)) + rrsc*qpcMIZ(:,zoo))
   ren  = max(ZERO, runn/(p_small + runc) - p_qncMIZ(zoo))* runc
   rep  = max(ZERO, runp/(p_small + runc) - p_qpcMIZ(zoo))* runc
   call quota_flux(iiPel, ppzoon, ppzoon, ppN4n, ren, tfluxN)
@@ -313,7 +289,7 @@
      ! Eliminate the excess of the non-limiting constituent under fixed quota
      ! Determine release due to either C, P, or N limitation
      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-     call fixratio(tfluxC,tfluxN,tfluxP,qncMIZ(zoo,:),qpcMIZ(zoo,:),pe_R6c, pe_N4n, pe_N1p)
+     call fixratio(tfluxC,tfluxN,tfluxP,qncMIZ(:,zoo),qpcMIZ(:,zoo),pe_R6c, pe_N4n, pe_N1p)
 
      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
      ! Apply the correction terms depending on the limiting constituent

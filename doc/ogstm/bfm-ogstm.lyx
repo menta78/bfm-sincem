@@ -1,7 +1,9 @@
-#LyX 2.1 created this file. For more info see http://www.lyx.org/
-\lyxformat 474
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
 \begin_document
 \begin_header
+\save_transient_properties true
+\origin unavailable
 \textclass scrbook
 \begin_preamble
 \usepackage{listings}
@@ -48,16 +50,18 @@ eqs-within-sections
 \language_package default
 \inputencoding auto
 \fontencoding global
-\font_roman times
-\font_sans helvet
-\font_typewriter courier
-\font_math auto
+\font_roman "times" "default"
+\font_sans "helvet" "default"
+\font_typewriter "courier" "default"
+\font_math "auto" "auto"
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
-\font_sf_scale 100
-\font_tt_scale 100
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -87,6 +91,7 @@ eqs-within-sections
 \suppress_date true
 \justification true
 \use_refstyle 0
+\use_minted 0
 \index Index
 \shortcut idx
 \color #008000
@@ -99,7 +104,10 @@ eqs-within-sections
 \tocdepth 3
 \paragraph_separation indent
 \paragraph_indentation default
-\quotes_language english
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
 \papercolumns 2
 \papersides 2
 \paperpagestyle headings
@@ -133,14 +141,18 @@ begin{titlepage}
 \end_inset
 
 
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
 \align center
 \begin_inset Graphics
-	filename Figures/all_logos.png
-	lyxscale 25
-	scale 50
+	filename ../logos/BFM-Consortium_members.png
+	lyxscale 15
+	scale 40
 
 \end_inset
 
@@ -225,12 +237,12 @@ P.
 
 \begin_layout Standard
 \align center
-DRAFT REVISION Release 1.0, March 2016
+Release 2.0, February 2023
 \begin_inset Newline newline
 \end_inset
 
------ BFM Report series N.
- 3 -----
+—– BFM Report series N.
+ 3 —–
 \begin_inset Newline newline
 \end_inset
 
@@ -248,7 +260,7 @@ http://bfm-community.eu
 \begin_inset Newline newline
 \end_inset
 
-info@bfm-community.eu
+bfm_st@cmcc.it
 \end_layout
 
 \begin_layout Standard
@@ -276,8 +288,8 @@ height "1pt"
 
 
 \begin_inset Graphics
-	filename Figures/BFM-gray.png
-	lyxscale 10
+	filename ../logos/BFM_Full_logo.png
+	lyxscale 40
 	width 50text%
 
 \end_inset
@@ -314,9 +326,9 @@ This document should be cited as:
 \end_inset
 
 Lazzari, P., Bolzon, G.
- (2016) Coupling BFM with OGSTM model Release 1.0; BFM Report series N.
+ (2022) Coupling BFM with OGSTM model Release 2.0; BFM Report series N.
  3.
- March 2016, Trieste, Italy, http://bfm-community.eu
+ October 2022, Trieste, Italy, http://bfm-community.eu
 \end_layout
 
 \begin_layout Address
@@ -325,7 +337,7 @@ Lazzari, P., Bolzon, G.
 \begin_inset VSpace 13cm
 \end_inset
 
-Copyright 2016, The BFM System Team.
+Copyright 2022, The BFM System Team.
  This work is licensed under the Creative Commons Attribution-Noncommercial-No
  Derivative Works 2.5 License.
  To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-
@@ -401,13 +413,21 @@ where
  of ordinary differential equations that express the transformation fluxes
  of biogeochemical properties in the marine environment.
  The BFM formualtion and the standalone implementation are described in
- full details in the BFM manual.
+ full details in the BFM manual 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "BFM-manual"
+literal "false"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
 In the present version OGSTM uses a Smolarkiewicz scheme to solve advection
  and a bilaplacian scheme for horizontal diffusion.
- Advection, horzintal diffusion and biological transformations are integrated
+ Advection, horzointal diffusion and biological transformations are integrated
  in time using an euler forward time step while vertical diffusion is solved
  by means of an implicit scheme.
  
@@ -466,7 +486,7 @@ status open
 
 \begin_layout Plain Layout
 
-BIO	General	IO	MPI	PHYS	namelists
+BC	BIO	DA	General	IO	MPI	PHYS	namelists
 \end_layout
 
 \end_inset
@@ -475,16 +495,8 @@ BIO	General	IO	MPI	PHYS	namelists
 \end_layout
 
 \begin_layout Standard
-the coupling elements are presents in the 
-\begin_inset Quotes eld
-\end_inset
-
-General
-\begin_inset Quotes erd
-\end_inset
-
- directory for the initialization and finalization files, and in the BIO
- directory for the stepping phase.
+the coupling elements are presents in the General/ directory for the initializat
+ion and finalization files, and in the BIO directory for the stepping phase.
 \end_layout
 
 \begin_layout Section
@@ -492,7 +504,8 @@ Coupling in terms of coding
 \end_layout
 
 \begin_layout Standard
-The approach used to couple the pelagic component of the BFM is a 0D approach.
+The approach used to couple the pelagic component of the BFM is a 1D approach,
+ based on sea water columns.
  In particular the BFM is invoked as an external library totally independent
  from the host three-dimensional model.
  The coupling is realized in each of the three principal sections of the
@@ -512,7 +525,8 @@ the finalization routine.
 \end_layout
 
 \begin_layout Standard
-The BFM initialization calls are in the ogstm_initialize subroutine:
+The BFM initialization calls are in the ogstm_initialize subroutine inside
+ General/ogstm.f90:
 \end_layout
 
 \begin_layout Standard
@@ -523,22 +537,40 @@ status open
 
 \begin_layout Plain Layout
 
-! Initialization of Biogeochemical reactor with 0D approach
+! Initialization of Biogeochemical reactor with 1D approach
 \end_layout
 
 \begin_layout Plain Layout
 
-      call BFM0D_NO_BOXES(1,1,1,1,1)
 \end_layout
 
 \begin_layout Plain Layout
 
-      call BFM0D_INIT_IO_CHANNELS()
+      call BFM1D_NO_BOXES(jpk,1,1,jpk,1)
+\end_layout
+
+\begin_layout Plain Layout
+
+      parallel_rank=myrank
+\end_layout
+
+\begin_layout Plain Layout
+
+      call Init_bfm()
+\end_layout
+
+\begin_layout Plain Layout
+
+      call BFM1D_INIT_IO_CHANNELS()
 \end_layout
 
 \begin_layout Plain Layout
 
       call Initialize()
+\end_layout
+
+\begin_layout Plain Layout
+
 \end_layout
 
 \end_inset
@@ -547,18 +579,16 @@ status open
 \end_layout
 
 \begin_layout Standard
-The BMF0D_NO_BOXES() subroutine essentially tells to the BFM library that
+The BFM1D_NO_BOXES() subroutine essentially tells to the BFM library that
  it has to allocate a one dimensional spatial box.
- The BFM0D_INIT_IO_CHANNELS() initialize the IO for the ascii BFM files.
+ The BFM1D_INIT_IO_CHANNELS() initialize the IO for the ascii BFM files.
  The Initialize() subroutine allocates the internal memory of the BFM library.
  In the top call, the ogstm() subroutine, an 
-\begin_inset Quotes eld
-\end_inset
-
+\family sans
+\shape italic
 use
-\begin_inset Quotes erd
-\end_inset
-
+\family default
+\shape default
  statement including all the BFM modules (#include "BFM_module_list.h") is
  present in order to force the consistency of allocated memory in all the
  following subroutines called in the algorithm tree.
@@ -574,10 +604,10 @@ step
 \begin_inset Quotes erd
 \end_inset
 
- phase, in the trcbio.F subroutine, the following peaces of code are inside
- a loop on ji, jj, jk index (zonal, meridional and vertical indexes).
+ phase, in the src/BIO/trcbio.f90 subroutine, the following pieces of code
+ are inside a loop on ji, jj index (zonal and meridional indexes).
  As shown in the panel the loop on tracers index, jtr, put all the tracer
- state vector for a single cell in the 3D domain in the one dimensional
+ state vector for a single column of the 3D domain in the two dimensional
  vector a.
  Moreover the environmental regulator vector (er) is assigned with the values
  of the parameters needed by BFM.
@@ -596,8 +626,8 @@ status open
 
 \begin_layout Plain Layout
 
-           a(jtr) = trn(ji,jj,jk,jtr) ! current biogeochemical concentrations
-                           
+           a(1:bottom, jtr) = trn(1:bottom,jj,ji,jtr) ! current biogeochemical
+ concentrations
 \end_layout
 
 \begin_layout Plain Layout
@@ -616,58 +646,118 @@ status open
 
 \begin_layout Plain Layout
 
+er(1:bottom,1)  = tn (1:bottom,jj,ji)      ! Temperature (Celsius)
 \end_layout
 
 \begin_layout Plain Layout
 
-      er(1)  = tn (ji,jj,jk)               ! temperature in degrees Celsius
+er(1:bottom,2)  = sn (1:bottom,jj,ji)      ! Salinity PSU
 \end_layout
 
 \begin_layout Plain Layout
 
-      er(2)  = sn (ji,jj,jk)               ! salinity PSU
+er(1:bottom,3)  = rho(1:bottom,jj,ji)      ! Density Kg/m3
 \end_layout
 
 \begin_layout Plain Layout
 
-      er(3)  = rho(ji,jj,jk)               ! density in-situ (kg/m3)
+er(1       ,4)  = ice                      ! from 0 to 1 adimensional
 \end_layout
 
 \begin_layout Plain Layout
 
-      er(4)  = ice                         ! Ice coverage [0,1] adimensional
+er(1       ,5)  = ogstm_co2(jj,ji)         ! CO2 Mixing Ratios (ppm)
 \end_layout
 
 \begin_layout Plain Layout
 
-      er(5)  = co2(ji,jj)                  ! CO2 Mixing Ratios (ppm)
+do jk=1, bottom
 \end_layout
 
 \begin_layout Plain Layout
 
-      er(6)  = xpar(ji,jj,jk)              ! PAR umoles/m2/s, Watt to umoles
- photons W2E=1./0.217 
+  er(jk,6) = instant_par(COMMON_DATEstring,xpar(jk,jj,ji))  ! PAR umoles/m2/s
+ | Watt to umoles photons W2E=1./0.217                           enddo
 \end_layout
 
 \begin_layout Plain Layout
 
-      er(7)  = DAY_LENGTH(ji,jj)           ! Photoperiod expressed in hours
+er(1       ,7)  = DAY_LENGTH(jj,ji)        ! fotoperiod expressed in hours
 \end_layout
 
 \begin_layout Plain Layout
 
-      er(8)  = e3t(jk)                     ! Thickness in meters of the
+er(1:bottom,8)  = e3t(1:bottom,jj,ji)      ! depth in meters of the given
  cell
 \end_layout
 
 \begin_layout Plain Layout
 
-      er(9)  = vatm(ji,jj) * surf_mask(jk) ! wind speed (m/s)
+er(1       ,9)  = vatm(jj,ji)              ! wind speed (m/s)
 \end_layout
 
 \begin_layout Plain Layout
 
-     er(10) = PH(ji,jj,jk)                 ! pH
+er(1:bottom,10) = ogstm_PH(1:bottom,jj,ji) ! 8.1
+\end_layout
+
+\begin_layout Plain Layout
+
+do jk=1,bottom
+\end_layout
+
+\begin_layout Plain Layout
+
+   correct_fact= 1.0D0  
+\end_layout
+
+\begin_layout Plain Layout
+
+   if ( (gdept(jk,jj,ji) .GT.
+ 1000.0D0 ) .AND.
+  (gdept(jk,jj,ji) .LT.
+ 2000.0D0)) then
+\end_layout
+
+\begin_layout Plain Layout
+
+     correct_fact= 0.25D0
+\end_layout
+
+\begin_layout Plain Layout
+
+   endif
+\end_layout
+
+\begin_layout Plain Layout
+
+   if (gdept(jk,jj,ji) .GE.
+ 2000.0D0 ) then
+\end_layout
+
+\begin_layout Plain Layout
+
+     correct_fact= 0.0D0
+\end_layout
+
+\begin_layout Plain Layout
+
+   endif
+\end_layout
+
+\begin_layout Plain Layout
+
+   er(jk,11) = correct_fact * ( gdept(jpk,jj,ji)-gdept(jk,jj,ji) ) /gdept(jpk,jj
+,ji)
+\end_layout
+
+\begin_layout Plain Layout
+
+enddo
+\end_layout
+
+\begin_layout Plain Layout
+
 \end_layout
 
 \end_inset
@@ -677,24 +767,16 @@ status open
 
 \begin_layout Standard
 the tracer state vector 
-\begin_inset Quotes eld
-\end_inset
-
+\shape italic
 a
-\begin_inset Quotes erd
-\end_inset
-
+\shape default
  and the vector 
-\begin_inset Quotes eld
-\end_inset
-
+\shape italic
 er
-\begin_inset Quotes erd
-\end_inset
-
+\shape default
  are transferred to the internal memory of the BFM library by means of the
- function BFM0D_Input_EcologyDynamics().
- The BFM0D_reset() subroutine reset all the derivatives in the BFM internal
+ function BFM1D_Input_EcologyDynamics().
+ The BFM1D_reset() subroutine reset all the derivatives in the BFM internal
  memory.
  
 \end_layout
@@ -711,7 +793,7 @@ status open
 
 \begin_layout Plain Layout
 
-call BFM0D_Input_EcologyDynamics(sur,bot,a,jtrmax,er)
+call BFM1D_Input_EcologyDynamics(bottom,a,jtrmax,er)
 \end_layout
 
 \begin_layout Plain Layout
@@ -720,7 +802,7 @@ call BFM0D_Input_EcologyDynamics(sur,bot,a,jtrmax,er)
 
 \begin_layout Plain Layout
 
-call BFM0D_reset()
+call BFM1D_reset()
 \end_layout
 
 \begin_layout Plain Layout
@@ -738,27 +820,7 @@ call EcologyDynamics()
 
 \begin_layout Plain Layout
 
-if (sur) then
-\end_layout
-
-\begin_layout Plain Layout
-
-    call BFM0D_Output_EcologyDynamics_surf(b, c, d ,d2)
-\end_layout
-
-\begin_layout Plain Layout
-
-else
-\end_layout
-
-\begin_layout Plain Layout
-
-    call BFM0D_Output_EcologyDynamics(b, c, d)
-\end_layout
-
-\begin_layout Plain Layout
-
-endif
+call BFM1D_Output_EcologyDynamics_surf(b, c, d ,d2)
 \end_layout
 
 \begin_layout Plain Layout
@@ -772,7 +834,8 @@ DO jtr=1, jtrmax
 
 \begin_layout Plain Layout
 
-    tra(ji,jj,jk,jtr) =tra(ji,jj,jk,jtr) +b(jtr) ! trend
+    tra(1:bottom,jj,ji,jtr) =tra(1:bottom,jj,ji,jtr) +b(jtr,1:bottom) !
+ trend
 \end_layout
 
 \begin_layout Plain Layout
@@ -783,53 +846,35 @@ END DO
 \end_inset
 
 Then the EcologyDynamics() updates the BFM SOURCE array and in the end the
- BFM0D_Output_EcologyDynamics() extracts the derivatives(
-\begin_inset Quotes eld
-\end_inset
-
+ BFM1D_Output_EcologyDynamics() extracts the derivatives (
+\shape italic
 b
-\begin_inset Quotes erd
-\end_inset
-
+\shape default
 ) and other parameters (like sinking velocity 
-\begin_inset Quotes eld
-\end_inset
-
+\shape italic
 c
-\begin_inset Quotes erd
-\end_inset
-
-) and diagnostics (d and d2 - for surface cells-) defined in the layout
- of the BFM.
- This procedure is performed for each computational cell of the model and
- in fact the derivatives contained in the vector 
-\begin_inset Quotes eld
-\end_inset
-
+\shape default
+) and diagnostics (
+\shape italic
+d
+\shape default
+ and
+\shape italic
+ d2
+\shape default
+ - for surface cells-) defined in the layout of the BFM.
+ The derivatives contained in the vector 
+\shape italic
 b
-\begin_inset Quotes erd
-\end_inset
-
- for that specific point are added to the tracer matrix 
-\begin_inset Quotes eld
-\end_inset
-
+\shape default
+ for the column are added to the tracer matrix 
+\shape slanted
 tra
-\begin_inset Quotes erd
-\end_inset
-
+\shape default
  to compute the cumulative derivative as required in the source splitting
  approach.
  We recall that all the coupling instructions are perfomed in a loop over
- the 
-\begin_inset Quotes eld
-\end_inset
-
-wet points
-\begin_inset Quotes erd
-\end_inset
-
- with indexes ji (longitude), jj (latitude), and jk (depth).
+ the surface wetpoints.
 \end_layout
 
 \begin_layout Chapter
@@ -843,7 +888,9 @@ Installation
 \begin_layout Standard
 Both the OGSTM and the BFM codes are under a GIT versioning systems.
  The installation phase starts with the downloading of the code.
- A bash script (ogstm_downloader.sh) can automatically perform this task:
+ There is a public github repository (https://github.com/inogs/ModelBuild)
+ designed to download the codes and build together.
+ This can be done with the following steps:
 \end_layout
 
 \begin_layout Standard
@@ -854,7 +901,21 @@ status open
 
 \begin_layout Plain Layout
 
-#! /bin/bash
+\end_layout
+
+\begin_layout Plain Layout
+
+     git clone git@github.com:inogs/ModelBuild.git CODE
+\end_layout
+
+\begin_layout Plain Layout
+
+     cd CODE
+\end_layout
+
+\begin_layout Plain Layout
+
+     git checkout testcase
 \end_layout
 
 \begin_layout Plain Layout
@@ -863,70 +924,23 @@ status open
 
 \begin_layout Plain Layout
 
-     OGSTM_HOME=$PWD
+     ./downloader_ogstm_bfm.sh # downloads bfm and ogstm
 \end_layout
 
 \begin_layout Plain Layout
 
+     # Configure BFM: edit layout and namelists_bfm (fully detailed in the
+ BFM manual)
 \end_layout
 
 \begin_layout Plain Layout
 
------------ BFM library ---------------------
+     # Now, edit builder_ogstm_bfm.sh
 \end_layout
 
 \begin_layout Plain Layout
 
-    
-\end_layout
-
-\begin_layout Plain Layout
-
-# Requirement: to have an account on git bfm server
-\end_layout
-
-\begin_layout Plain Layout
-
-    git clone git@dev.cmcc.it:bfm
-\end_layout
-
-\begin_layout Plain Layout
-
-    cd bfm
-\end_layout
-
-\begin_layout Plain Layout
-
-    git checkout dev 
-\end_layout
-
-\begin_layout Plain Layout
-
------------ OGSTM code ---------------------
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-# Requirement: to have an account on github ogstm server
-\end_layout
-
-\begin_layout Plain Layout
-
-    cd $OGSTM_HOME
-\end_layout
-
-\begin_layout Plain Layout
-
-    git clone git@github.com:gbolzon/ogstm.git
-\end_layout
-
-\begin_layout Plain Layout
-
-    cp ogstm/ogstm_builder.sh .
+     ./builder_ogstm_bfm.sh    # builds bfm library and ogstm executable
 \end_layout
 
 \begin_layout Plain Layout
@@ -935,12 +949,10 @@ status open
 
 \end_inset
 
-this procedure will download all the code necessary to create the executable
- and the namelists needed to run the model.
- We suggest to create a top directory and launch this script ogtsm_downloader.sh
- from inside the directory.
- After the model download with the above instructions the top directory
- will be populated as:
+The builder needs to be edited at its top, about compiler flags and machine
+ dependent settings.
+ Here we present, as default, a module file in ogstm/compilers/machine_modules/
+ section with intel compiler and consistent netcdf libraries.
 \end_layout
 
 \begin_layout Standard
@@ -951,30 +963,145 @@ status open
 
 \begin_layout Plain Layout
 
-bfm  ogstm  ogstm_builder.sh  ogstm_downloader.sh
+#          builder_ogstm_bfm.sh
 \end_layout
-
-\end_inset
-
-the compilation of the code can be done with the following command:
-\end_layout
-
-\begin_layout Standard
-\begin_inset listings
-lstparams "basicstyle={\ttfamily}"
-inline false
-status open
 
 \begin_layout Plain Layout
 
-% ./ogstm_builder.sh $OGSTM_HOME/bfm $OGSTM_HOME/ogstm
+#      Edit sections 1,2,3,4 in order to configure compilation and linking.
+\end_layout
+
+\begin_layout Plain Layout
+
+################################################################### 
+\end_layout
+
+\begin_layout Plain Layout
+
+#  Section 1.
+ Choose the *.inc file, with the definition of compiler flags, to be included
+ in Makefile
+\end_layout
+
+\begin_layout Plain Layout
+
+# #           This is a machine dependent operation, flags for
+\end_layout
+
+\begin_layout Plain Layout
+
+#             most popular compilers (gnu, intel, xl) are provided.
+\end_layout
+
+\begin_layout Plain Layout
+
+#             In the following example user will select the file x86_64.LINUX.inte
+l.dbg.inc
+\end_layout
+
+\begin_layout Plain Layout
+
+#             both in bfm/compilers/ and ogstm/compilers
+\end_layout
+
+\begin_layout Plain Layout
+
+OGSTM_ARCH=x86_64 
+\end_layout
+
+\begin_layout Plain Layout
+
+OGSTM_OS=LINUX 
+\end_layout
+
+\begin_layout Plain Layout
+
+OGSTM_COMPILER=intel 
+\end_layout
+
+\begin_layout Plain Layout
+
+DEBUG=        # this is the choice for production flags 
+\end_layout
+
+\begin_layout Plain Layout
+
+#DEBUG=.dbg   # this is the one for debug flags
+\end_layout
+
+\begin_layout Plain Layout
+
+###################################################################
+\end_layout
+
+\begin_layout Plain Layout
+
+#  Section 2.
+ Use of OpenMP threads, to improve the parallelization of ogstm.
+\end_layout
+
+\begin_layout Plain Layout
+
+# Just comment one of thes lines:
+\end_layout
+
+\begin_layout Plain Layout
+
+export OPENMP_FLAG=-fopenmp  # OpenMP activated 
+\end_layout
+
+\begin_layout Plain Layout
+
+export OPENMP_FLAG=          # OpenMP deactivated
+\end_layout
+
+\begin_layout Plain Layout
+
+################################################################### 
+\end_layout
+
+\begin_layout Plain Layout
+
+# Section 3.
+  Module loads (and set of environment variables)
+\end_layout
+
+\begin_layout Plain Layout
+
+# This is a machine dependent operation.
+ Modules are usually used on clusters.
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+# User can write his module file, in the directory below there are some
+ examples.
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+# Warning : this choice must be consistent with Section 1.
+\end_layout
+
+\begin_layout Plain Layout
+
+# Just comment the two following lines you are not using modules.
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+export MODULEFILE=$PWD/ogstm/compilers/machine_modules/g100.intel
 \end_layout
 
 \end_inset
 
-before launching this instruction the ogstm_builder.sh needs to be edited
- in order to set the correct compilator and the corresponding netcdf libraries
- paths.
+
 \end_layout
 
 \begin_layout Section
@@ -989,17 +1116,24 @@ name "sec:Configuring-BFM-OGSTM"
 \end_layout
 
 \begin_layout Standard
-The configuration of the model is done automatically by the script 
+Inside builder_ogstm_bfm.sh there are these lines to generate the code and
+ compile the bfm library.
+ The first one edits the file configuration to set the .inc file consitent
+ with compiler we want to use.
+\end_layout
+
+\begin_layout Standard
+Then, there is the actual automatic configuration of the model by using
+ the script
 \shape italic
-bfm_configure.sh
+ bfm_configure.sh
 \shape default
  (see the BFM manual for more information or simply run 
 \family typewriter
 ./bfm_configure.sh -h
 \family default
 ).
- The default configuration is generated and the bfm library compiled with
- the command:
+ 
 \end_layout
 
 \begin_layout Standard
@@ -1010,12 +1144,18 @@ status open
 
 \begin_layout Plain Layout
 
+% sed -i "s/.*ARCH.*/        ARCH    = '$INC_FILE'  /"  build/configurations/OGS_P
+ELAGIC/configuration
+\end_layout
+
+\begin_layout Plain Layout
+
 % cd $BFMDIR/build
 \end_layout
 
 \begin_layout Plain Layout
 
-% ./bfm_configure.sh -gc -o ../lib/libbfm.a -p OGS_PELAGIC
+% ./bfm_configure.sh -gcv -o ../lib/libbfm.a -p OGS_PELAGIC
 \end_layout
 
 \end_inset
@@ -1029,8 +1169,8 @@ Every time the layout is changed this procedure must be repeated in order
  recompiled.
 \end_layout
 
-\begin_layout Subsection
-The BFM0D preset
+\begin_layout Standard
+Here we display the content of build/configurations/OGS_PELAGIC/configuration
 \end_layout
 
 \begin_layout Subsubsection*
@@ -1064,12 +1204,12 @@ status open
 
 \begin_layout Plain Layout
 
-        CPPDEFS = 'BFM_STANDALONE INCLUDE_PELCO2 INCLUDE_DIAG BFM_OGS',
+        CPPDEFS = 'BFM_STANDALONE INCLUDE_PELCO2 BFM_OGS',
 \end_layout
 
 \begin_layout Plain Layout
 
-        ARCH    = 'gfortran.inc',
+        ARCH    = 'x86_64.LINUX.intel.inc',
 \end_layout
 
 \begin_layout Plain Layout
@@ -1097,46 +1237,6 @@ status open
 
 \end_layout
 
-\begin_layout Subsubsection*
-
-\family typewriter
-layout:
-\family default
- memory layout configuration file
-\end_layout
-
-\begin_layout Standard
-This file contains the list of state variables and diagnostics defined in
- the BFM.
- This is independent of the coupled configuration and it is fully detailed
- in the BFM manual 
-\begin_inset CommandInset citation
-LatexCommand citep
-key "BFM-manual"
-
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Subsubsection*
-
-\family typewriter
-namelists_bfm: parameter file
-\end_layout
-
-\begin_layout Standard
-This file contains all the parameters that characterize the biogeochemical
- processes and are fully detailed in the BFM manual 
-\begin_inset CommandInset citation
-LatexCommand citep
-key "BFM-manual"
-
-\end_inset
-
-.
-\end_layout
-
 \begin_layout Chapter
 Running BFM OGSTM testcase
 \begin_inset CommandInset label
@@ -1150,13 +1250,15 @@ name "chap:Running-BFM_OGSTM"
 
 \begin_layout Standard
 To run a test simulation of the code the first thing is to be sure to have
- a working python installed on the machine with the scipy and netcdf module
+ a working python3 installed on the machine with the scipy and netcdf module
  installed.
- The second thing to do .is to download the python scripts that automaticcally
- create the simulation area.
- Given those prerequisites the third thing to do is to copy TEST_LIST.dat_templat
-e to TEST_LIST.dat and edit the file to configure the needed tests.
- The test are performed on a rectangular box with closed boundary conditions.
+ 
+\end_layout
+
+\begin_layout Standard
+Then, go in ogstm/testcase/ directory and copy TEST_LIST.dat_template to
+ TEST_LIST.dat and edit the file to configure the needed tests.
+ The tests are performed on a rectangular box with closed boundary conditions.
 \end_layout
 
 \begin_layout Section
@@ -1246,17 +1348,17 @@ status open
 
 \begin_layout Plain Layout
 
-   DA.create_dataset(test)
+   c_mask.create_meshmask_nc(test)
 \end_layout
 
 \begin_layout Plain Layout
 
-   c_dom.create_Dom_Dec(test)        
+   c_bfmmask.create_bfmmask_nc(test)
 \end_layout
 
 \begin_layout Plain Layout
 
-   c_mask.create_meshmask_nc(test)   
+   c_dom.create_Dom_Dec(test)           
 \end_layout
 
 \begin_layout Plain Layout
@@ -1271,7 +1373,12 @@ status open
 
 \begin_layout Plain Layout
 
-   c_bc.create_bc_nc(test)           
+   c_bc.create_bc_nc(test)
+\end_layout
+
+\begin_layout Plain Layout
+
+   create_fluxes.create_fluxes(test)          
 \end_layout
 
 \begin_layout Plain Layout
@@ -1297,27 +1404,7 @@ status open
 \begin_layout Standard
 the argumet test is a data structure containing all the informations defined
  in a single line of the TEST_LIST.dat file.
- test is iterated along the lines of the TEST_LIST.dat file.
-\end_layout
-
-\begin_layout Standard
-\begin_inset listings
-lstparams "basicstyle={\small\ttfamily}"
-inline false
-status open
-
-\begin_layout Plain Layout
-
-    DA.create_dataset(test)
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-Data Assimilation testing (not discussed in the present manual)
+ Test is iterated along the lines of the TEST_LIST.dat file.
 \end_layout
 
 \begin_layout Standard
@@ -1337,8 +1424,7 @@ status open
 \end_layout
 
 \begin_layout Standard
-Create ascii file for MPI domain decomposition (Dom_Dec_jpi.ascii and Dom_Dec_jpj.
-ascii)
+Create ascii file for MPI domain decomposition (domdec.txt)
 \end_layout
 
 \begin_layout Standard
@@ -1596,7 +1682,7 @@ status open
 \begin_layout Standard
 The parallel version requires mpirun command and usully the run is submitted
  by a job, specifing the number of processors and other important aspects
- of the simulation, we report an example for the pbs scheduler:
+ of the simulation, we report an example for the slurm scheduler:
 \end_layout
 
 \begin_layout Standard
@@ -1612,32 +1698,35 @@ status open
 
 \begin_layout Plain Layout
 
-#PBS -N TESTCASE 
 \end_layout
 
 \begin_layout Plain Layout
 
-#PBS -l walltime=24:00:00
+#SBATCH --job-name=TEST
 \end_layout
 
 \begin_layout Plain Layout
 
-#PBS -q parallel 
+#SBATCH -N2 
 \end_layout
 
 \begin_layout Plain Layout
 
-#PBS -l select=4:ncpus=20:mpiprocs=20:mem=100GB 
+#SBATCH --ntasks-per-node=48 
 \end_layout
 
 \begin_layout Plain Layout
 
-#PBS -o testcase.out 
+#SBATCH --time=24:00:00 
 \end_layout
 
 \begin_layout Plain Layout
 
-#PBS -e testcase.err
+#SBATCH --mem=300gb
+\end_layout
+
+\begin_layout Plain Layout
+
 \end_layout
 
 \begin_layout Plain Layout
@@ -1647,7 +1736,7 @@ status open
 
 \begin_layout Plain Layout
 
-cd $PBS_O_WORKDIR
+cd $SLURM_SUBMIT_DIR
 \end_layout
 
 \begin_layout Plain Layout
@@ -1687,7 +1776,12 @@ date
 
 \begin_layout Plain Layout
 
-mpirun -np 80 ./ogstm.xx # -genvall
+export RANKS_PER_NODE=48
+\end_layout
+
+\begin_layout Plain Layout
+
+mpirun -np 96 ./ogstm.xx
 \end_layout
 
 \begin_layout Plain Layout
@@ -1873,6 +1967,50 @@ twocolumn
 \end_layout
 
 \begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename Figures/TEST01_C_CF_m0.png
+	lyxscale 50
+	scale 50
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Hovmoeller diagrams of model output after one year of simulation.
+ Top left panel shows Photo-synthetical Available Radiation PAR.
+ Top right panel show Vertical eddy diffusivity.
+ Bottom left panel total chlorophyll derived as the sum of the four phytoplankto
+n functional types (TotChl=P1l+P2l+P3l+P4l) used in this BFM configuration.
+ Bottom right panel shows phosphate temporal evolution (N1p).
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
 \begin_inset Newpage cleardoublepage
 \end_inset
 
@@ -1882,7 +2020,7 @@ twocolumn
 \begin_layout Standard
 \begin_inset CommandInset bibtex
 LatexCommand bibtex
-bibfiles "bfm-nemo-references"
+bibfiles "bfm-ogstm-references"
 options "bibtotoc,elsart-harv"
 
 \end_inset

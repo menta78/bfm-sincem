@@ -24,7 +24,6 @@
   ! Modules (use of ONLY is strongly encouraged!)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-  use bfm_error_msg, ONLY: set_warning_for_getm
   use global_mem, ONLY:RLEN,LOGUNIT,ZERO,ONE
 #ifdef NOPOINTERS
   use mem
@@ -59,7 +58,7 @@
 !
 ! COPYING
 !   
-!   Copyright (C) 2020 BFM System Team (bfm_st@cmcc.it)
+!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
 !   Copyright (C) 2006 P. Ruardij & Marcllo Vichi
 !   (rua@nioz.nl, vichi@bo.ingv.it)
 !
@@ -87,11 +86,6 @@
    real(RLEN)           :: cD2m, HT_0,alpha,HTc,HTn,HTp,chM5s
    real(RLEN),dimension(NO_BOXES_XY)  :: r
    integer              :: i,nn
-
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  real(RLEN), external  :: GetDelta
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Get actual time step for the calculation of the transient profile of &

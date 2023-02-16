@@ -1,60 +1,51 @@
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! ROUTINE: Runge-Kutta 2nd-order time-integration
+!
+! DESCRIPTION
+!   Runge-Kutta 2nd-order integration with time step adjustment
+!
+! COPYING
+!
+!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU General Public License for more details.
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! INCLUDE
 #include "cppdefs.h"
-!-----------------------------------------------------------------------
-!BOP
 !
-! !ROUTINE: Runge-Kutta 2nd-order time-integration
-!
-! !INTERFACE
+! INTERFACE
    SUBROUTINE integrationRK2
 !
-! !DESCRIPTION
-!  Runge-Kutta 2nd-order integration with time step adjustment
-! !USES
+! USES
    use global_mem, ONLY:RLEN,ONE
    use mem, ONLY: NO_D3_BOX_STATES,NO_BOXES,D3SOURCE,D3STATE, &
                   D3STATETYPE
-#ifdef EXPLICIT_SINK
-   use mem, ONLY: D3SINK
-#endif
 
 #if defined INCLUDE_SEAICE
    use mem, ONLY: NO_D2_BOX_STATES_ICE, D2SOURCE_ICE, &
         D2STATE_ICE, D2STATETYPE_ICE
-#ifdef EXPLICIT_SINK
-   use mem, ONLY: D2SINK_ICE
-#endif
 #endif
 
    use mem, ONLY: NO_D2_BOX_STATES_BEN, D2SOURCE_BEN, &
         D2STATE_BEN, D2STATETYPE_BEN
-#ifdef EXPLICIT_SINK
-   use mem, ONLY: D2SINK_BEN
-#endif
    use standalone
    use api_bfm
+
    implicit none
-!
-! !INPUT PARAMETERS:
-!
-! !OUTPUT PARAMETERS:
-!
-! !REVISION HISTORY:
-!  Original author(s): Momme Butenschoen (UNIBO)
-!
-!
-! COPYING
-!
-!   Copyright (C) 2020 BFM System Team (bfm_st@cmcc.it)
-!
-!   This program is free software; you can redistribute it and/or modify
-!   it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation;
-!   This program is distributed in the hope that it will be useful,
-!   but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-!   GNU General Public License for more details.
-!
-! !LOCAL VARIABLES:
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Local Variables
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    real(RLEN),parameter    :: eps=0.0_RLEN
    real(RLEN)              :: min3D,min2D
    logical                 :: cut,cut_pel
@@ -68,10 +59,8 @@
    real(RLEN)              :: min2D_ben
    integer,dimension(2,2)  :: blccc_ben
    logical                 :: cut_ben
-!
-! !EOP
-!-----------------------------------------------------------------------
-!BOC
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
 #ifdef DEBUG
    LEVEL1 'integration RK: starting delt = ',delt
 #endif
@@ -84,58 +73,34 @@
    bbccc2D_ben=D2STATE_BEN
    TLOOP : DO
    ! Integration step:
-#ifndef EXPLICIT_SINK
       bccc3D=D3SOURCE
-#else
-      bccc3D=sum(D3SOURCE-D3SINK,2)
-#endif
       ccc_tmp3D=D3STATE
 
 #if defined INCLUDE_SEAICE
-#ifndef EXPLICIT_SINK
       bccc2D_ice=D2SOURCE_ICE
-#else
-      bccc2D_ice=sum(D2SOURCE_ICE-D2SINK_ICE,2)
-#endif
       ccc_tmp2D_ice=D2STATE_ICE
 #endif
 
-#ifndef EXPLICIT_SINK
       bccc2D_ben=D2SOURCE_BEN
-#else
-      bccc2D_ben=sum(D2SOURCE_BEN-D2SINK_BEN,2)
-#endif
       ccc_tmp2D_ben=D2STATE_BEN
 
       DO j=1,NO_D3_BOX_STATES
          IF (D3STATETYPE(j).ge.0) THEN
-#ifndef EXPLICIT_SINK
-            D3STATE(j,:) = ccc_tmp3D(j,:) + delt*D3SOURCE(j,:)
-#else
-            D3STATE(j,:) = ccc_tmp3D(j,:) + delt*sum(D3SOURCE(j,:,:)-D3SINK(j,:,:),1)
-#endif
+            D3STATE(:,j) = ccc_tmp3D(:,j) + delt*D3SOURCE(:,j)
          END IF
       END DO
 
 #if defined INCLUDE_SEAICE
       DO j=1,NO_D2_BOX_STATES_ICE
          IF (D2STATETYPE_ICE(j).ge.0) THEN
-#ifndef EXPLICIT_SINK
-            D2STATE_ICE(j,:) = ccc_tmp2D_ice(j,:) + delt*D2SOURCE_ICE(j,:)
-#else
-            D2STATE_ICE(j,:) = ccc_tmp2D_ice(j,:) + delt*sum(D2SOURCE_ICE(j,:,:)-D2SINK_ICE(j,:,:),1)
-#endif
+            D2STATE_ICE(:,j) = ccc_tmp2D_ice(:,j) + delt*D2SOURCE_ICE(:,j)
          END IF
       END DO
 #endif
 
       DO j=1,NO_D2_BOX_STATES_BEN
          IF (D2STATETYPE_BEN(j).ge.0) THEN
-#ifndef EXPLICIT_SINK
-            D2STATE_BEN(j,:) = ccc_tmp2D_ben(j,:) + delt*D2SOURCE_BEN(j,:)
-#else
-            D2STATE_BEN(j,:) = ccc_tmp2D_ben(j,:) + delt*sum(D2SOURCE_BEN(j,:,:)-D2SINK_BEN(j,:,:),1)
-#endif
+            D2STATE_BEN(:,j) = ccc_tmp2D_ben(:,j) + delt*D2SOURCE_BEN(:,j)
          END IF
       END DO
 
@@ -168,17 +133,17 @@
             if ( cut_ice) then
                blccc_ice(:,2)=minloc(D2STATE_ICE)
                LEVEL1 'Sea ice variable: ', var_names(stIceStateS+blccc_ice(1,2)-1)
-               LEVEL1 'Value=',ccc_tmp2D_ice(blccc_ice(1,2),blccc_ice(2,2)), &
-                              'Rate=',bccc2D_ice(blccc_ice(1,2),blccc_ice(2,2))
+               LEVEL1 'Value=',ccc_tmp2D_ice(blccc_ice(2,2),blccc_ice(1,2)), &
+                              'Rate=',bccc2D_ice(blccc_ice(2,2),blccc_ice(1,2))
                D2STATE_ICE=bbccc2D_ice
             end if
 #endif
 
             if ( cut_ben) then
-               blccc_ben(:,2)=minloc(D2STATE_BEN)
-               LEVEL1 'Benthic Variable: ', var_names(stBenStateS+blccc_ben(1,2)-1)
-               LEVEL1 'Value=',ccc_tmp2D_ben(blccc_ben(1,2),blccc_ben(2,2)), &
-                              'Rate=',bccc2D_ben(blccc_ben(1,2),blccc_ben(2,2))
+               blccc_ben(:,1)=minloc(D2STATE_BEN)
+               LEVEL1 'Benthic Variable: ', var_names(stBenStateS+blccc_ben(1,1)-1)
+               LEVEL1 'Value=',ccc_tmp2D_ben(blccc_ben(1,1),blccc_ben(2,1)), &
+                              'Rate=',bccc2D_ben(blccc_ben(1,1),blccc_ben(2,1))
                D2STATE_BEN=bbccc2D_ben
             end if
 
@@ -218,38 +183,23 @@
          call EcologyDynamics
          DO j=1,NO_D3_BOX_STATES
             IF (D3STATETYPE(j).ge.0) THEN
-#ifndef EXPLICIT_SINK
-               D3STATE(j,:) = ccc_tmp3D(j,:) +.5*delt*(D3SOURCE(j,:)+bccc3D(j,:)) 
-#else
-               D3STATE(j,:) = ccc_tmp3D(j,:) + &
-                  .5*delt*(sum(D3SOURCE(j,:,:)-D3SINK(j,:,:),1)+bccc3D(j,:))
-#endif
+               D3STATE(:,j) = ccc_tmp3D(:,j) +.5*delt*(D3SOURCE(:,j)+bccc3D(:,j)) 
             END IF
          END DO
 
 #if defined INCLUDE_SEAICE
          DO j=1,NO_D2_BOX_STATES_ICE
             IF (D2STATETYPE_ICE(j).ge.0) THEN
-#ifndef EXPLICIT_SINK
-               D2STATE_ICE(j,:) = ccc_tmp2D_ice(j,:) + &
-                  .5*delt*(D2SOURCE_ICE(j,:)+bccc2D_ice(j,:))
-#else
-               D2STATE_ICE(j,:) = ccc_tmp2D_ice(j,:) + &
-                  .5*delt*(sum(D2SOURCE_ICE(j,:,:)-D2SINK_ICE(j,:,:),1)+bccc2D_ice(j,:))
-#endif
+               D2STATE_ICE(:,j) = ccc_tmp2D_ice(:,j) + &
+                  .5*delt*(D2SOURCE_ICE(:,j)+bccc2D_ice(:,j))
             END IF
          END DO
 #endif
 
          DO j=1,NO_D2_BOX_STATES_BEN
             IF (D2STATETYPE_BEN(j).ge.0) THEN
-#ifndef EXPLICIT_SINK
-               D2STATE_BEN(j,:) = ccc_tmp2D_ben(j,:) + &
-                  .5*delt*(D2SOURCE_BEN(j,:)+bccc2D_ben(j,:))
-#else
-               D2STATE_BEN(j,:) = ccc_tmp2D_ben(j,:) + &
-                  .5*delt*(sum(D2SOURCE_BEN(j,:,:)-D2SINK_BEN(j,:,:),1)+bccc2D_ben(j,:))
-#endif
+               D2STATE_BEN(:,j) = ccc_tmp2D_ben(:,j) + &
+                  .5*delt*(D2SOURCE_BEN(:,j)+bccc2D_ben(:,j))
             END IF
          END DO
 
@@ -273,8 +223,8 @@
                if ( cut_pel) then
                   blccc(:,1)=minloc(D3STATE)
                   LEVEL1 'Pelagic variable: ',var_names(stPelStateS+blccc(1,1)-1)
-                  LEVEL1 'value=',ccc_tmp3D(blccc(1,1),blccc(2,1)), &
-                                 'rate=',bccc3D(blccc(1,1),blccc(2,1))
+                  LEVEL1 'value=',ccc_tmp3D(blccc(2,1),blccc(1,1)), &
+                                 'rate=',bccc3D(blccc(2,1),blccc(1,1))
                   D3STATE=bbccc3D
                end if
 
@@ -282,17 +232,17 @@
                if ( cut_ice) then
                   blccc_ice(:,2)=minloc(D2STATE_ICE)
                   LEVEL1 'Sea ice variable: ', var_names(stIceStateS+blccc_ice(1,2)-1)
-                  LEVEL1 'value=',ccc_tmp2D_ice(blccc_ice(1,2),blccc_ice(2,2)), &
-                                 'rate=',bccc2D_ice(blccc_ice(1,2),blccc_ice(2,2))
+                  LEVEL1 'value=',ccc_tmp2D_ice(blccc_ice(2,2),blccc_ice(1,2)), &
+                                 'rate=',bccc2D_ice(blccc_ice(2,2),blccc_ice(1,2))
                   D2STATE_ICE=bbccc2D_ice
                end if
 #endif
 
                if ( cut_ben) then
-                  blccc_ben(:,2)=minloc(D2STATE_BEN)
-                  LEVEL1 'Benthic variable: ', var_names(stBenStateS+blccc_ben(1,2)-1)
-                  LEVEL1 'value=',ccc_tmp2D_ben(blccc_ben(1,2),blccc_ben(2,2)), &
-                                 'rate=',bccc2D_ben(blccc_ben(1,2),blccc_ben(2,2))
+                  blccc_ben(:,1)=minloc(D2STATE_BEN)
+                  LEVEL1 'Benthic variable: ', var_names(stBenStateS+blccc_ben(1,1)-1)
+                  LEVEL1 'value=',ccc_tmp2D_ben(blccc_ben(2,1),blccc_ben(1,1)), &
+                                 'rate=',bccc2D_ben(blccc_ben(2,1),blccc_ben(1,1))
                   D2STATE_BEN=bbccc2D_ben
                end if
 
@@ -334,5 +284,7 @@
 #endif
 
    END SUBROUTINE integrationRK2
-!EOC
-!-----------------------------------------------------------------------
+
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

@@ -6,7 +6,7 @@
 <head>
 	<title>BFM Standalone diagnostics</title>
         <link href="https://fonts.googleapis.com/css?family=Lato|Source+Sans+Pro:300,400,600" rel="stylesheet">
-	<link rel="icon" href="https://cmcc-foundation.github.io/www.bfm-community.eu/favicon.ico" type="image/x-icon"/>
+	<link rel="icon" href="https://bfm-community.github.io/www.bfm-community.eu/favicon.ico" type="image/x-icon"/>
 
 <!-- Add here object styles (like in css files) -->
 <style>
@@ -153,7 +153,7 @@ h4 {
        	<!-- Page title -->
 	<div "header" style="background: inherit;">
 	<h1 id="logo">
-                <img src="https://cmcc-foundation.github.io/www.bfm-community.eu/img/logos/BFM_Short_logo.svg" height="70" style="margin:-10px 20px">BFM Standalone</a>
+                <img src="https://bfm-community.github.io/www.bfm-community.eu/img/logos/BFM_Short_logo.svg" height="70" style="margin:-10px 20px">BFM Standalone</a>
         </h1>
         <p style="font-size: larger; margin-top: -40px; text-align: center;">_EXP_PATH_</p>
         </div>

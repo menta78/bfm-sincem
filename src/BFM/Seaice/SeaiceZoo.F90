@@ -1,24 +1,32 @@
-#include "DEBUG.h"
-#include "INCLUDE.h"
-
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model 
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-!BOP
 !
-! !ROUTINE: SeaiceZoo
+! ROUTINE: SeaiceZoo
 !
 ! DESCRIPTION
 !
-! !INTERFACE
+! COPYING
+!
+!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU General Public License for more details.
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! INCLUDE
+#include "DEBUG.h"
+#include "INCLUDE.h"
+!
+! INTERFACE
   subroutine SeaiceZooDynamics(zoo)
 !
-! !USES:
-
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! Modules (use of ONLY is strongly encouraged!)
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-
+! USES
   use global_mem, ONLY:RLEN,ZERO,ONE
   use constants,  ONLY:MW_C
 #ifdef NOPOINTERS
@@ -33,49 +41,15 @@
 #endif
   use mem_Param,  ONLY: p_pe_R1c, p_pe_R1n, p_pe_R1p, p_small
   use mem_SeaiceZoo
-
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! The following vector functions are used: eTq, MM
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   use mem_globalfun,   ONLY: eTq, MM
 
 
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! Implicit typing is never allowed
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   IMPLICIT NONE
 
-! !INPUT:
+  ! INPUT
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   integer,intent(IN)  :: zoo
-!  
-!
-! !AUTHORS
-!
-!
-! !REVISION_HISTORY
-!
-!
-! COPYING
-!   
-!   Copyright (C) 2020 BFM System Team (bfm_st@cmcc.it)
-!
-!   This program is free software; you can redistribute it and/or modify
-!   it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation;
-!   This program is distributed in the hope that it will be useful,
-!   but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-!   GNU General Public License for more details.
-!
-!EOP
-!-------------------------------------------------------------------------!
-!BOC
-!
-!
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! Set up Local Variable for copy of state var. object
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Local Variables
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -117,13 +91,14 @@
   real(RLEN),dimension(NO_BOXES_ICE,iiSeaiceAlgae)  :: SALc
   real(RLEN),dimension(NO_BOXES_ICE,iiSeaiceZoo)  :: SZOc
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   !  Copy  state var. object in local var
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ppzooc = ppSeaiceZoo(zoo,iiC)
   ppzoon = ppSeaiceZoo(zoo,iiN)
   ppzoop = ppSeaiceZoo(zoo,iiP)
-  zooc = D2STATE_ICE(ppzooc,:)
+  zooc = D2STATE_ICE(:,ppzooc)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Temperature effect
@@ -145,24 +120,24 @@
     SBAc(:,i) = p_paSBA(zoo,i)*SeaiceBacteria(i,iiC)* &
                 MM(SeaiceBacteria(i,iiC), p_minfood(zoo))
     rumc = rumc + SBAc(:,i)
-    rumn = rumn + SBAc(:,i)*qncSBA(i,:)
-    rump = rump + SBAc(:,i)*qpcSBA(i,:)
+    rumn = rumn + SBAc(:,i)*qncSBA(:,i)
+    rump = rump + SBAc(:,i)*qpcSBA(:,i)
  end do
 
   do i = 1 ,iiSeaiceAlgae
      SALc(:,i) = p_paSAL(zoo,i)*SeaiceAlgae(i,iiC)* &
                  MM(SeaiceAlgae(i,iiC), p_minfood(zoo))
      rumc = rumc + SALc(:,i)
-     rumn = rumn + SALc(:,i)*qncSAL(i,:)
-     rump = rump + SALc(:,i)*qpcSAL(i,:)
+     rumn = rumn + SALc(:,i)*qncSAL(:,i)
+     rump = rump + SALc(:,i)*qpcSAL(:,i)
   end do
 
   do i = 1, iiSeaiceZoo
      SZOc(:,i) = p_paSZO(zoo,i)* SeaiceZoo(i,iiC)* &
                 MM(SeaiceZoo(i,iiC), p_minfood(zoo))
      rumc = rumc + SZOc(:,i)
-     rumn = rumn + SZOc(:,i)*qncSZO(i,:)
-     rump = rump + SZOc(:,i)*qpcSZO(i,:)
+     rumn = rumn + SZOc(:,i)*qncSZO(:,i)
+     rump = rump + SZOc(:,i)*qpcSZO(:,i)
   end do
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -181,25 +156,25 @@
   do i = 1 , iiSeaiceBacteria
     ruSBAc =  sut* SBAc(:, i)
     call flux_vector(iiIce, ppSeaiceBacteria(i,iiC),ppzooc,ruSBAc)
-    call flux_vector(iiIce, ppSeaiceBacteria(i,iiN),ppzoon,ruSBAc*qncSBA(i,:))
-    call flux_vector(iiIce, ppSeaiceBacteria(i,iiP),ppzoop,ruSBAc*qpcSBA(i,:))
-    rugn = rugn + ruSBAc*qncSBA(i,:)
-    rugp = rugp + ruSBAc*qpcSBA(i,:)
+    call flux_vector(iiIce, ppSeaiceBacteria(i,iiN),ppzoon,ruSBAc*qncSBA(:,i))
+    call flux_vector(iiIce, ppSeaiceBacteria(i,iiP),ppzoop,ruSBAc*qpcSBA(:,i))
+    rugn = rugn + ruSBAc*qncSBA(:,i)
+    rugp = rugp + ruSBAc*qpcSBA(:,i)
   end do
 
   do i = 1, iiSeaiceAlgae
     ruSALc = sut*SALc(:,i)
     call flux_vector(iiIce, ppSeaiceAlgae(i,iiC),ppzooc,ruSALc)
-    call flux_vector(iiIce, ppSeaiceAlgae(i,iiN),ppzoon,ruSALc*qncSAL(i,:))
-    call flux_vector(iiIce, ppSeaiceAlgae(i,iiP),ppzoop,ruSALc*qpcSAL(i,:))
-    rugn = rugn + ruSALc*qncSAL(i,:)
-    rugp = rugp + ruSALc*qpcSAL(i,:)
+    call flux_vector(iiIce, ppSeaiceAlgae(i,iiN),ppzoon,ruSALc*qncSAL(:,i))
+    call flux_vector(iiIce, ppSeaiceAlgae(i,iiP),ppzoop,ruSALc*qpcSAL(:,i))
+    rugn = rugn + ruSALc*qncSAL(:,i)
+    rugp = rugp + ruSALc*qpcSAL(:,i)
     ! Chl is transferred to the infinite sink
     call flux_vector(iiIce, ppSeaiceAlgae(i,iiL), &
-               ppSeaiceAlgae(i,iiL),-ruSALc*qlcSAL(i,:))
+               ppSeaiceAlgae(i,iiL),-ruSALc*qlcSAL(:,i))
     ! silicon constituent is transferred to biogenic silicate
     if (ppSeaiceAlgae(i,iiS) > 0) &
-       call flux_vector(iiIce, ppSeaiceAlgae(i,iiS), ppU6s,-ruSALc*qscSAL(i,:))
+       call flux_vector(iiIce, ppSeaiceAlgae(i,iiS), ppU6s,-ruSALc*qscSAL(:,i))
   end do
 
   do i = 1, iiSeaiceZoo
@@ -207,11 +182,11 @@
     ! Note that intra-group predation (cannibalism) is not added as a flux
     if ( i/= zoo) then
       call flux_vector(iiIce, ppSeaiceZoo(i,iiC),ppzooc,ruSZOc)
-      call flux_vector(iiIce, ppSeaiceZoo(i,iiN),ppzoon,ruSZOc*qncSZO(i,:))
-      call flux_vector(iiIce, ppSeaiceZoo(i,iiP),ppzoop,ruSZOc*qpcSZO(i,:))
+      call flux_vector(iiIce, ppSeaiceZoo(i,iiN),ppzoon,ruSZOc*qncSZO(:,i))
+      call flux_vector(iiIce, ppSeaiceZoo(i,iiP),ppzoop,ruSZOc*qpcSZO(:,i))
     end if
-    rugn = rugn + ruSZOc*qncSZO(i,:)
-    rugp = rugp + ruSZOc*qpcSZO(i,:)
+    rugn = rugn + ruSZOc*qncSZO(:,i)
+    rugp = rugp + ruSZOc*qpcSZO(:,i)
   end do
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -252,7 +227,7 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Organic Nitrogen dynamics
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  rrin = rugn*p_pu_ea(zoo) + rdc*qncSZO(zoo,:)
+  rrin = rugn*p_pu_ea(zoo) + rdc*qncSZO(:,zoo)
   rr1n = rrin*p_pe_R1n
   rr6n = rrin - rr1n
   call flux_vector(iiIce, ppzoon, ppU1n, rr1n)
@@ -261,7 +236,7 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Organic Phosphorus dynamics
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  rrip = rugp*p_pu_ea(zoo) + rdc*qpcSZO(zoo,:)
+  rrip = rugp*p_pu_ea(zoo) + rdc*qpcSZO(:,zoo)
   rr1p = rrip*p_pe_R1p
   rr6p = rrip - rr1p
   call flux_vector(iiIce, ppzoop, ppU1p, rr1p)
@@ -272,15 +247,15 @@
   ! Compare the quota of the net growth rates with the optimal quota
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   runc = max(ZERO, rugc*(ONE - p_pu_ea(zoo)) - rrac)
-  runn = max(ZERO, rugn*(ONE - p_pu_ea(zoo)) + rrsc*qncSZO(zoo,:))
-  runp = max(ZERO, rugp*(ONE - p_pu_ea(zoo)) + rrsc*qpcSZO(zoo,:))
+  runn = max(ZERO, rugn*(ONE - p_pu_ea(zoo)) + rrsc*qncSZO(:,zoo))
+  runp = max(ZERO, rugp*(ONE - p_pu_ea(zoo)) + rrsc*qpcSZO(:,zoo))
   ren = max(ZERO,  runn/(p_small + runc) - p_qncSZO(zoo))* runc
   rep = max(ZERO,  runp/(p_small + runc) - p_qpcSZO(zoo))* runc
   call flux_vector(iiIce, ppzoon, ppI4n, ren)
   call flux_vector(iiIce, ppzoop, ppI1p, rep)
 
   end subroutine SeaiceZooDynamics
-!EOC
+
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model 
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

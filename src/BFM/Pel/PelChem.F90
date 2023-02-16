@@ -1,31 +1,39 @@
-#include "DEBUG.h"
-#include "INCLUDE.h"
-
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model 
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-!BOP
 !
-! !ROUTINE: PelChem
+! ROUTINE: PelChem
 !
 ! DESCRIPTION
 !       This process describes the additional dynamics of dissolved
 !       compounds in the watercolumn. Parameterized processes are:
-!       - nitrification
-!       - denitrification
+!       - nitrification / denitrification
 !       - reoxidation of reduction equivalents
 !       - dissolution of biogenic silica
-!       This function also calls the carbonate system dynamics
-!       (INCLUDE_PELCO2) and iron dynamics (INCLUDE_PELFE)
-!       if activated
+!       This function also calls the carbonate system dynamics (INCLUDE_PELCO2)
+!       and iron dynamics (INCLUDE_PELFE) if activated
 !
-! !INTERFACE
+! COPYING
+!
+!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU General Public License for more details.
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! INCLUDE
+#include "DEBUG.h"
+#include "INCLUDE.h"
+!
+! INTERFACE
   subroutine PelChemDynamics
 !
-! !USES:
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! Modules (use of ONLY is strongly encouraged!)
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+! USES
   use global_mem, ONLY:RLEN,ZERO,ONE
 #ifdef NOPOINTERS
   use mem
@@ -39,39 +47,9 @@
 #endif
   use mem_Param,  ONLY: p_qon_nitri, p_qro, p_qon_dentri, p_small
   use mem_PelChem
-  use mem_globalfun,   ONLY: MM, eTq, insw
+  use mem_globalfun,   ONLY: MM, eTq, insw, eTa
   use bfm_error_msg,   ONLY: bfm_error
-!  
-!
-! !AUTHORS
-!   Original version by P. Ruardij and M. Vichi
-!
-!
-!
-! !REVISION_HISTORY
-!
-! COPYING
-!   
-!   Copyright (C) 2020 BFM System Team (bfm_st@cmcc.it)
-!   Copyright (C) 2006 P. Ruardij, M. Vichi
-!   (rua@nioz.nl, vichi@bo.ingv.it)
-!
-!   This program is free software; you can redistribute it and/or modify
-!   it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation;
-!   This program is distributed in the hope that it will be useful,
-!   but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-!   GNU General Public License for more details.
-!
-!EOP
-!-------------------------------------------------------------------------!
-!BOC
-!
-!
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! Implicit typing is never allowed
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
   IMPLICIT NONE
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -84,6 +62,8 @@
 #ifdef INCLUDE_PELFE
   real(RLEN),allocatable,save,dimension(:) :: fR1N7f, fR6N7f
 #endif
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Allocate local memory
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -132,7 +112,7 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Dissolution of biogenic silicate
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  fR6N5s  =   p_sR6N5* eTq(  ETW(:),  p_q10R6N5)* R6s(:)
+  fR6N5s  =   p_sR6N5* eTa(  ETW(:),  p_aeR6N5)* R6s(:)
   call flux_vector( iiPel, ppR6s,ppN5s, fR6N5s )
 
 #ifdef INCLUDE_PELFE
@@ -164,7 +144,7 @@
 #endif
 
   end subroutine PelChemDynamics
-!EOC
+
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model 
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

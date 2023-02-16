@@ -1,11 +1,8 @@
-#include "DEBUG.h"
-#include "INCLUDE.h"
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-!BOP
 !
-! !ROUTINE: PelagicBenthicCoupling
+! ROUTINE: PelagicBenthicCoupling
 !
 ! DESCRIPTION
 !   This routine solve the exchanges of OMT and Inorganic Nutrients 
@@ -22,15 +19,27 @@
 !  2) Burial velocity is defined in ModuleSettling.F90, which controls 
 !     the inflow rate of OMT and phytoplankton from the pelagic to benthic
 !
-! !INTERFACE
+! COPYING
+!
+!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU General Public License for more details.
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! INCLUDE
+#include "DEBUG.h"
+#include "INCLUDE.h"
+!
+! INTERFACE
    subroutine PelagicBenthicCoupling
 !
-! !USES:
-
-   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-   ! Modules (use of ONLY is strongly encouraged!)
-   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-
+! USES
    use global_mem, ONLY:RLEN,ZERO,ONE
 #ifdef NOPOINTERS
    use mem
@@ -38,13 +47,13 @@
    use mem, ONLY: D3STATE, PELBOTTOM, PhytoPlankton, NO_BOXES_XY, Depth,  &
            PhytoPlankton, ppPhytoPlankton, iiPhytoPlankton,               &
            MicroZooPlankton, ppMicroZooPlankton, iiMicroZooPlankton,      &
-           R1c, R2c, R6c, R1n, R6n, R1p, R6p, R6s,                        &
-           ppR1c, ppR6c, ppR1n, ppR6n, ppR1p, ppR6p, ppR6s, ppR2c,        &
+           R1c, R2c, R3c, R6c, R1n, R6n, R1p, R6p, R6s,                   &
+           ppR1c, ppR6c, ppR1n, ppR6n, ppR1p, ppR6p, ppR6s, ppR2c, ppR3c, &
            ppO2o, ppN1p, ppN3n, ppN4n, ppN5s, ppN6r,                      &
            jbotR6c, jbotR6n, jbotR6p, jbotR6s, jbotR1c, jbotR1n, jbotR1p, &
-           jbotO2o, jbotN1p, jbotN3n, jbotN4n, jbotN5s, jbotN6r,          &
-           sediPPY, sediR2, sediR6,                                       &
-           qpcPPY, qncPPY, qscPPY, qlcPPY, qncMIZ, qpcMIZ,qccPPY,                &
+           jbotO2o, jbotN1p, jbotN3n, jbotN4n, jbotN5s, jbotN6r, jbotR3c, &
+           sediPPY, sediR2, sediR3, sediR6,                               &
+           qpcPPY, qncPPY, qscPPY, qlcPPY, qncMIZ, qpcMIZ, qccPPY,        &
            iiC, iiN, iiP, iiL, iiS, iiLastElement, iiBen, iiPel,          &
            flux, flux_vector
 #ifdef INCLUDE_PELFE
@@ -70,36 +79,9 @@
    use mem, ONLY: jPIY3c, jZIY3c, ZI_Fc, jRIY3c, jRIY3n, jRIY3p, jRIY3s,  &
                   D1m, D6m, D7m, D8m, D9m, ppD6m, ppD7m, ppD8m, ppD9m
 #endif
-#ifdef BFM_GOTM
- use bio_var, ONLY: BOTindices
-#else
  use api_bfm, ONLY: BOTindices
-#endif
-   !
-   !
-   ! !AUTHORS
-   !   2018 : T. Lovato
-   !
-   ! COPYING
-   !
-   !   Copyright (C) 2020 BFM System Team (bfm_st@cmcc.it)
-   !
-   !   This program is free software; you can redistribute it and/or modify
-   !   it under the terms of the GNU General Public License as published by
-   !   the Free Software Foundation;
-   !   This program is distributed in the hope that it will be useful,
-   !   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   !   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   !   GNU General Public License for more details.
-   !
-   !EOP
-   !-------------------------------------------------------------------------!
-   !BOC
-   !
-   !
-   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-   ! Implicit typing is never allowed
-   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+ use time,    ONLY: GetDelta
+
    IMPLICIT NONE
  
    !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -114,10 +96,10 @@
    !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    integer  :: i, j, kbot, Box 
    real(RLEN) :: sedi, c, p, s, uptake, ruQc, ruQn, ruQp, ruQs, ruQf, ruQl, Delta
-   real(RLEN), external  :: GetDelta
    !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-   allocate(jbotR1PPY(iiLastElement,NO_BOXES_XY), jbotR2R1(NO_BOXES_XY),   &
-            jbotR6PPY(iiLastElement,NO_BOXES_XY), jbotR2R6(NO_BOXES_XY) )
+
+   allocate(jbotR1PPY(NO_BOXES_XY,iiLastElement), jbotR2R1(NO_BOXES_XY),   &
+            jbotR6PPY(NO_BOXES_XY,iiLastElement), jbotR2R6(NO_BOXES_XY) )
    !
    jbotR2R1  = ZERO ; jbotR2R6  = ZERO
    jbotR1PPY = ZERO ; jbotR6PPY = ZERO
@@ -146,22 +128,22 @@
             lcl_PhytoPlankton => PhytoPlankton(i,iiC)
             ! Check amount of carbon, this may generate a negligible,small mass loss
             if ( lcl_PhytoPlankton(kbot) > p_small) then
-               uptake = jPIY3c(i,Box)
+               uptake = jPIY3c(Box,i)
                j = ppPhytoPlankton(i,iiC)
-               PELBOTTOM(j,Box) = - uptake
+               PELBOTTOM(Box,j) = - uptake
                j = ppPhytoPlankton(i,iiN) 
-               PELBOTTOM(j,Box) = - uptake*qncPPY(i,kbot)
+               PELBOTTOM(Box,j) = - uptake*qncPPY(kbot,i)
                j = ppPhytoPlankton(i,iiP)
-               PELBOTTOM(j,Box) = - uptake*qpcPPY(i,kbot)
+               PELBOTTOM(Box,j) = - uptake*qpcPPY(kbot,i)
                j = ppPhytoPlankton(i,iiL)
-               PELBOTTOM(j,Box) = - uptake*qlcPPY(i,kbot)
+               PELBOTTOM(Box,j) = - uptake*qlcPPY(kbot,i)
                j = ppPhytoPlankton(i,iiS)
                if ( j > 0) &
-                  PELBOTTOM(j,Box) = - uptake*qscPPY(i,kbot)
+                  PELBOTTOM(Box,j) = - uptake*qscPPY(kbot,i)
 #ifdef INCLUDE_PELFE
                j = ppPhytoPlankton(i,iiF)
                if ( j > 0) & 
-                  PELBOTTOM(j,Box) = - uptake*qfcPPY(i,kbot)
+                  PELBOTTOM(Box,j) = - uptake*qfcPPY(kbot,i)
 #endif
             end if
          end do
@@ -173,13 +155,13 @@
             ! Check amount of carbon, this may generate a negligible,small mass loss
             if ( c < p_small) uptake = ZERO
             j = ppMicroZooPlankton(i,iiC)
-            PELBOTTOM(j,Box) = - uptake
+            PELBOTTOM(Box,j) = - uptake
             j = ppMicroZooPlankton(i,iiN)
             if ( j > 0 ) &
-              PELBOTTOM(j,Box) = -uptake* qncMIZ(i,kbot)
+              PELBOTTOM(Box,j) = -uptake* qncMIZ(kbot,i)
             j = ppMicroZooPlankton(i,iiP)
             if ( j > 0 ) &
-              PELBOTTOM(j,Box) = -uptake* qpcMIZ(i,kbot)
+              PELBOTTOM(Box,j) = -uptake* qpcMIZ(kbot,i)
          end do
          !
          ! Detritus (net flux= uptake - excretion of food : flux may be negative!)
@@ -197,45 +179,45 @@
    !
       ! Phytoplankton
       do i = 1 , ( iiPhytoPlankton)
-         sedi  =   sediPPY(i,kbot)
+         sedi  =   sediPPY(kbot,i)
          if ( sedi> ZERO ) then
             lcl_PhytoPlankton => PhytoPlankton(i,iiC)
             ! carbon
             j=ppPhytoPlankton(i,iiC)
             ruQc = sedi* lcl_PhytoPlankton(kbot)
-            PELBOTTOM(j,Box)   = PELBOTTOM(j,Box) - ruQc
-            jbotR1PPY(iiC,Box) = jbotR1PPY(iiC,Box) - ruQc * p_pe_R1c
-            jbotR6PPY(iiC,Box) = jbotR6PPY(iiC,Box) - ruQc * (ONE - p_pe_R1c)
+            PELBOTTOM(Box,j)   = PELBOTTOM(Box,j) - ruQc
+            jbotR1PPY(Box,iiC) = jbotR1PPY(Box,iiC) - ruQc * p_pe_R1c
+            jbotR6PPY(Box,iiC) = jbotR6PPY(Box,iiC) - ruQc * (ONE - p_pe_R1c)
             ! nitrogen
             j=ppPhytoPlankton(i,iiN)
-            ruQn = ruQc * qncPPY(i,kbot)
-            PELBOTTOM(j,Box)   = PELBOTTOM(j,Box) - ruQn
-            jbotR1PPY(iiN,Box) = jbotR1PPY(iiN,Box) - ruQn * p_pe_R1n
-            jbotR6PPY(iiN,Box) = jbotR6PPY(iiN,Box) - ruQn * (ONE - p_pe_R1n)
+            ruQn = ruQc * qncPPY(kbot,i)
+            PELBOTTOM(Box,j)   = PELBOTTOM(Box,j) - ruQn
+            jbotR1PPY(Box,iiN) = jbotR1PPY(Box,iiN) - ruQn * p_pe_R1n
+            jbotR6PPY(Box,iiN) = jbotR6PPY(Box,iiN) - ruQn * (ONE - p_pe_R1n)
             ! phosphorus
             j=ppPhytoPlankton(i,iiP)
-            ruQp = ruQc * qpcPPY(i,kbot)
-            PELBOTTOM(j,Box)   = PELBOTTOM(j,Box) - ruQp
-            jbotR1PPY(iiP,Box) = jbotR1PPY(iiP,Box) - ruQp * p_pe_R1p
-            jbotR6PPY(iiP,Box) = jbotR6PPY(iiP,Box) - ruQp * (ONE - p_pe_R1p)
+            ruQp = ruQc * qpcPPY(kbot,i)
+            PELBOTTOM(Box,j)   = PELBOTTOM(Box,j) - ruQp
+            jbotR1PPY(Box,iiP) = jbotR1PPY(Box,iiP) - ruQp * p_pe_R1p
+            jbotR6PPY(Box,iiP) = jbotR6PPY(Box,iiP) - ruQp * (ONE - p_pe_R1p)
             ! chlorophyll (stored but not used)
             j=ppPhytoPlankton(i,iiL)
-            ruQl = ruQc * qlcPPY(i,kbot)
+            ruQl = ruQc * qlcPPY(kbot,i)
             j=ppPhytoPlankton(i,iiL)
-            PELBOTTOM(j,Box)=  PELBOTTOM(j,Box) - ruQl
+            PELBOTTOM(Box,j)=  PELBOTTOM(Box,j) - ruQl
             ! silica
             j=ppPhytoPlankton(i,iiS)
             if ( j> 0) then
-               ruQs = ruQc * qscPPY(i,kbot)
-               PELBOTTOM(j,Box)   = PELBOTTOM(j,Box) - ruQs
-               jbotR6PPY(iiS,Box) = jbotR6PPY(iiS,Box) - ruQs
+               ruQs = ruQc * qscPPY(kbot,i)
+               PELBOTTOM(Box,j)   = PELBOTTOM(Box,j) - ruQs
+               jbotR6PPY(Box,iiS) = jbotR6PPY(Box,iiS) - ruQs
             end if
 #ifdef INCLUDE_PELFE
             j=ppPhytoPlankton(i,iiF)
             if ( j> 0) then
-               ruQf = ruQc * qfcPPY(i,kbot)
-               PELBOTTOM(j,Box)   = PELBOTTOM(j,Box) - ruQf
-               jbotR6PPY(iiF,Box) = jbotR6PPY(iiF,Box) - ruQf ! split also to R1 ?
+               ruQf = ruQc * qfcPPY(kbot,i)
+               PELBOTTOM(Box,j)   = PELBOTTOM(Box,j) - ruQf
+               jbotR6PPY(Box,iiF) = jbotR6PPY(Box,iiF) - ruQf ! split also to R1 ?
             end if
 #endif
          end if
@@ -269,6 +251,13 @@
          jbotR2R1(Box) = - ruQc *    p   
          jbotR2R6(Box) = - ruQc * (ONE-p)
       end if
+
+      ! Refractory OM (R3) fluxes to R6/R16
+      if ( sediR3(kbot) > ZERO) then
+         ruQc = sediR3(kbot) * R3c(kbot)
+         jbotR3c(Box) = jbotR3c(Box) - ruQc
+      end if 
+
       !
 #ifdef INCLUDE_PELCO2
       ! burial rate of PIC (calcite)
@@ -302,22 +291,23 @@
 #endif
       c = jbotR2R6(Box) + jbotR2R1(Box)
       call flux(kbot, iiPel, ppR2c, ppR2c, ( c /Depth(kbot)) )
+      call flux(kbot, iiPel, ppR3c, ppR3c, ( jbotR3c(Box)/Depth(kbot)) )
       !
       ! Detritus (R6,R1,R2,PPY) fluxes to sediment are directed via R6/R1
       ! R6 -> Q6 
-      jbotR6c(Box) = jbotR6c(Box) + jbotR6PPY(iiC,Box) + jbotR2R6(Box)
-      jbotR6n(Box) = jbotR6n(Box) + jbotR6PPY(iiN,Box)
-      jbotR6p(Box) = jbotR6p(Box) + jbotR6PPY(iiP,Box)
-      jbotR6s(Box) = jbotR6s(Box) + jbotR6PPY(iiS,Box)
+      jbotR6c(Box) = jbotR6c(Box) + jbotR6PPY(Box,iiC) + jbotR2R6(Box)
+      jbotR6n(Box) = jbotR6n(Box) + jbotR6PPY(Box,iiN)
+      jbotR6p(Box) = jbotR6p(Box) + jbotR6PPY(Box,iiP)
+      jbotR6s(Box) = jbotR6s(Box) + jbotR6PPY(Box,iiS)
 #ifdef INCLUDE_PELFE
-      jbotR6f(Box) = jbotR6f(Box) + jbotR6PPY(iiF,Box)
+      jbotR6f(Box) = jbotR6f(Box) + jbotR6PPY(Box,iiF)
 #endif
       ! R1 -> Q1
-      jbotR1c(Box) = jbotR1c(Box) + jbotR1PPY(iiC,Box) + jbotR2R1(Box)
-      jbotR1n(Box) = jbotR1n(Box) + jbotR1PPY(iiN,Box)
-      jbotR1p(Box) = jbotR1p(Box) + jbotR1PPY(iiP,Box)
+      jbotR1c(Box) = jbotR1c(Box) + jbotR1PPY(Box,iiC) + jbotR2R1(Box)
+      jbotR1n(Box) = jbotR1n(Box) + jbotR1PPY(Box,iiN)
+      jbotR1p(Box) = jbotR1p(Box) + jbotR1PPY(Box,iiP)
 #ifdef INCLUDE_PELFE
-      jbotR1f(Box) = jbotR1f(Box) + jbotR1PPY(iiF,Box)
+      jbotR1f(Box) = jbotR1f(Box) + jbotR1PPY(Box,iiF)
 #endif
       !
    enddo OMT_XY_LOOP
@@ -350,33 +340,33 @@
       ! PhytoPlankton
       do i = 1 , ( iiPhytoPlankton)
          j = ppPhytoPlankton(i,iiC)
-         call flux(kbot, iiPel, j, j, PELBOTTOM(j,Box)/Depth(kbot) )
+         call flux(kbot, iiPel, j, j, PELBOTTOM(Box,j)/Depth(kbot) )
          j = ppPhytoPlankton(i,iiN)
-         call flux(kbot, iiPel, j, j, PELBOTTOM(j,Box)/Depth(kbot) )
+         call flux(kbot, iiPel, j, j, PELBOTTOM(Box,j)/Depth(kbot) )
          j = ppPhytoPlankton(i,iiP)
-         call flux(kbot, iiPel, j, j, PELBOTTOM(j,Box)/Depth(kbot) )
+         call flux(kbot, iiPel, j, j, PELBOTTOM(Box,j)/Depth(kbot) )
          j = ppPhytoPlankton(i,iiL)
-         call flux(kbot, iiPel, j, j, PELBOTTOM(j,Box)/Depth(kbot) )
+         call flux(kbot, iiPel, j, j, PELBOTTOM(Box,j)/Depth(kbot) )
          j = ppPhytoPlankton(i,iiS)
          if ( j > 0 ) &
-           call flux(kbot, iiPel, j, j, PELBOTTOM(j,Box)/Depth(kbot) )
+           call flux(kbot, iiPel, j, j, PELBOTTOM(Box,j)/Depth(kbot) )
 #ifdef INCLUDE_PELFE
          j = ppPhytoPlankton(i,iiF)
          if ( j > 0 ) &
-           call flux(kbot, iiPel, j, j, PELBOTTOM(j,Box)/Depth(kbot) )
+           call flux(kbot, iiPel, j, j, PELBOTTOM(Box,j)/Depth(kbot) )
 #endif
       enddo
       !
       ! MicroZooplankton
       do i = 1 , ( iiMicroZooPlankton)
          j = ppMicroZooPlankton(i,iiC)
-         call flux(kbot, iiPel, j, j, PELBOTTOM(j,Box)/Depth(kbot) )
+         call flux(kbot, iiPel, j, j, PELBOTTOM(Box,j)/Depth(kbot) )
          j = ppMicroZooPlankton(i,iiN)
          if ( j > 0) &
-           call flux(kbot, iiPel, j, j, PELBOTTOM(j,Box)/Depth(kbot) )
+           call flux(kbot, iiPel, j, j, PELBOTTOM(Box,j)/Depth(kbot) )
          j = ppMicroZooPlankton(i,iiP)
          if ( j > 0) &
-           call flux(kbot, iiPel, j, j, PELBOTTOM(j,Box)/Depth(kbot) )
+           call flux(kbot, iiPel, j, j, PELBOTTOM(Box,j)/Depth(kbot) )
       enddo
       !
    enddo FLUXES_XY_LOOP
@@ -399,10 +389,12 @@
          call flux_vector( iiBen, ppQ16p,ppQ16p, -jbotR6p(:) * burfrac)
          call flux_vector( iiBen, ppQ16s,ppQ16s, -jbotR6s(:) * burfrac)
          call flux_vector( iiBen, ppQ16c,ppQ16c, -jbotO5c(:) )
+         call flux_vector( iiBen, ppQ16c,ppQ16c, -jbotR3c(:) )
       else
          ! Here Divert O5c flux to surface Benthic OM for mass conservation 
          ! TL: it has to be included in benthic CSYS 
          call flux_vector( iiBen, ppQ6c,ppQ6c, -jbotO5c(:) )
+         call flux_vector( iiBen, ppQ6c,ppQ6c, -jbotR3c(:) )
 
       endif
 
@@ -445,3 +437,6 @@
 
 end subroutine PelagicBenthicCoupling
 
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

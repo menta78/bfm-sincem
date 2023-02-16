@@ -1,60 +1,44 @@
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model 
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-!BOP
 !
-! !ROUTINE: PelBac
+! ROUTINE: PelBac
 !
 ! DESCRIPTION
 !   Module containing the parameters for bacterioplankton and the 
 !   initialization and consistency check
 !
-! !INTERFACE
-  module mem_PelBac
-!
-! !USES:
-  use global_mem
-  use mem,  ONLY: iiPelBacteria,D3STATETYPE,ppR2c,ppR3c
-!  
-!
-! !AUTHORS
-!   First ERSEM version by J.W. Baretta and H. Baretta-Bekker
-!   Additional parametrizations by P. Ruardij and M. Vichi 
-!   (Vichi et al., 2004; Vichi et al., 2007)
-!   L. Polimene, I. Allen and M. Zavatarelli (Polimene et al., 2006)
-!   Dynamical allocation by G. Mattia 
-!
-! !REVISION_HISTORY
-!   !
-!
 ! COPYING
-!   
-!   Copyright (C) 2020 BFM System Team (bfm_st@cmcc.it)
-!   Copyright (C) 2006 P. Ruardij and M. Vichi
-!   (rua@nioz.nl, vichi@bo.ingv.it)
 !
-!   This program is free software; you can redistribute it and/or modify
+!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
+!
+!   This program is free software: you can redistribute it and/or modify
 !   it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation;
+!   the Free Software Foundation.
 !   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-!   GNU General Public License for more details.
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU General Public License for more details.
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 !
-!EOP
-!-------------------------------------------------------------------------!
-!BOC
+! INCLUDE
+#include "cppdefs.h"
 !
+! INTERFACE
+  module mem_PelBac
 !
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! Implicit typing is never allowed
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+! USES
+  use global_mem
+  use mem,  ONLY: iiPelBacteria,D3STATETYPE,ppR2c,ppR3c
+
   IMPLICIT NONE
+
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Default all is public
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   public
   integer,private     :: i
+
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   !NAMELIST PelBacteria_parameters
   !-------------------------------------------------------------------------!
@@ -76,7 +60,6 @@
   ! p_suR3      [1/d]            Specific potential uptake for semi-refractory DOC
   ! p_suR6      [1/d]            Specific potential uptake for POM (1/d)
   ! p_sum       [1/d]            Potential specific growth rate
-  ! p_qsum      [-]              Ratio of first-slope maximum growth (p_sum) to particulate substrate limited maximum growth at inifinite bacteria concentrations
   ! p_pu_ra     [-]              Activity respiration fraction
   ! p_pu_ra_o   [-]              Additional respiration fraction at low O2 conc
   ! p_srs       [1/d]            Specific rest respiration
@@ -92,6 +75,8 @@
   ! p_ruep      [1/d]            Relaxation timescale for P uptake/remin.
   ! p_rec       [1/d]            Relaxation timescale for semi-labile excretion
   ! p_pu_ea_R3  [-]              Excretion of semi-refractory DOC
+  ! p_chuc      [mgC/m3]         Half saturation total carbon uptake from substrate
+  ! p_chuc_lim  [-]              Scaling factor of p_chuc to set minimum value
   integer     :: p_version(iiPelBacteria), itrp
   integer, parameter ::       BACT1=1,BACT2=2,BACT3=3
   real(RLEN)  :: p_q10(iiPelBacteria)
@@ -104,7 +89,6 @@
   real(RLEN)  :: p_suR6(iiPelBacteria)
   real(RLEN)  :: p_suR3(iiPelBacteria)
   real(RLEN)  :: p_sum(iiPelBacteria)
-  real(RLEN)  :: p_qsum(iiPelBacteria)
   real(RLEN)  :: p_pu_ra(iiPelBacteria)
   real(RLEN)  :: p_pu_ra_o(iiPelBacteria)
   real(RLEN)  :: p_srs(iiPelBacteria)
@@ -120,6 +104,9 @@
   real(RLEN)  :: p_ruep(iiPelBacteria)
   real(RLEN)  :: p_rec(iiPelBacteria)
   real(RLEN)  :: p_pu_ea_R3(iiPelBacteria)
+  real(RLEN)  :: p_chuc(iiPelBacteria)
+  real(RLEN)  :: p_dep(iiPelBacteria)
+  real(RLEN)  :: p_dep_exp(iiPelBacteria)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! SHARED PUBLIC FUNCTIONS (must be explicited below "contains")
@@ -127,24 +114,19 @@
 
   contains
 
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! Initialization of Pelagic Bacteria
-  ! Definition of th enamelist with all the parameters
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   subroutine InitPelBac()
+
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   namelist /PelBacteria_parameters/ p_version, p_q10, p_chdo, p_sd, p_sd2, p_suhR1, &
     p_sulR1, p_suR2, p_suR6, p_sum, p_pu_ra, p_pu_ra_o, p_pu_ea_R3, p_srs, &
     p_suR3, p_qpcPBA, p_qlpc, p_qncPBA, p_qlnc, p_qun, p_qup, p_chn, p_chp, &
-    p_ruen, p_ruep, p_rec
+    p_ruen, p_ruep, p_rec, p_chuc, p_dep, p_dep_exp
 
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  !BEGIN compute
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   !  Open the namelist file(s)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  write(LOGUNIT,*) "#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
-  write(LOGUNIT,*) "#  Reading PelBac parameters.."
+  LEVEL1 "#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+  LEVEL1 "#  Reading PelBac parameters.."
   open(NMLUNIT,file='Pelagic_Ecology.nml',status='old',action='read',err=100)
   read(NMLUNIT,nml=PelBacteria_parameters,err=101)
   close(NMLUNIT)
@@ -153,48 +135,48 @@
   ! Check consistency of parameters according to the parametrization
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   do i=1,iiPelBacteria
-     write(LOGUNIT,*) "#  Checking PelBacteria parameters for group:",i
-     write(LOGUNIT,*) "#   Use formulation (p_version) -> ",p_version
+     LEVEL1 "#  Checking PelBacteria parameters for group:",i
+     LEVEL1 "#   Use formulation (p_version) -> ",p_version
      select case ( p_version(i) )
        case ( BACT3 ) ! Polimene et al. (2006)
          p_sulR1(i) = ZERO
-         write(LOGUNIT,*) "#   forcing p_sulR1=0"
+         LEVEL1 "#   forcing p_sulR1=0"
          if (p_pu_ea_R3(i) + p_pu_ra(i) .GT. 0.3_RLEN) then
-           write(LOGUNIT,*)"#  Warning: Bacterial growth efficiency is lower than 0.3!"
-           write(LOGUNIT,*)"#  The release of capsular material is possibly larger than p_pu_ra/4"
+           LEVEL1 "#  Warning: Bacterial growth efficiency is lower than 0.3!"
+           LEVEL1 "#  The release of capsular material is possibly larger than p_pu_ra/4"
          end if
        case ( BACT1 ) ! Vichi et al. 2007
          p_sulR1(i) = ZERO
          p_suR2(i) = ZERO
          p_suR3(i) = ZERO
-         write(LOGUNIT,*) "#   forcing p_sulR1, p_suR2, p_suR3=0"
+         LEVEL1 "#   forcing p_sulR1, p_suR2, p_suR3=0"
        case ( BACT2 ) ! Vichi et al. 2004
          p_suR3(i) = ZERO
-         write(LOGUNIT,*) "#   forcing p_suR3=0"
+         LEVEL1 "#   forcing p_suR3=0"
      end select
   end do
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Check across bacterial groups if R2 and R3 must be kept in transport
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   itrp=maxval(p_version)
-  if ( itrp < 3 ) then
-     D3STATETYPE(ppR3c)=NOTRANSPORT
-     write(LOGUNIT,*) " Disable R3c transport as no bacterial group use it "
-  endif
-  if ( itrp < 2 ) then
-     D3STATETYPE(ppR2c)=NOTRANSPORT
-     write(LOGUNIT,*) " Disable R2c transport as no bacterial group use it "
-  endif
-   write(LOGUNIT,*) ""
+  select case (itrp)
+     case ( 1 )
+        D3STATETYPE(ppR3c)=NOTRANSPORT
+        D3STATETYPE(ppR2c)=NOTRANSPORT
+        LEVEL1 " Disable R2c & R3c transport as no bacterial group use it "
+     case ( 4 )
+        D3STATETYPE(ppR2c)=NOTRANSPORT
+        LEVEL1 " Disable R2c transport as no bacterial group use it "
+     case default
+        LEVEL1 " Active R2c & R3c transport"
+  end select
+  LEVEL1 ""
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Write parameter list to the log
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  write(LOGUNIT,*) "#  Namelist is:"
-  write(LOGUNIT,nml=PelBacteria_parameters)
+  LEVEL1 "#  Namelist is:"
+  if (bfm_lwp) write(LOGUNIT,nml=PelBacteria_parameters)
 
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  !END compute
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   return
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Local Error Messages
@@ -202,9 +184,10 @@
 100 call error_msg_prn(NML_OPEN,"InitPelBac.f90","Pelagic_Ecology.nml")
 101 call error_msg_prn(NML_READ,"InitPelBac.f90","PelBacteria_parameters")
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  end  subroutine InitPelBac
+  end subroutine InitPelBac
+
   end module mem_PelBac
-!BOP
+
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model 
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

@@ -2,27 +2,8 @@
 
 A set of tools is here provided to perform different processing of BFM output and restart data:
 
-- **bnmerge**: merge the output files produced by MPI parallel `BFM_NEMO` simulations when XIOS is not used
 - **chlsat**: compute satellite-like Chlorophyll-a fields from 3D BFM outputs
 - **standalone_diag**: create plots and HTML index for STANDALONE experiments
-
-## bnmerge
-This tool merges the output files produced by `BFM_NEMO` when run in parallel without the use of XIOS library.
-The 1D BFM output files are remapped into NEMO 3D grid and all variables are copied in output file along with NEMO `tmask`.
-
-**Setup**
-
-Change the variable `COMPILER` in the `Makefile` with the name of the included compiler file from the Compilers directory. Run gmake. 
-
-The tool requires NetCDF-4.3+ libraries. To debug (OMP parallel or serial) export variable DEBUG equal to yes, namely `$> export DEBUG=yes`
-
-**Usage**
-
-Data processing is controlled using the namelist `bnmerge.nml` (Check the example provided for explanations of the input parameters):
-
-`$>./bnmerge.x -f bnmerge.nml`
-
-A batch execution script (`bnmerge.sh`) is provided as an example to generate and use the reconstruction tool on CMCC clusters.
 
 ## chlsat
 This code computes the chlorophyll concentration as seen by satellite considering:

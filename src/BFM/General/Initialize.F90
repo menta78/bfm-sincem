@@ -1,18 +1,32 @@
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model 
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-!BOP
 !
-! !ROUTINE: Initialize
+! ROUTINE: Initialize
 !
 ! DESCRIPTION
-!   Initialization of model
-!   Allocation of memory for variables, reading of data files 
+!   Initialization of model, with allocation of memory and 
+!   reading of data files 
 !
-! !INTERFACE
+! COPYING
+!
+!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU General Public License for more details.
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! INCLUDE
+!
+! INTERFACE
   SUBROUTINE Initialize
 !
-! USES:
+! USES
   use mem, only: InitializeModel
   use mem_Param
   use mem_PelChem
@@ -57,104 +71,77 @@
   use mem_SeaicetoPel
 #endif
 
-!  
-!
-! !AUTHORS
-!   mfstep ERSEM team
-!
-! !REVISION_HISTORY
-!   ---
-!
-! COPYING
-!   
-!   Copyright (C) 2020 BFM System Team (bfm_st@cmcc.it)
-!   Copyright (C) 2006 P. Ruardij, the mfstep group, the ERSEM team 
-!   (rua@nioz.nl, vichi@bo.ingv.it)
-!
-!   This program is free software; you can redistribute it and/or modify
-!   it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation;
-!   This program is distributed in the hope that it will be useful,
-!   but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-!   GNU General Public License for more details.
-!
-!EOP
-!-------------------------------------------------------------------------!
-!BOC
-!
-!
     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-      InitializeModel=0
+    InitializeModel=0
 
-      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-      ! Allocate Memory for All global variables
-      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-      call AllocateMem
+    !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    ! Allocate Memory for All global variables
+    !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    call AllocateMem
 
-      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-      ! Initialize state variables transport and bottom box porosity
-      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-      call InitTransportStateTypes
-      call InitBoxParams
+    !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    ! Initialize state variables transport and bottom box porosity
+    !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    call InitTransportStateTypes
+    call InitBoxParams
 
-      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-      ! Read all data files:(namelist files)
-      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-      call InitParam
-      call InitPelChem
-      call InitPelBac
-      call InitMesoZoo
-      call InitMicroZoo
-      call InitPhyto
-      call InitPAR
-      call InitPelSinkSet
+    !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    ! Read all data files:(namelist files)
+    !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    call InitParam
+    call InitPelChem
+    call InitPelBac
+    call InitMesoZoo
+    call InitMicroZoo
+    call InitPhyto
+    call InitPAR
+    call InitPelSinkSet
 
 #if defined BENTHIC_BIO
-      ! Intermediate benthic return
-      call InitBenOrganisms
-      call InitFilterFeeder
-      call InitBenBac
-      call InitBioturbation
-      call InitBenthicRemin
-      call InitBenOxygen
-      call InitControlBennutBuffers
+    ! Intermediate benthic return
+    call InitBenOrganisms
+    call InitFilterFeeder
+    call InitBenBac
+    call InitBioturbation
+    call InitBenthicRemin
+    call InitBenOxygen
+    call InitControlBennutBuffers
 #elif defined BENTHIC_FULL
-      ! Full benthic nutrients
-      call InitBenOrganisms
-      call InitFilterFeeder
-      call InitBenBac
-      call InitBioturbation
-      call InitBenthicNutrient
-      call InitBenAmmonium
-      call InitBenNitrate
-      call InitBenOxygen
-      call InitBenAnoxic
-      call InitBenDenitriDepth
-      call InitBenPhosphate
-      call InitBenSilica
-      call InitBenQ1Transport
-      call InitControlBennutBuffers
+    ! Full benthic nutrients
+    call InitBenOrganisms
+    call InitFilterFeeder
+    call InitBenBac
+    call InitBioturbation
+    call InitBenthicNutrient
+    call InitBenAmmonium
+    call InitBenNitrate
+    call InitBenOxygen
+    call InitBenAnoxic
+    call InitBenDenitriDepth
+    call InitBenPhosphate
+    call InitBenSilica
+    call InitBenQ1Transport
+    call InitControlBennutBuffers
 #else
-      ! Simple benthic return
-      call InitBenthicReturn
+    ! Simple benthic return
+    call InitBenthicReturn
 #endif
 #ifdef INCLUDE_BENCO2
-      call InitBenCO2Transport
-      call InitBenAlkalinity
+    call InitBenCO2Transport
+    call InitBenAlkalinity
 #endif
 #ifdef INCLUDE_PELCO2
-      call InitCO2
+    call InitCO2
 #endif
 #ifdef INCLUDE_SEAICE
-      call InitSeaiceAlgae
-      call InitSeaiceBac
-      call InitSeaiceZoo
-      call InitSeaicetoPel
+    call InitSeaiceAlgae
+    call InitSeaiceBac
+    call InitSeaiceZoo
+    call InitSeaicetoPel
 #endif
 
-    END SUBROUTINE Initialize
-!EOC
+  END SUBROUTINE Initialize
+
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model 
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

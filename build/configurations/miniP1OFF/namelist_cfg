@@ -1,0 +1,157 @@
+!!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+!! NEMO/OPA  :  PELAGOS1_OFF configuration namelist used ot overwrite SHARED/namelist_ref
+!!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+!-----------------------------------------------------------------------
+&namrun        !   parameters of the run
+!-----------------------------------------------------------------------
+   cn_exp      =  "PELAGOS1_OFF"  !  experience name 
+   nn_it000    =       1    !  first time step
+   nn_itend    =    2920    !  last  time step (std 5475)
+   nn_stock    =    2920    !  frequency of creation of a restart file (modulo referenced to 1)
+   nn_write    =    2920    !  frequency of write in the output file   (modulo referenced to nn_it000)
+   nn_date0    =  20000101  !  date at nit_0000 (format yyyymmdd) used if ln_rstart=F or (ln_rstart=T and nn_rstctl=0 or 1)
+   ln_clobber  = .false.    !  clobber (overwrite) an existing file
+/
+!-----------------------------------------------------------------------
+&namcfg        !   parameters of the configuration
+!-----------------------------------------------------------------------
+   cp_cfg      =  "pelagos1_off"               !  name of the configuration
+   jp_cfg      =       1               !  resolution of the configuration
+   jpidta      =     362               !  1st lateral dimension ( >= jpi )
+   jpjdta      =     292               !  2nd    "         "    ( >= jpj )
+   jpkdta      =      50               !  number of levels      ( >= jpk )
+   jpiglo      =     362               !  1st dimension of global domain --> i =jpidta
+   jpjglo      =     292               !  2nd    -                  -    --> j  =jpjdta
+   jperio      =       6               !  lateral cond. type (between 0 and 6)
+/
+!-----------------------------------------------------------------------
+&namzgr        !   vertical coordinate
+!-----------------------------------------------------------------------
+/
+!-----------------------------------------------------------------------
+&namdom        !   space and time domain (bathymetry, mesh, timestep)
+!-----------------------------------------------------------------------
+   nn_msh      =    0      !  create (=1) a mesh file or not (=0)
+   rn_rdt      = 14400.    !  time step for the dynamics (and tracer if nn_acc=0)
+   rn_rdtmin   = 14400.          !  minimum time step on tracers (used if nn_acc=1)
+   rn_rdtmax   = 14400.          !  maximum time step on tracers (used if nn_acc=1)
+   rn_hmin     =   -3.
+   jphgr_msh   =       0               !  type of horizontal mesh
+   ppglam0     =  999999.0             !  longitude of first raw and column T-point (jphgr_msh = 1)
+   ppgphi0     =  999999.0             ! latitude  of first raw and column T-point (jphgr_msh = 1)
+   ppe1_deg    =  999999.0             !  zonal      grid-spacing (degrees)
+   ppe2_deg    =  999999.0             !  meridional grid-spacing (degrees)
+   ppe1_m      =  999999.0             !  zonal      grid-spacing (degrees)
+   ppe2_m      =  999999.0             !  meridional grid-spacing (degrees)
+   ppsur       =  999999.0             !  ORCA r4, r2 and r05 coefficients
+   ppa0        =  999999.0             ! (default coefficients)
+   ppa1        =  999999.0             !
+   ppkth       =      38.0             !
+   ppacr       =      11.0             !
+   ppdzmin     =       1.0             !  Minimum vertical spacing
+   pphmax      =    5700.0             !  Maximum depth
+   ldbletanh   =   .FALSE.             !  Use/do not use double tanf function for vertical coordinates
+   ppa2        =  999999.0             !  Double tanh function parameters
+   ppkth2      =  999999.0             !
+   ppacr2      =  999999.0             !
+/
+!-----------------------------------------------------------------------
+&namcrs        !   Grid coarsening for dynamics output and/or
+               !   passive tracer coarsened online simulations
+!-----------------------------------------------------------------------
+/
+!-----------------------------------------------------------------------
+&namsbc        !   Surface Boundary Condition (surface module)
+!-----------------------------------------------------------------------
+   nn_fsbc     = 1         !  frequency of surface boundary condition computation 
+   ln_dm2dc    = .false.    !  daily mean to diurnal cycle on short wave
+/  
+!-----------------------------------------------------------------------
+&namtra_qsr    !   penetrative solar radiation
+!-----------------------------------------------------------------------
+   ln_traqsr   = .false.   !  Light penetration (T) or not (F)
+/
+&namsbc_rnf    !   runoffs namelist surface boundary condition
+!-----------------------------------------------------------------------
+!              !  file name           ! frequency (hours) ! variable  ! time interp. !  clim  ! 'yearly'/ ! weights  ! rotation ! land/sea mask !
+!              !                      !  (if <0  months)  !   name    !   (logical)  !  (T/F) ! 'monthly' ! filename ! pairing  ! filename      !
+   sn_rnf      = 'runoff_DT09_clim'   ,        -1         , 'sorunoff',   .true.     , .true. , 'yearly'  , ''       , ''       , ''
+
+   cn_dir       = './'      !  root directory for the location of the runoff files
+   ln_rnf_mouth = .false.    !  specific treatment at rivers mouths
+/
+!-----------------------------------------------------------------------
+&namsbc_ssr    !   surface boundary condition : sea surface restoring
+!-----------------------------------------------------------------------
+/      
+
+!-----------------------------------------------------------------------
+&namcla        !   cross land advection
+!-----------------------------------------------------------------------
+/
+!-----------------------------------------------------------------------
+&nambbl        !   bottom boundary layer scheme
+!-----------------------------------------------------------------------
+/
+!-----------------------------------------------------------------------
+&nameos        !   ocean physical parameters
+!-----------------------------------------------------------------------
+   nn_eos      = 0     !  type of equation of state and Brunt-Vaisala frequency
+   ln_useCT    = .false.  ! use of Conservative Temp. ==> surface CT converted in Pot. Temp. in sbcssm
+/
+!-----------------------------------------------------------------------
+&namtra_ldf    !   lateral diffusion scheme for tracer 
+!-----------------------------------------------------------------------
+   !                       !  Operator type:
+   ln_traldf_lap    =  .true.   !  laplacian operator
+   ln_traldf_bilap  =  .false.  !  bilaplacian operator
+   !                       !  Direction of action:
+   ln_traldf_level  =  .false.  !  iso-level
+   ln_traldf_hor    =  .false.  !  horizontal (geopotential)   (needs "key_ldfslp" when ln_sco=T)
+   ln_traldf_iso    =  .true.   !  iso-neutral                 (needs "key_ldfslp")
+   !                       !  Griffies parameters              (all need "key_ldfslp")
+   ln_traldf_grif   =  .false.  !  griffies skew flux formulation       (require "key_ldfslp")
+   ln_traldf_gdia   =  .false.  !  griffies operator strfn diagnostics  (require "key_ldfslp")
+   ln_triad_iso     =  .false.  !  pure lateral mixing in ML
+   ln_botmix_grif   =  .false.  !  griffies operator with lateral mixing on bottom (require "key_ldfslp")
+   rn_aht_0         =  1000.    !  horizontal eddy diffusivity for tracers [m2/s]
+   rn_aeiv_0        =  1000.    !  eddy induced velocity coefficient [m2/s]    (require "key_traldf_eiv")
+   rn_ahtb_0        =     0.    !  background eddy diffusivity for ldf_iso [m2/s]
+/
+!-----------------------------------------------------------------------
+&namdta_dyn        !   offline dynamics read in files                ("key_offline")
+!-----------------------------------------------------------------------
+!          !  file name                             ! frequency (hours) ! variable  ! time interp. !  clim  ! 'yearly'/ ! weights  ! rotation ! land/sea mask !
+!          !                                        !  (if <0  months)  !   name    !   (logical)  !  (T/F) ! 'monthly' ! filename ! pairing  ! filename      !
+   sn_tem  = 'PC.n36.esm2.00_1d_01400101_01401231_grid_T' ,    24            , 'thetao'     ,  .true.    , .true. ,   'yearly'  , ''       , ''    , ''
+   sn_sal  = 'PC.n36.esm2.00_1d_01400101_01401231_grid_T' ,    24            , 'so'         ,  .true.    , .true. ,   'yearly'  , ''       , ''    , ''
+   sn_mld  = 'PC.n36.esm2.00_1d_01400101_01401231_grid_T' ,    24            , 'somixhgt'   ,  .true.    , .true. ,   'yearly'  , ''       , ''    , ''
+   sn_emp  = 'PC.n36.esm2.00_1d_01400101_01401231_grid_T' ,    24            , 'wfo'        ,  .true.    , .true. ,   'yearly'  , ''       , ''    , ''
+   sn_fmf  = 'PC.n36.esm2.00_1d_01400101_01401231_grid_T' ,    24            , 'sosflxdo'   ,  .true.    , .true. ,   'yearly'  , ''       , ''    , ''
+   sn_ice  = 'PC.n36.esm2.00_1d_01400101_01401231_grid_T' ,    24            , 'sic'        ,  .true.    , .true. ,   'yearly'  , ''       , ''    , ''
+   sn_wnd  = 'PC.n36.esm2.00_1d_01400101_01401231_grid_T' ,    24            , 'sowindsp'   ,  .true.    , .true. ,   'yearly'  , ''       , ''    , ''
+   sn_qsr  = 'PC.n36.esm2.00_3h_01400101_01401231_grid_T' ,     3            , 'rsntds'     ,  .true.    , .true. ,   'yearly'  , ''       , ''    , ''
+   sn_uwd  = 'PC.n36.esm2.00_1d_01400101_01401231_grid_U' ,    24            , 'uocetr_eff' ,  .true.    , .true. ,   'yearly'  , ''       , ''    , ''
+   sn_vwd  = 'PC.n36.esm2.00_1d_01400101_01401231_grid_V' ,    24            , 'vocetr_eff' ,  .true.    , .true. ,   'yearly'  , ''       , ''    , ''
+   sn_wwd  = 'PC.n36.esm2.00_1d_01400101_01401231_grid_W' ,    24            , 'wocetr_eff' ,  .true.    , .true. ,   'yearly'  , ''       , ''    , ''
+   sn_avt  = 'PC.n36.esm2.00_1d_01400101_01401231_grid_W' ,    24            , 'voddmavs'   ,  .true.    , .true. ,   'yearly'  , ''       , ''    , ''
+   sn_ubl  = 'PC.n36.esm2.00_1d_01400101_01401231_grid_U' ,    24            , 'sobblcox'   ,  .true.    , .true. ,   'yearly'  , ''       , ''    , ''
+   sn_vbl  = 'PC.n36.esm2.00_1d_01400101_01401231_grid_V' ,    24            , 'sobblcoy'   ,  .true.    , .true. ,   'yearly'  , ''       , ''    , ''
+   sn_rnf  = 'PC.n36.esm2.00_1d_01400101_01401231_grid_T' ,    24            , 'sorunoff'   ,  .true.    , .true. ,   'yearly'  , ''       , ''    , ''
+!
+   cn_dir          = './'       !  root directory for the location of the dynamical files
+   ln_dynrnf       =  .true.   !  runoffs option enabled (T) or not (F)
+   ln_dynrnf_depth =  .false.   ! runoffs is spread in vertical (T) or not (F)
+/
+!-----------------------------------------------------------------------
+&nammpp        !   Massively Parallel Processing                        ("key_mpp_mpi")
+!-----------------------------------------------------------------------
+   jpni        =   15       !  jpni   number of processors following i (set automatically if < 1)
+   jpnj        =   20       !  jpnj   number of processors following j (set automatically if < 1)
+   jpnij       =   256       !  jpnij  number of local domains (set automatically if < 1)
+/
+!-----------------------------------------------------------------------
+&namctl        !   Control prints & Benchmark
+!-----------------------------------------------------------------------
+   nn_timing   =    0      !  timing by routine activated (=1) creates timing.output file, or not (=0)
+/

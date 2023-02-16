@@ -1,47 +1,42 @@
-!-----------------------------------------------------------------------
-!BOP
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 !
-! !PROGRAM: main
+! PROGRAM: main
 ! 
-! !INTERFACE:
-   PROGRAM main
-!
-! !DESCRIPTION: 
-!
-! !USES:
-   use standalone
-   IMPLICIT NONE
-!
-! !INPUT PARAMETERS:
-!
-! !INPUT/OUTPUT PARAMETERS:
-!
-! !OUTPUT PARAMETERS:
-!
-! !REVISION HISTORY:
-!  Author(s): Momme Butenschoen (UNIBO) and Marcello Vichi (INGV)
-!
+! DESCRIPTION
+!   Main program of standalone interface
 !
 ! COPYING
 !
-!   Copyright (C) 2020 BFM System Team (bfm_st@cmcc.it)
+!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
 !
-!   This program is free software; you can redistribute it and/or modify
+!   This program is free software: you can redistribute it and/or modify
 !   it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation;
+!   the Free Software Foundation.
 !   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-!   GNU General Public License for more details.
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU General Public License for more details.
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 !
-! !LOCAL VARIABLES:
-! 
-!EOP
-!-----------------------------------------------------------------------
-!BOC
-      call init_standalone
-      call timestepping
-      call end_standalone
+! INCLUDE
+!
+! INTERFACE
+   PROGRAM main
+!
+! USES
+   use standalone
 
-      END PROGRAM main
-!EOC
+   IMPLICIT NONE
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+    call init_standalone
+    call timestepping
+    call end_standalone
+
+   END PROGRAM main
+
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

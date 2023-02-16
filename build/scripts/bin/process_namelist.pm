@@ -1,24 +1,24 @@
 #!/usr/bin/perl -w
 
+#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+# MODEL  BFM - Biogeochemical Flux Model
+#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+#
 # DESCRIPTION
 #   Process namelist files (read, check and generation)
 #
-# AUTHORS
-#   Esteban Gutierrez esteban.gutierrez@cmcc.it
-#   Tomas Lovato toma.lovato@cmcc.it
-#
 # COPYING
-#  
-#   Copyright (C) 2013 BFM System Team ( bfm_st@lists.cmcc.it )
 #
-#   This program is free software; you can redistribute it and/or modify
+#   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
+#
+#   This program is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
-#   the Free Software Foundation;
+#   the Free Software Foundation.
 #   This program is distributed in the hope that it will be useful,
 #   but WITHOUT ANY WARRANTY; without even the implied warranty of
-#   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#   GNU General Public License for more details.
-# -----------------------------------------------------
+#   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+#   See the GNU General Public License for more details.
+#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 package process_namelist;
 
@@ -59,7 +59,7 @@ sub getGroupComponents{
     foreach my $group_name (keys %$groups_ref){
         if( $$groups_ref{$group_name}->getAcro() eq $group_acro ){ 
             #calculate the number of elements belong to this group
-            foreach my $param ( sort { $$params_ref{$a}->getIndex() cmp $$params_ref{$b}->getIndex() } keys %$params_ref ){
+            foreach my $param ( sort { $$params_ref{$a}->getIndex() <=> $$params_ref{$b}->getIndex() } keys %$params_ref ){
                 my $prm_grp_name = $$params_ref{$param}->getGroup();
                 if( $prm_grp_name && $prm_grp_name eq $group_name ){
                   push( @components, $param );  
@@ -213,7 +213,7 @@ sub check_namelists{
                 my $list_name = $list->name;
                 #check all the parameters which are part of this group
                 my @params_grp = ();
-                foreach my $param ( sort { $$params_ref{$a}->getIndex() cmp $$params_ref{$b}->getIndex() } keys %$params_ref ){
+                foreach my $param ( sort { $$params_ref{$a}->getIndex() <=> $$params_ref{$b}->getIndex() } keys %$params_ref ){
                     my $prm_grp_name = $$params_ref{$param}->getGroup();
                     if( $prm_grp_name && $prm_grp_name eq $grp_name ){
                         push ( @params_grp, $param );

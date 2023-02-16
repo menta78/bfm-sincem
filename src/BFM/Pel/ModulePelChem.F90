@@ -1,9 +1,8 @@
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model 
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-!BOP
 !
-! !ROUTINE: PelChem
+! ROUTINE: PelChem
 !
 ! DESCRIPTION
 !   This process descibes the additional dynamics of dissolved
@@ -13,48 +12,36 @@
 !       - reoxidation of reduction equivalents
 !       - iron scavenging and remineralization (INCLUDE_PELFE)
 !
-! !INTERFACE
-  module mem_PelChem
-!
-! !USES:
-  use global_mem
-  use mem,        only: D3STATETYPE, ppO4n, ppN6r
-!  
-!
-! !AUTHORS
-!   Original version by P. Ruardij and M. Vichi
-!
-!
-!
-! !REVISION_HISTORY
-!
 ! COPYING
-!   
-!   Copyright (C) 2020 BFM System Team (bfm_st@cmcc.it)
-!   Copyright (C) 2006 P. Ruardij, M. Vichi
-!   (rua@nioz.nl, vichi@bo.ingv.it)
 !
-!   This program is free software; you can redistribute it and/or modify
+!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
+!
+!   This program is free software: you can redistribute it and/or modify
 !   it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation;
+!   the Free Software Foundation.
 !   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-!   GNU General Public License for more details.
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU General Public License for more details.
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 !
-!EOP
-!-------------------------------------------------------------------------!
-!BOC
+! INCLUDE
+#include "cppdefs.h"
 !
+! INTERFACE
+  module mem_PelChem
 !
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! Implicit typing is never allowed
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+! USES
+  use global_mem
+  use mem,        only: D3STATETYPE, ppO4n, ppN6r
+
   IMPLICIT NONE
+
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Default all is public
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   public
+
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! PelChem PARAMETERS (read from nml)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -72,7 +59,7 @@
   ! p_clN6r     [mmolHS/m3]      Half-saturation concentration of
   !                              reduction equivalents for denitrification
   ! p_rPAo      [mmolO2/m3/d]    Reference anoxic mineralization rate
-  ! p_q10R6N5   [-]              Q10 factor for biogenic silica
+  ! p_aeR6N5    [kJ/mol]         Arrhenius activation energy for biogenic silica
   ! p_sR6N5     [1/d]            Specific remineralization rate of
   !                              biogenic silica
   real(RLEN)  :: p_q10N4N3
@@ -82,7 +69,7 @@
   real(RLEN)  :: p_sN3O4n
   real(RLEN)  :: p_clN6r
   real(RLEN)  :: p_rPAo
-  real(RLEN)  :: p_q10R6N5
+  real(RLEN)  :: p_aeR6N5
   real(RLEN)  :: p_sR6N5
 #ifdef INCLUDE_PELFE
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -102,13 +89,13 @@
   ! SHARED PUBLIC FUNCTIONS (must be explicited below "contains")
 
   public InitPelChem
+
   contains
 
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   subroutine InitPelChem()
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  namelist /PelChem_parameters/ p_sN4N3, p_q10N4N3, p_q10R6N5, p_rOS, p_clO2o, &
+  namelist /PelChem_parameters/ p_sN4N3, p_q10N4N3, p_aeR6N5, p_rOS, p_clO2o, &
     p_clN6r, p_sN3O4n, p_rPAo, p_sR6N5
 #ifdef INCLUDE_PELFE
   namelist /PelChem_parameters_iron/ p_q10R6N7, p_sR6N7, p_sR1N7, p_scavOrg, &
@@ -116,35 +103,31 @@
 #endif
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-  !BEGIN compute
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   !  Open the namelist file(s)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-
-  write(LOGUNIT,*) "#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
-  write(LOGUNIT,*) "#  Reading PelChem parameters.."
+  LEVEL1  "#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+  LEVEL1  "#  Reading PelChem parameters.."
   open(NMLUNIT,file='Pelagic_Environment.nml',status='old',action='read',err=100)
   read(NMLUNIT,nml=PelChem_parameters,err=101)
 #ifdef INCLUDE_PELFE
   read(NMLUNIT,nml=PelChem_parameters_iron,err=102)
 #endif
   close(NMLUNIT)
-  write(LOGUNIT,*) "#  Namelist is:"
-  write(LOGUNIT,nml=PelChem_parameters)
+  LEVEL1 "#  Namelist is:"
+  if (bfm_lwp) write(LOGUNIT,nml=PelChem_parameters)
 #ifdef INCLUDE_PELFE
-  write(LOGUNIT,nml=PelChem_parameters_iron)
+  if (bfm_lwp) write(LOGUNIT,nml=PelChem_parameters_iron)
 #endif
   ! Disable the transport of O4n as it is only a sink of nitrogen (NO3 -> N2)
   D3STATETYPE(ppO4n)=NOTRANSPORT
-  write(LOGUNIT,*) " Disable O4n transport as it used only for mass balance"
+  LEVEL1 " Disable O4n transport as it used only for mass balance"
   ! Disable the transport of N6r if denitrification is disabled
   if ( (p_rOS .le. ZERO) .and. (p_sN3O4n .le. ZERO) ) then
      D3STATETYPE(ppN6r)=NOTRANSPORT
-     write(LOGUNIT,*) " Disable N6r transport as denitrification is not used (p_rOS & p_sN3O4n = ZERO)"
+     LEVEL1 " Disable N6r transport as denitrification is not used (p_rOS & p_sN3O4n = ZERO)"
   endif
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  !END compute
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
   return
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Local Error Messages
@@ -153,9 +136,10 @@
 101 call error_msg_prn(NML_READ,"InitPelChem.f90","PelChem_parameters")
 102 call error_msg_prn(NML_READ,"InitPelChem.f90","PelChem_parameters_iron")
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  end  subroutine InitPelChem
+  end subroutine InitPelChem
+
   end module mem_PelChem
-!EOC
+
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model 
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

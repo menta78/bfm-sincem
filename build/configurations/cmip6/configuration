@@ -1,0 +1,34 @@
+#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+#       CONFIGURATION VARIABLES
+#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+# BFM - Biogeochemical Flux Model
+#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+#
+# COPYING
+#
+#   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
+#
+#   This program is free software; you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation;
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+#  Currently available macros (cppdefs) are:
+#  BFM_PARALLEL     : activate parallel coupling with BFM
+#  INCLUDE_PELFE    : add Iron component to the pelagic system
+#  INCLUDE_PELCO2   : activate Pelagic Carbonate System and CO2 dynamics 
+#  BENTHIC_BIO      : use Intermediate complexity Benthic system
+
+&BFM_conf
+        MODE     = 'NEMO_CESM',
+        CPPDEFS  = 'BFM_NOPOINTERS BFM_PARALLEL INCLUDE_PELCO2 INCLUDE_PELFE',
+        EXP      = 'tn1v3',
+        EXPFILES = 'file_def_bfm.xml',
+/
+#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+#       CONFIGURATION VARIABLES
+#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

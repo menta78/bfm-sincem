@@ -6,7 +6,6 @@ SUBROUTINE PrintSet(NUTR,msg)
      USE mem_BenthicNutrient, ONLY:bennut_messages
      USE global_mem, ONLY: LOGUNIT
      USE bennut_variables,ONLY:sets
-     USE BFM_ERROR_MSG, ONLY: set_warning_for_getm
      implicit none
      integer,intent(IN)             ::NUTR    !Specification`
      character(len=*),intent(IN)    ::msg
@@ -15,7 +14,6 @@ SUBROUTINE PrintSet(NUTR,msg)
     
      write(LOGUNIT,'(''Warnings benthic nutrient model'')')
      write(LOGUNIT,'(''Message;'',A)') msg(1:len_trim(msg))
-     call set_warning_for_getm
      if ( bennut_messages == 0 ) return
      write(LOGUNIT,'(''Nutrient Sequence number(NUTR):'',I3)') NUTR
      write(LOGUNIT,'(''Point BoxNumberX_ben,BoxNumberY_ben:'',I5,'','',I5 )') BoxNumberX_ben,BoxNumberY_ben

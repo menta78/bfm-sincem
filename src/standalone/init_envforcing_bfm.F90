@@ -1,57 +1,52 @@
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! ROUTINE: Initialise the standalone BFM
+!
+! DESCRIPTION
+!   Read the namelist parameters for the analytical forcings
+!   Also initialize additional components for other forcing methods
+!
+! COPYING
+!
+!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU General Public License for more details.
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! INCLUDE
 #include "cppdefs.h"
-!-----------------------------------------------------------------------
-!BOP
 !
-! !IROUTINE: Initialise the standalone BFM
-!
-! !INTERFACE:
+! INTERFACE
    subroutine init_envforcing_bfm
 !
-! !DESCRIPTION:
-!  Read the namelist parameters for the analytical forcings
-!  Also initialize additional components for other forcing methods
-!
-!
-! !USES:
+! USES
    use global_mem, only:RLEN,LOGUNIT,NML_OPEN,NML_READ,error_msg_prn,NMLUNIT
    use api_bfm
    use time
    use envforcing
 
    IMPLICIT NONE
-!
-! !INPUT PARAMETERS:
-!
-! !REVISION HISTORY:
-!  Original author(s): Marcello Vichi
-!
-!
-! COPYING
-!
-!   Copyright (C) 2020 BFM System Team (bfm_st@cmcc.it)
-!
-!   This program is free software; you can redistribute it and/or modify
-!   it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation;
-!   This program is distributed in the hope that it will be useful,
-!   but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-!   GNU General Public License for more details.
-!
-! !LOCAL VARIABLES:
-   logical :: use_seaice_data
 
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Local Variables
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    namelist /forcings_nml/ forcing_method,ltype,lw,ls,sw,ss,tw,ts,tde, & 
             ww,ws,CO2inc,botdep_c,botdep_n,botdep_p,botdep_si,botox_o,  &
             forcing_file, &
             use_seaice_data, seaice_file, &
+            use_benthic_data, benthic_file, &
             use_external_data, data_file, &
             use_event_data, event_file
-!
-! !LOCAL VARIABLES:
-!EOP
-!-----------------------------------------------------------------------
-!BOC
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
    LEVEL2 'init_envforcing_bfm'
        !---------------------------------------------
        ! Give initial default values
@@ -86,6 +81,13 @@
     case (3) ! interactive air-sea fluxes
       !call init_air_sea(data_file,latitude, longitude)
     end select
+    if (use_benthic_data) then
+       LEVEL2 'Reading benthic forcing data from:'
+       LEVEL3 trim(benthic_file)
+       open(unit_benthic,file=benthic_file,action='read',status='old',err=110)
+    else
+       LEVEL2 'Skipping benthic forcing data'
+    end if
 #ifdef INCLUDE_SEAICE
     if (use_seaice_data) then
        LEVEL2 'Reading sea-ice forcing data from:'
@@ -111,11 +113,15 @@
    return
 
 100   call error_msg_prn(NML_OPEN,"init_envforcing_bfm.f90","standalone.nml")
-102   call error_msg_prn(NML_READ,"init_envforcing_bfm.f90","anforcings_nml")
-106   call error_msg_prn(NML_OPEN,"init_envforcing_bfm.f90",trim(forcing_file))
-107   call error_msg_prn(NML_OPEN,"init_envforcing_bfm.f90",trim(data_file))
-108   call error_msg_prn(NML_OPEN,"init_envforcing_bfm.f90",trim(seaice_file))
-109   call error_msg_prn(NML_OPEN,"init_envforcing_bfm.f90",trim(event_file))
+102   call error_msg_prn(NML_READ,"init_envforcing_bfm.f90","forcings_nml")
+106   call error_msg_prn(NML_OPEN,"init_envforcing_bfm.f90","forcing_file: "//trim(forcing_file))
+107   call error_msg_prn(NML_OPEN,"init_envforcing_bfm.f90","data_file: "//trim(data_file))
+108   call error_msg_prn(NML_OPEN,"init_envforcing_bfm.f90","seaice_file: "//trim(seaice_file))
+109   call error_msg_prn(NML_OPEN,"init_envforcing_bfm.f90","event_file: "//trim(event_file))
+110   call error_msg_prn(NML_OPEN,"init_envforcing_bfm.f90","benthic_file: "//trim(benthic_file))
 
    end subroutine init_envforcing_bfm
-!EOC
+
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

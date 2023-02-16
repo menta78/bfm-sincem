@@ -1,19 +1,35 @@
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! ROUTINE: compute the average field
+!
+! DESCRIPTION
+!   This is a sophisticated subroutine to accumulate instantaneous
+!   values and compute averages over each output interval.
+!   It stores only the variables defined in the {/tt namelist} variable
+!   {/tt ave_save}.
+!
+! COPYING
+!
+!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU General Public License for more details.
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! INCLUDE
 #include "cppdefs.h"
-!-----------------------------------------------------------------------
-!BOP
 !
-! !ROUTINE: compute the average field
-!
-! !INTERFACE:
+! INTERFACE
    subroutine calcmean_bfm(mode)
 !
-! !DESCRIPTION:
-!  This is a sophisticated subroutine to accumulate instantaneous
-!  values and compute averages over each output interval.
-!  It stores only the variables defined in the {/tt namelist} variable
-!  {/tt ave_save}.
-!
-! !USES:
+! USES
    use api_bfm
    use mem, only: D3STATE,D3DIAGNOS,D2DIAGNOS
 
@@ -26,14 +42,13 @@
 
    implicit none
 
-!
-! !INPUT PARAMETERS:
+  ! INPUT
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    integer,intent(IN)                  :: mode
-!
-! !REVISION HISTORY:
-!  Original author(s): Piet Ruardij (NIOZ)
-!
-! !LOCAL VARIABLES:
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Local Variables
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     integer                     ::i
     integer                     ::j
     integer                     ::k
@@ -43,10 +58,8 @@
     logical,save                ::do_2ave_ice
 #endif
     logical,save                ::do_2ave_ben
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-!EOP
-!-----------------------------------------------------------------------
-!BOC
 #ifdef DEBUG
    LEVEL1 'calcmean_bfm, mode=',mode
 #endif
@@ -55,7 +68,7 @@
       case(INIT)   ! initialization
          i=count(var_ave(stPelStart:stPelFluxE))
          if ( i > 0 ) then
-            allocate(D3ave(1:i,1:NO_BOXES),stat=rc)
+            allocate(D3ave(1:NO_BOXES,1:i),stat=rc)
             if (rc /= 0) stop 'init_bio(): Error allocating D3ave'
             D3ave=0.0
             do_3ave = .true.
@@ -64,7 +77,7 @@
          endif
          i=count(var_ave(stPelDiag2dS:stPelEnd))
          if ( i > 0 ) then
-            allocate(D2ave(1:i,1:NO_BOXES_XY),stat=rc)
+            allocate(D2ave(1:NO_BOXES_XY,1:i),stat=rc)
             if (rc /= 0) stop 'init_bio(): Error allocating D2ave'
             D2ave=0.0
             do_2ave = .true.
@@ -74,7 +87,7 @@
 #if defined INCLUDE_SEAICE
          i=count(var_ave(stIceStart:stIceEnd))
          if ( i > 0 ) then
-            allocate(D2ave_ice(1:i,1:NO_BOXES_XY),stat=rc)
+            allocate(D2ave_ice(1:NO_BOXES_XY,1:i),stat=rc)
             if (rc /= 0) stop 'init_bio(): Error allocating D2ave_ice'
             D2ave_ice=0.0
             do_2ave_ice = .true.
@@ -84,7 +97,7 @@
 #endif
          i=count(var_ave(stBenStart:stBenEnd))
          if ( i > 0 ) then
-            allocate(D2ave_ben(1:i,1:NO_BOXES_XY),stat=rc)
+            allocate(D2ave_ben(1:NO_BOXES_XY,1:i),stat=rc)
             if (rc /= 0) stop 'init_bio(): Error allocating D2ave_ben'
             D2ave_ben=0.0
             do_2ave_ben = .true.
@@ -119,9 +132,9 @@
                if ( var_ave(i) ) then
                   k=k+1
                   if ( ave_count < 1.5 ) then
-                     D3ave(k,:)=D3STATE(j,:)
+                     D3ave(:,k)=D3STATE(:,j)
                   else
-                     D3ave(k,:)=D3ave(k,:)+D3STATE(j,:)
+                     D3ave(:,k)=D3ave(:,k)+D3STATE(:,j)
                   end if
                end if
             end do
@@ -132,9 +145,9 @@
                if ( var_ave(i) ) then
                   k=k+1
                   if ( ave_count < 1.5 ) then
-                     D3ave(k,:)=D3DIAGNOS(j,:)
+                     D3ave(:,k)=D3DIAGNOS(:,j)
                   else
-                     D3ave(k,:)=D3ave(k,:)+D3DIAGNOS(j,:)
+                     D3ave(:,k)=D3ave(:,k)+D3DIAGNOS(:,j)
                   end if
                end if
             end do
@@ -146,9 +159,9 @@
                   k=k+1
                   call correct_flux_output(1,j,1,NO_BOXES,c1dim)
                   if ( ave_count < 1.5 ) then
-                     D3ave(k,:)=c1dim
+                     D3ave(:,k)=c1dim
                   else
-                     D3ave(k,:)=D3ave(k,:)+c1dim
+                     D3ave(:,k)=D3ave(:,k)+c1dim
                   end if
                end if
             end do
@@ -159,14 +172,14 @@
             !---------------------------------------------
             k=0
             j=0
-            do i=stPelDiag2dS,stPelRivE
+            do i=stPelDiag2dS,stPelBotE
                j=j+1
                if ( var_ave(i) ) then
                   k=k+1
                   if ( ave_count < 1.5 ) then
-                     D2ave(k,:)=D2DIAGNOS(j,:)
+                     D2ave(:,k)=D2DIAGNOS(:,j)
                   else
-                     D2ave(k,:)=D2ave(k,:)+D2DIAGNOS(j,:)
+                     D2ave(:,k)=D2ave(:,k)+D2DIAGNOS(:,j)
                   end if
                end if
             end do
@@ -184,9 +197,9 @@
                if ( var_ave(i) ) then
                   k=k+1
                   if ( ave_count < 1.5 ) then
-                     D2ave_ice(k,:)=D2STATE_ICE(j,:)
+                     D2ave_ice(:,k)=D2STATE_ICE(:,j)
                   else
-                     D2ave_ice(k,:)=D2ave_ice(k,:)+D2STATE_ICE(j,:)
+                     D2ave_ice(:,k)=D2ave_ice(:,k)+D2STATE_ICE(:,j)
                   end if
                end if
             end do
@@ -197,9 +210,9 @@
                if ( var_ave(i) ) then
                   k=k+1
                   if ( ave_count < 1.5 ) then
-                     D2ave_ice(k,:)=D2DIAGNOS_ICE(j,:)
+                     D2ave_ice(:,k)=D2DIAGNOS_ICE(:,j)
                   else
-                     D2ave_ice(k,:)=D2ave_ice(k,:)+D2DIAGNOS_ICE(j,:)
+                     D2ave_ice(:,k)=D2ave_ice(:,k)+D2DIAGNOS_ICE(:,j)
                   end if
                end if
             end do
@@ -210,9 +223,9 @@
                if ( var_ave(i) ) then
                   k=k+1
                   if ( ave_count < 1.5 ) then
-                     D2ave_ice(k,:)=D2FLUX_FUNC_ICE(j,:)
+                     D2ave_ice(:,k)=D2FLUX_FUNC_ICE(:,j)
                   else
-                     D2ave_ice(k,:)=D2ave_ice(k,:)+D2FLUX_FUNC_ICE(j,:)
+                     D2ave_ice(:,k)=D2ave_ice(:,k)+D2FLUX_FUNC_ICE(:,j)
                   end if
                end if
             end do
@@ -230,9 +243,9 @@
                if ( var_ave(i) ) then
                   k=k+1
                   if ( ave_count < 1.5 ) then
-                     D2ave_ben(k,:)=D2STATE_BEN(j,:)
+                     D2ave_ben(:,k)=D2STATE_BEN(:,j)
                   else
-                     D2ave_ben(k,:)=D2ave_ben(k,:)+D2STATE_BEN(j,:)
+                     D2ave_ben(:,k)=D2ave_ben(:,k)+D2STATE_BEN(:,j)
                   end if
                end if
             end do
@@ -243,9 +256,9 @@
                if ( var_ave(i) ) then
                   k=k+1
                   if ( ave_count < 1.5 ) then
-                     D2ave_ben(k,:)=D2DIAGNOS_BEN(j,:)
+                     D2ave_ben(:,k)=D2DIAGNOS_BEN(:,j)
                   else
-                     D2ave_ben(k,:)=D2ave_ben(k,:)+D2DIAGNOS_BEN(j,:)
+                     D2ave_ben(:,k)=D2ave_ben(:,k)+D2DIAGNOS_BEN(:,j)
                   end if
                end if
             end do
@@ -256,9 +269,9 @@
                if ( var_ave(i) ) then
                   k=k+1
                   if ( ave_count < 1.5 ) then
-                     D2ave_ben(k,:)=D2FLUX_FUNC_BEN(j,:)
+                     D2ave_ben(:,k)=D2FLUX_FUNC_BEN(:,j)
                   else
-                     D2ave_ben(k,:)=D2ave_ben(k,:)+D2FLUX_FUNC_BEN(j,:)
+                     D2ave_ben(:,k)=D2ave_ben(:,k)+D2FLUX_FUNC_BEN(:,j)
                   end if
                end if
             end do
@@ -266,4 +279,7 @@
    end select
 
 end subroutine calcmean_bfm
-!EOC
+
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

@@ -1,19 +1,50 @@
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! ROUTINE: external_seaice
+!
+! DESCRIPTION
+!   Read seaice data, interpolate in time
+!   Coupling of sea ice processes for Kobbefjord site
+!   Required input fields:
+!      EICE : Seaice cover                   : --
+!      EHB  : Sea-ice biotic layer thickness : m
+!      EVB  : Brine volume fraction          : --
+!      ETB  : Brine temperature              : C
+!      ESB  : Brine salinity                 : --
+!      EIB  : Brine irradiance               : uE/m2/s
+!      ESI  : Sea-ice bulk salinity          : --
+!      EDH  : Sea-ice growth rate at bottom  : m/s
+!      EDS  : Snow growth rate at surface    : m/s
+!      EDM  : Snow ice layer growth rate     : m/s
+!      EIR  : Irradiance                     : uE/m2/s
+!
+! COPYING
+!
+!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU General Public License for more details.
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! INCLUDE
 #include "cppdefs.h"
-!-----------------------------------------------------------------------
-!BOP
 !
-! !IROUTINE: Read seaice data, interpolate in time
-!
-! !INTERFACE:
+! INTERFACE
    subroutine external_seaice
+
 #ifdef INCLUDE_SEAICE
 !
-! !DESCRIPTION:
-! Coupling of sea ice processes for Kobbefjord site
-!
-! !USES:
+! USES
    use global_mem, only: RLEN,ZERO,ONE
    use constants,  only: E2W, SEC_PER_DAY
+   use mem_PAR,    only: p_PAR
    ! seaice forcings
    use mem,        only: EICE,EVB,ETB,ESB,EIB,EHB,ESI,EDH,EDS
    use mem,        only: ESW,EIR
@@ -23,30 +54,12 @@
                          unit_seaice, read_obs, END_OF_FILE, READ_ERROR
    use standalone, only: latitude
    use bfm_error_msg
+
    IMPLICIT NONE
-!
-! !INPUT PARAMETERS:
-!
-! !REVISION HISTORY:
-!  Original author(s): Karsten Bolding
-!  modified for BFM by: Marcello Vichi
-!
-! COPYING
-!
-!   Copyright (C) 2020 BFM System Team (bfm_st@cmcc.it)
-!
-!   This program is free software; you can redistribute it and/or modify
-!   it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation;
-!   This program is distributed in the hope that it will be useful,
-!   but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-!   GNU General Public License for more details.
-!
-!
-!EOP
-!
-! !LOCAL VARIABLES:
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Local Variables
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    integer,parameter                  :: NSI=9
    integer                            :: yy,mm,dd,hh,minutes,ss
    real(RLEN)                         :: t,alpha,jday
@@ -55,8 +68,8 @@
    integer, save                      :: data_jul2=0,data_secs2=0
    real(RLEN), save                   :: obs1(NSI),obs2(NSI)=0.
    integer                            :: ierr,jh,jn
-!-----------------------------------------------------------------------
-!BOC
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
 #ifdef DEBUG
    LEVEL1 'external_forcing (jul,sec): ',julianday,secondsofday
    call  calendar_date(real(julianday,RLEN),yy,mm,dd,jh,jn)
@@ -110,11 +123,10 @@
    ETB(:) = obs1(4) + t*alpha
    alpha = (obs2(5)-obs1(5))/dt
    ESB(:) = obs1(5) + t*alpha
-   ! convert from irradiance (W/m2) to PAR in uE/m2/s for BFM to run 
+   ! E2W converts from irradiance units (W/m2) to PAR units (uE/m2/s)
+   ! p_PAR converts to visibile light only
    alpha = (obs2(6)-obs1(6))/dt
-  ! the PAR/IRRAD is 0.5 for ocean, but for sea ice it is computed by 
-  ! the physical model so it is not used
-   EIB(:) = ((obs1(6) + t*alpha)/E2W)
+   EIB(:) = ((obs1(6) + t*alpha)*p_PAR/E2W)
    alpha = (obs2(7)-obs1(7))/dt
    ESI(:) = obs1(7) + t*alpha
    alpha = (obs2(8)-obs1(8))/dt
@@ -135,6 +147,9 @@
 #endif
   return
 #endif
-   end subroutine external_seaice
-!EOC
 
+   end subroutine external_seaice
+
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

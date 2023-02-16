@@ -1,60 +1,38 @@
-#include "DEBUG.h"
-#include "INCLUDE.h"
-
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-!BOP
 !
-! !ROUTINE: CheckMassConservation
+! ROUTINE: CheckMassConservation
 !
 ! DESCRIPTION
 !
-! !INTERFACE
+! COPYING
+!
+!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU General Public License for more details.
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! INCLUDE
+#include "DEBUG.h"
+#include "INCLUDE.h"
+!
+! INTERFACE
   subroutine CheckMassConservationDynamics
 !
-! !USES:
-
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! Modules (use of ONLY is strongly encouraged!)
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-
+! USES
   use global_mem,   ONLY: RLEN,ZERO,ONE,LOGUNIT
   use constants,    ONLY: MW_C, MW_P, MW_N, MW_SI
   use mem
   use mem_Param,    ONLY: CalcBenthicFlag,p_d_tot
   use time, only: bfmtime
 
-!
-!
-! !AUTHORS
-!   Piet Ruardij and Marcello Vichi
-!
-!
-!
-! !REVISION_HISTORY
-!   Created at Mon Nov 21 09:44:23 CET 2005
-!
-!
-!
-! COPYING
-!
-!   Copyright (C) 2020 BFM System Team (bfm_st@cmcc.it)
-!   Copyright (C) 2006 P. Ruardij and M. Vichi
-!   (rua@nioz.nl, vichi@bo.ingv.it)
-!
-!   This program is free software; you can redistribute it and/or modify
-!   it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation;
-!   This program is distributed in the hope that it will be useful,
-!   but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-!   GNU General Public License for more details.
-!
-!
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! Implicit typing is never allowed
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   IMPLICIT NONE
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -68,37 +46,37 @@
   logical,save    :: first=.TRUE.
   logical,save    :: flag=.FALSE.
   real(RLEN),parameter :: p_prec=1.e-12_RLEN
-!EOP
-!-------------------------------------------------------------------------!
-!BOC
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
   totpelc(:)=ZERO
   totpelp(:)=ZERO
   totpeln(:)=ZERO
   totpels(:)=ZERO
+
   ! Pelagic Bacteria
   do i=1, iiPelBacteria
      totpelc(:)=totpelc(:) + PelBacteria(i,iiC)
-     totpeln(:)=totpeln(:) + PelBacteria(i,iiC)*qncPBA(i,:)
-     totpelp(:)=totpelp(:) + PelBacteria(i,iiC)*qpcPBA(i,:)
+     totpeln(:)=totpeln(:) + PelBacteria(i,iiC)*qncPBA(:,i)
+     totpelp(:)=totpelp(:) + PelBacteria(i,iiC)*qpcPBA(:,i)
   end do
   ! PhytoPlankton
   do i=1, iiPhytoPlankton
      totpelc(:)=totpelc(:) + PhytoPlankton(i,iiC)
-     totpeln(:)=totpeln(:) + PhytoPlankton(i,iiC)*qncPPY(i,:)
-     totpelp(:)=totpelp(:) + PhytoPlankton(i,iiC)*qpcPPY(i,:)
-     totpels(:)=totpels(:) + PhytoPlankton(i,iiC)*qscPPY(i,:)
+     totpeln(:)=totpeln(:) + PhytoPlankton(i,iiC)*qncPPY(:,i)
+     totpelp(:)=totpelp(:) + PhytoPlankton(i,iiC)*qpcPPY(:,i)
+     totpels(:)=totpels(:) + PhytoPlankton(i,iiC)*qscPPY(:,i)
   end do
   ! MicroZooplankton
   do i=1, iiMicroZooplankton
      totpelc(:)=totpelc(:) + MicroZooplankton(i,iiC)
-     totpeln(:)=totpeln(:) + MicroZooplankton(i,iiC)*qncMIZ(i,:)
-     totpelp(:)=totpelp(:) + MicroZooplankton(i,iiC)*qpcMIZ(i,:)
+     totpeln(:)=totpeln(:) + MicroZooplankton(i,iiC)*qncMIZ(:,i)
+     totpelp(:)=totpelp(:) + MicroZooplankton(i,iiC)*qpcMIZ(:,i)
   end do
   ! MesoZooPlankton
   do i=1, iiMesoZooPlankton
      totpelc(:)=totpelc(:) + MesoZooPlankton(i,iiC)
-     totpeln(:)=totpeln(:) + MesoZooPlankton(i,iiC)*qncMEZ(i,:)
-     totpelp(:)=totpelp(:) + MesoZooPlankton(i,iiC)*qpcMEZ(i,:)
+     totpeln(:)=totpeln(:) + MesoZooPlankton(i,iiC)*qncMEZ(:,i)
+     totpelp(:)=totpelp(:) + MesoZooPlankton(i,iiC)*qpcMEZ(:,i)
    end do
   ! Pelagic Detritus
   do i=1, iiPelDetritus
@@ -187,7 +165,7 @@
 #endif
 
 #ifdef INCLUDE_BENCO2
-     totbenc(:) = totbenc(:)+G3c(:)
+     totbenc(:) = totbenc(:) + G3c(:)
 #endif
      ! Convert from default units to g and multiply for the sediment volume
      totbenc(:) = totbenc(:)/1000.0_RLEN*Area2d(:)
@@ -248,7 +226,7 @@
   prevsyss = totsyss(1)
 
   end subroutine CheckMassConservationDynamics
-!EOC
+
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

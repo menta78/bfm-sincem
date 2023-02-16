@@ -109,7 +109,7 @@
                      H,      &
                      ZZ
 !
-      use Service, ONLY: ISM
+      use CPL_VARIABLES, ONLY: ISM
 !
 !  -----IMPLICIT TYPING IS NEVER ALLOWED-----
 !

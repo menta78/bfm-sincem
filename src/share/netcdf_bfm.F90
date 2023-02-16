@@ -1,18 +1,33 @@
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! MODULE netcdf_bfm --- Save the BFM results in NetCDF
+!
+! DESCRIPTION
+!   This module provides routines for saving the results using NetCDF format.
+!
+! COPYING
+!
+!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU General Public License for more details.
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! INCLUDE
 #include"cppdefs.h"
 #define REAL_4B real(4)
-!-----------------------------------------------------------------------
-!BOP
 !
-! !MODULE: netcdf_bfm --- Save the BFM results in NetCDF
+! INTERFACE
+  module netcdf_bfm
 !
-! !INTERFACE:
-   module netcdf_bfm
-!
-! !DESCRIPTION:
-!  This module provides routines for saving the results using
-!  NetCDF format.
-!
-! !USES:
+! USES
    use string_functions, ONLY : replace_char
    use api_bfm, ONLY: var_names, var_units, var_long, var_ids, &
         var_ave, &
@@ -21,7 +36,6 @@
         c1dim, &
         bfm_rstctl, out_dir, &
         D3ave, D2ave, &
-        nc_compres,nc_shuffle,nc_deflate,nc_defllev, &
 #if defined INCLUDE_SEAICE
         D2ave_ice, &
         stIceStateS, stIceDiag2dS, stIceFlux2dS, stIceStateE, &
@@ -31,9 +45,9 @@
         stBenStateS, stBenDiag2dS, stBenFlux2dS, stBenStateE, &
         stBenDiag2dE, stBenFlux2dE, stBenStart, stBenEnd,  &
         stStart, stEnd, stPelStateS, stPelDiagS, stPelFluxS, &
-        stPelDiag2dS, stPelSurS, stPelBotS, stPelRivS, &
+        stPelDiag2dS, stPelSurS, stPelBotS, &
         stPelStateE, stPelDiagE, stPelFluxE, stPelDiag2dE, &
-        stPelSurE, stPelBotE, stPelRivE, stPelStart, stPelEnd
+        stPelSurE, stPelBotE, stPelStart, stPelEnd
 
 
    use mem,     only: NO_BOXES,NO_BOXES_X,NO_BOXES_Y,NO_BOXES_Z,NO_BOXES_XY,Depth
@@ -47,6 +61,7 @@
    use constants, ONLY: SEC_PER_DAY
    use init_var_bfm_local
    use netcdf
+
    implicit none
 !
 ! !PUBLIC MEMBER FUNCTIONS:
@@ -101,12 +116,6 @@
    integer                       :: ph_rid
 #endif
 !
-! !REVISION HISTORY:
-!  Original author(s): Karsten Bolding & Hans Burchard
-!  Modifications and BFM additions: Marcello Vichi , Tomas Lovato
-!
-!EOP
-!
 ! !PRIVATE DATA MEMBERS
 !  variable ids
    integer, private          :: start(4),edges(4)
@@ -115,25 +124,19 @@
 
    contains
 
-!-----------------------------------------------------------------------
-!BOP
-!
-! !IROUTINE: Initialize the netcdf output
-!
-! !INTERFACE:
    subroutine init_netcdf_bfm(title,start_time,expinfo,time_unit,      &
                               lat,lon,z,dz,lat2d,lon2d,                &
                               oceanpoint,surfacepoint,bottompoint,     &
                               roceanpoint,rsurfacepoint,rbottompoint,  &
                               mask3d,column)
 !
-! !DESCRIPTION:
-!  Prepare the netcdf output file which is finalized in init_save_bfm
+! DESCRIPTION
+!   Prepare the netcdf output file which is finalized in init_save_bfm
 !
-! !USES:
    implicit none
-!
-! !INPUT/OUTPUT PARAMETERS:
+
+  ! INPUT/OUTPUT
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    character(len=*), intent(in)                 :: title,start_time,expinfo
    integer, intent(in)                          :: time_unit
    real(RLEN), intent(in),optional                :: lat,lon
@@ -145,14 +148,10 @@
    real(RLEN), intent(in),optional              :: rsurfacepoint,rbottompoint
    real(RLEN),intent(in),dimension(:,:,:),optional:: mask3d
    logical, intent(in),optional                   :: column
-!
-! !REVISION HISTORY:
-!  Original author(s): Karsten Bolding & Hans Burchard
-!  Modifications: Marcello Vichi
-!
-!EOP
-!
-! !LOCAL VARIABLES:
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Local Variables
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    character(len=PATH_MAX)   :: ext,fname
    integer                   :: iret,ndims
    character(len=128)        :: ncdf_time_str,history
@@ -160,9 +159,8 @@
    integer                   :: lon_len
    integer                   :: lat_len
    integer                   :: depth_len
-!!
-!-------------------------------------------------------------------------
-!BOC
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
    LEVEL1 'init_netcdf_bfm: create output data file(s) ...'
 
    !---------------------------------------------
@@ -172,7 +170,7 @@
    fname = TRIM(out_dir) //'/'// TRIM(title) // '.' // ext
    LEVEL2 'Output NetCDF file is (time unit is set to seconds):'
    LEVEL2 TRIM(fname)
-   call check_err(NF90_CREATE(fname,NF90_NETCDF4,ncid_bfm), fname)
+   call check_err(NF90_CREATE(fname,NF90_64BIT_OFFSET,ncid_bfm), fname)
 
    ncdf_time_unit = time_unit
 
@@ -236,7 +234,6 @@
       dims(2) = y_dim
       dims(3) = depth_dim
       call check_err(NF90_DEF_VAR(ncid_bfm,'mask',NF90_REAL,dims,mask_id), fname)
-      if (nc_compres) call check_err(NF90_DEF_VAR_DEFLATE(ncid_bfm,mask_id,nc_shuffle,nc_deflate,nc_defllev))
       DEALLOCATE(dims)
    end if
 
@@ -257,14 +254,6 @@
    call check_err(set_attributes(ncid_bfm,botpoint_id,compress='none'), fname)
    call check_err(set_attributes(ncid_bfm,surfpoint_id,formula_term='surface points'), fname)
    call check_err(set_attributes(ncid_bfm,surfpoint_id,compress='none'), fname)
-#endif
-#ifdef BFM_GOTM
-   call check_err(set_attributes(ncid_bfm,ocepoint_id,formula_term='watercolumn levels'), fname)
-   call check_err(set_attributes(ncid_bfm,ocepoint_id,compress='z'), fname)
-   call check_err(set_attributes(ncid_bfm,surfpoint_id,formula_term='watercolumn surface'), fname)
-   call check_err(set_attributes(ncid_bfm,surfpoint_id,compress='z'), fname)
-   call check_err(set_attributes(ncid_bfm,botpoint_id,formula_term='watercolumn bottom'), fname)
-   call check_err(set_attributes(ncid_bfm,botpoint_id,compress='z'), fname)
 #endif
 #ifdef BFM_NEMO
    if (present(column)) then
@@ -355,33 +344,27 @@
    Call FLUSH (LOGUNIT)
 
    end subroutine init_netcdf_bfm
-!EOC
 
 !-----------------------------------------------------------------------
-!BOP
-!
-! !IROUTINE: Initialize the netcdf restart
-!
-! !INTERFACE:
+
    subroutine init_netcdf_rst_bfm(title,start_time,time_unit,lat,lon,z,dz, &
                               lat2d,lon2d,oceanpoint,surfacepoint,     &
                               bottompoint,mask3d)
 !
-! !DESCRIPTION:
-!  Prepare the netcdf restart file for the BFM
+! DESCRIPTION:
+!   Prepare the netcdf restart file for the BFM
 !
-! !USES:
-
-   use mem, only: NO_D3_BOX_STATES, NO_BOXES,    &
-                  NO_BOXES_XY
+! USES
+   use mem, only: NO_D3_BOX_STATES, NO_BOXES, NO_BOXES_XY
 #if defined INCLUDE_SEAICE
    use mem, only: NO_D2_BOX_STATES_ICE
 #endif
    use mem, only: NO_D2_BOX_STATES_BEN
 
    implicit none
-!
-! !INPUT/OUTPUT PARAMETERS:
+
+  ! INPUT/OUTPUT
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    character(len=*), intent(in)                    :: title,start_time
    integer, intent(in)                             :: time_unit
    real(RLEN), intent(in),optional                 :: lat,lon
@@ -390,20 +373,15 @@
    integer, intent(in),dimension(:),optional       :: oceanpoint
    integer, intent(in),dimension(:),optional       :: surfacepoint,bottompoint
    real(RLEN),intent(in),dimension(:,:,:),optional :: mask3d
-!
-! !REVISION HISTORY:
-!  Original author(s): Karsten Bolding & Hans Burchard
-!  Modifications: Marcello Vichi
-!
-!EOP
-!
-! !LOCAL VARIABLES:
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Local Variables
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    character(len=PATH_MAX)   :: ext,fname
    integer                   :: iret,ndims
    character(len=128)        :: ncdf_time_str,history
-!!
-!-------------------------------------------------------------------------
-!BOC
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
    LEVEL2 'init_netcdf_rst_bfm: define output restart file(s) ...'
 
    !---------------------------------------------
@@ -413,7 +391,7 @@
    fname = './'// TRIM(title) // '.' // ext
    LEVEL2 'Restart NetCDF file is :'
    LEVEL2 TRIM(fname)
-   call check_err(NF90_CREATE(fname,NF90_NETCDF4,ncid_rst), fname)
+   call check_err(NF90_CREATE(fname,NF90_64BIT_OFFSET,ncid_rst), fname)
 
    ncdf_time_unit = time_unit
 
@@ -437,20 +415,17 @@
    call check_err(NF90_DEF_DIM(ncid_rst, 'char_max', LEN(var_names), chars_rdim), fname)
    call check_err(NF90_DEF_DIM(ncid_rst, 'd3vars', NO_D3_BOX_STATES, d3vars_rdim), fname)
    ALLOCATE(dims(2))
-   dims(1) = d3vars_rdim
-   dims(2) = ocepoint_rdim
+   dims(1) = ocepoint_rdim
+   dims(2) = d3vars_rdim
    call check_err(NF90_DEF_VAR(ncid_rst,'D3STATE',NF90_DOUBLE,dims,d3state_rid), fname)
-   if (nc_compres) call check_err(NF90_DEF_VAR_DEFLATE(ncid_rst,d3state_rid,nc_shuffle,nc_deflate,nc_defllev))
    call check_err(NF90_DEF_VAR(ncid_rst,'D3STATE_NAME',NF90_CHAR,(/chars_rdim, d3vars_rdim/),d3state_name_rid), fname)
    call check_err(NF90_DEF_VAR(ncid_rst,'D3STATE_UNITS',NF90_CHAR,(/chars_rdim, d3vars_rdim/),d3state_units_rid), fname)
    call check_err(NF90_DEF_VAR(ncid_rst,'D3STATE_LONG',NF90_CHAR,(/chars_rdim, d3vars_rdim/),d3state_long_rid), fname)
 #ifdef INCLUDE_PELCO2
    call check_err(NF90_DEF_VAR(ncid_rst,'pH',NF90_DOUBLE,ocepoint_rdim,ph_rid), fname)
-   if (nc_compres) call check_err(NF90_DEF_VAR_DEFLATE(ncid_rst,ph_rid,nc_shuffle,nc_deflate,nc_defllev))
 #endif
 #if defined BFM_NEMO || defined BFM_POM
    call check_err(NF90_DEF_VAR(ncid_rst,'D3STATEB',NF90_DOUBLE,dims,d3stateb_rid), fname)
-   if (nc_compres) call check_err(NF90_DEF_VAR_DEFLATE(ncid_rst,d3stateb_rid,nc_shuffle,nc_deflate,nc_defllev))
 #endif
 
    !---------------------------------------------
@@ -479,16 +454,14 @@
    ! define 2D Seaice dimensions and variables
    !---------------------------------------------
    call check_err(NF90_DEF_DIM(ncid_rst,'d2vars_ice', NO_D2_BOX_STATES_ICE, d2vars_rdim_ice), fname)
-   dims(1) = d2vars_rdim_ice
-   dims(2) = surfpoint_rdim
+   dims(1) = surfpoint_rdim
+   dims(2) = d2vars_rdim_ice
    call check_err(NF90_DEF_VAR(ncid_rst,'D2STATE_ICE',NF90_DOUBLE,dims,d2state_rid_ice), fname)
-   if (nc_compres) call check_err(NF90_DEF_VAR_DEFLATE(ncid_rst,d2state_rid_ice,nc_shuffle,nc_deflate,nc_defllev))
    call check_err(NF90_DEF_VAR(ncid_rst,'D2STATE_ICE_NAME',NF90_CHAR,(/chars_rdim, d2vars_rdim_ice/),d2state_name_rid_ice), fname)
    call check_err(NF90_DEF_VAR(ncid_rst,'D2STATE_ICE_UNITS',NF90_CHAR,(/chars_rdim, d2vars_rdim_ice/),d2state_units_rid_ice), fname)
    call check_err(NF90_DEF_VAR(ncid_rst,'D2STATE_ICE_LONG',NF90_CHAR,(/chars_rdim, d2vars_rdim_ice/),d2state_long_rid_ice), fname)
 #if defined BFM_NEMO || defined BFM_POM
    call check_err(NF90_DEF_VAR(ncid_rst,'D2STATEB_ICE',NF90_DOUBLE,dims,d2stateb_rid_ice), fname)
-   if (nc_compres) call check_err(NF90_DEF_VAR_DEFLATE(ncid_rst,d2stateb_rid_ice,nc_shuffle,nc_deflate,nc_defllev))
 #endif
 #endif
 
@@ -497,16 +470,14 @@
    ! define 2D Benthic dimensions and variables
    !---------------------------------------------
    call check_err(NF90_DEF_DIM(ncid_rst,'d2vars_ben', NO_D2_BOX_STATES_BEN, d2vars_rdim_ben), fname)
-   dims(1) = d2vars_rdim_ben
-   dims(2) = botpoint_rdim
+   dims(1) = botpoint_rdim
+   dims(2) = d2vars_rdim_ben
    call check_err(NF90_DEF_VAR(ncid_rst,'D2STATE_BEN',NF90_DOUBLE,dims,d2state_rid_ben), fname)
-   if (nc_compres) call check_err(NF90_DEF_VAR_DEFLATE(ncid_rst,d2state_rid_ben,nc_shuffle,nc_deflate,nc_defllev))
    call check_err(NF90_DEF_VAR(ncid_rst,'D2STATE_BEN_NAME',NF90_CHAR,(/chars_rdim, d2vars_rdim_ben/),d2state_name_rid_ben), fname)
    call check_err(NF90_DEF_VAR(ncid_rst,'D2STATE_BEN_UNITS',NF90_CHAR,(/chars_rdim, d2vars_rdim_ben/),d2state_units_rid_ben), fname)
    call check_err(NF90_DEF_VAR(ncid_rst,'D2STATE_BEN_LONG',NF90_CHAR,(/chars_rdim, d2vars_rdim_ben/),d2state_long_rid_ben), fname)
 #if defined BFM_NEMO || defined BFM_POM
    call check_err(NF90_DEF_VAR(ncid_rst,'D2STATEB_BEN',NF90_DOUBLE,dims,d2stateb_rid_ben), fname)
-   if (nc_compres) call check_err(NF90_DEF_VAR_DEFLATE(ncid_rst,d2stateb_rid_ben,nc_shuffle,nc_deflate,nc_defllev))
 #endif
 
    DEALLOCATE(dims)
@@ -536,14 +507,6 @@
    call check_err(set_attributes(ncid_rst,surfpoint_rid,compress='none'), fname)
    call check_err(set_attributes(ncid_rst,botpoint_rid,formula_term='bottom points'), fname)
    call check_err(set_attributes(ncid_rst,botpoint_rid,compress='none'), fname)
-#endif
-#ifdef BFM_GOTM
-   call check_err(set_attributes(ncid_rst,ocepoint_rid,formula_term='watercolumn levels'), fname)
-   call check_err(set_attributes(ncid_rst,ocepoint_rid,compress='z'), fname)
-   call check_err(set_attributes(ncid_rst,surfpoint_rid,formula_term='watercolumn surface'), fname)
-   call check_err(set_attributes(ncid_rst,surfpoint_rid,compress='z'), fname)
-   call check_err(set_attributes(ncid_rst,botpoint_rid,formula_term='watercolumn bottom'), fname)
-   call check_err(set_attributes(ncid_rst,botpoint_rid,compress='z'), fname)
 #endif
 #ifdef BFM_NEMO
    call check_err(set_attributes(ncid_rst,ocepoint_rid,formula_term='water points'), fname)
@@ -616,20 +579,15 @@
    Call FLUSH (LOGUNIT)
 
 end subroutine init_netcdf_rst_bfm
-!EOC
 
 !-----------------------------------------------------------------------
-!BOP
-!
-! !ROUTINE: Store the restart file
-!
-! !INTERFACE:
+
   subroutine save_rst_bfm(time)
 !
-! !DESCRIPTION:
-! output restart file of BFM variables 
+! DESCRIPTION
+!   output restart file of BFM variables 
 !
-! !USES:
+! USES
    use mem, only: D3STATE, NO_D3_BOX_STATES, NO_BOXES
 #ifdef INCLUDE_PELCO2
    use mem, only: D3DIAGNOS,pppH
@@ -651,10 +609,14 @@ end subroutine init_netcdf_rst_bfm
 #endif
 
    implicit none
-!
-! !INPUT PARAMETERS:
+
+  ! INPUT
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    real(RLEN),intent(in)     :: time
-! !LOCAL VARIABLES:
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Local Variables
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    integer                   :: iret, iter
    character(len=80)         :: restfile
    real(RLEN)                :: temp_time
@@ -663,13 +625,7 @@ end subroutine init_netcdf_rst_bfm
    character(len=LEN(var_names)), dimension(NO_D2_BOX_STATES_ICE) :: tmp_d2names_ice,tmp_d2units_ice,tmp_d2long_ice
 #endif
    character(len=LEN(var_names)), dimension(NO_D2_BOX_STATES_BEN) :: tmp_d2names_ben,tmp_d2units_ben,tmp_d2long_ben
-!
-! !REVISION HISTORY:
-!  Original author(s): Marcello Vichi (INGV) 
-!
-!EOP
-!-----------------------------------------------------------------------
-!BOC
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 !  Storing the time - both the coordinate and later a time string.
      select case (ncdf_time_unit)
@@ -686,8 +642,8 @@ end subroutine init_netcdf_rst_bfm
 
 
      restfile="out_restart"
-     start(1) = 1;   edges(1) = NO_D3_BOX_STATES
-     start(2) = 1;   edges(2) = NO_BOXES
+     start(1) = 1;   edges(1) = NO_BOXES
+     start(2) = 1;   edges(2) = NO_D3_BOX_STATES
      tmp_d3names(:) = var_names(stPelStateS:stPelStateE)
      do iter=1, SIZE(tmp_d3names)
         call replace_char(str=tmp_d3names(iter), Tar='()', rep='_')
@@ -709,8 +665,8 @@ end subroutine init_netcdf_rst_bfm
 #endif
 
 #if defined INCLUDE_SEAICE
-     start(1) = 1;   edges(1) = NO_D2_BOX_STATES_ICE
-     start(2) = 1;   edges(2) = NO_BOXES_XY
+     start(1) = 1;   edges(1) = NO_BOXES_XY
+     start(2) = 1;   edges(2) = NO_D2_BOX_STATES_ICE
      tmp_d2names_ice(:) = var_names(stIceStateS:stIceStateE)
      do iter=1, SIZE(tmp_d2names_ice)
         call replace_char(str=tmp_d2names_ice(iter), tar='()', rep='_')
@@ -729,8 +685,8 @@ end subroutine init_netcdf_rst_bfm
 #endif
 #endif
 
-     start(1) = 1;   edges(1) = NO_D2_BOX_STATES_BEN
-     start(2) = 1;   edges(2) = NO_BOXES_XY
+     start(1) = 1;   edges(1) = NO_BOXES_XY
+     start(2) = 1;   edges(2) = NO_D2_BOX_STATES_BEN
      tmp_d2names_ben(:) = var_names(stBenStateS:stBenStateE)
      do iter=1, SIZE(tmp_d2names_ben)
         call replace_char(str=tmp_d2names_ben(iter), tar='()', rep='_')
@@ -751,20 +707,16 @@ end subroutine init_netcdf_rst_bfm
 ! the file is closed in the main (in case of more restart files)
 
   end subroutine save_rst_bfm 
-!EOC
+
 
 !-----------------------------------------------------------------------
-!BOP
-!
-! !IROUTINE: Read the restart file
-!
-! !INTERFACE:
+
   subroutine read_rst_bfm(title)
 !
-! !DESCRIPTION:
-! Read restart file of BFM variables 
+! DESCRIPTION
+!   Read restart file of BFM variables 
 !
-! !USES:
+! USES
    use mem, only: D3STATE, NO_D3_BOX_STATES, NO_BOXES
 #ifdef INCLUDE_PELCO2
    use mem, only: D3DIAGNOS,pppH
@@ -786,22 +738,21 @@ end subroutine init_netcdf_rst_bfm
 #endif
 
    implicit none
-!
-! !INPUT PARAMETERS:
+
+  ! INPUT
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    character(len=*), intent(in)                 :: title
-   character(len=NF90_MAX_NAME)                :: namedimt 
-! !LOCAL VARIABLES:
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Local Variables
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+   character(len=NF90_MAX_NAME)                :: namedimt
    character(len=PATH_MAX)   :: ext,fname
    integer                   :: iret
    integer                   :: nstate_id,nstate_len
    integer                   :: ncomp_id,ncomp_len
-!
-! !REVISION HISTORY:
-!  Original author(s): Marcello Vichi (INGV) 
-!
-!EOP
-!-----------------------------------------------------------------------
-!BOC
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
    LEVEL1 'read_rst_bfm: READ initial conditions from multiple restart files ...'
 
    !---------------------------------------------
@@ -835,7 +786,7 @@ end subroutine init_netcdf_rst_bfm
    call check_err(NF90_GET_VAR(ncid_rst_in,nstate_id,D3STATE(:,:)), fname)
 #ifdef INCLUDE_PELCO2
    call check_err(NF90_INQ_VARID(ncid_rst_in,"pH",nstate_id), fname)
-   call check_err(NF90_GET_VAR(ncid_rst_in,nstate_id,D3DIAGNOS(pppH,:)), fname)
+   call check_err(NF90_GET_VAR(ncid_rst_in,nstate_id,D3DIAGNOS(:,pppH)), fname)
 #endif 
 #if defined BFM_NEMO || defined BFM_POM
    call check_err(NF90_INQ_VARID(ncid_rst_in,"D3STATEB",nstate_id), fname)
@@ -907,258 +858,27 @@ end subroutine init_netcdf_rst_bfm
    call upd_organic_quotas()
 
   end subroutine read_rst_bfm
-!EOC
 
 !-----------------------------------------------------------------------
-!BOP
-!
-! !IROUTINE: Read the restart file
-!
-! !INTERFACE:
-  subroutine read_rst_bfm_glo(title, narea, jpnij, &
-        jpiglo, jpjglo, jpkglo, &
-        nlcit, nlcjt, &
-        nldit, nldjt, &
-        nleit, nlejt, &
-        nimppt, njmppt, &
-        SEAmask )
-!
-! !DESCRIPTION:
-! Read restart file of BFM variables from one merged file in 3d 
-!
-! !USES:
-   use mem, only: D3STATE
-#ifdef INCLUDE_PELCO2
-   use mem, only: D3DIAGNOS,pppH
-#endif
-   use mem, only: D2STATE_BEN
 
-   implicit none
-!
-! !INPUT PARAMETERS:
-   character(len=*), intent(in)          :: title                  ! name of the file to open
-   integer, intent(in)                   :: narea                  ! index of subdomain
-   integer, intent(in)                   :: jpnij                  ! nb of local domain = nb of processors ( <= jpni x jpnj )
-   integer, intent(in)                   :: jpiglo, jpjglo, jpkglo ! i-, j-, k-dimensions of the global domain
-   integer, intent(in), dimension(:)     :: nlcit,  nlcjt          !: dimensions of every subdomain
-   integer, intent(in), dimension(:)     :: nldit,  nldjt          !: first, last indoor index for each i-domain
-   integer, intent(in), dimension(:)     :: nleit,  nlejt          !: first, last indoor index for each j-domain
-   integer, intent(in), dimension(:)     :: nimppt, njmppt         !: i-, j-indexes for each processor
-   logical, intent(in), dimension(:,:,:) :: SEAmask !: 3D boolean Land-sea mask
-!
-! !LOCAL VARIABLES:
-   character(len=PATH_MAX) :: fname
-   integer                 :: ncid_rst_3d, ncomp_id, ncomp_len, iret
-
-   integer :: idx_var, idx_var_array, vid
-
-   integer,dimension(4)                      :: array_3d_start, array_3d_count, array_3d_end
-   real(RLEN),allocatable,dimension(:,:,:,:) :: array_3d
-   integer,dimension(3)                      :: array_2d_start, array_2d_count, array_2d_end
-   real(RLEN),allocatable,dimension(:,:,:) :: array_2d
-
-
-   integer :: iniI, iniJ, cntI, cntJ, cntK
-
-   integer :: idx_i, idx_j, idx_k, noce
-
-   character(len=PATH_MAX) :: fname_ph
-   integer :: ncid_ph, IDx, IDy, IDz, IDtime, IDboxes, IDtarget, IDtarget_mask, IDtarget_box
-
-   character(len=NF90_MAX_NAME) :: string
-!
-! !REVISION HISTORY:
-!  Original author(s): Marcello Vichi (INGV) 
-!
-!EOP
-!-----------------------------------------------------------------------
-!BOC
-   LEVEL1 'read_rst_bfm_glo: READ initial conditions from single restart file ...'
-
-   !---------------------------------------------
-   ! open the netcdf restart file
-   !---------------------------------------------
-   fname = TRIM(title) // '.' // 'nc'
-   LEVEL2 'Reading Restart file in NetCDF 3D'
-   LEVEL2 TRIM(fname)
-   call check_err(NF90_OPEN(fname,NF90_NOWRITE,ncid_rst_3d), fname)
-   !---------------------------------------------
-   ! Check 3D dimensions 
-   !---------------------------------------------
-   call check_err(NF90_INQ_DIMID(ncid_rst_3d,"x",ncomp_id), fname)
-   call check_err(NF90_INQUIRE_DIMENSION(ncid_rst_3d,ncomp_id, len=ncomp_len), fname)
-   if (ncomp_len/=jpiglo) then
-      LEVEL1 "Global X Dimension mismatch in 3d restart file:"
-      LEVEL2 TRIM(fname)
-      LEVEL3 "DIM X in model:", jpiglo
-      LEVEL3 "DIM X in file:",  ncomp_len
-      stop "STOP in read_rst_bfm_glo contained in netcdf_bfm.F90"
-   end if
-   call check_err(NF90_INQ_DIMID(ncid_rst_3d,"y",ncomp_id), fname)
-   call check_err(NF90_INQUIRE_DIMENSION(ncid_rst_3d,ncomp_id, len=ncomp_len), fname)
-   if (ncomp_len/=jpjglo) then
-      LEVEL1 "Global Y Dimension mismatch in 3d restart file:"
-      LEVEL2 TRIM(fname)
-      LEVEL3 "DIM Y in model:", jpjglo
-      LEVEL3 "DIM Y in file:",  ncomp_len
-      stop "STOP in read_rst_bfm_glo contained in netcdf_bfm.F90"
-   end if
-   call check_err(NF90_INQ_DIMID(ncid_rst_3d,"depth",ncomp_id), fname)
-   call check_err(NF90_INQUIRE_DIMENSION(ncid_rst_3d,ncomp_id, len=ncomp_len), fname)
-   if (ncomp_len/=jpkglo) then
-      LEVEL1 "Global Z Dimension mismatch in 3d restart file:"
-      LEVEL2 TRIM(fname)
-      LEVEL3 "DIM Z in model:", jpkglo
-      LEVEL3 "DIM Z in file:",  ncomp_len
-      stop "STOP in read_rst_bfm_glo contained in netcdf_bfm.F90"
-   end if
-
-   !---------------------------------------------
-   ! get the coordinates of the sub-domain
-   !---------------------------------------------
-   iniI = nimppt(narea)
-   iniJ = njmppt(narea)
-   cntI = nlcit(narea)
-   cntJ = nlcjt(narea)
-   cntK = jpkglo
-
-
-   !allocate subdomain array and global mask
-   allocate( array_3d(cntI,cntJ,cntK,1) )
-   array_3d_start = (/ iniI       , iniJ       , 1   , 1 /)
-   array_3d_count = (/ cntI       , cntJ       , cntk, 1 /)
-   array_3d_end   = (/ iniI+cntI-1, iniJ+cntJ-1, cntk, 1 /)
-   allocate( array_2d(cntI,cntJ,1) )
-   array_2d_start = (/ iniI       , iniJ       , 1 /)
-   array_2d_count = (/ cntI       , cntJ       , 1 /)
-   array_2d_end   = (/ iniI+cntI-1, iniJ+cntJ-1, 1 /)
-
-   !---------------------------------------------
-   ! Initialize 3D Pelagic variables
-   !---------------------------------------------
-   do idx_var=stPelStateS, stPelStateE
-      idx_var_array = idx_var - stPelStateS + 1
-      string = var_names(idx_var)
-      iret = NF90_INQ_VARID(ncid_rst_3d, string, vid)
-      if( iret /= NF90_NOERR ) then
-         ! in new BFM version netcdf output remove '(' and ')' 
-         call replace_char(str=string, tar='()', rep='_')
-         iret = NF90_INQ_VARID(ncid_rst_3d, string, vid)
-      end if
-      if( iret == NF90_NOERR ) then
-         call check_err(nf90_get_var(ncid_rst_3d, vid, array_3d, &
-              start=array_3d_start, count=array_3d_count), fname)
-
-         noce = 0
-         do idx_k=1,cntK
-            do idx_j=1,cntJ
-               do idx_i=1,cntI
-                  if( SEAmask(idx_i,idx_j,idx_k) ) then
-                     noce = noce+1
-                     D3STATE(idx_var_array,noce) = array_3d(idx_i,idx_j,idx_k,1)
-                  end if
-               end do
-            end do
-         end do
-
-      end if
-   end do
-
-   !---------------------------------------------
-   ! Initialize Ph variable
-   !---------------------------------------------
-#ifdef INCLUDE_PELCO2
-   call check_err(NF90_INQ_VARID(ncid_rst_3d,"pH", vid), fname)
-   call check_err(nf90_get_var(ncid_rst_3d, vid, array_3d, &
-        start=array_3d_start, count=array_3d_count), fname)
-
-   noce = 0
-   do idx_k=1,cntK
-      do idx_j=1,cntJ
-         do idx_i=1,cntI
-            if( SEAmask(idx_i,idx_j,idx_k) ) then
-               noce = noce+1
-               D3DIAGNOS(pppH,noce) = array_3d(idx_i,idx_j,idx_k,1)
-            end if
-         end do
-      end do
-   end do
-
-#endif
-   !---------------------------------------------
-   ! Initialize 2D Benthic variables
-   !---------------------------------------------
-   LEVEL2 "read_rst_bfm_glo: READ 2D benthic initial conditions"
-   do idx_var=stBenStateS, stBenStateE
-      idx_var_array = idx_var - stBenStateS + 1
-      string = var_names(idx_var)
-      iret = NF90_INQ_VARID(ncid_rst_3d, string, vid)
-      if( iret /= NF90_NOERR ) then
-         ! in new BFM version netcdf output remove '(' and ')' 
-         call replace_char(str=string, tar='()', rep='_')
-         iret = NF90_INQ_VARID(ncid_rst_3d, string, vid)
-      end if
-      if( iret == NF90_NOERR ) then
-         call check_err(nf90_get_var(ncid_rst_3d, vid, array_2d, &
-              start=array_2d_start, count=array_2d_count), fname)
-         noce = 0
-         do idx_j=1,cntJ
-            do idx_i=1,cntI
-               if( SEAmask(idx_i,idx_j,1) ) then
-                  noce = noce+1
-                  D2STATE_BEN(idx_var_array,noce) = array_2d(idx_i,idx_j,1)
-               end if
-            end do
-         end do
-      end if
-   end do
-
-   call check_err(nf90_close(ncid_rst_3d),fname)
-
-   LEVEL2 'read_rst_bfm_glo: READ single restart file ... DONE! '
-   LEVEL2 ' '
-
-   !---------------------------------------------
-   ! Update quotas of non- and living organic components
-   !---------------------------------------------
-   call upd_organic_quotas()
-
-   if(allocated(array_3d)) deallocate(array_3d)
-
-  end subroutine read_rst_bfm_glo
-!EOC
-
-!-----------------------------------------------------------------------
-!BOP
-! !IROUTINE: Intialise the storage of results in NetCDF
-!
-! !INTERFACE:
    subroutine init_save_bfm()
 !
-! !DESCRIPTION:
-! Preparation of the netcdf output.
+! DESCRIPTION:
+!   Intialise the storage of results in NetCDF
 !
-! !USES:
+! USES
    implicit none
-!
-! !INPUT PARAMETERS:
 
-!
-! !REVISION HISTORY:
-!  Original author(s): Hans Burchard & Karsten Bolding
-!  Adapted to BFM: Marcello Vichi (INGV) & Piet Ruardij (NIOZ)
-!
-! !LOCAL VARIABLES:
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Local Variables
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    integer, save             :: nn       ! number pel.var to be saved 
    integer, save             :: nnb      ! number ben.var to be saved 
    integer                   :: iret,rc
    real(RLEN)                :: ltime
    integer                   :: out_unit=67
    integer                   :: i,j,n
-!EOP
-!-----------------------------------------------------------------------
-!BOC
-
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    !---------------------------------------------
    ! Enter define mode
    !---------------------------------------------
@@ -1178,7 +898,7 @@ end subroutine init_netcdf_rst_bfm
          end if 
       end do
 
-      do n=stPelDiag2dS,stPelRivE
+      do n=stPelDiag2dS,stPelBotE
          dims(1) = botpoint_dim 
          if ( n >= stPelDiag2dS .AND. n <= stPelSurE ) dims(1) = surfpoint_dim
 
@@ -1242,21 +962,17 @@ end subroutine init_netcdf_rst_bfm
       LEVEL1 ' '
    endif
    return
+
    end subroutine init_save_bfm
-!EOC
 
 !-----------------------------------------------------------------------
-!BOP
-!
-! !IROUTINE: Store the results
-!
-! !INTERFACE:
+
   subroutine save_bfm(time)
 !
-! !DESCRIPTION:
-! output of BFM variables 
+! DESCRIPTION
+!    output of BFM variables 
 !
-! !USES:
+! USES
    use mem, only: D3STATE,D3DIAGNOS,D3FLUX_FUNC
    use mem, only: D2DIAGNOS
 #if defined INCLUDE_SEAICE
@@ -1265,22 +981,19 @@ end subroutine init_netcdf_rst_bfm
    use mem, only: D2STATE_BEN,D2DIAGNOS_BEN,D2DIAGNOS_BEN,D2FLUX_FUNC_BEN
 
    implicit none
-!
-! !INPUT PARAMETERS:
+
+  ! INPUT
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    real(RLEN),intent(in)     :: time
-! !LOCAL VARIABLES:
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Local Variables
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    integer                   :: iret
    integer                   :: k,n,idx_tmp
    real(RLEN)                :: temp_time
-!
-! !REVISION HISTORY:
-!  Original author(s): Hans Burchard & Karsten Bolding
-!  Adapted to BFM: Marcello Vichi (INGV) & Piet Ruardij (NIOZ)
-!  Rev. 2012 : Tomas Lovato (CMCC)
-!
-!EOP
-!-----------------------------------------------------------------------
-!BOC
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
 #ifndef BFM_STANDALONE
    LEVEL1 'save_bfm: SAVE bfm output data at day ',time/SEC_PER_DAY
 #endif
@@ -1310,12 +1023,12 @@ end subroutine init_netcdf_rst_bfm
          !-- Store snapshot of pelagic state variables
          if ( n >= stPelStateS .AND. n <= stPelStateE ) then
             idx_tmp=n-stPelStateS+1
-            iret = store_data(ncid_bfm,var_ids(n),OCET_SHAPE,NO_BOXES,garray=D3STATE(idx_tmp,:))     
+            iret = store_data(ncid_bfm,var_ids(n),OCET_SHAPE,NO_BOXES,garray=D3STATE(:,idx_tmp))     
          end if
          !-- Store snapshot of pelagic diagnostics
          if ( n >= stPelDiagS .AND. n <= stPelDiagE ) then
             idx_tmp=n-stPelDiagS+1
-            iret = store_data(ncid_bfm,var_ids(n),OCET_SHAPE,NO_BOXES,garray=D3DIAGNOS(idx_tmp,:))
+            iret = store_data(ncid_bfm,var_ids(n),OCET_SHAPE,NO_BOXES,garray=D3DIAGNOS(:,idx_tmp))
          end if
          !-- Store snapshot of pelagic fluxes
          if ( n >= stPelFluxS .AND. n <= stPelFluxE ) then 
@@ -1328,7 +1041,7 @@ end subroutine init_netcdf_rst_bfm
         ELSE
            if (temp_time /= ZERO ) then
               k=k+1
-              iret = store_data(ncid_bfm,var_ids(n),OCET_SHAPE,NO_BOXES,garray=D3ave(k,:))
+              iret = store_data(ncid_bfm,var_ids(n),OCET_SHAPE,NO_BOXES,garray=D3ave(:,k))
            endif
         ENDIF
  
@@ -1339,29 +1052,29 @@ end subroutine init_netcdf_rst_bfm
    ! Pelagic 2D variables
    !---------------------------------------------
    k=0
-   do n = stPelDiag2dS , stPelRivE
+   do n = stPelDiag2dS , stPelBotE
       if ( var_ids(n) > 0 ) then   
          IF ( .not. var_ave(n) ) THEN
             ! Store snapshot of pelagic 2D diagnostics
             if ( n >= stPelDiag2dS .AND. n <= stPelDiag2dE ) then
                idx_tmp=n-stPelDiag2dS+1
-               iret = store_data(ncid_bfm,var_ids(n),SURFT_SHAPE,NO_BOXES_XY,garray=D2DIAGNOS(idx_tmp,:))
+               iret = store_data(ncid_bfm,var_ids(n),SURFT_SHAPE,NO_BOXES_XY,garray=D2DIAGNOS(:,idx_tmp))
             end if
             ! Store snapshot of pelagic 2D diagnostics at surface
             if ( n >= stPelSurS .AND. n <= stPelSurE) then
                idx_tmp=n-stPelDiag2dS+1
-               iret = store_data(ncid_bfm,var_ids(n),SURFT_SHAPE,NO_BOXES_XY,garray=D2DIAGNOS(idx_tmp,:))
+               iret = store_data(ncid_bfm,var_ids(n),SURFT_SHAPE,NO_BOXES_XY,garray=D2DIAGNOS(:,idx_tmp))
             end if
             ! Store snapshot of pelagic 2D diagnostics at bottom
-            if ( n >= stPelBotS .AND. n <= stPelRivE) then
+            if ( n >= stPelBotS .AND. n <= stPelBotE) then
                idx_tmp=n-stPelDiag2dS+1
-               iret = store_data(ncid_bfm,var_ids(n),BOTT_SHAPE,NO_BOXES_XY,garray=D2DIAGNOS(idx_tmp,:))
+               iret = store_data(ncid_bfm,var_ids(n),BOTT_SHAPE,NO_BOXES_XY,garray=D2DIAGNOS(:,idx_tmp))
             end if
          ELSE
             ! Store mean values of (pelagic) 2D entity
             if ( temp_time /= ZERO ) then
                k=k+1
-               iret = store_data(ncid_bfm,var_ids(n),SURFT_SHAPE,NO_BOXES_XY,garray=D2ave(k,:))
+               iret = store_data(ncid_bfm,var_ids(n),SURFT_SHAPE,NO_BOXES_XY,garray=D2ave(:,k))
             end if
          ENDIF
       end if
@@ -1379,23 +1092,23 @@ end subroutine init_netcdf_rst_bfm
             ! Store snapshot of seaice 2D state
             if ( n >= stIceStateS .AND. n <= stIceStateE) then
                idx_tmp=n-stIceStateS+1
-               iret = store_data(ncid_bfm,var_ids(n),SURFT_SHAPE,NO_BOXES_XY,garray=D2STATE_ICE(idx_tmp,:))
+               iret = store_data(ncid_bfm,var_ids(n),SURFT_SHAPE,NO_BOXES_XY,garray=D2STATE_ICE(:,idx_tmp))
             end if
             ! Store snapshot of seaice 2D diagnostics
             if ( n >= stIceDiag2dS .AND. n <= stIceDiag2dE ) then
                idx_tmp=n-stIceDiag2dS+1
-               iret = store_data(ncid_bfm,var_ids(n),SURFT_SHAPE,NO_BOXES_XY,garray=D2DIAGNOS_ICE(idx_tmp,:))
+               iret = store_data(ncid_bfm,var_ids(n),SURFT_SHAPE,NO_BOXES_XY,garray=D2DIAGNOS_ICE(:,idx_tmp))
             end if
             ! Store snapshot of seaice 2D flux
             if ( n >= stIceFlux2dS .AND. n <= stIceFlux2dE ) then
                idx_tmp=n-stIceFlux2dS+1
-               iret = store_data(ncid_bfm,var_ids(n),SURFT_SHAPE,NO_BOXES_XY,garray=D2FLUX_FUNC_ICE(idx_tmp,:))
+               iret = store_data(ncid_bfm,var_ids(n),SURFT_SHAPE,NO_BOXES_XY,garray=D2FLUX_FUNC_ICE(:,idx_tmp))
             end if
          ELSE
             ! Store mean values of (any) 2D entity
             if ( temp_time /= ZERO ) then
                k=k+1
-               iret = store_data(ncid_bfm,var_ids(n),SURFT_SHAPE,NO_BOXES_XY,garray=D2ave_ice(k,:))
+               iret = store_data(ncid_bfm,var_ids(n),SURFT_SHAPE,NO_BOXES_XY,garray=D2ave_ice(:,k))
             end if
          ENDIF
       end if
@@ -1413,23 +1126,23 @@ end subroutine init_netcdf_rst_bfm
             ! Store snapshot of benthic 2D state
             if ( n >= stBenStateS .AND. n <= stBenStateE) then
                idx_tmp=n-stBenStateS+1
-               iret = store_data(ncid_bfm,var_ids(n),BOTT_SHAPE,NO_BOXES_XY,garray=D2STATE_BEN(idx_tmp,:))
+               iret = store_data(ncid_bfm,var_ids(n),BOTT_SHAPE,NO_BOXES_XY,garray=D2STATE_BEN(:,idx_tmp))
             end if
             ! Store snapshot of benthic 2D diagnostics
             if ( n >= stBenDiag2dS .AND. n <= stBenDiag2dE ) then
                idx_tmp=n-stBenDiag2dS+1
-               iret = store_data(ncid_bfm,var_ids(n),BOTT_SHAPE,NO_BOXES_XY,garray=D2DIAGNOS_BEN(idx_tmp,:))
+               iret = store_data(ncid_bfm,var_ids(n),BOTT_SHAPE,NO_BOXES_XY,garray=D2DIAGNOS_BEN(:,idx_tmp))
             end if
             ! Store snapshot of benthic 2D flux
             if ( n >= stBenFlux2dS .AND. n <= stBenFlux2dE ) then
                idx_tmp=n-stBenFlux2dS+1
-               iret = store_data(ncid_bfm,var_ids(n),BOTT_SHAPE,NO_BOXES_XY,garray=D2FLUX_FUNC_BEN(idx_tmp,:))
+               iret = store_data(ncid_bfm,var_ids(n),BOTT_SHAPE,NO_BOXES_XY,garray=D2FLUX_FUNC_BEN(:,idx_tmp))
             end if
          ELSE
             ! Store mean values of (any) 2D entity
             if ( temp_time /= ZERO ) then
                k=k+1
-               iret = store_data(ncid_bfm,var_ids(n),BOTT_SHAPE,NO_BOXES_XY,garray=D2ave_ben(k,:))
+               iret = store_data(ncid_bfm,var_ids(n),BOTT_SHAPE,NO_BOXES_XY,garray=D2ave_ben(:,k))
             end if
          ENDIF
       end if
@@ -1446,72 +1159,55 @@ end subroutine init_netcdf_rst_bfm
 
    return
    end subroutine save_bfm
-!EOC
-
 
 !-----------------------------------------------------------------------
-!BOP
-!
-! !IROUTINE: Close files used for saving model results
-!
-! !INTERFACE:
+
    subroutine close_ncdf(ncid)
+!
+! DESCRIPTION:
+!   Close files used for saving model results
+!
    IMPLICIT NONE
-!
-! !DESCRIPTION:
-!  Closes the NetCDF file.
-!
-! !INPUT PARAMETERS:
+
+  ! INPUT
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    integer, intent(in)       :: ncid
-!
-! !REVISION HISTORY:
-!  Original author(s): Karsten Bolding & Hans Burchard
-!
-!EOP
-!
-! !LOCAL VARIABLES:
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Local Variables
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    integer                   :: iret
-!
-!-------------------------------------------------------------------------
-!BOC
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
    iret = NF90_CLOSE(ncid)
    call check_err(iret, 'close_ncdf')
 
    return
+
    end subroutine close_ncdf
-!EOC
 
 !-----------------------------------------------------------------------
-!BOP
-!
-! !IROUTINE: Begin or end define mode
-!
-! !INTERFACE:
+
    integer function define_mode(ncid,action)
 !
-! !DESCRIPTION:
-!  Depending on the value of the argument {\tt action},
-!  this routine put NetCDF in the `define' mode or not.
+! DESCRIPTION
+!   Depending on the value of the argument {\tt action},
+!   this routine put NetCDF in the `define' mode or not.
 !
-! !USES:
+! USES
    IMPLICIT NONE
-!
-! !INPUT PARAMETERS:
+
+  ! INPUT
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    integer, intent(in)       :: ncid
    logical, intent(in)       :: action
-!
-! !REVISION HISTORY:
-!  Original author(s): Karsten Bolding & Hans Burchard
-!
-!
-!EOP
-!
-! !LOCAL VARIABLES:
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Local Variables
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    integer         :: iret
-!
-!-----------------------------------------------------------------------
-!BOC
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
    if(action) then
       iret = NF90_REDEF(ncid)
    else
@@ -1519,60 +1215,48 @@ end subroutine init_netcdf_rst_bfm
    end if
    define_mode = 0
    return
+
    end function define_mode
-!EOC
 
 !-----------------------------------------------------------------------
-!BOP
-!
-! !IROUTINE: Define a new NetCDF variable
-!
-! !INTERFACE:
+
    integer function new_nc_variable(ncid,name,data_type,dimids,id)
 !
-! !DESCRIPTION:
-!  This routine is used to define a new variable to store in a NetCDF file.
+! DESCRIPTION
+!   This routine is used to define a new variable to store in a NetCDF file.
 !
-! !USES:
+! USES
    implicit none
-!
-! !INPUT PARAMETERS:
+
+  ! INPUT
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    integer, intent(in)                 :: ncid
    character(len=*), intent(in)        :: name
    integer, intent(in)                 :: data_type
    integer, intent(in)                 :: dimids(:)
-!
-! !OUTPUT PARAMETERS:
+  ! OUTPUT
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    integer, intent(out)                :: id
-!
-! !REVISION HISTORY:
-!  Original author(s): Karsten Bolding & Hans Burchard
-!  TOM
-!EOP
-!
-! !LOCAL VARIABLES:
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Local Variables
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    integer                   :: iret
    character(LEN=LEN(name))  :: string
-!
-!-----------------------------------------------------------------------
-!BOC
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
    !Replace the name if have "(" or ")"
    string = name
    call replace_char(str=string, tar='()', rep='_')
    iret = NF90_DEF_VAR(ncid,string,data_type,dimids,id)
    call check_err(iret, ('caller: new_nc_variable with input '//trim(string)))
-   if (nc_compres) call check_err(NF90_DEF_VAR_DEFLATE(ncid,id,nc_shuffle,nc_deflate,nc_defllev))
    new_nc_variable = iret
    return
+
    end function new_nc_variable
-!EOC
 
 !-----------------------------------------------------------------------
-!BOP
-!
-! !IROUTINE: Set attributes for a NetCDF variable.
-!
-! !INTERFACE:
+
    integer function set_attributes(ncid,id,                         &
                                    units,long_name,                 &
                                    valid_min,valid_max,valid_range, &
@@ -1587,10 +1271,9 @@ end subroutine init_netcdf_rst_bfm
 !  The list of recognized keywords is very easy to extend. 
 !  The CF-1.0 convention is used.
 !
-! !USES:
-!  IMPLICIT NONE
-!
-! !INPUT PARAMETERS:
+
+  ! INPUT
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    integer, intent(in)                 :: ncid,id
    character(len=*), optional          :: units,long_name
    real(RLEN), optional                  :: valid_min,valid_max
@@ -1599,18 +1282,14 @@ end subroutine init_netcdf_rst_bfm
    real(RLEN), optional                  :: FillValue,missing_value
    character(len=*), optional          :: C_format,FORTRAN_format
    character(len=*), optional          :: compress,formula_term
-!
-! !REVISION HISTORY:
-!  Original author(s): Karsten Bolding & Hans Burchard
-!
-!
-! !LOCAL VARIABLES:
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Local Variables
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    integer                   :: len,iret
    REAL_4B                   :: vals(2)
-!
-!EOP
-!-----------------------------------------------------------------------
-!BOC
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
    if(present(units)) then
 !      len = len_trim(units)
       iret = NF90_PUT_ATT(ncid,id,'units',units)
@@ -1668,28 +1347,25 @@ end subroutine init_netcdf_rst_bfm
 
    set_attributes = 0
    return
+
    end function set_attributes
-!EOC
 
 !-----------------------------------------------------------------------
-!BOP
-!
-! !IROUTINE: Store values in a NetCDF file
-!
-! !INTERFACE:
+
    integer function store_data(ncid,id,var_shape,nbox,             &
                                iscalar,iarray,scalar,array,garray, &
                                array2d,array3d)
 !
-! !DESCRIPTION:
-!  This routine is used to store a variable in the NetCDF file.
-!  The subroutine uses {\tt optional} parameters to find out which data
-!  type to save.
+! DESCRIPTION
+!   This routine is used to store a variable in the NetCDF file.
+!   The subroutine uses {\tt optional} parameters to find out which data
+!   type to save.
 !
-! !USES:
+! USES
    IMPLICIT NONE
-!
-! !INPUT PARAMETERS:
+
+  ! INPUT
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    integer, intent(in)                 :: ncid,id,var_shape,nbox
    integer, optional                   :: iscalar
    integer, optional                   :: iarray(1:nbox)
@@ -1698,20 +1374,15 @@ end subroutine init_netcdf_rst_bfm
    real(RLEN), optional                  :: garray(1:nbox)
    real(RLEN), optional                  :: array2d(:,:)
    real(RLEN), optional                  :: array3d(:,:,:)
-!
-! !REVISION HISTORY:
-!  Original author(s): Karsten Bolding & Hans Burchard
-!  Modifications: Marcello Vichi
-!
-!EOP
-!
-! !LOCAL VARIABLES:
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Local Variables
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    integer                   :: iret,n=0
    integer                   :: idum(1:nbox)
    REAL_4B                   :: r4,dum(1:nbox)
-!
-!-----------------------------------------------------------------------
-!BOC
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
    if (.not. present(iscalar) .and. .not. present(iarray)  .and. &
        .not. present(scalar)  .and. .not. present(array)   .and. &
        .not. present(garray)  .and. .not. present(array2d) .and. &
@@ -1820,32 +1491,32 @@ end subroutine init_netcdf_rst_bfm
    call check_err(iret, 'store_data')
    store_data = iret
    return
+
    end function store_data
-!EOC
+
+!-----------------------------------------------------------------------
 
 #if defined INCLUDE_BENPROFILES
-!-----------------------------------------------------------------------
-!BOP
-! !ROUTINE: Definine extra dimension variables
-!
-! !INTERFACE:
+
    integer function special_dims(mode,ncid,nlev,name,extname,units, &
                                  time_dim,vars_id)
 !
-! !DESCRIPTION:
-! This is a spcialized routine for the storage of diagnostic variables 
-! with  alternative dimensions.
-! The typical example are the benthic profiles, which have a sigma
-! layer grid with nlev levels.
-! 2 additional dimension variables, one with the sigma levels and 
-! one for the data points, which is a compressed coordinate
+! DESCRIPTION
+!   This is a spcialized routine for the storage of diagnostic variables 
+!   with  alternative dimensions.
+!   The typical example are the benthic profiles, which have a sigma
+!   layer grid with nlev levels.
+!   2 additional dimension variables, one with the sigma levels and 
+!   one for the data points, which is a compressed coordinate
 !
-! !USES:
+! USES
    use mem, only: seddepth
    use netcdf
+
    IMPLICIT NONE
-!
-! !INPUT PARAMETERS:
+
+  ! INPUT
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    integer, intent(in)                 :: mode
    integer, intent(in)                 :: ncid
    integer, intent(in)                 :: nlev
@@ -1854,10 +1525,10 @@ end subroutine init_netcdf_rst_bfm
    character(*), intent(in)            :: units
    integer, intent(inout)              :: vars_id
    integer, intent(in)                 :: time_dim
-!
-!  Generic BFM version: Marcello Vichi
-!
-! !LOCAL VARIABLES:
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Local Variables
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    real(RLEN)                  :: zz,r,s
    integer                   :: i,j,n,status,altZ_id,dim_altZ
    integer                   :: benprofpoint_dim,benprofpoint_id
@@ -1865,7 +1536,8 @@ end subroutine init_netcdf_rst_bfm
    character(len=30)         :: altZ,altZ_longname
    character(len=6)          :: dum,alt_unit
    integer                   :: dims(2)
-!EOP
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
        if ( index(extname,'__Z' ) ==1 ) then
           j=index(extname,':')-1
           read(extname(1:j),*) dum,altZ, zz,alt_unit, altZ_longname
@@ -1914,28 +1586,29 @@ end subroutine init_netcdf_rst_bfm
        else
           special_dims=0
        endif
+
    end function special_dims
+
 #endif
 
 !-----------------------------------------------------------------------
-!BOP
-!
-! !ROUTINE: check_err() - error reporting on netcdf operations 
 
    subroutine check_err(iret,filename)
 !
-! !DESCRIPTION:
+! DESCRIPTION
+!   Error reporting on netcdf operations
 !
-! !USES
+! USES
    use netcdf
+
    IMPLICIT NONE
-!
-! !INPUT PARAMETERS:
+
+  ! INPUT
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    integer iret
    character(len=*),optional,intent(IN) :: filename
-!
-!-----------------------------------------------------------------------
-!BOC
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
    if (iret .ne. NF90_NOERR) then
 
      FATAL "Access to file (or caller): ", trim(filename)
@@ -1945,14 +1618,12 @@ end subroutine init_netcdf_rst_bfm
    endif
 
    return
+
    end subroutine check_err
-!-----------------------------------------------------------------------
 
-   end module netcdf_bfm
+  end module netcdf_bfm
 
-
-!-----------------------------------------------------------------------
-! Copyright 2013 BFM System Team (bfm_st@lists.cmcc.it)
-! Copyright by the GOTM-team under the GNU Public License - www.gnu.org
-!-----------------------------------------------------------------------
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 

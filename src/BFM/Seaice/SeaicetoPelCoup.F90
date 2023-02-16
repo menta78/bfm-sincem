@@ -1,51 +1,39 @@
-#include "DEBUG.h"
-#include "cppdefs.h"
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-!BOP
 !
-! !ROUTINE: Seaicealgae
+! ROUTINE: Seaicealgae
 !
 ! DESCRIPTION
 !   Parameter values for the sea ice algae group
 !
-! !INTERFACE
+! COPYING
+!
+!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU General Public License for more details.
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! INCLUDE
+#include "DEBUG.h"
+#include "cppdefs.h"
+!
+! INTERFACE
   module mem_SeaicetoPel
 !
-! !USES:
-
+! USES
   use global_mem
   use mem, only: iiSeaiceAlgae,iiSeaiceDetritus,iiSeaiceBacteria,iiSeaiceZoo
   use mem, only: iiP1,iiP2,iiZ5,iiB1,iiR1,iiR6
-!
-!
-! !AUTHORS
-!   Letizia Tedesco and Marcello Vichi
-!
-! COPYING
-!
-!   Copyright (C) 2020 BFM System Team (bfm_st@cmcc.it)
-!
-!   This program is free software; you can redistribute it and/or modify
-!   it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation;
-!   This program is distributed in the hope that it will be useful,
-!   but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-!   GNU General Public License for more details.
-!
-!EOP
-!-------------------------------------------------------------------------!
-!BOC
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! Implicit typing is never allowed
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
   IMPLICIT NONE
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! Default all is not public
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! public
+
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Sea ice - pelagic coupling PARAMETERS (read from nml)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -75,13 +63,13 @@
   integer,dimension(iiSeaiceDetritus):: DET
   integer,dimension(iiSeaiceZoo)     :: ZOO
   integer,dimension(iiSeaiceBacteria):: BAC
+
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! SHARED PUBLIC FUNCTIONS (must be explicited below "contains")
-
   public InitSeaicetoPel, SeaicetoPelCoup
+
   contains
 
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   subroutine InitSeaicetoPel()
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -90,7 +78,7 @@
     CalcSeaiceFloodFlux, p_floN1, p_floN3, p_floN4, p_floN5, &
     CalcSeaiceAddPelFlux, p_pelN1, p_relaxN1
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  !BEGIN compute
+
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     ! set default values
     p_epsIce = 1.5_RLEN
@@ -123,9 +111,7 @@
     close(NMLUNIT)
     write(LOGUNIT,*) "#  Namelist is:"
     write(LOGUNIT,nml=Seaicecoup_parameters)
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  !END compute
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
   return
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Local Error Messages
@@ -133,24 +119,14 @@
 100 call error_msg_prn(NML_OPEN,"SeaicetopelCoup.F90","Seaice_Coupling.nml")
 101 call error_msg_prn(NML_READ,"SeaicetopelCoup.F90","Seaicecoup_parameters")
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
   end  subroutine InitSeaicetoPel
 
-!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-!BOP
-!
-! !ROUTINE: SeaicetoPelCoup
-!
-! DESCRIPTION
-!
-! !INTERFACE
+! -----------------------------------------------------------------------------
+
   subroutine SeaicetoPelCoup
 !
-! !USES:
-
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! Modules (use of ONLY is strongly encouraged!)
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-
+! USES
    use global_mem, only: RLEN,ZERO,ONE
    use mem_PAR,    only: p_PAR, p_epsR6
    use mem_Param,  only: CalcSeaiceAlgae,CalcSeaiceZoo,CalcSeaiceBacteria 
@@ -159,11 +135,13 @@
    use mem
    use api_bfm,    only: SRFindices, BOTindices 
    use mem_SeaiceAlgae, only: p_epsSAL
+   use time,       only: GetDelta
+
+   IMPLICIT NONE
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! Implicit typing is never allowed
+  ! Local Variables
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-   IMPLICIT NONE
    real(RLEN), dimension(NO_BOXES_XY) :: flux_pel_ice_N1,flux_pel_ice_N3
    real(RLEN), dimension(NO_BOXES_XY) :: flux_pel_ice_N4,flux_pel_ice_N5
    real(RLEN), dimension(NO_BOXES_XY) :: flux_pel_ice_O2,flux_pel_ice_O3
@@ -177,17 +155,12 @@
    real(RLEN), dimension(NO_BOXES_XY) :: I1p_star,I3n_star,I4n_star,I5s_star
    real(RLEN), dimension(NO_BOXES_XY) :: F2o_star,F3c_star
    real(RLEN), dimension(NO_BOXES_XY) :: EICE1D,epsIce,EIRsrf
-
+   !
    integer                            :: i,j,p
    real(RLEN), dimension(:), pointer  :: lcl_PelagicVar,lcl_SeaiceVar
    real(RLEN)                         :: tmpflux(NO_BOXES)
    real(RLEN)                         :: delta
-   real(RLEN), external               :: GetDelta
-!
-!EOP
-!-------------------------------------------------------------------------!
-!BOC
-!
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
     delta = GetDelta()
 
@@ -248,7 +221,7 @@
     end do
 
     ! fluxes to the BAL from atmosphere, flooding and pelagic
-    where (EHB(:) > ZERO)
+    where (EHB(:) > p_small)
        ! volume concentration
        I1p_tilde(:) = I1p(:)/EHB(:)
        I3n_tilde(:) = I3n(:)/EHB(:)
@@ -270,7 +243,7 @@
                            + min(ZERO, EDH(:)*I1p_tilde(:))
        flux_pel_ice_N3(:)= max(ZERO,EDH(:)*I3n_star(:)) &
                            + min(ZERO, EDH(:)*I3n_tilde(:))
-        flux_pel_ice_N4(:)= max(ZERO,EDH(:)*I4n_star(:)) &
+       flux_pel_ice_N4(:)= max(ZERO,EDH(:)*I4n_star(:)) &
                            + min(ZERO, EDH(:)*I4n_tilde(:))
        flux_pel_ice_N5(:)= max(ZERO,EDH(:)*I5s_star(:)) &
                            + min(ZERO, EDH(:)*I5s_tilde(:))
@@ -327,10 +300,6 @@
     tmpflux(SRFindices) = jsurN1p(:) / Depth(SRFindices)
     call flux_vector(iiPel,ppN1p,ppN1p, tmpflux(:) )
 
-    jbotN1p(:)=jbotN1p(:) + flux_bott_pel_n1(:)
-    tmpflux(BOTindices) = jbotN1p(:)/Depth(BOTindices)
-    call flux_vector( iiPel, ppN1p, ppN1p, tmpflux )
-
     jsurN3n(:)=jsurN3n(:) - flux_pel_ice_N3(:)
     tmpflux(SRFindices) = jsurN3n(:) / Depth(SRFindices)
     call flux_vector(iiPel,ppN3n,ppN3n, tmpflux(:) )
@@ -353,7 +322,7 @@
           lcl_SeaiceVar => SeaiceAlgae(j,i)
           lcl_PelagicVar => PhytoPlankton(PPY(j),i)
           if( associated(lcl_SeaiceVar) .AND. associated(lcl_PelagicVar) ) then
-             where (EHB(:)>ZERO)
+             where (EHB(:)>p_small)
                 flux_pel_ice(:) = max(ZERO, EDH(:)*lcl_PelagicVar(SRFindices)*EVB(:))  &
                      + min(ZERO, EDH(:)*lcl_SeaiceVar(:)/EHB(:))
              elsewhere
@@ -365,9 +334,9 @@
             if (p>0) call flux_vector( iiIce, p, p, flux_pel_ice(:) ) 
             p = ppPhytoPlankton(PPY(j),i)
             if (p>0) then
-               PELSURFACE(p,:) =  PELSURFACE(p,:) - flux_pel_ice(:)  
+               PELSURFACE(:,p) =  PELSURFACE(:,p) - flux_pel_ice(:)  
                ! map the flux into a 3D temporary array and send to D3SOURCE
-               tmpflux(SRFindices) = PELSURFACE(p,:) / Depth(SRFindices)
+               tmpflux(SRFindices) = PELSURFACE(:,p) / Depth(SRFindices)
                call flux_vector(iiPel, p, p, tmpflux(:) )
             end if
        end do
@@ -382,7 +351,7 @@
          lcl_SeaiceVar => SeaiceDetritus(j,i)
          lcl_PelagicVar => PelDetritus(DET(j),i)
          if( associated(lcl_SeaiceVar) .AND. associated(lcl_PelagicVar) ) then
-            where (EHB(:)>ZERO)
+            where (EHB(:)>p_small)
                flux_pel_ice(:)= max(ZERO, EDH(:)*lcl_PelagicVar(SRFindices)*EVB(:))  &
                     + min(ZERO, EDH(:)*lcl_SeaiceVar(:)/EHB(:))
             elsewhere
@@ -394,9 +363,9 @@
          if (p>0) call flux_vector( iiIce, p, p, flux_pel_ice(:) ) 
          p = ppPelDetritus(DET(j),i)
          if (p>0) then
-            PELSURFACE(p,:) =  PELSURFACE(p,:) - flux_pel_ice(:)  
+            PELSURFACE(:,p) =  PELSURFACE(:,p) - flux_pel_ice(:)  
             ! map the flux into a 3D temporary array
-            tmpflux(SRFindices) = PELSURFACE(p,:) / Depth(SRFindices)
+            tmpflux(SRFindices) = PELSURFACE(:,p) / Depth(SRFindices)
             call flux_vector(iiPel, p, p, tmpflux(:) )
          end if
       end do
@@ -411,7 +380,7 @@
            lcl_SeaiceVar => SeaiceBacteria(j,i)
            lcl_PelagicVar => PelBacteria(BAC(j),i)
            if( associated(lcl_SeaiceVar) .AND. associated(lcl_PelagicVar) ) then
-              where (EHB(:)>ZERO)
+              where (EHB(:)>p_small)
                  flux_pel_ice(:)= max(ZERO, EDH(:)*lcl_PelagicVar(SRFindices)*EVB(:))  &
                       + min(ZERO, EDH(:)*lcl_SeaiceVar(:)/EHB(:))
               elsewhere
@@ -423,9 +392,9 @@
            if (p>0) call flux_vector( iiIce, p,p, flux_pel_ice(:) ) 
            p = ppPelBacteria(BAC(j),i)
            if (p>0) then
-              PELSURFACE(p,:) =  PELSURFACE(p,:) - flux_pel_ice(:)  
+              PELSURFACE(:,p) =  PELSURFACE(:,p) - flux_pel_ice(:)  
               ! map the flux into a 3D temporary array
-              tmpflux(SRFindices) = PELSURFACE(p,:) / Depth(SRFindices)
+              tmpflux(SRFindices) = PELSURFACE(:,p) / Depth(SRFindices)
               call flux_vector(iiPel, p, p, tmpflux(:) )
            end if
         end do
@@ -441,7 +410,7 @@
            lcl_SeaiceVar => SeaiceZoo(j,i)
            lcl_PelagicVar => MicroZooPlankton(ZOO(j),i)
            if( associated(lcl_SeaiceVar) .AND. associated(lcl_PelagicVar) ) then
-              where (EHB(:)>ZERO)
+              where (EHB(:)>p_small)
                  flux_pel_ice(:)= max(ZERO, EDH(:)*lcl_PelagicVar(SRFindices)*EVB(:))  &
                       + min(ZERO, EDH(:)*lcl_SeaiceVar(:)/EHB(:))
               elsewhere
@@ -453,9 +422,9 @@
            if (p>0) call flux_vector( iiIce, p,p, flux_pel_ice(:) ) 
            p = ppMicroZooPlankton(ZOO(j),i)
            if (p>0) then
-              PELSURFACE(p,:) =  PELSURFACE(p,:) - flux_pel_ice(:)  
+              PELSURFACE(:,p) =  PELSURFACE(:,p) - flux_pel_ice(:)  
               ! map the flux into a 3D temporary array
-              tmpflux(SRFindices) = PELSURFACE(p,:) / Depth(SRFindices)
+              tmpflux(SRFindices) = PELSURFACE(:,p) / Depth(SRFindices)
               call flux_vector(iiPel, p, p, tmpflux(:) )
            end if
         end do
@@ -465,7 +434,6 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Other Seaice diagnostics
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-
 #ifdef DEBUG
    LEVEL2 'F3 flux ',flux_pel_ice_O3
    LEVEL2 'flux_pel_ice_N1',flux_pel_ice_N1
@@ -475,13 +443,10 @@
    LEVEL2 'EHB=',EHB
 #endif
  
-!EOC
+  end subroutine SeaicetoPelCoup
 
-end subroutine SeaicetoPelCoup
-!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  end module mem_SeaicetoPel
 
-end module mem_SeaicetoPel
-!EOC
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model 
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

@@ -1,26 +1,35 @@
-#include "DEBUG.h"
-#include "INCLUDE.h"
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model 
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-!BOP
 !
-! !ROUTINE: BenBac
+! ROUTINE: BenBac
 !
 ! DESCRIPTION
-!   !    This submodel describes the carbon dynamics and associated
-!    nutrient dynamics in benthic bacteria (represented
-!    by state variables H1-H2) 
+!   This submodel describes the carbon dynamics and associated
+!   nutrient dynamics in benthic bacteria (represented
+!   by state variables H1-H2) 
+!
+! COPYING
+!
+!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU General Public License for more details.
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! INCLUDE
+#include "DEBUG.h"
+#include "INCLUDE.h"
 ! 
-! !INTERFACE
+! INTERFACE
   subroutine BenBacDynamics(hx,  pphxc, pphxn, pphxp)
 !
-! !USES:
-
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! Modules (use of ONLY is strongly encouraged!)
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-
+! USES
   use global_mem, ONLY:RLEN, ZERO, ONE
   use constants, ONLY: MW_C
 #ifdef NOPOINTERS
@@ -39,54 +48,17 @@
   use mem_Param,  ONLY: p_d_tot, p_small, p_pe_R1c, p_pe_R1n, p_pe_R1p, p_qro, &
                         p_clD1D2m
   use mem_BenBac
-
-
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! The following vector functions are used: eTq, MM, PartQ, eramp, insw
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   use mem_globalfun, ONLY: eTq, MM, PartQ, eramp, insw
 
 
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! Implicit typing is never allowed
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   IMPLICIT NONE
 
-! !INPUT:
+  ! INPUT
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   integer,intent(IN)  :: hx
   integer,intent(IN) :: pphxc
   integer,intent(IN) :: pphxn
   integer,intent(IN) :: pphxp
-
-!  
-!
-! !AUTHORS
-!   W. Ebenhoh and C. Kohlmeier,  
-! 
-!
-!
-! !REVISION_HISTORY
-!   
-!
-! COPYING
-!   
-!   Copyright (C) 2020 BFM System Team (bfm_st@cmcc.it)
-!   Copyright (C) 2006 P. Ruardij, M. Vichi
-!   (rua@nioz.nl, vichi@bo.ingv.it)
-!
-!   This program is free software; you can redistribute it and/or modify
-!   it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation;
-!   This program is distributed in the hope that it will be useful,
-!   but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-!   GNU General Public License for more details.
-!
-!EOP
-!-------------------------------------------------------------------------!
-!BOC
-!
 !
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Set up Local Variable for copy of state var. object
@@ -142,13 +114,18 @@
   real(RLEN),dimension(NO_BOXES_XY)  :: rupp
   real(RLEN),dimension(NO_BOXES_XY)  :: rupn
   integer,dimension(NO_BOXES_XY)  :: i
+
+#ifndef INCLUDE_BENCO2
+  integer,parameter :: ppG3c = 0, ppG13c = 0
+#endif
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   !  Copy  state var. object in local var
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  hxc = D2STATE_BEN(pphxc,:)
-  hxn = D2STATE_BEN(pphxn,:)
-  hxp = D2STATE_BEN(pphxp,:)
+  hxc = D2STATE_BEN(:,pphxc)
+  hxn = D2STATE_BEN(:,pphxn)
+  hxp = D2STATE_BEN(:,pphxp)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Assign functional group-dependent parameters:
@@ -233,7 +210,7 @@
 
   call flux_vector( iiBen, ppQ6c,pphxc, ruQ6c )
   call flux_vector( iiBen, ppBenDetritus(p_iQ1(hx),iiC),pphxc, ruQ1c )
-  ruHI(hx,:)  =   ruQ1c
+  ruHI(:,hx)  =   ruQ1c
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Nutrient fluxes into bacteria from carbon fluxes
@@ -308,7 +285,7 @@
   call flux_vector( iiBen, pphxn,ppBenDetritus(p_iQ1(hx),iiN), hxn(:)* sm* p_pe_R1n )
   call flux_vector( iiBen, pphxp,ppBenDetritus(p_iQ1(hx),iiP), hxp(:)* sm* p_pe_R1p )
 
-  reHI(hx,:)  =  hxc(:)* sm* p_pe_R1c;
+  reHI(:,hx)  =  hxc(:)* sm* p_pe_R1c;
 
   call flux_vector( iiBen, pphxc,ppQ6c, rqt6c )
   call flux_vector( iiBen, pphxn,ppQ6n, rqt6n )
@@ -332,10 +309,8 @@
   select case ( hx)
 
     case ( iiH1 )
-#ifdef INCLUDE_BENCO2
-      call flux_vector( iiBen, pphxc,ppG3c,rrc )
-#endif
-      call flux_vector(iiBen, ppG2o,ppG2o,-( rrc/ MW_C))
+      call flux_vector(iiBen, pphxc, ppG3c, rrc)
+      call flux_vector(iiBen, ppG2o, ppG2o, -( rrc/ MW_C))
 
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
       ! Add respiration and excretion to benthic totals:
@@ -345,9 +320,7 @@
       reBTp(:)  =   reBTp(:)+ rep
 
     case ( iiH2 )
-#ifdef INCLUDE_BENCO2
-      call flux_vector( iiBen, pphxc,ppG13c,rrc )
-#endif
+      call flux_vector(iiBen, pphxc, ppG13c, rrc)
 
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
       ! Respiration in anoxic circumstances produces reduced material
@@ -373,7 +346,7 @@
   call flux_vector(iiBen, ppD8m,ppD8m,( cmm- D8m(:))*( ruQ6p- rqt6p)/ Q6p(:))
 
   end subroutine BenBacDynamics
-!EOC
+
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model 
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

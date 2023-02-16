@@ -1,12 +1,8 @@
-#include "DEBUG.h"
-#include "INCLUDE.h"
-
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-!BOP
 !
-! !ROUTINE: PhotoAvailableRadiation
+! ROUTINE: PhotoAvailableRadiation
 !
 ! DESCRIPTION
 !   This process computes the depth-integrated PAR and expresses
@@ -30,16 +26,27 @@
 !
 !     with y = irradiance/optimal
 ! 
+! COPYING
 !
-! !INTERFACE
+!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU General Public License for more details.
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! INCLUDE
+#include "DEBUG.h"
+#include "INCLUDE.h"
+!
+! INTERFACE
   subroutine PhotoAvailableRadiation(phyto)
 !
-! !USES:
-
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! Modules (use of ONLY is strongly encouraged!)
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-
+! USES
   use global_mem, ONLY:RLEN,ZERO,ONE,NOTRANSPORT
 #ifdef NOPOINTERS
   use mem
@@ -50,59 +57,14 @@
 #endif
   use mem_PAR
   use mem_Phyto, ONLY: p_iswLtyp
-
-
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! The following vector functions are used: insw
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   use mem_globalfun,   ONLY: insw
 
-
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! Implicit typing is never allowed
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   IMPLICIT NONE
 
-! !INPUT:
+  ! INPUT
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   integer,intent(IN)  :: phyto
 
-!  
-!
-! !AUTHORS
-!   Original version by W. Ebenhoeh, Oldenburg University 
-!                           Hanneke Baretta-Bekker, VKI
-!       Translated to OpenSesame by Piet Ruardij, NIOZ
-!	Dependency on phytoplankton species by M. Vichi, INGV
-!
-!
-!
-! !REVISION_HISTORY
-!   File created on 8 feb. 1997
-!	Modified by Daji Huang and JWB, 19/6/1998
-!	Scaled the calculation of eiPPY to a max. of 1 (at SUNQ of 16h) JWB040930
-!	(Re)introduced the Smith formulations and removed the eiPPY scaling JWB041006
-!
-!
-! COPYING
-!   
-!   Copyright (C) 2020 BFM System Team (bfm_st@cmcc.it)
-!   Copyright (C) 2006 P. Ruardij, M. Vichi
-!   (rua@nioz.nl, vichi@bo.ingv.it)
-!
-!   This program is free software; you can redistribute it and/or modify
-!   it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation;
-!   This program is distributed in the hope that it will be useful,
-!   but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-!   GNU General Public License for more details.
-!
-!EOP
-!-------------------------------------------------------------------------!
-!BOC
-!
-!
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Local Variables
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -130,6 +92,7 @@
   real(RLEN),dimension(NO_BOXES)  :: noon_light
   real(RLEN),dimension(NO_BOXES)  :: afternoon_light
   real(RLEN),dimension(NO_BOXES)  :: sum_state_phyto
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 
   ! Recalculate Optimal light from the transported Px.l
@@ -137,10 +100,10 @@
   select case ( D3STATETYPE( i))
 
     case ( NOTRANSPORT )
-      ELiPPY(phyto,:)  =   PhytoPlankton(phyto,iiL)
+      ELiPPY(:,phyto)  =   PhytoPlankton(phyto,iiL)
 
     case default
-      ELiPPY(phyto,:)  =   PhytoPlankton(phyto,iiL)/ PhytoPlankton(phyto,iiC)
+      ELiPPY(:,phyto)  =   PhytoPlankton(phyto,iiL)/ PhytoPlankton(phyto,iiC)
 
   end select
 
@@ -151,9 +114,9 @@
   exfac  =   exp( - xd)
 
 
-  pIRR0  =   EIR(:)/ ELiPPY(phyto,:)
-  pirr0_noon  =   noon_light/ ELiPPY(phyto,:)
-  pirr0_afternoon  =   afternoon_light/ ELiPPY(phyto,:)
+  pIRR0  =   EIR(:)/ ELiPPY(:,phyto)
+  pirr0_noon  =   noon_light/ ELiPPY(:,phyto)
+  pirr0_afternoon  =   afternoon_light/ ELiPPY(:,phyto)
 
   pIRRZ  =   pIRR0* exfac
   pirrz_noon  =   pirr0_noon* exfac
@@ -253,17 +216,17 @@
 
     case ( 1 )
       !rectangular integration:
-      eiPPY(phyto,:)  =   min(  ONE,  corr_mean)
+      eiPPY(:,phyto)  =   min(  ONE,  corr_mean)
 
     case ( 3 )
       !   Simpson integration is used as default:
-      eiPPY(phyto,:)  =  ( corr_irra+ 4.0E+00_RLEN* corr_irrb)/ 6.0E+00_RLEN
+      eiPPY(:,phyto)  =  ( corr_irra+ 4.0E+00_RLEN* corr_irrb)/ 6.0E+00_RLEN
 
   end select
 
 
   end subroutine PhotoAvailableRadiation
-!EOC
+
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

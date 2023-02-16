@@ -1,28 +1,37 @@
-#include "DEBUG.h"
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model 
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-!BOP
 !
-! !ROUTINE: PelagicSystem
+! ROUTINE: PelagicSystem
 !
 ! DESCRIPTION
 !   This is the Pelagic Submodel. 
 !   All the pelagic biogeochemical modules are called in sequence
 !   according to the logical switches
 !        
-! !INTERFACE
+! COPYING
+!
+!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU General Public License for more details.
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! INCLUDE
+#include "DEBUG.h"
+!
+! INTERFACE
   subroutine PelagicSystemDynamics
 !
-! !USES:
-
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! Modules (use of ONLY is strongly encouraged!)
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-
+! USES
   use global_mem, ONLY:RLEN, ZERO
   use mem, ONLY: iiPhytoPlankton, iiMesoZooPlankton, iiMicroZooPlankton,      &
-                 iiPelBacteria, flPTN6r, sediR2, sediR6, sediPPY 
+                 iiPelBacteria, flPTN6r, sediR2, sediR3, sediR6, sediPPY 
 #ifdef INCLUDE_PELFE
   use mem, ONLY: iiF
 #endif
@@ -33,44 +42,21 @@
     PhytoDynamics, LightAdaptationDynamics, MesoZooDynamics, MicroZooDynamics
   use api_bfm, ONLY: LOGUNIT, BOTindices
   use init_var_bfm_local, only: upd_organic_quotas
-  use mem_PelSinkSet, ONLY: p_rR6m, p_rPIm, p_burvel_R2, p_burvel_R6, p_burvel_PI
+  use mem_PelSinkSet, ONLY: p_rR6m, p_rR3m, p_rPIm, p_burvel_R2, p_burvel_R3, p_burvel_R6, p_burvel_PI
 #if defined INCLUDE_PELCO2
   use mem,            ONLY: sediO5
   use mem_PelSinkSet, ONLY: p_rO5m, p_burvel_O5
 #endif
   use mem_PelBac,     ONLY: p_version
+
+  IMPLICIT NONE
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Local Variables
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  integer :: i
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-!  
-!
-! !AUTHORS
-!   BFM team
-!
-! !REVISION_HISTORY
-!
-! COPYING
-!   
-!   Copyright (C) 2020 BFM System Team (bfm_st@cmcc.it)
-!
-!   This program is free software; you can redistribute it and/or modify
-!   it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation;
-!   This program is distributed in the hope that it will be useful,
-!   but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-!   GNU General Public License for more details.
-!
-!EOP
-!-------------------------------------------------------------------------!
-!BOC
-!
-!
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! Implicit typing is never allowed
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  IMPLICIT NONE
-  integer :: i
-  ! 
   flPTN6r(:)  =   ZERO
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -87,12 +73,13 @@
   ! Set background sedimentation velocities
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   sediR2(:) = ZERO
+  sediR3(:) = p_rR3m
   sediR6(:) = p_rR6m
 #if defined INCLUDE_PELCO2
   sediO5(:) = p_rO5m
 #endif
   do i = 1 , (iiPhytoPlankton)
-    sediPPY(i,:) = p_rPIm( i)
+    sediPPY(:,i) = p_rPIm( i)
   end do
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -144,7 +131,11 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   do i =1,iiPelBacteria
      if ( CalcPelBacteria(i) ) then
+        if ( p_version(i) .eq. 4) then
+           call PelBacDynamics4( i )
+        else
            call PelBacDynamics( i )
+        endif
      endif
   end do
 
@@ -153,12 +144,13 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   if ( BOTindices(1) .NE.0 )  then 
       sediR2(BOTindices) = p_burvel_R2
+      sediR3(BOTindices) = p_burvel_R3
       sediR6(BOTindices) = p_burvel_R6
 #if defined INCLUDE_PELCO2
       sediO5(BOTindices) = p_burvel_O5
 #endif
       do i = 1 , ( iiPhytoPlankton)
-          sediPPY(i,BOTindices)  =   p_burvel_PI
+          sediPPY(BOTindices,i)  =   p_burvel_PI
       end do
   endif
 
@@ -170,7 +162,7 @@
   end if
 
   end subroutine PelagicSystemDynamics
-!EOC
+
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model 
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

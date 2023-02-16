@@ -1,20 +1,35 @@
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! MODULE: standalone
+!
+! DESCRIPTION
+!   This module contains all the routines for the standard BFM
+!   simulation in standalone version, i.e. with a 0.5D setup
+!   (pelagic and benthic).
+!   It also contains all the ancillary functions for forcing functions.
+!
+! COPYING
+!
+!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU General Public License for more details.
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! INCLUDE
 #include "cppdefs.h"
-!-----------------------------------------------------------------------
-!BOP
 !
-! !MODULE: standalone
-!
-! !INTERFACE:
+! INTERFACE
    module standalone
 !
-! !DESCRIPTION:
-! This module contains all the routines for the standard BFM
-! simulation in standalone version, i.e. with a 0.5D setup
-! (pelagic and benthic).
-! It also contains all the ancillary functions for forcing functions.
-!
-! !USES:
-!  default: all is private.
+! USES
    use global_mem, only:RLEN,ONE,PI
    use constants,  only:SEC_PER_DAY
    use init_var_bfm_local
@@ -22,6 +37,7 @@
    use mem_CO2, ONLY: CloseCO2
 #endif   
    use sw_tool,    only: gsw_p_from_z
+
    private
 !
 ! !PUBLIC MEMBER FUNCTIONS:
@@ -73,43 +89,18 @@
 ! !PRIVATE DATA MEMBERS:
    real(RLEN),parameter :: RFACTOR=PI/180._RLEN
 
-!
-! !REVISION HISTORY:
-!  Original author(s): Marcello Vichi (INGV), Momme Buthenschoen (UNIBO)
-!
-!
-! COPYING
-!
-!   Copyright (C) 2020 BFM System Team (bfm_st@cmcc.it)
-!
-!   This program is free software; you can redistribute it and/or modify
-!   it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation;
-!   This program is distributed in the hope that it will be useful,
-!   but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-!   GNU General Public License for more details.
-!
-!EOP
 !-----------------------------------------------------------------------
 
    contains
 
-!-----------------------------------------------------------------------
-!BOP
-!
-! !IROUTINE: Initialise the standalone BFM
-!
-! !INTERFACE:
    subroutine init_standalone()
 !
-! !DESCRIPTION:
-!  Main communication of array dimensions between
-!  BFM and the standalone setup
-!  Read also integration limits
+! DESCRIPTION:
+!   Initialise the standalone BFM
+!   Main communication of array dimensions between
+!   BFM and the standalone setup
 !
-!
-! !USES:
+! USES
    use constants, only: E2W
    use mem,   only: NO_D3_BOX_STATES, NO_BOXES,          &
                   NO_BOXES_X, NO_BOXES_Y, NO_BOXES_Z,  &
@@ -132,24 +123,19 @@
                   NO_STATES_BEN
 
    IMPLICIT NONE
-!
-! !INPUT PARAMETERS:
-!
-! !REVISION HISTORY:
-!  Original author(s): Marcello Vichi
-!
-! !LOCAL VARIABLES:
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Local Variables
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    namelist /standalone_nml/ nboxes,indepth,maxdelt,    &
             mindelt,method,latitude,longitude
    namelist /time_nml/ timefmt,MaxN,start,stop,simdays
-!
-! !LOCAL VARIABLES:
+   !
    real(RLEN) :: tt
    integer    :: dtm1,i
    character(LEN=8)  :: datestr
-!EOP
-!-----------------------------------------------------------------------
-!BOC
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
    call Date_And_Time(datestr,timestr)
    STDERR ' '
    STDERR LINE
@@ -335,17 +321,17 @@
    !---------------------------------------------
    ! allocate and initialise integration arrays
    !---------------------------------------------
-   allocate(bbccc3D(NO_D3_BOX_STATES,NO_BOXES))
-   allocate(bccc3D(NO_D3_BOX_STATES,NO_BOXES))
-   allocate(ccc_tmp3D(NO_D3_BOX_STATES,NO_BOXES))
+   allocate(bbccc3D(NO_BOXES,NO_D3_BOX_STATES))
+   allocate(bccc3D(NO_BOXES,NO_D3_BOX_STATES))
+   allocate(ccc_tmp3D(NO_BOXES,NO_D3_BOX_STATES))
 #if defined INCLUDE_SEAICE
-   allocate(bccc2D_ice(NO_D2_BOX_STATES_ICE,NO_BOXES_ICE))
-   allocate(bbccc2D_ice(NO_D2_BOX_STATES_ICE,NO_BOXES_ICE))
-   allocate(ccc_tmp2D_ice(NO_D2_BOX_STATES_ICE,NO_BOXES_ICE))
+   allocate(bccc2D_ice(NO_BOXES_ICE,NO_D2_BOX_STATES_ICE))
+   allocate(bbccc2D_ice(NO_BOXES_ICE,NO_D2_BOX_STATES_ICE))
+   allocate(ccc_tmp2D_ice(NO_BOXES_ICE,NO_D2_BOX_STATES_ICE))
 #endif
-   allocate(bccc2D_ben(NO_D2_BOX_STATES_BEN,NO_BOXES_BEN))
-   allocate(bbccc2D_ben(NO_D2_BOX_STATES_BEN,NO_BOXES_BEN))
-   allocate(ccc_tmp2D_ben(NO_D2_BOX_STATES_BEN,NO_BOXES_BEN))
+   allocate(bccc2D_ben(NO_BOXES_BEN,NO_D2_BOX_STATES_BEN))
+   allocate(bbccc2D_ben(NO_BOXES_BEN,NO_D2_BOX_STATES_BEN))
+   allocate(ccc_tmp2D_ben(NO_BOXES_BEN,NO_D2_BOX_STATES_BEN))
 
    ! Initialize prior time step for leap-frog:
    if (method == 3) then
@@ -362,15 +348,15 @@
 #ifdef DEBUG
    ! print out initial values (first grid point only)
    do i=1,NO_D3_BOX_STATES
-     LEVEL1 trim(var_names(stPelStateS+i-1)),D3STATE(i,1)
+     LEVEL1 trim(var_names(stPelStateS+i-1)),D3STATE(1,i)
    end do
 #if defined INCLUDE_SEAICE
    do i=1,NO_D2_BOX_STATES_ICE
-     LEVEL1 trim(var_names(stIceStateS+i-1)),D2STATE_ICE(i,1)
+     LEVEL1 trim(var_names(stIceStateS+i-1)),D2STATE_ICE(1,i)
    end do
 #endif
    do i=1,NO_D2_BOX_STATES_BEN
-     LEVEL1 trim(var_names(stBenStateS+i-1)),D2STATE_BEN(i,1)
+     LEVEL1 trim(var_names(stBenStateS+i-1)),D2STATE_BEN(1,i)
    end do
 #endif
 
@@ -381,43 +367,34 @@
 103   call error_msg_prn(NML_READ,"standalone.f90","time_nml")
 
    end subroutine init_standalone
-!EOC
 
 !-----------------------------------------------------------------------
-!BOP
+
+   subroutine timestepping()
 !
-! !IROUTINE:
+! DESCRIPTION
+!   Standalaone time marching execution
 !
-! !INTERFACE:
-   SUBROUTINE timestepping()
-!
-! !DESCRIPTION:
-!
-!
-! !USES:
+! USES
    use global_mem, only:RLEN
    use netcdf_bfm, only: save_bfm
    use mem
    use api_bfm, only: out_delta, save_delta , time_delta, update_save_delta
-#ifdef DEBUG
-   use api_bfm, only: printDEBUG
+   use api_bfm, only: stPelStateS, stBenStateS, var_names
+#if defined INCLUDE_SEAICE
+   use api_bfm, only: stIceStateS
 #endif
+   use global_mem, only: RLEN, bfm_lwp, LOGUNIT
    use time
+
    IMPLICIT NONE
-! !INPUT PARAMETERS:
-! !INPUT/OUTPUT PARAMETERS:
-!
-! !OUTPUT PARAMETERS:
-! !REVISION HISTORY:
-!  Author(s): Momme Butenschoen (UNIBO)
-!
-! !LOCAL VARIABLES:
-!
-!EOP
-!-----------------------------------------------------------------------
-!BOC
-integer    :: i
-real(RLEN) :: localtime
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Local Variables
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+   integer    :: i
+   real(RLEN) :: localtime
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
    LEVEL1 'timestepping'
    do while (ntime.le.nendtim)
@@ -472,43 +449,42 @@ real(RLEN) :: localtime
       call update_time(ntime)
 #ifdef DEBUG
       LEVEL2 'julian, seconds=',julianday,secondsofday
+      LEVEL2 ('                       '//trim(var_names(stPelStateS+i-1)), i=1,NO_D3_BOX_STATES)
+      LEVEL2 'PELAGIC', D3STATE
+      LEVEL2 ('                       '//trim(var_names(stIceStateS+i-1)), i=1,NO_D2_BOX_STATES_ICE)
+#if defined INCLUDE_SEAICE
+      LEVEL2 'SEAICE', D2STATE_ICE
+      LEVEL2 ('                       '//trim(var_names(stBenStateS+i-1)), i=1,NO_D2_BOX_STATES_BEN)
+#endif
+      LEVEL2 'BENTHIC', D2STATE_BEN
+      LEVEL2 ''
 #endif
    end do
 
-   END SUBROUTINE timestepping
-!EOC
+   end subroutine timestepping
 
 !-----------------------------------------------------------------------
-!BOP
-!
-! !IROUTINE: Finalise the standalone BFM
-!
-! !INTERFACE:
+
    subroutine end_standalone()
 !
-! !DESCRIPTION:
-!  Terminates the standalone simulation.
+! DESCRIPTION
+!   Finalise the BFM standalone simulation.
 !
-!
-! !USES:
+! USES
    use time
    use netcdf_bfm, only: close_ncdf, ncid_bfm, save_rst_bfm, ncid_rst
+   use global_mem, only: RLEN, bfm_lwp, LOGUNIT
    use api_bfm, only: time_delta
+
    IMPLICIT NONE
-! !INPUT PARAMETERS:
-! !INPUT/OUTPUT PARAMETERS:
-!
-! !OUTPUT PARAMETERS:
-! !REVISION HISTORY:
-!  Author(s): Karsten Bolding and Hans Burchard
-!
-! !LOCAL VARIABLES:
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Local Variables
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    character(LEN=8)          :: datestr
    real(RLEN)       :: localtime
-!
-!EOP
-!-----------------------------------------------------------------------
-!BOC
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
    ! save and close the restart file
    localtime = (time_delta - real(bfmtime%step0,RLEN)) * bfmtime%timestep
    call save_rst_bfm(localtime)
@@ -523,9 +499,37 @@ real(RLEN) :: localtime
    call Date_And_Time(datestr,timestr)
    STDERR LINE
    STDERR 'BFM standalone finished on  ',datestr,' ',timestr
+
    end subroutine end_standalone
-!EOC
+
 !-----------------------------------------------------------------------
+
+   subroutine printDEBUG( ntime )
+!
+! DESCRIPTION
+!   Print debug information
+!
+! USES
+     use mem, only: D3STATE
+     use global_mem, only: RLEN,LOGUNIT
+     use api_bfm, only: stPelStateS , stPelStateE, var_names
+
+     implicit none
+     integer, intent(IN) :: ntime
+     integer :: idx, idx_tmp
+
+     write(LOGUNIT,*)
+     write(LOGUNIT,*) 'D3STATE: (', ntime, ')'
+     do idx = stPelStateS , stPelStateE
+        idx_tmp=idx-stPelStateS+1
+        write(LOGUNIT,*) "  ", trim(var_names(idx)), "= ", D3STATE(:,idx_tmp)
+     end do
+     write(LOGUNIT,*)
+
+   end subroutine  printDEBUG
 
    END MODULE standalone
 
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

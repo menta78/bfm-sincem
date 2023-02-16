@@ -1,25 +1,35 @@
-#include "DEBUG.h"
-#include "INCLUDE.h"
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-!BOP
 !
-! !ROUTINE: FilterFeeder
+! ROUTINE: FilterFeeder
 !
 ! DESCRIPTION
 !   This process describes the carbon dynamics and associated
 !   nutrient dynamics in benthic organism Y3 (suspension feeders)
 !   Y3 is handled separately because it also feeds from the water column.
 !
+! COPYING
 !
-! !INTERFACE
+!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU General Public License for more details.
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! INCLUDE
+#include "DEBUG.h"
+#include "INCLUDE.h"
+!
+! INTERFACE
   subroutine FilterFeederDynamics
 !
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! Modules (use of ONLY is strongly encouraged!)
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-
+! USES
   use global_mem, ONLY:RLEN,ZERO,ONE
   use constants, ONLY:MW_C
 #ifdef NOPOINTERS
@@ -41,50 +51,12 @@
 #endif
 
 #endif
-#ifdef BFM_GOTM
-  use bio_var, ONLY: BOTindices
-#else
   use api_bfm, ONLY: BOTindices
-#endif
   use mem_Param,  ONLY: p_d_tot,p_pe_R1c, p_pe_R1n, p_pe_R1p,p_small
   use mem_FilterFeeder
   use mem_BenOrganisms, ONLY: p_qncBOs, p_qpcBOS
-
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! The following vector functions are used
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   use mem_globalfun,   ONLY: eTq, MM, MM_power, insw, PartQ
 
-!
-! !AUTHORS
-!   W. Ebenhoeh and C. Kohlmeier
-!
-!
-! !REVISION_HISTORY
-!   !
-!
-! COPYING
-!
-!   Copyright (C) 2020 BFM System Team (bfm_st@cmcc.it)
-!   Copyright (C) 2006 P. Ruardij, M. Vichi
-!   (rua@nioz.nl, vichi@bo.ingv.it)
-!
-!   This program is free software; you can redistribute it and/or modify
-!   it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation;
-!   This program is distributed in the hope that it will be useful,
-!   but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-!   GNU General Public License for more details.
-!
-!EOP
-!-------------------------------------------------------------------------!
-!BOC
-!
-!
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! Implicit typing is never allowed
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   IMPLICIT NONE
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -102,7 +74,7 @@
   real(RLEN),dimension(NO_BOXES_XY)  :: ePC
   real(RLEN),dimension(NO_BOXES_XY)  :: foodpm2
   real(RLEN),dimension(NO_BOXES_XY)  :: food
-  real(RLEN),dimension(iiPhytoPlankton,NO_BOXES_XY)  :: sfood_PI
+  real(RLEN),dimension(NO_BOXES_XY,iiPhytoPlankton)  :: sfood_PI
   real(RLEN),dimension(NO_BOXES_XY)  :: food_PT
   real(RLEN),dimension(NO_BOXES_XY)  :: sfood_ZI
   real(RLEN),dimension(NO_BOXES_XY)  :: sfood_RI
@@ -166,6 +138,10 @@
   real(RLEN),dimension(NO_BOXES_XY)  :: fsat ! filtering saturation : at high feed levels less filtering
                                              ! is necessairy
   real(RLEN),dimension(NO_BOXES_XY)  :: netto
+
+#ifndef INCLUDE_BENCO2
+  integer,parameter :: ppG3c = 0
+#endif
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 
@@ -187,16 +163,16 @@
   ! For phytoplankton:
   food_PT=ZERO
   do i=1,iiPhytoPlankton
-     r =  MM( PI_Benc(i,:),  clu)
-     call CorrectConcNearBed(Depth_Ben(:), sediPPY_Ben(i,:), p_height, &
+     r =  MM( PI_Benc(:,i),  clu)
+     call CorrectConcNearBed(Depth_Ben(:), sediPPY_Ben(:,i), p_height, &
                                   p_max, p_vum*et*Y3c(:), corr)
 
 #ifdef BFM_POM
      corr=ONE
 #endif
 
-     sfood_PI(i,:)=corr*p_PI
-     food_PT(:)  =   food_PT(:)+ PI_Benc(i,:) * sfood_PI(i,:)
+     sfood_PI(:,i)=corr*p_PI
+     food_PT(:)  =   food_PT(:)+ PI_Benc(:,i) * sfood_PI(:,i)
   enddo
   food  =   food  + food_PT(:)
 
@@ -370,16 +346,16 @@
   rePIp  =   ZERO
 
   do i=1,iiPhytoPlankton
-    choice=sfood_PI(i,:)* fdepth
-    jPIY3c(i,:) =       PI_Benc(i,:)* sgu* choice
-    ruPIc  = ruPIc  +   PI_Benc(i,:)* sgu* choice
-    ruPIn  = ruPIn  +   PI_Benn(i,:)* sgu* choice
-    ruPIp  = ruPIp  +   PI_Benp(i,:)* sgu* choice
-    ruPIs  = ruPIs  +   PI_Bens(i,:)* sgu* choice
+    choice=sfood_PI(:,i)* fdepth
+    jPIY3c(:,i) =       PI_Benc(:,i)* sgu* choice
+    ruPIc  = ruPIc  +   PI_Benc(:,i)* sgu* choice
+    ruPIn  = ruPIn  +   PI_Benn(:,i)* sgu* choice
+    ruPIp  = ruPIp  +   PI_Benp(:,i)* sgu* choice
+    ruPIs  = ruPIs  +   PI_Bens(:,i)* sgu* choice
 
-    rePIc  = rePIc  +   PI_Benc(i,:)* se_uPI* choice
-    rePIn  = rePIn  +   PI_Benn(i,:)* se_uPI* choice*eNC
-    rePIp  = rePIp  +   PI_Benp(i,:)* se_uPI* choice*ePC
+    rePIc  = rePIc  +   PI_Benc(:,i)* se_uPI* choice
+    rePIn  = rePIn  +   PI_Benn(:,i)* se_uPI* choice*eNC
+    rePIp  = rePIp  +   PI_Benp(:,i)* se_uPI* choice*ePC
   enddo
 
   call flux_vector( iiBen, ppY3c,ppY3c, ruPIc )
@@ -476,9 +452,7 @@
   rrc  =   rrc+ p_pur*( rgu- retR6c- retQ6c)
 
   call flux_vector(iiBen, ppY3c,ppY3c, -rrc*p_pePel )
-#ifdef INCLUDE_BENCO2
-  call flux_vector( iiBen, ppY3c,ppG3c, rrc*(ONE-p_pePel) )
-#endif
+  call flux_vector(iiBen, ppY3c,ppG3c, rrc*(ONE-p_pePel) )
   call flux_vector(iiBen, ppG2o,ppG2o,-( rrc/ MW_C)* ( ONE-p_pePel))
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -610,7 +584,7 @@
 
   ! The silicate is directly transferred to Q6.s
   ! the ruPis which is put back in R6 is however sedimentating:
-  jbotR6s(:)  =   jbotR6s(:)- ruPIs- ruR6s -reR6s
+  jbotR6s(:)  =   jbotR6s(:)- ruPIs- ruR6s
 
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -657,7 +631,7 @@
 #endif
 
   end subroutine FilterFeederDynamics
-!EOC
+
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

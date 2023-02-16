@@ -219,7 +219,7 @@ Equation Description and User Manual
 \begin_inset Newline newline
 \end_inset
 
-BFM version 5.2
+BFM version 5.3
 \end_layout
 
 \begin_layout Standard
@@ -252,7 +252,7 @@ The BFM System Team
 
 \begin_layout Standard
 \align center
-Release 1.2, June 2020
+Release 1.3, Ferbuary 2023
 \begin_inset Newline newline
 \end_inset
 
@@ -342,11 +342,11 @@ This document should be cited as:
 
 Vichi M., Lovato T., Butenschön M., Tedesco L., Lazzari P., Cossarini G., Masina
  S., Pinardi N., Solidoro C., Zavatarelli M.
- (2020).
+ (2022).
  The Biogeochemical Flux Model (BFM): Equation Description and User Manual.
- BFM version 5.2.
+ BFM version 5.3.
  BFM Report series N.
- 1, Release 1.2, June 2020, Bologna, Italy, http://bfm-community.eu, pp.
+ 1, Release 1.3, June 2022, Bologna, Italy, http://bfm-community.eu, pp.
  104
 \end_layout
 
@@ -434,9 +434,8 @@ Synopsis
 \begin_layout Standard
 This report is divided in two main parts.
  The first part contains an extended description of the Biogeochemical Flux
- Model (BFM version 5) equations and as such it describes different parameteriza
-tions that can be used to simulate biogeochemical processes in the marine
- system.
+ Model (BFM) equations and as such it describes different parameterizations
+ that can be used to simulate biogeochemical processes in the marine system.
  Part 
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -633,7 +632,7 @@ literal "false"
 \end_layout
 
 \begin_layout Quote
-Copyright 2020, The BFM System Team (bfm_st@cmcc.it)
+Copyright 2022, The BFM System Team (bfm_st@cmcc.it)
 \begin_inset Newline newline
 \end_inset
 
@@ -13516,7 +13515,7 @@ Specific rate of nutrients and carbon excretion
 \begin_layout Plain Layout
 
 \size footnotesize
-\begin_inset Formula $d_{0_{Z}}$
+\begin_inset Formula $d_{_{Z}}^{dns}$
 \end_inset
 
 
@@ -13556,68 +13555,7 @@ d
 \begin_layout Plain Layout
 
 \size footnotesize
-Specific mortality rate 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size footnotesize
-\begin_inset Formula $d_{_{Z}}^{dns}$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size footnotesize
-p_sdo
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="left" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size footnotesize
-m
-\begin_inset Formula $^{3}$
-\end_inset
-
- mgC
-\begin_inset Formula $^{-1}$
-\end_inset
-
- d
-\begin_inset Formula $^{-1}$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\size footnotesize
-Density-dependent specific mortality rate
+Density-dependent specific mortality rate 
 \end_layout
 
 \end_inset
@@ -13667,6 +13605,67 @@ p_sds
 
 \size footnotesize
 Exponent for density dependent mortality
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size footnotesize
+\begin_inset Formula $d_{_{Z}}^{o}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size footnotesize
+p_sdo
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size footnotesize
+m
+\begin_inset Formula $^{3}$
+\end_inset
+
+ mgC
+\begin_inset Formula $^{-1}$
+\end_inset
+
+ d
+\begin_inset Formula $^{-1}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size footnotesize
+Oxygen-dependent specific mortality rate
 \end_layout
 
 \end_inset
@@ -14051,7 +14050,7 @@ for mesozooplankton the carbon loss term reads:
 \begin_layout Standard
 \begin_inset Formula 
 \begin{align}
-\left.\frac{dZ_{c}}{dt}\right|_{R_{c}^{(6)}}^{rel} & =\beta_{_{Z}}I_{c}+(d_{0_{Z}}+doxy_{0_{Z}}(1-f_{Z}^{o}))\,f_{_{Z}}^{T}\,Z_{c}+\nonumber \\
+\left.\frac{dZ_{c}}{dt}\right|_{R_{c}^{(6)}}^{rel} & =\beta_{_{Z}}I_{c}+(d_{_{Z}}^{o}(1-f_{Z}^{o}))\,f_{_{Z}}^{T}\,Z_{c}+\nonumber \\
  & +d_{_{Z}}^{dns}\,Z_{c}^{\gamma_{_{Z}}}+Q_{Z}^{c}\label{eq:zooplankton_out-3}
 \end{align}
 
@@ -16269,7 +16268,7 @@ Specific reoxidation rate of reduction equivalents
 \begin_layout Plain Layout
 
 \size footnotesize
-\begin_inset Formula $Q_{10_{N5}}$
+\begin_inset Formula $AE_{N5}$
 \end_inset
 
 
@@ -16283,7 +16282,7 @@ Specific reoxidation rate of reduction equivalents
 \begin_layout Plain Layout
 
 \size footnotesize
-p_q10R6N5
+p_aeR6N5
 \end_layout
 
 \end_inset
@@ -16294,7 +16293,11 @@ p_q10R6N5
 \begin_layout Plain Layout
 
 \size footnotesize
-(-)
+kJ mol
+\begin_inset Formula $^{-1}$
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -16305,7 +16308,7 @@ p_q10R6N5
 \begin_layout Plain Layout
 
 \size footnotesize
-Q10 factor for dissolution of biogenic silica
+Activation energy for biogenic silica dissulution
 \end_layout
 
 \end_inset
@@ -16903,19 +16906,20 @@ where
 \begin_inset Formula $\Lambda_{s}^{rmn}$
 \end_inset
 
- is the constant specific dissolution rate and 
-\begin_inset Formula $f_{_{R^{(6)}}}^{T}$
-\end_inset
-
- is the temperature regulating factor as in eq.
- (
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "eq:Q10"
+ is the constant specific dissolution rate and the temperature dependence
+ based on the Arrhenius formulation 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "sarmientogruber2006"
+literal "false"
 
 \end_inset
 
-), mimicking bacterial activity enhancement at higher temperatures.
+ is represented as 
+\begin_inset Formula $f_{_{R^{(6)}}}^{T}=exp\left(\frac{AE_{N5}}{R}\left(\frac{1}{10}-\frac{1}{T}\right)\right)$
+\end_inset
+
+ .
 \end_layout
 
 \begin_layout Standard
@@ -23371,94 +23375,7 @@ reference "sec:Test-cases"
 \end_inset
 
 .
- The full directory tree of the BFM core is given in Fig.
  
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:Source-directory-tree"
-
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Standard
-The minimal user local settings to use BFM configuration/compilation tools
- is provided by means of the environmental shell variable:
-\end_layout
-
-\begin_layout Itemize
-BFMDIR The root directory of the BFM model (the path to the installed bfm-<versi
-on> directory).
-\end_layout
-
-\begin_layout Standard
-\begin_inset Float figure
-wide true
-sideways false
-status open
-
-\begin_layout Plain Layout
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-
-\backslash
-centering
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Graphics
-	filename Figures/dirtree_51.png
-	height 90theight%
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Caption Standard
-
-\begin_layout Plain Layout
-\begin_inset CommandInset label
-LatexCommand label
-name "fig:Source-directory-tree"
-
-\end_inset
-
-
-\begin_inset Argument 1
-status open
-
-\begin_layout Plain Layout
-BFM directory tree
-\end_layout
-
-\end_inset
-
- Directory tree of the current BFM version.
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Subsection
-System Requirements
 \end_layout
 
 \begin_layout Standard
@@ -23472,9 +23389,8 @@ The software requirements are:
 \end_layout
 
 \begin_layout Itemize
-PERL (version 5.8.2 and above) including Switch module, used automatically
- during compilation time to generate the code from the model template (see
- Sec.
+PERL (version 5.8.2 and above) is used automatically during compilation time
+ to generate the code from the model template (see Sec.
  
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -23611,7 +23527,7 @@ status open
 
 \begin_layout Plain Layout
 
-  CPPDEFS = 'BFM_STANDALONE INCLUDE_PELCO2 INCLUDE_DIAG',         
+  CPPDEFS = 'BFM_STANDALONE INCLUDE_PELCO2',         
 \end_layout
 
 \begin_layout Plain Layout
@@ -23767,23 +23683,6 @@ INCLUDE_PELCO2:
 INCLUDE_PELFE:
 \family default
  Add iron component and activate the related dynamics in the system.
-\end_layout
-
-\begin_layout Description
-
-\family typewriter
-INCLUDE_DIAG:
-\family default
- Activate the computation and storage of user-defined diagnostics described
- in Chap.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "chap:Model_outputs"
-
-\end_inset
-
-.
 \end_layout
 
 \begin_layout Description
@@ -28852,7 +28751,7 @@ status open
 \noindent
 \align center
 \begin_inset Graphics
-	filename Figures/memory-variable-mapping.eps
+	filename Figures/memory-variable-mapping.png
 	scale 80
 
 \end_inset
@@ -28889,226 +28788,43 @@ D3STATE
 \end_layout
 
 \begin_layout Standard
-The other basic arrays of the memory are the ones containing the time rates
+The other basic array of the memory is the one containing the time rates
  of change due to each physiological or ecological interaction.
  The rate of mass exchange between two state variables is an element of
- an array 
+ the array 
 \family typewriter
 D3SOURCE
 \family default
-, if it is a production term, and 
-\family typewriter
-D3SINK
-\family default
- if it is a loss term, both with dimensions 
-\family typewriter
-NO_D3_BOX_STATES
-\family default
- 
-\begin_inset Formula $\times$
-\end_inset
-
- 
-\family typewriter
-NO_D3_BOX_STATES
-\family default
- 
-\begin_inset Formula $\times$
-\end_inset
-
-
-\family typewriter
- NO_BOXES
-\family default
- (Fig.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:Schematic-of-D3SOURCE"
-
-\end_inset
-
-).
- It is clear that the two matrices are symmetrical and a predation (negative)
- rate from variable 
-\family typewriter
-P1c
-\family default
- to 
-\family typewriter
-Z4c
-\family default
- is equivalent to an ingestion rate (positive) of 
-\family typewriter
-Z4c
-\family default
- over 
-\family typewriter
-P1c
-\family default
-.
- All the rates are defined positive by convention, so that to obtain the
- net rate of change for variable of row j, it is sufficient to compute
-\begin_inset listings
-lstparams "basicstyle={\normalsize\ttfamily},language=Fortran"
-inline false
-status open
-
-\begin_layout Plain Layout
-
-sum(D3SOURCE(j,:,:)-D3SINK(j,:,:))
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-Fluxes which involve a variable not defined in the model, such as oxygen
- production from water during photosynthesis can be taken into account by
- using the diagonal of the matrix.
- There is a positive flow from 
-\family typewriter
-O2o
-\family default
- to itself computed stoichiometrically from the gross carbon production
- rate and inserted in (
-\family typewriter
-D3SOURCE(O2o,O2o,:)
-\family default
-, cf.
- Fig.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:Schematic-of-D3SOURCE"
-
-\end_inset
-
-).
-\end_layout
-
-\begin_layout Standard
-The same definitions apply for the 2-dimensional system, and the arrays
+, which collects both production and loss terms.
+ The same definitions apply for the 2-dimensional system and the arrays
  are called 
 \family typewriter
 D2SOURCE
 \family default
- and 
-\family typewriter
-D2SINK
-\family default
- with dimensions 
-\family typewriter
-NO_D2_BOX_STATES
-\family default
- 
-\begin_inset Formula $\times$
-\end_inset
-
-
-\family typewriter
- NO_D2_BOX_STATES
-\family default
- 
-\begin_inset Formula $\times$
-\end_inset
-
-
-\family typewriter
- NO_BOXES_XY
-\family default
 .
-\end_layout
+ The computation of fluxes not explicitly defined in the model through a
+ variable is obtained by collecting the mass exchange rates between two
+ or more state variables as defined in the memory array 
+\family typewriter
+D(3-2)FLUX_MATRIX
+\family default
+ (see also 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:Model_outputs"
+plural "false"
+caps "false"
+noprefix "false"
 
-\begin_layout Standard
-This separation between positive and negative terms allow to use more sophistica
-ted positive-definite integration schemes, but it may result in an excessive
- memory usage.
- Thus, the default setting of BFM make use of a shrank version of 
-\family typewriter
-D3SOURCE
-\family default
- (
-\family typewriter
-NO_D3_BOX_STATES
-\family default
- 
-\begin_inset Formula $\times$
 \end_inset
 
-
-\family typewriter
- NO_BOXES
-\family default
-), which is the result of the addition of all the terms after the combination
- of the two symmetrical matrices into one that contains all the source (upper-le
-ft part) and sink (lower-right part) terms.
- It is possible to use the two separated matrices for source and sinks terms
- through the inclusion of the compilation macro 
-\family typewriter
-EXPLICIT_SINK 
-\family default
-in the preset configuration file.
-\end_layout
-
-\begin_layout Standard
-No direct mass exchanges are allowed between variables from different realms
- (like for instance between pelagic and benthic variables), and therefore
- those fluxes are defined as diagonal fluxes each one within its own realm
- taking into account any change of units.
+).
  Specialized functions have been written to take into account all the possible
  kind of exchanges and are collected in 
 \family typewriter
-General/FluxFunctions.F90
+General/FluxFunctions.h90
 \family default
 .
-\end_layout
-
-\begin_layout Standard
-\begin_inset Float figure
-wide true
-sideways false
-status open
-
-\begin_layout Plain Layout
-\noindent
-\align center
-\begin_inset Graphics
-	filename Figures/memory-d3source-array.eps
-	scale 80
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Caption Standard
-
-\begin_layout Plain Layout
-\begin_inset CommandInset label
-LatexCommand label
-name "fig:Schematic-of-D3SOURCE"
-
-\end_inset
-
-Schematic of the 
-\family typewriter
-D3SOURCE
-\family default
- array collecting the source terms.
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
 \end_layout
 
 \begin_layout Section
@@ -31602,11 +31318,7 @@ D3(D2)SINK
 \family typewriter
 STANDALONE_PELAGIC/layout
 \family default
- file and are activated with the compilation macros 
-\family typewriter
-INCLUDE_DIAG
-\family default
-:
+ file:
 \begin_inset listings
 lstparams "basicstyle={\small\ttfamily},breaklines=true,language=sh"
 inline false
@@ -31629,7 +31341,7 @@ status open
 
 \begin_layout Plain Layout
 
-3d-flux-pel -if-exist INCLUDE_DIAG INCLUDE_PELCO2
+3d-flux-pel -if-exist INCLUDE_PELCO2
 \end_layout
 
 \begin_layout Plain Layout
@@ -31663,7 +31375,7 @@ end
 
 \begin_layout Plain Layout
 
-3d-flux-pel -if-exist INCLUDE_DIAG
+3d-flux-pel
 \end_layout
 
 \begin_layout Plain Layout

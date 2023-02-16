@@ -16,18 +16,8 @@
 
 #endif
 
-
-#ifdef BFM_GOTM
-
-#define BFM_ERROR_MSG gotm_error_msg
-#define BFM_ERROR gotm_error
-
-#else
-
 #define BFM_ERROR_MSG bfm_error_msg
 #define BFM_ERROR bfm_error
-
-#endif
 
 
 

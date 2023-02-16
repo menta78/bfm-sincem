@@ -2,7 +2,7 @@
        USE api_bfm
        USE bfm_error_msg
        USE constants
-       USE envforcing
+!       USE envforcing
        USE global_interface
        USE global_mem
        USE init_var_bfm_local
@@ -19,8 +19,7 @@
        USE mem_pelsinkset
        USE mem_phyto
        USE netcdf_bfm
-       USE print_functions
-       USE standalone
+!       USE standalone
        USE string_functions
        USE sw_tool
        USE systemforcing

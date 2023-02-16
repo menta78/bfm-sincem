@@ -1,45 +1,40 @@
-#include "cppdefs.h"
-!-----------------------------------------------------------------------
-!BOP
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 !
-! !IROUTINE: Close forcing files in the standalone BFM
+! ROUTINE: Close forcing files in the standalone BFM
 !
-! !INTERFACE:
-   subroutine end_envforcing_bfm
-!
-! !DESCRIPTION:
-!  Read the namelist parameters for the analytical forcings
-!  Also initialize additional components for other forcing methods
-!
-!
-! !USES:
-   use envforcing
-
-   IMPLICIT NONE
-!
-! !INPUT PARAMETERS:
-!
-! !REVISION HISTORY:
-!  Original author(s): Marcello Vichi
-!
+! DESCRIPTION
+!   Read the namelist parameters for the analytical forcings
+!   Also initialize additional components for other forcing methods
 !
 ! COPYING
 !
-!   Copyright (C) 2020 BFM System Team (bfm_st@cmcc.it)
+!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
 !
-!   This program is free software; you can redistribute it and/or modify
+!   This program is free software: you can redistribute it and/or modify
 !   it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation;
+!   the Free Software Foundation.
 !   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-!   GNU General Public License for more details.
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU General Public License for more details.
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 !
-! !LOCAL VARIABLES:
+! INCLUDE
+#include "cppdefs.h"
 !
-!EOP
-!-----------------------------------------------------------------------
-!BOC
+! INTERFACE
+   subroutine end_envforcing_bfm
+!
+! USES
+   use envforcing
+   use global_mem, only: RLEN, bfm_lwp, LOGUNIT
+
+   IMPLICIT NONE
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
    LEVEL1 'end_envforcing_bfm'
     select case (forcing_method)
     case (1) ! analytical forcings
@@ -54,13 +49,23 @@
        end if
     case (3) ! interactive air-sea fluxes
     end select
+    if ( use_benthic_data ) then
+       LEVEL2 'Closing benthic forcing data file:'
+       LEVEL2 trim(benthic_file)
+       close(unit_benthic)
+    endif
 #ifdef INCLUDE_SEAICE
-    LEVEL2 'Closing sea-ice forcing data file:'
-    LEVEL2 trim(seaice_file)
-    close(unit_seaice)
+    if ( use_seaice_data ) then
+       LEVEL2 'Closing sea-ice forcing data file:'
+       LEVEL2 trim(seaice_file)
+       close(unit_seaice)
+    endif
 #endif
 
    return
 
    end subroutine end_envforcing_bfm
-!EOC
+
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

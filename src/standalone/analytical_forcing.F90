@@ -1,16 +1,33 @@
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! ROUTINE analytical_forcing
+!
+! DESCRIPTION
+!   Define analytical forcings used in the BFM
+!
+! COPYING
+!
+!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU General Public License for more details.
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! INCLUDE
 #include "cppdefs.h"
 #include "INCLUDE.h"
-!-----------------------------------------------------------------------
-!BOP
 !
-! !ROUTINE: analytical_forcing
-!
-! !INTERFACE
+! INTERFACE
 subroutine analytical_forcing
 !
-! !DESCRIPTION
-!   Define analytical forcings used in the BFM
-! !USES
+! USES
    use api_bfm
    use global_mem, only: RLEN,ONE
 #ifdef NOPOINTERS
@@ -22,8 +39,12 @@ subroutine analytical_forcing
    use mem,        only: iiC,iiN,iiP,iiS
    use mem_param,  only: p_small
 #ifdef INCLUDE_SEAICE
-   ! seaice forcings
+   ! seaice environment
    use mem,        only: EVB,ETB,ESB,EIB,EHB,ESI
+#endif
+#if defined BENTHIC_BIO || defined BENTHIC_FULL
+   ! benthic environment
+   use mem,        only: ETW_Ben,ESW_Ben,ERHO_Ben
 #endif
 #endif
    use mem_PAR,    only: ChlAttenFlag, P_PARRGB, P_PAR, &
@@ -41,34 +62,15 @@ subroutine analytical_forcing
    use bfm_error_msg
 
    IMPLICIT NONE
-!
-! !INPUT PARAMETERS:
-!
-! !OUTPUT PARAMETERS:
-!
-! !REVISION HISTORY:
-!  Original author(s): Momme Butenschoen (UNIBO), M. Vichi (CMCC)
-!
-! COPYING
-!
-!   Copyright (C) 2020 BFM System Team (bfm_st@cmcc.it)
-!
-!   This program is free software; you can redistribute it and/or modify
-!   it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation;
-!   This program is distributed in the hope that it will be useful,
-!   but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-!   GNU General Public License for more details.
-!
-! !LOCAL VARIABLES:
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Local Variables
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    real(RLEN)          :: dfrac,wlight,dtime
    integer             :: dyear
-   real(RLEN),external :: GetDelta
    real(RLEN)          :: biodelta
-!EOP
-!-----------------------------------------------------------------------
-!BOC
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
 #ifdef DEBUG
    LEVEL1 'envforcing_bfm: analytical'
    LEVEL2 'time=',timesec
@@ -150,19 +152,26 @@ subroutine analytical_forcing
    if (botdep_p>ZERO) jbotR6p(:) = -deposition(dyear,dfrac,botdep_p,iiP)
    if (botdep_si>ZERO) jbotR6s(:) = -deposition(dyear,dfrac,botdep_si,iiS)
 
+#if defined BENTHIC_BIO || defined BENTHIC_FULL
+   ETW_Ben(:)  =   ETW(BOTindices)
+   ESW_Ben(:)  =   ESW(BOTindices)
+   ERHO_Ben(:) =   ERHO(BOTindices)
+#endif
+
 #ifdef INCLUDE_SEAICE
-! sea-ice environmental forcings
-! overwritten by the seaice data file, if present
-  EVB(:) = ONE
-  ETB(:) = ONE
-  ESB(:) = ONE
-  ! convert from irradiance to PAR in uE/m2/s
-  EIB(:) = ONE/E2W
-  EHB(:) = ONE
-  ESI(:) = ONE
+   ! sea-ice environmental forcings
+   ! overwritten by the seaice data file, if present
+   EVB(:) = ONE
+   ETB(:) = ONE
+   ESB(:) = ONE
+   ! convert from irradiance to PAR in uE/m2/s
+   EIB(:) = ONE/E2W
+   EHB(:) = ONE
+   ESI(:) = ONE
 #endif
 
 end subroutine analytical_forcing
-!EOC
-!-----------------------------------------------------------------------
 
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

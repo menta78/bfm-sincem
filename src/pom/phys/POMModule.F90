@@ -25,6 +25,7 @@
 ! ** Giulia Mussap and Nadia Pinardi. However, previous       **
 ! ** significant contributions were provided also by          **
 ! ** Momme Butenschoen and Marcello Vichi.                    **
+! ** Subsequent maintance by Lorenzo Mentaschi.               **
 ! ** Thanks are due to Prof. George L. Mellor that allowed us **
 ! ** to modify use and distribute the one dimensional         **
 ! ** version of the Princeton Ocean Model.                    **
@@ -75,19 +76,6 @@
 !     -----VERTICAL LAYERS-----
 !
       integer(ilong),parameter :: KB=31
-!
-!     -----SWITCH FOR PROGNOSTIC/DIAGNOSTIC SIMULATION-----
-!
-!     *****************************************************
-!     *****************************************************
-!     **                                                 **
-!     ** IDIAGN=0 PROGNOSTIC (T&S PROFILES COMPUTED)     **
-!     ** IDIAGN=1 DIAGNOSTIC (T&S PROFILES PRESCRIBED)   **
-!     **                                                 **
-!     *****************************************************
-!     *****************************************************
-!
-      integer(ilong)           ::IDIAGN
 !
 !     -----DEFINE SURFACE AND BOTTOM LAYERS LOG DISTRIBUTION-----
 !
@@ -264,18 +252,6 @@
 !
 !     -----SHORT WAVE  RADIATION-----
 !
-!     *****************************************
-!     *****************************************
-!     **                                     **
-!     ** N.B.                                **
-!     **  WHEN THE MODEL IS RUN IN           **
-!     **  DIAGNOSTIC MODE, THIS IS USED ONLY **
-!     **  TO PROVIDE PAR TO THE              **
-!     **  BIOGEOCHEMICAL COMPONENT           **
-!     **                                     **
-!     *****************************************
-!     *****************************************
-!
       real(RLEN)               :: SWRAD
 !
 !     -----BOTTOM ROUGHNESS LENGTH-----
@@ -304,28 +280,8 @@ real(RLEN)               :: CBC
 !     **                                     **
 !     *****************************************
 !     *****************************************
-!
-!     -----LOSS TERM OF THE SURFACE HEAT FLUX-----
-!
-      real(RLEN)               :: WTSURF
 ! 
 !     ------PRESCRIBED T & S VERTICAL PROFILES-----
-!
-!     *****************************************
-!     *****************************************
-!     **                                     **
-!     ** INTERPOLATED, CLIMATOLOGICAL        **
-!     ** AND TIME VARYING.                   **
-!     ** USED IN BOTH MODES (IDIAGN=0/1)     **
-!     **                                     **
-!     ** IDIAGN=0: USED TO COMPUTE           **
-!     ** LATERAL T&S ADVECTIVE FLUXES        **
-!     **                                     **
-!     ** IDIAGN=1: PROVIDE THE COMPLETE      **
-!     ** T&S VERTICAL PROFILES.
-!     **                                     **
-!     *****************************************
-!     *****************************************
 !
        real (RLEN),dimension (KB) :: TSTAR, SSTAR
 
@@ -354,6 +310,12 @@ real(RLEN)               :: CBC
 !
       real(RLEN), dimension(KB):: WTADV, WSADV
 !
+!
+!
+      CHARACTER(LEN=20)        :: NC_OUT_STARTTIME = '01-01-0000'
+!
+!     ----- old flag to set prognostic/diagnostic runs. Not used anymore, only diagnostic runs are supported.
+      integer(ilong)           ::IDIAGN
       end module POM
 
 ! EOC

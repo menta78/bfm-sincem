@@ -1,23 +1,37 @@
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model 
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! ROUTINE: PelCO2Dynamics
+!
+! DESCRIPTION
+!   Driver of the carbonate system computations
+!
+! COPYING
+!
+!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU General Public License for more details.
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! INCLUDE
 #include "cppdefs.h"
 #include "DEBUG.h"
 #include "INCLUDE.h"
 
 #ifdef INCLUDE_PELCO2
-!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-! MODEL  BFM - Biogeochemical Flux Model 
-!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-!BOP
+
 !
-! !ROUTINE: PelCO2Dynamics
-!
-! DESCRIPTION
-!   !
-!
-! !INTERFACE
+! INTERFACE
   subroutine PelagicCSYS()
 !
-! !USES:
-
+! USES
   use global_mem, ONLY: RLEN,ONE,ZERO
   use constants,  ONLY: MW_C, C2ALK
   use mem_Param,  ONLY: AssignAirPelFluxesInBFMFlag
@@ -26,57 +40,34 @@
 #else
   use mem, ONLY: iiPel, O3h, O3c, D3STATE, jsurO3c, CO2airflux,    &
                  Depth, flux_vector, DIC, ALK,                     &
-                 Source_D3_vector, ppO5c, ppN3n, ppN4n
+                 Source_D3_vector, ppO5c, ppN3n, ppN4n, BIOALK
   use mem, ONLY: ppO3h, ppO3c, NO_BOXES, NO_BOXES_XY, BoxNumber,   &
     N1p,N5s,CO2, HCO3, CO3, pCO2, pH, ETW, ESW, ERHO, EWIND, EICE, &
-    OCalc, OArag, EPR, ppO5c, O5c, EPCO2air, dissO5c
+    OCalc, OArag, EPR, ppO5c, O5c, EPCO2air, ffCO2, dpco2
 #endif
   use mem_CO2    
   use mem_CSYS, ONLY : CarbonateSystem
   use AirSeaExchange, ONLY: AirSeaCO2, AirpGas
   use BFM_ERROR_MSG, ONLY: BFM_ERROR
-#ifdef BFM_GOTM
-  use bio_var, ONLY: SRFindices
-#else
   use api_bfm, ONLY: SRFindices,bfm_init
-#endif
+
   IMPLICIT NONE
 
-!  
-!
-! !AUTHORS
-!  T. Lovato 
-!
-! !REVISION_HISTORY
-!
-! !LOCAL VARIABLES:
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Local Variables
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   integer            :: error=0
   integer,save       :: first=0
   integer            :: AllocStatus
-  real(RLEN),allocatable,save,dimension(:) :: rateN, excess, xflux
-!
-! COPYING
-!   
-!   Copyright (C) 2020 BFM System Team (bfm_st@cmcc.it)
-!
-!   This program is free software; you can redistribute it and/or modify
-!   it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation;
-!   This program is distributed in the hope that it will be useful,
-!   but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-!   GNU General Public License for more details.
-!
-!EOP
-!-------------------------------------------------------------------------!
-!BOC
-!
-!
+  real(RLEN),allocatable,save,dimension(:) :: rateN, excess, rdiss, xflux
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Allocate local memory
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   if (first==0) then
-     ALLOCATE ( rateN(NO_BOXES), excess(NO_BOXES),  xflux(NO_BOXES), &
+     ALLOCATE ( rateN(NO_BOXES), excess(NO_BOXES), rdiss(NO_BOXES),  &
+        &      xflux(NO_BOXES),                                      &
         &      STAT = AllocStatus )
      IF( AllocStatus /= 0 ) call bfm_error('PelagicCSYS','Error allocating arrays')
      first=1
@@ -99,7 +90,7 @@
                N1p(BoxNumber), N5s(BoxNumber), DIC(BoxNumber), ALK(BoxNumber), &
                CO2(BoxNumber) ,HCO3(BoxNumber), CO3(BoxNumber), pH(BoxNumber), &
                pCO2(BoxNumber), patm=patm3d(BoxNumber), pr_in=EPR(BoxNumber), &
-               OmegaC=OCalc(BoxNumber), OmegaA=OArag(BoxNumber))
+               OmegaC=OCalc(BoxNumber), OmegaA=OArag(BoxNumber),fCO2=ffCO2(BoxNumber))
 
 #ifdef DEBUG
        write(LOGUNIT,*) "in PelagicCSYS:"
@@ -111,6 +102,7 @@
        write(LOGUNIT,'(A,'' ='',f12.6)') 'ALK',ALK(BoxNumber)
        write(LOGUNIT,'(A,'' ='',f12.6)') 'OCalc',OCalc(BoxNumber)
        write(LOGUNIT,'(A,'' ='',f12.6)') 'OArag',OArag(BoxNumber)
+       write(LOGUNIT,'(A,'' ='',f12.6)') 'ffCO2',  ffCO2(BoxNumber)
        write(LOGUNIT,'(''layer:'',I4,'' pH='',f12.6)') BoxNumber,pH(BoxNumber)
 #endif
        if ( error > 0 ) then
@@ -130,6 +122,7 @@
   if ( CalcBioAlk ) then
      rateN(:) = - Source_D3_vector(ppN3n) + Source_D3_vector(ppN4n)
      call flux_vector( iiPel, ppO3h,ppO3h, rateN)
+     BIOALK(:) = rateN(:)
   endif 
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -138,18 +131,19 @@
   ! Compute undersaturation
   excess(:) = max(ZERO,ONE - OCalc(:))
   ! Dissolution rate of C in CaCO3 (mg C/m3/d) from Morse and Berner (1972)
-  dissO5c(:) = p_kdca * excess(:)**p_nomega * O5c(:)
+  rdiss(:) = p_kdca * excess(:)**p_nomega * O5c(:)
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Inorganic carbon and alkalinity flux due to PIC changes
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  call flux_vector( iiPel, ppO5c, ppO3c, dissO5c(:) )
-  call flux_vector( iiPel, ppO3h, ppO3h, C2ALK*dissO5c(:) )
+  call flux_vector( iiPel, ppO5c, ppO3c, rdiss(:) )
+  call flux_vector( iiPel, ppO3h, ppO3h, C2ALK*rdiss(:) )
 
   if (SRFindices(1) .eq. 0 ) return
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Computes Atmospheric pCO2 value
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   EPCO2air(:) = AirpGas(AtmCO2%fnow, patm3d(SRFindices), ETW(SRFindices), ESW(SRFindices))
+  dpco2(:) = EPCO2air(:) - pCO2(SRFindices)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Computes air-sea flux (only at surface points)
@@ -158,12 +152,13 @@
           ERHO(SRFindices), EWIND, EICE, CO2(SRFindices) )
 
   jsurO3c(:) = jsurO3c(:) + CO2airflux(:) * MW_C
-  xflux(SRFindices) = jsurO3c(:) / Depth(SRFindices) * CO2fluxfac
+  xflux(SRFindices) = jsurO3c(:) / Depth(SRFindices)
   if ( AssignAirPelFluxesInBFMFlag)  call flux_vector( iiPel, ppO3c,ppO3c, xflux )
 
   end subroutine PelagicCSYS
-!EOC
+
+#endif
+
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model 
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-#endif

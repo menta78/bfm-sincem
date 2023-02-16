@@ -7,7 +7,7 @@
 #
 # COPYING
 #   
-#   Copyright (C) 2020 BFM System Team (bfm_st@cmcc.it)
+#   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
 #                                                                                                     
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -90,7 +90,7 @@ end
   #	State Variable(s) for Phytoplankton Species
   #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
    group PhytoPlankton[cnpls] (PPY) :  mg C/m3 : mmol N/m3 : mmol P/m3 : mg Chl/m3 : mmol Si/m3
-	   P1	    : Diatoms
+	   P1	        : Diatoms
 	   P2[-s]	: Flagellates
 	   P3[-s]	: PicoPhytoplankton
 	   P4[-s]	: Large Phytoplankton
@@ -128,7 +128,7 @@ end
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 3d-state-pel -if-exist INCLUDE_PELCO2
   group Inorganic[ch] (CAR): mg C/m3 : mmol eq/m3
-     O3     : Dissolved Inorganic Carbon: Alkalinity
+     O3     : Dissolved Inorganic Carbon : Alkalinity
      O5[-h] : Calcite
   end
 end
@@ -136,6 +136,7 @@ end
 2d-variable-pel -if-exist INCLUDE_PELCO2
   EPCO2air   : Atmospheric CO2 Partial Pressure : uatm
   CO2airflux : Sea-air CO2 Flux : mmol/m2/d
+  dpco2      : Air-Sea pCO2 difference :uatm
 end
 
 3d-variable-pel -if-exist INCLUDE_PELCO2
@@ -148,6 +149,7 @@ end
     pH         : pH : -
     OCalc      : Saturation state of Calcite : -
     OArag      : Saturation state of Aragonite : -
+    ffCO2      : CO2 fugacity   : uatm
 end
 
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -170,7 +172,6 @@ end
     # Diagnostic collective variables 
     #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     Chla : Chlorophyll-a : mg Chl/m3
-    sunPPY(PhytoPlankton) : Specific Net Production of PhytoPlankton : 1/d
 
     #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     # Water column diagnostic rates
@@ -186,7 +187,7 @@ end
     qncPPY(PhytoPlankton)	: Quotum N/C in Phytoplankton : mmol N/mg C 
     qscPPY(PhytoPlankton)	: Quotum Si/C in Phytoplankton : mmol Si/mg C 
     qlcPPY(PhytoPlankton)	: Quotum Chl/C in Phytoplankton : mg Chl /mg C
-    qccPPY(PhytoPlankton)   : Quotum PIC/POC in Phytoplankton : mg C/mg C
+    qccPPY(PhytoPlankton)       : Quotum PIC/POC in Phytoplankton : mg C/mg C
 
     qpcMEZ(MesoZooPlankton)	: Quotum P/C in Mesozooplankton :mmol P/mg C 
     qncMEZ(MesoZooPlankton)	: Quotum N/C in Mesozooplankton :mmol N/mg C 
@@ -197,7 +198,7 @@ end
     qpcOMT(PelDetritus)		: Quotum P/C in Organic Matter:mmol N/mg C 
     qncOMT(PelDetritus)		: Quotum N/C in Organic Matter:mmol P/mg C  
     qscOMT(PelDetritus)		: Quotum Si/C in Organic Matter:mmol Si/mg C
- 
+
     qpcPBA(PelBacteria)		: Quotum P/C in Pelagic Bacteria :mmol P/mg C  
     qncPBA(PelBacteria)		: Quotum N/C in Pelagic Bacteria :mmol N/mg C  
 
@@ -208,12 +209,14 @@ end
     sediMIZ(MicroZooPlankton) : MicroZooPlankton sedimentation rate:m/d
     sediMEZ(MesoZooPlankton)  : MesoZooPlankton sedimentation rate :m/d
     sediR2                    : Colloidal OMT sedimentation rate   :m/d
+    sediR3                    : Refractory OMT sedimentation rate  :m/d
     sediR6                    : Detritus sedimentation rate        :m/d
     sediO5                    : Calcite sedimentation rate         :m/d
 
    #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
    # Light diagnostics
    #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    sunPPY(PhytoPlankton) : Specific Net Production of PhytoPlankton : 1/d
     eiPPY(PhytoPlankton)  : Regulating Factor for Light in PhytoPlankton : -
     xEPS                  : Total Extinction Coefficient : 1/m
     ELiPPY(PhytoPlankton) : Optimal light in PhytoPlankton : W/m2
@@ -222,8 +225,14 @@ end
    #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
    # Other diagnostics
    #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    dissO5c : Calcite dissolution: mg C/m3/d
+    BGE                      : Bac growth efficiency : -
+    BIOALK                   : O3h biological rate of change: mmol/m3
+    exPPYR2ac(PhytoPlankton) : activity exudation to R2 : mg C/ m3/d
+    BAC_ACT_FACT             : Bacteria activity factor depth dependent
+end
 
+2d-variable-pel
+    dpo2      : Air-Sea pO2 difference :atm
 end
 
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -267,78 +276,48 @@ end
   totsyss  : total mass :  g Si
 end
 
-1d-variable -if-exist BFM_OGS
-  #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  # OGS 1d variables
-  #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  SiPToutr  : Sinks variables
-  SiPToutc  : Sinks variable
-  SiPTouto  : Sinks variable
-  SiPToutn  : Sinks variable
-  SiPToutp  : Sinks variable
-  SiPTouti  : Sinks variable
-  SiQIc     : Sinks variable
-  SiQIn     : Sinks variable
-  SiQIp     : Sinks variable
-  SiQIs     : Sinks variable
-  SiBTsinkc : Sinks variable
-  SiBTsinkn : Sinks variable
-  SiBTsinko : Sinks variable
-  SiBTsinkr : Sinks variable
-  SiBTsinkp : Sinks variable
-  SiBTsinks : Sinks variable
-  SiATsinkr : Sinks variable
-  SiATsinks : Sinks variable
-  SiG3c     : Sinks variable
-  SoO2Airo  : Sinks variable
-  SoPTinr   : Sinks variable
-  SoPTinc   : Sinks variable
-  SoPTino   : Sinks variable
-  SoPTinn   : Sinks variable
-  SoPTinp   : Sinks variable
-  SoPTini   : Sinks variable
-  SoRIc     : Sinks variable
-  SoRIn     : Sinks variable
-  SoRIp     : Sinks variable
-  SoRIs     : Sinks variable
-end
-
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 #                       DIAGNOSTIC RATES
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-3d-flux-pel -if-exist INCLUDE_DIAG INCLUDE_PELCO2
+3d-flux-pel -if-exist INCLUDE_PELCO2
   ruPPYc=P.c  <- O3c : Gross Primary Production    : mg C/m3/d
   resPPYc=P.c -> O3c : Phytoplankton Respiration   : mg C/m3/d
-  resPBAc=B.c -> O3c : Bacterial Respiration       : mg C/m3/d
-  resZOOc=Z.c -> O3c : Zooplankton Respiration     : mg C/m3/d
-  rcalCARc=O5c <- O3c: Calcification rate          : mg C/m3/d
+  #netPPYc=(P.c <- O3c) - (P.c -> O3c)  :  net primary production  : mg C/m3/d
+  #resPBAc=B.c -> O3c : Bacterial Respiration       : mg C/m3/d
+  #resZOOc=Z.c -> O3c : Zooplankton Respiration     : mg C/m3/d
+  #rcalCARc=O5c <- O3c: Calcification rate          : mg C/m3/d
 end
 
-3d-flux-pel -if-exist INCLUDE_DIAG
-  ruPPYn=P.n <- N3n+N4n: Net Nitrogen Uptake:mmol N/m3/d
-  ruPPYp=P.p <- N1p : Net Phosphate Uptake : mmol P/m3/d
-  ruPPYs=P.s <- N5s : Net Silicate Uptake : mmol Si/m3/d
-  exPPYc=(P.c->R1c+R2c+R3c+R6c): C excretion from phytoplankton :mg C/m3/d
-  ruZOOc=(Z.c<-P.c+B.c+Z.c): Gross/Net Secondary Production:mg C/m3/d
-  resPELo=(O2o->*): Pelagic Oxygen Demand : mmol O2/m3/d
-  remZOOn=(N4n<-B.n+Z.n): Zooplankton N Remineralization : mmol N/m3/d
-  remZOOp=(N1p<-B.p+Z.p): Zooplankton P Remineralization : mmol P/m3/d
-  remPBAn=(N4n<-B.n): Bacterial N Uptake/Remineralization : mmol N/m3/d
-  remPBAp=(N1p<-B.p): bacterial P Uptake/Remineralization : mmol P/m3/d
+3d-flux-pel
+#  ruPPYn=P.n <- N3n+N4n: Net Nitrogen Uptake:mmol N/m3/d
+#  ruPPYp=P.p <- N1p : Net Phosphate Uptake : mmol P/m3/d
+#  ruPPYs=P.s <- N5s : Net Silicate Uptake : mmol Si/m3/d
+#  exPPYc=(P.c->R1c+R2c+R3c+R6c): C excretion from phytoplankton :mg C/m3/d
+#  exPPYcR1=(P.c->R1c): C flux from phytoplankton to R1C :mg C/m3/d
+#  exPPYcR2=(P.c->R2c): C flux from phytoplankton to R2C :mg C/m3/d
+#  exPPYcR3=(P.c->R3c): C flux from phytoplankton to R3C :mg C/m3/d
+#  exPPYcR6=(P.c->R6c): C flux from phytoplankton to R6C :mg C/m3/d
+#  ruZOOc=(Z.c<-P.c+B.c+Z.c): Gross/Net Secondary Production:mg C/m3/d
+#  resPELo=(O2o->*): Pelagic Oxygen Demand : mmol O2/m3/d
+#  remPBAn=(N4n<-B.n): Bacterial N Uptake/Remineralization : mmol N/m3/d
+#  remPBAp=(N1p<-B.p): bacterial P Uptake/Remineralization : mmol P/m3/d
 end
 
-3d-flux-pel -if-exist INCLUDE_DIAG INCLUDE_PELCO2 BFM_OGS
+3d-flux-pel -if-exist INCLUDE_PELCO2 BFM_OGS
   #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   # OGS diagnostic rates
   #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  resPPY1c=P1c -> O3c : Respiration Diatoms         : mg C/m3/d
-  resPPY2c=P2c -> O3c : Respiration Flagellates     : mg C/m3/d
-  resPPY3c=P3c -> O3c : Respiration Pico            : mg C/m3/d
-  resPPY4c=P4c -> O3c : Respiration Dinaflagellates : mg C/m3/d
-  ruPBAc=B.c <- O3c : Bacterial Production : mg C/m3/d
-  resPBA1c=B1c -> O3c : Aerobic and Anaerobic Bacteria Respiration : mg C/m3/d
-  resMEZ1c=Z3c -> O3c : Carnivorous Zoo Respiration               : mg C/m3/d
-  resMEZ2c=Z4c -> O3c : Omnivorous Zoo Respiration                : mg C/m3/d
-  resMIZ1c=Z5c -> O3c : Microzooplankton Respiration              : mg C/m3/d
-  resMIZ2c=Z6c -> O3c : Heterotrophic Nanoflagellates Respiration : mg C/m3/d
+#  resPPY1c=P1c -> O3c : Respiration Diatoms         : mg C/m3/d
+#  resPPY2c=P2c -> O3c : Respiration Flagellates     : mg C/m3/d
+#  resPPY3c=P3c -> O3c : Respiration Pico            : mg C/m3/d
+#  resPPY4c=P4c -> O3c : Respiration Dinaflagellates : mg C/m3/d
+#  ruPBAc=B.c <- O3c : Bacterial Production : mg C/m3/d
+#  resPBA1c=B1c -> O3c : Aerobic and Anaerobic Bacteria Respiration : mg C/m3/d
+#  resMEZ1c=Z3c -> O3c : Carnivorous Zoo Respiration               : mg C/m3/d
+#  resMEZ2c=Z4c -> O3c : Omnivorous Zoo Respiration                : mg C/m3/d
+#  resMIZ1c=Z5c -> O3c : Microzooplankton Respiration              : mg C/m3/d
+#  resMIZ2c=Z6c -> O3c : Heterotrophic Nanoflagellates Respiration : mg C/m3/d
+#  O3c_concdilu_flux
+#  O3h_concdilu_flux
+
 end

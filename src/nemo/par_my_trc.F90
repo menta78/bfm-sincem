@@ -5,58 +5,47 @@ MODULE par_my_trc
    !!======================================================================
    !! History :   2.0  !  2007-12  (C. Ethe, G. Madec)  revised architecture
    !!----------------------------------------------------------------------
-   !! NEMO/TOP 3.3 , NEMO Consortium (2010)
-   !! $Id$ 
-   !! Software governed by the CeCILL licence (NEMOGCM/NEMO_CeCILL.txt)
+   !! NEMO/TOP 4.0 , NEMO Consortium (2018)
+   !! $Id: par_my_trc.F90 10068 2018-08-28 14:09:04Z nicolasmartin $ 
+   !! Software governed by the CeCILL license (see ./LICENSE)
    !!----------------------------------------------------------------------
-   USE par_pisces , ONLY : jp_pisces       !: number of tracers in PISCES
-   USE par_pisces , ONLY : jp_pisces_2d    !: number of 2D diag in PISCES
-   USE par_pisces , ONLY : jp_pisces_3d    !: number of 3D diag in PISCES
-   USE par_pisces , ONLY : jp_pisces_trd   !: number of biological diag in PISCES
-#ifdef BFM_NEMO
-   USE mem        , ONLY : NO_D3_BOX_STATES !: number of BFM pelagic tracers
-#endif
+   USE par_kind, ONLY: wp, lca
 
    IMPLICIT NONE
 
-   INTEGER, PARAMETER ::   jp_lm      =  jp_pisces     !: 
-   INTEGER, PARAMETER ::   jp_lm_2d   =  jp_pisces_2d  !:
-   INTEGER, PARAMETER ::   jp_lm_3d   =  jp_pisces_3d  !:
-   INTEGER, PARAMETER ::   jp_lm_trd  =  jp_pisces_trd !:
-
-#if defined key_my_trc
-   !!---------------------------------------------------------------------
-   !!   'key_my_trc'                     user defined tracers (MY_TRC)
-   !!---------------------------------------------------------------------
-   LOGICAL, PUBLIC, PARAMETER ::   lk_my_trc     = .TRUE.   !: PTS flag 
-   INTEGER, PUBLIC, PARAMETER ::   jp_my_trc     =  NO_D3_BOX_STATES     !: number of PTS tracers
-   INTEGER, PUBLIC, PARAMETER ::   jp_my_trc_2d  =  0       !: additional 2d output arrays ('key_trc_diaadd')
-   INTEGER, PUBLIC, PARAMETER ::   jp_my_trc_3d  =  0       !: additional 3d output arrays ('key_trc_diaadd')
-   INTEGER, PUBLIC, PARAMETER ::   jp_my_trc_trd =  0       !: number of sms trends for MY_TRC
-
-   ! assign an index in trc arrays for each PTS prognostic variables
-   INTEGER, PUBLIC, PARAMETER ::   jpmyt1 = jp_lm + 1     !: 1st MY_TRC tracer
-
+   ! Starting/ending MY_TRC do-loop indices (N.B. no MY_TRC : jpl_pcs < jpf_pcs the do-loop are never done)
+   INTEGER, PUBLIC ::   jp_myt0             !: First index of MY_TRC passive tracers
+   INTEGER, PUBLIC ::   jp_myt1             !: Last  index of MY_TRC passive tracers
+   !
+   INTEGER, ALLOCATABLE, DIMENSION(:), PUBLIC :: var_map
+#if defined key_xios
+   LOGICAL,PUBLIC    :: bfm_iomput=.TRUE. ! use xios in nemo
 #else
-   !!---------------------------------------------------------------------
-   !!   Default                           No user defined tracers (MY_TRC)
-   !!---------------------------------------------------------------------
-   LOGICAL, PUBLIC, PARAMETER ::   lk_my_trc     = .FALSE.  !: MY_TRC flag 
-   INTEGER, PUBLIC, PARAMETER ::   jp_my_trc     =  0       !: No MY_TRC tracers
-   INTEGER, PUBLIC, PARAMETER ::   jp_my_trc_2d  =  0       !: No MY_TRC additional 2d output arrays 
-   INTEGER, PUBLIC, PARAMETER ::   jp_my_trc_3d  =  0       !: No MY_TRC additional 3d output arrays 
-   INTEGER, PUBLIC, PARAMETER ::   jp_my_trc_trd =  0       !: number of sms trends for MY_TRC
+   LOGICAL,PUBLIC    :: bfm_iomput=.FALSE.
 #endif
+   !!
+   INTEGER, PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:) ::  bottom_level          !: deepest level of water column
 
-   ! Starting/ending PISCES do-loop indices (N.B. no PISCES : jpl_pcs < jpf_pcs the do-loop are never done)
-   INTEGER, PUBLIC, PARAMETER ::   jp_myt0     = jp_lm     + 1              !: First index of MY_TRC passive tracers
-   INTEGER, PUBLIC, PARAMETER ::   jp_myt1     = jp_lm     + jp_my_trc      !: Last  index of MY_TRC passive tracers
-   INTEGER, PUBLIC, PARAMETER ::   jp_myt0_2d  = jp_lm_2d  + 1              !: First index of MY_TRC passive tracers
-   INTEGER, PUBLIC, PARAMETER ::   jp_myt1_2d  = jp_lm_2d  + jp_my_trc_2d   !: Last  index of MY_TRC passive tracers
-   INTEGER, PUBLIC, PARAMETER ::   jp_myt0_3d  = jp_lm_3d  + 1              !: First index of MY_TRC passive tracers
-   INTEGER, PUBLIC, PARAMETER ::   jp_myt1_3d  = jp_lm_3d  + jp_my_trc_3d   !: Last  index of MY_TRC passive tracers
-   INTEGER, PUBLIC, PARAMETER ::   jp_myt0_trd = jp_lm_trd + 1              !: First index of MY_TRC passive tracers
-   INTEGER, PUBLIC, PARAMETER ::   jp_myt1_trd = jp_lm_trd + jp_my_trc_trd  !: Last  index of MY_TRC passive tracers
+   !! boundary forcings
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:) :: fesed   ! Seabed supply of iron
 
+   !! support arrays
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:) :: chl_a
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:) :: ph
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:,:) :: sink_rates
+
+   !! benthic passive tracers  (input and output)
+   !! ------------------------------------------
+   INTEGER, PUBLIC ::   jp_bgc_b             !: Number of tracers
+   INTEGER, PUBLIC ::   jpk_b                !: Number of vertical levels
+   CHARACTER(len=lca), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   ctrcnm_b   !: tracers short name
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:,:) ::  tr_b          !: tracers concentration
+
+   !! seaice passive tracers  (input and output)
+   !! ------------------------------------------
+   INTEGER, PUBLIC ::   jp_bgc_i             !: Number of tracers
+   INTEGER, PUBLIC ::   jpk_i                !: Number of vertical levels
+   CHARACTER(len=lca), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:) ::   ctrcnm_i   !: tracers short name
+   REAL(wp), PUBLIC, ALLOCATABLE, SAVE, DIMENSION(:,:,:,:) ::  tr_i          !: tracers concentration
    !!======================================================================
 END MODULE par_my_trc

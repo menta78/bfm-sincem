@@ -1,24 +1,24 @@
 #!/usr/bin/perl -w
 
-# DESCRIPTION
-#   Apped to new configuration file the content of an old namelist file
+#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+# MODEL  BFM - Biogeochemical Flux Model
+#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 #
-# AUTHORS
-#   Esteban Gutierrez esteban.gutierrez@cmcc.it
-#   Tomas Lovato toma.lovato@cmcc.it
+# DESCRIPTION
+#   Append to new configuration file the content of an old namelist file
 #
 # COPYING
-#  
-#   Copyright (C) 2013 BFM System Team ( bfm_st@lists.cmcc.it )
 #
-#   This program is free software; you can redistribute it and/or modify
+#   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
+#
+#   This program is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
-#   the Free Software Foundation;
+#   the Free Software Foundation.
 #   This program is distributed in the hope that it will be useful,
 #   but WITHOUT ANY WARRANTY; without even the implied warranty of
-#   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#   GNU General Public License for more details.
-# -----------------------------------------------------
+#   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+#   See the GNU General Public License for more details.
+#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 use strict;
 use warnings;

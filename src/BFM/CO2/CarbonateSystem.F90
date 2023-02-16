@@ -1,15 +1,8 @@
-#include "cppdefs.h"
-
-#if defined INCLUDE_PELCO2 || defined INCLUDE_BENCO2
-
-module mem_CSYS
-!/*
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-!BOP
 !
-! !MODULE: CO2System
+! MODULE: CO2System
 !
 ! DESCRIPTION
 ! Solve for pH and other carbonate system variables using total alkalinity and
@@ -45,37 +38,40 @@ module mem_CSYS
 !   OmegaC = Omega for calcite, i.e., the   calcite saturation state
 !
 ! ORIGINAL REFERENCES
-!--------------------------------------------------------------------------
 !   Orr and Epitaloni, 2015: "Improved routines to model the ocean
 !   carbonate system: mocsy 2.0." GMD 8.3 : 485-499.
-!---------------------------------------------------------------------
-!*/
-!
-! AUTHORS
-!   T. Lovato (CMCC, tomas.lovato@cmcc.it)
-!
-! CHANGE_LOG
 !
 ! COPYING
-!   Copyright (C) 2020 BFM System Team (bfm_st@cmcc.it)
 !
-!   This program is free software; you can redistribute it and/or modify
+!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
+!
+!   This program is free software: you can redistribute it and/or modify
 !   it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation;
+!   the Free Software Foundation.
 !   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-!   GNU General Public License for more details.
-!
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU General Public License for more details.
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 !
-! !INTERFACE
-! !USES:
+! INCLUDE
+#include "cppdefs.h"
+
+#if defined INCLUDE_PELCO2 || defined INCLUDE_BENCO2
+
+!
+! INTERFACE
+  module mem_CSYS
+!
+! USES
   use global_mem, ONLY: RLEN, LOGUNIT, ONE, ZERO
   use mem_CO2, ONLY: MaxIterPHsolver
 
-! Shared variables
-  implicit none
+  IMPLICIT NONE
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Shared Variables
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   real(RLEN),public  ::  K0 ! solubility : [Co2]=k0Ac Pco2
   real(RLEN),public  ::  K1 ! carbonate equilibrium I
   real(RLEN),public  ::  K2 ! carbonate equilibrium II
@@ -90,23 +86,17 @@ module mem_CSYS
 
   public CarbonateSystem
 
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  !  functions
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   contains
 
-! !INTERFACE
   function CarbonateSystem(salt,temp,rho,n1p,n5s,dic,alk,      &
                    co2,hco3,co3,pH,pco2,patm,pr_in,OmegaC,OmegaA,fCO2)
-! !DESCRIPTION
-! See module preamble
-!
-! USES:
+  ! USES
   use constants,  ONLY : ZERO_KELVIN,MW_C,MW_Ca,Rgas
   use mem_Param,  ONLY : p_atm0
 
-! !INPUT PARAMETERS:
   IMPLICIT NONE
+
+  ! INPUT
   integer :: CarbonateSystem
   real(RLEN),intent(IN)            :: salt ! practical salinity
   real(RLEN),intent(IN)            :: temp ! in-situ temperature
@@ -117,12 +107,9 @@ module mem_CSYS
   real(RLEN),intent(IN)            :: alk
   real(RLEN),intent(IN),optional   :: patm  ! Atmospheric pressure  [atm]
   real(RLEN),intent(IN),optional   :: pr_in ! Water column Pressure [dbar]
-!
-! !INPUT/OUTPUT PARAMETERS:
+  ! INPUT/OUTPUT
   real(RLEN),intent(INOUT)         :: pH
-!
-! !OUTPUT PARAMETERS:
-!
+  ! OUTPUT
   real(RLEN),intent(OUT)           :: co2
   real(RLEN),intent(OUT)           :: hco3
   real(RLEN),intent(OUT)           :: co3
@@ -130,6 +117,7 @@ module mem_CSYS
   real(RLEN),intent(OUT),optional  :: OmegaC
   real(RLEN),intent(OUT),optional  :: OmegaA
   real(RLEN),intent(OUT),optional  :: fCO2
+
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Local Variables
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -173,8 +161,10 @@ module mem_CSYS
   DATA b1 / 0.0877_RLEN, -0.1475_RLEN, 0.0_RLEN,  0.0794_RLEN, 0.09_RLEN,  0.054_RLEN, &
             0.3692_RLEN,  0.3692_RLEN, 0.0427_RLEN, 0.09_RLEN, 0.0714_RLEN, 0.0_RLEN  /
   !DATA b2 / 12*0.0_RLEN / ! not used as it is zero
-  !
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
   CarbonateSystem = 0
+
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! 1. PREPARE INPUT FIELDS
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -433,7 +423,7 @@ module mem_CSYS
   ! 3. COMPUTE CARBONATE SYSTEM
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! H+ concentration (mol/kg) at previous step
-  if ( pH < 0._RLEN ) then
+  if ( pH <= 0._RLEN ) then
      Hi = Hini_for_at(ta,tc,bt,K1,K2,Kb)
   else
      Hi = 10.0_RLEN**(-pH)
@@ -732,8 +722,9 @@ module mem_CSYS
   END FUNCTION solve_at_general
 
 end module mem_CSYS
-!EOC
+
+#endif
+
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-#endif

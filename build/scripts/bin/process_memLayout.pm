@@ -1,29 +1,30 @@
 #!/usr/bin/perl -w
 
+#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+# MODEL  BFM - Biogeochemical Flux Model
+#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+#
 # DESCRIPTION
 #   Generate the memory layout from configuration file using templates
 #
-# AUTHORS
-#   Esteban Gutierrez esteban.gutierrez@cmcc.it
-#   Tomas Lovato toma.lovato@cmcc.it
-#
 # COPYING
-#  
-#   Copyright (C) 2013 BFM System Team ( bfm_st@lists.cmcc.it )
 #
-#   This program is free software; you can redistribute it and/or modify
+#   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
+#
+#   This program is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
-#   the Free Software Foundation;
+#   the Free Software Foundation.
 #   This program is distributed in the hope that it will be useful,
 #   but WITHOUT ANY WARRANTY; without even the implied warranty of
-#   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#   GNU General Public License for more details.
-# -----------------------------------------------------
+#   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+#   See the GNU General Public License for more details.
+#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 package process_memLayout;
 
 use strict;
 use warnings;
+
 use Exporter;
 use Data::Dumper;
 
@@ -91,8 +92,11 @@ sub check_directive{
     trim($include);
     my @includes = split(/\s+/, $include);
     my $hasOR = 0 ; my $check = 0 ;
-    if ( "||" =~ @includes ) { $hasOR = 1 ; };
+    for my $findor (@includes) {
+        if ($findor eq "||") { $hasOR = 1 ; };
+    };
     #print join("<>",@includes) . "\n";
+    #print ($hasOR . "\n");
     foreach my $inc (@includes){
         if ($inc eq "||") { next;};
         #print "\t$directives ----> $inc ----> return ";

@@ -1,26 +1,40 @@
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! ROUTINE: correct_flux_output
+!
+! DESCRIPTION
+!   The information provided in the flux definition as given in GlobalDefsBFM.model
+!   is transferred into a number of array and scalars (flx_*). All
+!   elements of these arrays are defined in AllocateMem.F90. This
+!   information is used by this routines to calculates sums of fluxes
+!   from D3SINK, D2SINK, D3SOURCE, D2SOURCE, D3STATE and D2STATE ( See
+!   ModuleMem.F90 and AllocateMem.F90)
+!
+!   At input the value of zlev is 0 or 1. The value depend to which
+!    model BFM is coupled. The arrays in GOTM start at index 0. In most
+!   other coupled models at 1.
+!
+! COPYING
+!
+!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU General Public License for more details.
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! INCLUDE
 #include"cppdefs.h"
-!-----------------------------------------------------------------------
-!BOP
 !
-! !ROUTINE:routine to calculate sum of fluxes of D*SINK's and D*SOURCE's
-!    into diagnostic variables defined as flux-variables in GlobalDefsBFM.model 
-!
-! !INTERFACE:
+! INTERFACE
 subroutine correct_flux_output(mode, nr0,zlev,nlev,out)
-  !
-  ! !DESCRIPTION:
-  !     The information provided in the flux definition as given in GlobalDefsBFM.model
-  !     is transferred into a number of array and scalars (flx_*). All
-  !     elements of these arrays are defined in AllocateMem.F90. This
-  !     information is used by this routines to calculates sums of fluxes
-  !     from D3SINK, D2SINK, D3SOURCE, D2SOURCE, D3STATE and D2STATE ( See
-  !     ModuleMem.F90 and AllocateMem.F90)
-  !
-  !     At input the value of zlev is 0 or 1. The value depend to which
-  !      model BFM is coupled. The arrays in GOTM start at index 0. In most
-  !     other coupled models at 1.
-  !
-  ! !USES:
+!
+! USES
   use constants, only: RLEN, ZERO, SEC_PER_DAY
   USE global_mem, ONLY: LOGUNIT
 
@@ -30,67 +44,36 @@ subroutine correct_flux_output(mode, nr0,zlev,nlev,out)
 
   use mem, only: NO_BOXES, PELBOTTOM,PELSURFACE,Depth, D3FLUX_FUNC, D3FLUX_MATRIX
 
-#ifdef BFM_GOTM
-  use bio_var, only: stPelStateS, stPelStateE
-#else
   use api_bfm, only: stPelStateS, stPelStateE
 #endif
 
-#endif
-
-#ifdef BFM_GOTM
-  use bio_var, ONLY: SRFindices,BOTindices
-#else
   use api_bfm, ONLY: SRFindices,BOTindices
-#endif
 
-
-  !
-  ! !INPUT PARAMETERS:
   implicit none
+
+  ! INPUT
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   integer,intent(IN)                  ::mode
   integer,intent(IN)                  ::nr0
   integer,intent(IN)                  ::zlev
   integer,intent(IN)                  ::nlev
-#ifdef BFM_GOTM
-  real(RLEN),intent(OUT),dimension(0:nlev)  :: out
-#else
   real(RLEN),intent(OUT),dimension(nlev)    :: out
-#endif
 
-  !
-  ! !REVISION HISTORY:
-  !  Original author(s): Piet Ruardij (NIOZ), Marcello Vichi (INGV)
-  !
-
-  !
-  ! !LOCAL VARIABLES:
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Local Variables
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   integer      ::nr
   integer      ::i
   integer      ::k
-
   integer      ::idx_i, idx_j, origin, destination
-
 #ifndef NOPOINTERS
   integer      ::idummy
 #endif
-
-#ifdef BFM_GOTM
-  real(RLEN),dimension(0:NO_BOXES) :: hulp
-#else
   real(RLEN),dimension(NO_BOXES)   :: hulp
-#endif
-
-
-  !EOP
-  !-----------------------------------------------------------------------
-  !BOC
-
-
-
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   nr=nr0
 
-  out(:) = D3FLUX_FUNC(nr0,:)
+  out(:) = D3FLUX_FUNC(:,nr0)
 
   ! correcting for fluxes  to other systems along the diagonal (origin == destination)
   do idx_i=stPelStateS, stPelStateE
@@ -111,10 +94,10 @@ subroutine correct_flux_output(mode, nr0,zlev,nlev,out)
                  !     " PELSURFACE(", origin, "): ", PELSURFACE(origin,:)
                  out(BOTindices) = out(BOTindices) - &
                       SIGN( 1, D3FLUX_MATRIX(origin,destination)%p(idx_j) ) * &
-                      max(ZERO, PELBOTTOM(origin,:)) / Depth(BOTindices)
+                      max(ZERO, PELBOTTOM(:,origin)) / Depth(BOTindices)
                  out(SRFindices) = out(SRFindices) - &
                       SIGN( 1, D3FLUX_MATRIX(origin,destination)%p(idx_j) ) * &
-                      max(ZERO, PELSURFACE(origin,:)) / Depth(SRFindices)
+                      max(ZERO, PELSURFACE(:,origin)) / Depth(SRFindices)
                  ! write(LOGUNIT,format2) "FUNC_SS0(", nr0 , ")-> ", "BOT: ", out(BOTindices)/SEC_PER_DAY, &
                  !     " -- SUR: ", out(SRFindices)/SEC_PER_DAY
               else ! "A<-B" => (in flow) => flux > ZERO => D3SOURCE
@@ -124,10 +107,10 @@ subroutine correct_flux_output(mode, nr0,zlev,nlev,out)
                  !     " PELSURFACE(", origin, "): ", PELSURFACE(origin,:)
                  out(BOTindices) = out(BOTindices) + &
                       SIGN( 1, D3FLUX_MATRIX(origin,destination)%p(idx_j) ) * &
-                      min(ZERO, PELBOTTOM(origin,:)) / Depth(BOTindices)
+                      min(ZERO, PELBOTTOM(:,origin)) / Depth(BOTindices)
                  out(SRFindices) = out(SRFindices) + &
                       SIGN( 1, D3FLUX_MATRIX(origin,destination)%p(idx_j) ) * &
-                      min(ZERO, PELSURFACE(origin,:)) / Depth(SRFindices)
+                      min(ZERO, PELSURFACE(:,origin)) / Depth(SRFindices)
                  ! write(LOGUNIT,format2) "FUNC_SS1(", nr0 , ")-> ", "BOT: ", out(BOTindices)/SEC_PER_DAY, &
                  !     " -- SUR: ", out(SRFindices)/SEC_PER_DAY
               endif
@@ -139,11 +122,12 @@ subroutine correct_flux_output(mode, nr0,zlev,nlev,out)
      end if
 
   end do
-
-
-
   ! write(LOGUNIT,*) "-------CORRECT FLUX END--------------"
+
   return
+
 end subroutine correct_flux_output
-!EOC
-!-----------------------------------------------------------------------
+
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

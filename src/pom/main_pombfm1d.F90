@@ -24,6 +24,7 @@
 ! ** Giulia Mussap and Nadia Pinardi. However, previous       **
 ! ** significant contributions were provided also by          **
 ! ** Momme Butenschoen and Marcello Vichi.                    **
+! ** Subsequent maintance by Lorenzo Mentaschi.               **
 ! ** Thanks are due to Prof. George L. Mellor that allowed us **
 ! ** to modify, use and distribute the one dimensional        **
 ! ** version of the Princeton Ocean Model.                    **
@@ -98,7 +99,6 @@
                      WUSURF,WVSURF,                                       &
                      WUBOT,WVBOT,                                         &
                      SWRAD,                                               &
-                     WTSURF,                                              &
                      TSURF, SSURF,                                        &
                      TSTAR, SSTAR,                                        &
                      WSSURF,                                              &
@@ -106,9 +106,10 @@
                      NRT,                                                 &
                      Z0B, CBCMIN, CBC,                                    &
                      D, DT,                                               &
-                     vonkarmann
+                     vonkarmann,                                          &
+                     NC_OUT_STARTTIME
 !
-      use Service,ONLY: ilong, savef
+      use CPL_VARIABLES,ONLY: ilong, savef, USE_KH_EXT
 !
       use Forcing,ONLY: Forcing_manager
 !
@@ -136,14 +137,12 @@
 !
       EXTERNAL DENS,            &
                PROFQ,           &
-               PROFTS,          &
-               PROFUV,          &
                CALCDEPTH,       &
-               get_TS_IC,       &
-               get_rst,         &
+               get_init_TS_IC,       &
+               load_restart,    &
                pom_ini_bfm_1d,  &
                pom_bfm_1d,      &
-               restart_BFM_inPOM
+               save_restart
 !
 !
 !     -----INTRINSIC FUNCTIONS-----
@@ -155,7 +154,7 @@
       NAMELIST /Params_POMBFM/ H,DTI,ALAT,IDIAGN,IDAYS,SMOTH,&
                                ihotst,UMOL,KL1,KL2,savef,NRT,NBCT,NBCS,NBCBFM,&
                                UMOL,UMOLT,UMOLS,UMOLBFM,NTP,TRT,SRT,UPPERH,SSRT, &
-                               CBCMIN,Z0B
+                               CBCMIN,Z0B,NC_OUT_STARTTIME
 !
       OPEN(namlst,file='pom_bfm_settings.nml',status='old',action='read')
       READ(namlst,nml=Params_POMBFM)
@@ -215,7 +214,6 @@
           WVSURF         = ZERO
           WUBOT          = ZERO
           WVBOT          = ZERO
-          WTSURF         = ZERO
           SWRAD          = ZERO 
           WSSURF         = ZERO
           TSURF          = ZERO
@@ -246,16 +244,20 @@
 !     -----ITERATIONS NEEDED TO CARRY OUT AN"IDAYS" SIMULATION-----
 !
       iend = idays*IFIX(SEC_PER_DAY)/IFIX(dti)
+
+!     opening the input files
+      call opendat
 !
 !     -----READ  T&S INITIAL CONDITIONS (IHOTST=0) OR RESTART FILE (IHOTST=1)-----
 !
+
       select case (ihotst)
 !
              case (0)
 !
                   time0=ZERO
 !
-                  call get_TS_IC
+                  call get_init_TS_IC
 !       
 !                 -----DEFINE INITIAL DENSITY FIELD----
 !    
@@ -265,7 +267,7 @@
 !
 !                 -----READ RESTART-----
 !
-                  call get_rst
+                  call load_restart
 ! 
        end select 
 !
@@ -287,118 +289,51 @@
 !
       DO intt = 1, IEND                        
 !
-!         -----COMPUTE TIME IN DAYS-----
+!        -----COMPUTE TIME IN DAYS-----
 !
-          time = time0+(DTI*float(intt)*dayi)
+         time = time0+(DTI*float(intt)*dayi)
 !
-!         -----DEFINE ALL FORCINGS-----
+!        -----DEFINE ALL FORCINGS-----
 !
-          call forcing_manager
+         call forcing_manager
 !
-!         ----- MELLOR-YAMADA (1982) TURBULENCE CLOSURE-----
-        
-          Q2F(:)  = Q2B(:)
-          Q2LF(:) = Q2LB(:)
+         IF (.NOT. USE_KH_EXT) THEN
+!            ----- MELLOR-YAMADA (1982) TURBULENCE CLOSURE-----
+             Q2F(:)  = Q2B(:)
+             Q2LF(:) = Q2LB(:)
 !
-          call PROFQ(DT2)
+             call PROFQ(DT2)
 !
-!         -----T&S COMPUTATION (PROGNOSTIC MODE)-----
+!            -----COMPUTE VELOCITY-----
 !
-          select case (IDIAGN)
-!           
-                 case (INT(ZERO))
+             UF(:) = UB(:) + DT2 * COR * V(:) ! CORIOLIS TERM & EXPLICIT LEAPFROG
 !
-!                -----COMPUTE LATERAL ADVECTION TERM FOR T&S-----
+             call PROFUV(DT2,UF,WUSURF,WUBOT)
 !
-                 wtadv(:) = ZERO
-                 wsadv(:) = ZERO
+             VF(:) = VB(:) - DT2 * COR * U(:) ! CORIOLIS TERM & EXPLICIT LEAPFROG
 !
-                 IF(TRT.ne.ZERO) THEN
+             call PROFUV(DT2,VF,WVSURF,WVBOT)
 !
-                    do K = 1, KB
- 
-                       if((-ZZ(K)*H).ge.upperH)   &
-                       wtadv(K) = (tstar(k)-T(k))/(TRT*SEC_PER_DAY)
+!            -----MIXING TIME STEP (ASSELIN FILTER)-----
 !
-                   enddo
+             Q2(:)   = Q2(:)  + 0.5_RLEN * SMOTH * (Q2F(:)  + Q2B(:)  - 2.0_RLEN * Q2(:))
+             Q2L(:)  = Q2L(:) + 0.5_RLEN * SMOTH * (Q2LF(:) + Q2LB(:) - 2.0_RLEN * Q2L(:))
 !
-                 ENDIF
+             U(:)    = U(:)   + 0.5_RLEN * SMOTH * (UF(:)   + UB(:)   - 2.0_RLEN * U(:))
+             V(:)    = V(:)   + 0.5_RLEN * SMOTH * (VF(:)   + VB(:)   - 2.0_RLEN * V(:))
 !
-                 IF(SRT.ne.ZERO) THEN
+!            -----RESTORE TIME SEQUENCE-----
 !
-                    do K = 1, KB
+             Q2B(:)  = Q2(:)
+             Q2(:)   = Q2F(:)
+             Q2LB(:) = Q2L(:)
+             Q2L(:)  = Q2LF(:)
 !
-                       if((-ZZ(K)*H).ge.upperH)   &
-                       wsadv(K) = (sstar(k)-S(k))/(SRT*SEC_PER_DAY)
-!
-                    enddo
-!
-                 ENDIF
-!
-!                -----COMPUTE SURFACE SALINITY FLUX-----
-!
-                 wssurf = -(ssurf-S(1))*SSRT/SEC_PER_DAY
-!
-!                -----COMPUTE TEMPERATURE-----
-!
-                 TF(:) = TB(:) + (WTADV(:) * DT2) ! EXPLICIT LEAPFROG
-!
-                 CALL PROFTS(TF,WTSURF,ZERO,SWRAD,TSURF,NBCT,DT2,NTP,UMOLT)
-!
-!                -----COMPUTE SALINITY-----
-!
-                 SF(:) = SB(:) + (WSADV(:) * DT2) ! EXPLICIT LEAPFROG
-!
-                 CALL PROFTS(SF,WSSURF,ZERO,ZERO,SSURF,NBCS,DT2,NTP,UMOLS)
-!
-!                -----MIXING THE TIMESTEP (ASSELIN FILTER)-----
-!
-                 T(:)  = T(:) + 0.5_RLEN * SMOTH * (TF(:) + TB(:) - 2.0_RLEN * T(:))
-                 S(:)  = S(:) + 0.5_RLEN * SMOTH * (SF(:) + SB(:) - 2.0_RLEN * S(:))
-!
-          end select
-!
-!        **************************************************************
-!        **************************************************************
-!        **                                                          **
-!        **     JUMP HERE IF RUN IS IN DIAGNOSTIC MODE (IDIAGN=1).   **
-!        **     CLIMATOLOGICAL TIME VARYING T&S VERTICAL PROFILES    **
-!        **     HAVE BEEN COMPUTED VIA LINEAR INTERPOLATION FROM     **
-!        **     DATA in SUBROUTINE FORCING_MANAGER                   **
-!        **                                                          **
-!        **************************************************************
-!        **************************************************************
-!
-!        -----COMPUTE VELOCITY-----
-!
-         UF(:) = UB(:) + DT2 * COR * V(:) ! CORIOLIS TERM & EXPLICIT LEAPFROG
-!
-         call PROFUV(DT2,UF,WUSURF,WUBOT)
-!
-         VF(:) = VB(:) - DT2 * COR * U(:) ! CORIOLIS TERM & EXPLICIT LEAPFROG
-!
-         call PROFUV(DT2,VF,WVSURF,WVBOT)
-
-!
-!        -----MIXING TIME STEP (ASSELIN FILTER)-----
-!
-         Q2(:)   = Q2(:)  + 0.5_RLEN * SMOTH * (Q2F(:)  + Q2B(:)  - 2.0_RLEN * Q2(:))
-         Q2L(:)  = Q2L(:) + 0.5_RLEN * SMOTH * (Q2LF(:) + Q2LB(:) - 2.0_RLEN * Q2L(:))
-!
-         U(:)    = U(:)   + 0.5_RLEN * SMOTH * (UF(:)   + UB(:)   - 2.0_RLEN * U(:))
-         V(:)    = V(:)   + 0.5_RLEN * SMOTH * (VF(:)   + VB(:)   - 2.0_RLEN * V(:))
-!
-!        -----RESTORE TIME SEQUENCE-----
-!
-         Q2B(:)  = Q2(:)
-         Q2(:)   = Q2F(:)
-         Q2LB(:) = Q2L(:)
-         Q2L(:)  = Q2LF(:)
-!
-         UB(:) = U(:)
-         U(:)  = UF(:)
-         VB(:) = V(:)
-         V(:)  = VF(:)
+             UB(:) = U(:)
+             U(:)  = UF(:)
+             VB(:) = V(:)
+             V(:)  = VF(:)
+         END IF
 !
          TB(:) = T(:)
          T(:)  = TF(:)
@@ -449,7 +384,7 @@
 #ifndef POM_only
 
 !
-      call restart_BFM_inPOM
+      call save_restart
 !
 #endif
 !

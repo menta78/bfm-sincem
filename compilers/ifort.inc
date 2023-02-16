@@ -22,6 +22,11 @@
   ARFLAGS=-r
 
   CPPFLAGS=
-  FFLAGS= -O3 -r8 -xHost -fp-model source ${NCDF_INC}
+  # production
+  FFLAGS= -O3 -r8 -xHost -fp-model source -traceback -qopt-zmm-usage=high -no-fma ${NCDF_INC}
+
+  # debug
+  # FFLAGS= -g -O0 -r8 -xHost -fp-model source -traceback -fp-stack-check -check all -fpe0 ${NCDF_INC}
+  
   LDFLAGS= ${NCDF_INC} ${NCDF_LIB}
 

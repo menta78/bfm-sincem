@@ -1,27 +1,35 @@
-#include "DEBUG.h"
-#include "INCLUDE.h"
-
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model 
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-!BOP
 !
-! !ROUTINE: Seaicealgae
+! ROUTINE: Seaicealgae
 !
 ! DESCRIPTION
 !   This process describes the dynamics of all sea ice algae
 !    groups. The differences in behaviour
 !    are expressed by differences in parameter-values only.
 !    
-! !INTERFACE
+! COPYING
+!
+!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU General Public License for more details.
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! INCLUDE
+#include "DEBUG.h"
+#include "INCLUDE.h"
+!
+! INTERFACE
   subroutine SeaiceAlgaeDynamics(alg)
 !
-! !USES:
-
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! Modules (use of ONLY is strongly encouraged!)
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-
+! USES
   use global_mem, ONLY:RLEN,ZERO,ONE
   use constants, ONLY: MW_C
 #ifdef NOPOINTERS
@@ -37,47 +45,14 @@
   use constants,  ONLY: SEC_PER_DAY, E2W, HOURS_PER_DAY
   use mem_Param,  ONLY: p_small
   use mem_SeaiceAlgae
-
-
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! The following vector functions are used: eTq, insw
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   use mem_globalfun,   ONLY: eTq, insw
 
-
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! Implicit typing is never allowed
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   IMPLICIT NONE
 
-! !INPUT:
+  ! INPUT
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   integer,intent(IN)  :: alg
 
-!  
-!
-! !AUTHORS
-! L. Tedesco and M. Vichi
-!
-! !REVISION_HISTORY
-!
-! COPYING
-!   
-!   Copyright (C) 2020 BFM System Team (bfm_st@cmcc.it)
-!
-!   This program is free software; you can redistribute it and/or modify
-!   it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation;
-!   This program is distributed in the hope that it will be useful,
-!   but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-!   GNU General Public License for more details.
-!
-!EOP
-!-------------------------------------------------------------------------!
-!BOC
-!
-!
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Set up Local Variable for copy of state var. object
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -134,6 +109,7 @@
   real(RLEN),dimension(NO_BOXES_ICE)  :: rate_Chl
   real(RLEN),dimension(NO_BOXES_ICE)  :: flSIU2c,flS1U6s
   real(RLEN),dimension(NO_BOXES_ICE)  :: seo
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Reset flux to biogenic silica
@@ -148,19 +124,19 @@
   ppalgp = ppSeaiceAlgae(alg,iiP)
   ppalgs = ppSeaiceAlgae(alg,iiS)
   ppalgl = ppSeaiceAlgae(alg,iiL)
-  algc = D2STATE_ICE(ppalgc,:)
-  algn = D2STATE_ICE(ppalgn,:)
-  algp = D2STATE_ICE(ppalgp,:)
-  algl = D2STATE_ICE(ppalgl,:)
-  if ( ppalgs > 0 )  algs = D2STATE_ICE(ppalgs,:)
+  algc = D2STATE_ICE(:,ppalgc)
+  algn = D2STATE_ICE(:,ppalgn)
+  algp = D2STATE_ICE(:,ppalgp)
+  algl = D2STATE_ICE(:,ppalgl)
+  if ( ppalgs > 0 )  algs = D2STATE_ICE(:,ppalgs)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Nutrient limitation (intracellular) N, P
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  iI1p = min( ONE, max( p_small, ( qpcSAL(alg, &
-    :)- p_qplc(alg))/( p_qpcSAL(alg)- p_qplc(alg))))
-  iINn = min( ONE, max( p_small, ( qncSAL(alg, &
-    :)- p_qnlc(alg))/( p_qncSAL(alg)- p_qnlc(alg))))
+  iI1p = min( ONE, max( p_small, ( qpcSAL(:,alg) - p_qplc(alg)) &
+          / ( p_qpcSAL(alg)- p_qplc(alg))))
+  iINn = min( ONE, max( p_small, ( qncSAL(:,alg) - p_qnlc(alg)) &
+          / ( p_qncSAL(alg)- p_qnlc(alg))))
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Sea ice algae growth is limited by nitrogen and phosphorus
@@ -194,9 +170,9 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Light is already at the middle of the cell in the BAL
   Irr =  max(p_small, EIB(:))*SEC_PER_DAY;
-  eiSAL(alg,:) = ( ONE- exp( - qlcSAL(alg, :)* p_alpha_chl(alg)/ &
+  eiSAL(alg,:) = ( ONE- exp( - qlcSAL(:, alg)* p_alpha_chl(alg)/ &
                  p_sum(alg)* Irr))
-  sum  =   p_sum(alg)* et* eiSAL(alg,:) * eI5s
+  sum  =   p_sum(alg)* et* eiSAL(:, alg) * eI5s
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Lysis and excretion
@@ -214,8 +190,8 @@
   ! at least a fraction equal to the minimum quota is released as POM.
   ! Therefore, nutrients (and C) in the structural part go to R6.
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  pe_U6 = min( p_qplc(alg)/( qpcSAL(alg, :)+ p_small), p_qnlc(alg)/( &
-             qncSAL(alg, :)+ p_small))
+  pe_U6 = min( p_qplc(alg)/( qpcSAL(:, alg)+ p_small), p_qnlc(alg)/( &
+             qncSAL(:, alg)+ p_small))
   pe_U6  =   min(  ONE,  pe_U6)
   rr6c  =   pe_U6* sdo* algc
   rr1c  =  ( ONE- pe_U6)* sdo* algc
@@ -238,13 +214,13 @@
   ! Nutrient-stress excretion is assigned to a temporary U2
   flSIU2c  =   seo*algc
 
-  call flux_vector( iiIce,ppF3c,ppalgc,rugc )
-  call flux_vector( iiIce, ppalgc,ppU6c, rr6c )
-  call flux_vector( iiIce, ppalgc,ppU1c, rr1c )
+  call flux_vector( iiIce, ppF3c, ppalgc, rugc )
+  call flux_vector( iiIce, ppalgc, ppU6c, rr6c )
+  call flux_vector( iiIce, ppalgc, ppU1c, rr1c )
 
-  call flux_vector( iiIce, ppalgc,ppF3c,rrc )
-  call flux_vector( iiIce, ppF2o,ppF2o,-(rrc/MW_C) )
-  call flux_vector( iiIce, ppF2o,ppF2o, rugc/MW_C )
+  call flux_vector( iiIce, ppalgc, ppF3c, rrc )
+  call flux_vector( iiIce, ppF2o,  ppF2o, -(rrc/MW_C) )
+  call flux_vector( iiIce, ppF2o,  ppF2o,  rugc/MW_C )
 
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -322,21 +298,14 @@
      call flux_vector( iiIce, ppI5s,ppalgs, runs)  ! source/sink.c
      ! The fixed loss rate for basal respiration is maintained to have 
      ! constant Si:C quota in the absence of production
-     flS1U6s(:)  =   flS1U6s(:)+ srs*algs
+     flS1U6s(:)  =   srs*algs
               
     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     ! Losses of Si
     !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     rr6s  =   sdo* algs  ! Lysis, particulate
-
-    ! Collect first all fluxes of P-->silica
     flS1U6s(:)  =   flS1U6s(:)+ rr6s
 
-!MAV: check this
-    ! fluxes to biogenic particulate silica are assigned here.
-    ! In the pelagic this is done in PelChem since the predation of zooplankton
-    ! also release biogenic particulate silica
-    ! Since there is no zooplankton here, we need to assign the flux
     call flux_vector( iiIce, ppalgs,ppU6s, flS1U6s(:) )
   endif
 
@@ -345,14 +314,13 @@
   ! Note that differently from phytoplankton, chl in sea ice algae 
   ! must be a variable
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  rho_Chl = p_qlcSAL( alg)* min(ONE, p_sum(alg)* eiSAL(alg,:) *  &
-            algc/(p_alpha_chl(alg)*( algl+ p_small)* Irr))
+  rho_Chl = p_qlcSAL(alg)* min(ONE, p_sum(alg)* eiSAL(:,alg) *  &
+            algc/(p_alpha_chl(alg)*(algl+ p_small)* Irr))
   rate_Chl = rho_Chl*(sum - sea + seo) * algc - (srt+ sdo)*algl
   call flux_vector( iiIce, ppalgl,ppalgl, rate_Chl )
 
-  ! End of computation section for process SeaiceAlgaeDynamics
   end subroutine SeaiceAlgaeDynamics
-!EOC
+
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model 
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

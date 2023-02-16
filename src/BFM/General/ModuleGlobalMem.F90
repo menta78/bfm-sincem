@@ -1,57 +1,41 @@
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model 
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-!BOP
 !
-! !ROUTINE: ModuleGlobalMem
+! ROUTINE: ModuleGlobalMem
 !
 ! DESCRIPTION
-!    !   Definiton of the runtime error messages.
 !   This module contains global settings:
 !   -general constants for controlling prescision,
 !   -parameters defining fle streams and error message numbers
 !   -the subroutine for printing the message
 !   and aborting the simulation
 !
-! !INTERFACE
-  MODULE global_mem
-!
-
-!  
-!
-! !AUTHORS
-!   P. Ruardij (NIOZ)/ M. Vichi (INGV) 
-!
-! !REVISION_HISTORY
-!   ---
-!
 ! COPYING
-!   
-!   Copyright (C) 2020 BFM System Team (bfm_st@cmcc.it)
-!   Copyright (C) 2006 P. Ruardij, M. Vichi 
-!   (rua@nioz.nl, vichi@bo.ingv.it)
 !
-!   This program is free software; you can redistribute it and/or modify
+!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
+!
+!   This program is free software: you can redistribute it and/or modify
 !   it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation;
+!   the Free Software Foundation.
 !   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-!   GNU General Public License for more details.
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU General Public License for more details.
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 !
-!EOP
-!-------------------------------------------------------------------------!
-!BOC
+! INCLUDE
 !
-!
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! Implicit typing is never allowed
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+! INTERFACE
+  MODULE global_mem
+
   IMPLICIT NONE
+
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Default all is public
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   public
+
   !=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Global Constants
   !=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -65,7 +49,7 @@
   real(RLEN), parameter ::BASETEMP= 10.0_RLEN
   !=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Control logical units for files I/O
-  logical               :: bfm_lwp = .TRUE. ! logical writing for proc 0
+  logical               :: bfm_lwp = .FALSE. ! logical writing for proc 0
   integer, parameter    :: bfm_file_FirstUnit = 1000
   integer               :: LOGUNIT
   integer               :: NMLUNIT
@@ -77,8 +61,6 @@
   integer,    parameter ::OFF=-100
   integer,    parameter ::SINKSOURCE=-1
   integer,    parameter ::NOTRANSPORT=0
-  integer,    parameter ::NOOBCSTATES=0
-  integer,    parameter ::OBCSTATES=1
   integer,    parameter ::HORTRANSPORT=10
   integer,    parameter ::ALLTRANSPORT=20
   real(RLEN), parameter :: DONE=1._RLEN
@@ -87,15 +69,19 @@
   integer,    parameter ::NML_OPEN=11
   integer,    parameter ::NML_READ=12
   integer,    parameter ::DIM_MISMATCH=13
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
   contains
 
   subroutine error_msg_prn(code,infile,what)
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! Implicit typing is never allowed
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
   IMPLICIT NONE
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   integer :: code
   character(LEN=*) :: what,infile
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
    write(LOGUNIT,*) "*********** RUN TIME ERROR BEGIN ***********"
    select case (code)
         case (ALLOC)
@@ -113,11 +99,11 @@
     end select
     write(LOGUNIT,*) "***********  RUN TIME ERROR END  ***********"
     stop "BFM error (see logfile)"
+
   end subroutine error_msg_prn
   
   end module global_mem
-  
-!EOC
+
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model 
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

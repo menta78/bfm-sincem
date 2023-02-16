@@ -1,24 +1,33 @@
-#include "DEBUG.h"
-#include "INCLUDE.h"
-
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model 
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-!BOP
 !
-! !ROUTINE: PelBac
+! ROUTINE: PelBac
 !
 ! DESCRIPTION
 !   This process describes the dynamics of bacterioplankton
 !    
+! COPYING
 !
-! !INTERFACE
+!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU General Public License for more details.
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! INCLUDE
+#include "DEBUG.h"
+#include "INCLUDE.h"
+!
+! INTERFACE
   subroutine PelBacDynamics(bac)
 !
-! !USES:
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! Modules (use of ONLY is strongly encouraged!)
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+! USES
   use global_mem, ONLY:RLEN
 #ifdef NOPOINTERS
   use mem
@@ -28,7 +37,10 @@
   use mem, ONLY: iiPelBacteria, ppPelBacteria, iiC, iiN, iiP, ppR6c, &
     ppR6n, ppR6p, ppR1c, ppR1n, ppR1p, &
     ppR2c, ppO2o, ppN6r, ppN4n, ppN1p, ppN3n, ppR3c, flPTN6r, Depth, ETW, &
-    qncPBA, qpcPBA, eO2mO2, qpcOMT, qncOMT, NO_BOXES, iiBen, iiPel, flux_vector,quota_flux
+    qncPBA, qpcPBA, qpcOMT, qncOMT, NO_BOXES, iiBen, iiPel, flux_vector,quota_flux
+#ifdef BFM_OGS
+    use mem, ONLY: BAC_ACT_FACT
+#endif
 #ifdef INCLUDE_PELCO2
   use mem, ONLY: ppO3c
 #endif
@@ -38,43 +50,11 @@
   use mem_PelBac
   use mem_globalfun,   ONLY: eTq, MM_power, insw, MM, fixratio
   use bfm_error_msg, ONLY: bfm_error
-!  
-!
-! !AUTHORS
-!   First ERSEM version by J.W. Baretta and H. Baretta-Bekker
-!   Additional parametrizations by P. Ruardij and M. Vichi 
-!   (Vichi et al., 2004; Vichi et al., 2007)
-!   L. Polimene, I. Allen and M. Zavatarelli (Polimene et al., 2006)
-!   Dynamical allocation by G. Mattia 
-!   2016 : (Lovato) Revise routine structure and add fixed stochiometry
-!
-! !REVISION_HISTORY
-!   !
-!
-! COPYING
-!   
-!   Copyright (C) 2020 BFM System Team (bfm_st@cmcc.it)
-!   Copyright (C) 2006 P. Ruardij, M. Vichi
-!   (rua@nioz.nl, vichi@bo.ingv.it)
-!
-!   This program is free software; you can redistribute it and/or modify
-!   it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation;
-!   This program is distributed in the hope that it will be useful,
-!   but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-!   GNU General Public License for more details.
-!
-!EOP
-!-------------------------------------------------------------------------!
-!BOC
-!
-!
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! Implicit typing is never allowed
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
   IMPLICIT NONE
-! !INPUT:
+
+  ! INPUT
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   integer,intent(IN)  :: bac
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -92,7 +72,8 @@
                                           reR3c,rut,rum,run,sun,rug, &
                                           suR2,cuR6,cuR1,iN1p,iNIn,iN, &
                                           eN1p,eN4n,huln, hulp, bacc, &
-                                          tfluxC, tfluxN, tfluxP, pe_N4n, pe_N1p, pe_R6c
+                                          tfluxC, tfluxN, tfluxP, pe_N4n, &
+                                          pe_N1p, pe_R6c
 #ifndef INCLUDE_PELCO2
   integer,parameter :: ppO3c = 0
 #endif
@@ -129,7 +110,7 @@
   ppbacc = ppPelBacteria(bac,iiC)
   ppbacn = ppPelBacteria(bac,iiN)
   ppbacp = ppPelBacteria(bac,iiP)
-  bacc = D3STATE(ppbacc,:)
+  bacc = D3STATE(:,ppbacc)
 
   ! Quota collectors
   tfluxC = ZERO
@@ -167,12 +148,12 @@
   rd  =  ( p_sd(bac)*et + p_sd2(bac)*bacc ) * bacc
 
   call quota_flux(iiPel, ppbacc, ppbacc, ppR6c, rd*(ONE-p_pe_R1c)              , tfluxC)
-  call quota_flux(iiPel, ppbacn, ppbacn, ppR6n, rd*qncPBA(bac,:)*(ONE-p_pe_R1n), tfluxN)
-  call quota_flux(iiPel, ppbacp, ppbacp, ppR6p, rd*qpcPBA(bac,:)*(ONE-p_pe_R1p), tfluxP)
+  call quota_flux(iiPel, ppbacn, ppbacn, ppR6n, rd*qncPBA(:,bac)*(ONE-p_pe_R1n), tfluxN)
+  call quota_flux(iiPel, ppbacp, ppbacp, ppR6p, rd*qpcPBA(:,bac)*(ONE-p_pe_R1p), tfluxP)
 
   call quota_flux(iiPel, ppbacc, ppbacc, ppR1c, rd*p_pe_R1c              , tfluxC)
-  call quota_flux(iiPel, ppbacn, ppbacn, ppR1n, rd*qncPBA(bac,:)*p_pe_R1n, tfluxN) 
-  call quota_flux(iiPel, ppbacp, ppbacp, ppR1p, rd*qpcPBA(bac,:)*p_pe_R1p, tfluxP)
+  call quota_flux(iiPel, ppbacn, ppbacn, ppR1n, rd*qncPBA(:,bac)*p_pe_R1n, tfluxN) 
+  call quota_flux(iiPel, ppbacp, ppbacp, ppR1p, rd*qpcPBA(:,bac)*p_pe_R1p, tfluxP)
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Substrate availability
@@ -199,8 +180,8 @@
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-==--=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-
       ! Nutrient limitation (intracellular, eq. 51 Vichi et al. 2007)
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-      iNIn = min(ONE, max(ZERO, qncPBA(bac,:)/p_qncPBA(bac)))  !Nitrogen
-      iN1p = min(ONE, max(ZERO, qpcPBA(bac,:)/p_qpcPBA(bac)))  !Phosphorus
+      iNIn = min(ONE, max(ZERO, qncPBA(:,bac)/p_qncPBA(bac)))  !Nitrogen
+      iN1p = min(ONE, max(ZERO, qpcPBA(:,bac)/p_qpcPBA(bac)))  !Phosphorus
       iN   = min(iN1p, iNIn)
 
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -212,8 +193,8 @@
       ! correction of substrate quality depending on nutrient content
       ! (eq. 52 Vichi et al. 2007)
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-      cuR1 = min(ONE, qpcOMT(iiR1,:)/p_qpcPBA(bac), qncOMT(iiR1,:)/ p_qncPBA(bac))
-      cuR6 = min(ONE, qpcOMT(iiR6,:)/p_qpcPBA(bac), qncOMT(iiR6,:)/ p_qncPBA(bac))
+      cuR1 = min(ONE, qpcOMT(:,iiR1)/p_qpcPBA(bac), qncOMT(:,iiR1)/ p_qncPBA(bac))
+      cuR6 = min(ONE, qpcOMT(:,iiR6)/p_qpcPBA(bac), qncOMT(:,iiR6)/ p_qncPBA(bac))
 
   end select
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -249,13 +230,13 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Organic Nitrogen and Phosphrous uptake
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  ruR1n = qncOMT(iiR1,:)*ruR1c
-  ruR6n = qncOMT(iiR6,:)*ruR6c
+  ruR1n = qncOMT(:,iiR1)*ruR1c
+  ruR6n = qncOMT(:,iiR6)*ruR6c
   call quota_flux(iiPel, ppbacn, ppR1n, ppbacn, ruR1n, tfluxN)
   call quota_flux(iiPel, ppbacn, ppR6n, ppbacn, ruR6n, tfluxN)
 
-  ruR1p = qpcOMT(iiR1,:)*ruR1c
-  ruR6p = qpcOMT(iiR6,:)*ruR6c
+  ruR1p = qpcOMT(:,iiR1)*ruR1c
+  ruR6p = qpcOMT(:,iiR6)*ruR6c
   call quota_flux(iiPel, ppbacp, ppR1p, ppbacp, ruR1p, tfluxP)
   call quota_flux(iiPel, ppbacp, ppR6p, ppbacp, ruR6p, tfluxP)
 
@@ -300,7 +281,7 @@
       ! and controlled with a Michaelis-Menten function
       ! Fix-ratio: actual quota comes from detritus uptake vs. realized growth
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-      ren  =  (qncPBA(bac,:) - p_qncPBA(bac))*bacc*p_ruen(bac)
+      ren  =  (qncPBA(:,bac) - p_qncPBA(bac))*bacc*p_ruen(bac)
       if ( ppbacn == 0 ) & 
          ren = min( ZERO, (ruR1n+ruR6n) - p_qncPBA(bac)*run )
       call quota_flux(iiPel, ppbacn, ppbacn, ppN4n,       ren*insw( ren), tfluxN)
@@ -313,7 +294,7 @@
       ! and controlled with a Michaelis-Menten function
       ! Fix-ratio: actual quota comes from detritus uptake vs. realized growth
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-      rep  =  (qpcPBA(bac,:) - p_qpcPBA(bac))*bacc*p_ruep(bac)
+      rep  =  (qpcPBA(:,bac) - p_qpcPBA(bac))*bacc*p_ruep(bac)
       if ( ppbacp == 0 ) &
          rep = min(ZERO, (ruR1p+ruR6p) - p_qpcPBA(bac)*run )
       call quota_flux(iiPel, ppbacp, ppbacp, ppN1p,       rep*insw( rep), tfluxP)
@@ -378,8 +359,8 @@
       ! to about 1/4 of the respiration rate, ~5% of uptake
       ! (Stoderegger and Herndl, 1998)
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-      reR2c = max((ONE-(qpcPBA(bac,:)/p_qpcPBA(bac))), &
-              (ONE-(qncPBA(bac,:)/p_qncPBA(bac))))*p_rec(bac)
+      reR2c = max((ONE-(qpcPBA(:,bac)/p_qpcPBA(bac))), &
+              (ONE-(qncPBA(:,bac)/p_qncPBA(bac))))*p_rec(bac)
       reR2c = max(ZERO,reR2c)*bacc
       reR3c = rug*(ONE-p_pu_ra(bac))*(p_pu_ra(bac)*p_pu_ea_R3(bac))
 
@@ -389,7 +370,7 @@
       ! This rate is assumed to occur with a timescale p_ruen=1 day
       ! and controlled with a Michaelis-Menten function
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-      ren = (qncPBA(bac,:) - p_qncPBA(bac))*bacc*p_ruen(bac)
+      ren = (qncPBA(:,bac) - p_qncPBA(bac))*bacc*p_ruen(bac)
       call quota_flux(iiPel, ppbacn, ppbacn, ppN4n,       ren*insw( ren), tfluxN)
       call quota_flux(iiPel, ppbacn, ppN4n, ppbacn, -eN4n*ren*insw(-ren), tfluxN)
 
@@ -399,7 +380,7 @@
       ! This rate is assumed to occur with a timescale of p_ruep=1 day
       ! and controlled with a Michaelis-Menten function
       !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-      rep  =  (qpcPBA(bac,:) - p_qpcPBA(bac))*bacc*p_ruep(bac)
+      rep  =  (qpcPBA(:,bac) - p_qpcPBA(bac))*bacc*p_ruep(bac)
       call quota_flux(iiPel, ppbacp, ppbacp, ppN1p,       rep*insw( rep), tfluxP)
       call quota_flux(iiPel, ppbacp, ppN1p, ppbacp, -eN1p*rep*insw(-rep), tfluxP)
 
@@ -410,14 +391,20 @@
       call quota_flux( iiPel, ppbacc, ppbacc, ppR3c, reR3c, tfluxC)
   
   end select
-   
+#ifdef BFM_OGS
+  ! Degradation of R3c ( time scale 100 years)
+  rrc = 1/(200.0D0*365.D0) * BAC_ACT_FACT * R3c
+  call flux_vector(iiPel, ppR3c,    ppO3c, rrc)
+  call flux_vector(iiPel, ppO2o,    0    , rrc/ MW_C)
+#endif
+
   if ( ppbacn == 0 .or. ppbacp == 0 ) then
 
      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
      ! Eliminate the excess of the non-limiting constituent under fixed quota
      ! Determine release due to either C, P, or N limitation
      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-     call fixratio(tfluxC,tfluxN,tfluxP,qncPBA(bac,:),qpcPBA(bac,:),pe_R6c, pe_N4n, pe_N1p)
+     call fixratio(tfluxC,tfluxN,tfluxP,qncPBA(:,bac),qpcPBA(:,bac),pe_R6c, pe_N4n, pe_N1p)
 
      !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
      ! Apply the correction terms depending on the limiting constituent
@@ -431,7 +418,6 @@
 
   end subroutine PelBacDynamics
 
-!EOC
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 ! MODEL  BFM - Biogeochemical Flux Model 
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

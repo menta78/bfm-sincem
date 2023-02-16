@@ -3,20 +3,17 @@
 # DESCRIPTION
 #   BFM Configuration manager
 #
-# AUTHORS
-#   Tomas Lovato tomas.lovato@cmcc.it
-#
 # COPYING
-#  
-#   Copyright (C) 2020 BFM System Team (bfm_st@cmcc.it)
 #
-#   This program is free software; you can redistribute it and/or modify
+#   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
+#
+#   This program is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
-#   the Free Software Foundation;
+#   the Free Software Foundation.
 #   This program is distributed in the hope that it will be useful,
 #   but WITHOUT ANY WARRANTY; without even the implied warranty of
-#   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#   GNU General Public License for more details.
+#   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+#   See the GNU General Public License for more details.
 # -----------------------------------------------------
 
 #logging configuration
@@ -24,10 +21,10 @@ LOGFILE=logfile_$$.log
 LOGDIR="Logs"
 
 #local paths
-VER=""
-TEMPDIR="build${VER}/tmp"
-CONFDIR="build${VER}/configurations"
-SCRIPTSDIR="build${VER}/scripts"
+VER="" # NEMO coupling version
+TEMPDIR="build/tmp"
+CONFDIR="build/configurations"
+SCRIPTSDIR="build/scripts"
 SCRIPTS_BIN="${SCRIPTSDIR}/bin"
 SCRIPTS_PROTO="${SCRIPTSDIR}/proto"
 
@@ -50,15 +47,15 @@ NMLLIST="";
 NEMOSUB="";
 
 #options
-OPTIONS=(     MODE     CPPDEFS     ARCH     CLEAN     EXP     EXPDIR     EXECMD     VALGRIND     PROC     QUEUE     BFMEXE     NEMOSUB     EXPFILES     FORCING     NMLLIST     RUNPROTO     )
-OPTIONS_USR=( mode_usr cppdefs_usr arch_usr clean_usr exp_usr expdir_usr execmd_usr valgrind_usr proc_usr queue_usr bfmexe_usr nemosub_usr expfiles_usr forcing_usr nmllist_usr runproto_usr )
+OPTIONS=(     MODE     CPPDEFS     ARCH     CLEAN     EXP     DIRFILES     EXECMD     VALGRIND     RUNDIR     QUEUE     BFMEXE     NEMOSUB     EXPFILES     FORCING     NMLLIST     RUNPROTO     )
+OPTIONS_USR=( mode_usr cppdefs_usr arch_usr clean_usr exp_usr DIRFILES_usr execmd_usr valgrind_usr rundir_usr queue_usr bfmexe_usr nemosub_usr expfiles_usr forcing_usr nmllist_usr runproto_usr )
 
 #error message
 ERROR_MSG="Execute $0 -h for help if you don't know what is going wrong. PLEASE read CAREFULLY before seeking help."
 
 #----------------- USER CONFIGURATION DEFAULT VALUES -----------------
 DEBUG="";
-BFMDIR_DEFAULT="${PWD}/.."
+BFMDIR_DEFAULT="$(dirname "${PWD}")"
 MODE="STANDALONE"
 CPPDEFS="BFM_STANDALONE INCLUDE_PELCO2 INCLUDE_DIAG"
 PRESET="STANDALONE"
@@ -66,11 +63,11 @@ ARCH="gfortran.inc"
 PROC=8
 PROC_CMP=8
 EXP="EXP00"
-QUEUE="poe_short"
+QUEUE="p_short"
 BFMEXE="bfm_standalone.x"
 CLEAN=1
 NETCDF_DEFAULT="/usr"
-MPICMD="mpirun.lsf"
+MPICMD="mpiexec.hydra"
 RUNPROTO="runscript"
 # --------------------------------------------------------------------
 
@@ -125,32 +122,28 @@ DESCRIPTION
        -x EXP
                   Name of the experiment for generation of the output folder (Default: "${EXP}")
        -F EXPFILES 
-                  Additional files of configuration folder to copy to experiment directory
+                  files (generated or not) to copy to experiment directory
        -i FORCING 
                   Necessary forcings to execute the model. To specify several files, separate them by colon ';' and surround all by quotes '"'.
                   (If the path is relative, the ROOT will be ${BFMDIR})
-       -D EXPDIR
-                  Input dir to copy entirely into experiment directory (look into "${PRESET}" first)
+       -D DIRFILES
+                  Input dir where are files to copy to experiment directory (Default: configurations/${PRESET}")
        -e EXECMD
                   Executable command to insert in runscript (Default for NEMO: "${MPICMD}", empty for others)
        -V VALGRIND
                   Executable valgrind command to insert in runscript
-       -r PROC
-                  Number of procs used for running. Default: 8
+       -r RUNDIR
+                  Path to folder where experiment will be created. (Default: "${BFMDIR}/run")
        -q QUEUE
                   Name of the queue number of procs used for running. Default
        -R RUNPROTO
                   Specify prototype for generating the experiment running script (Default: runscript)
 
 ENVIRONMENT VARIABLES
-       BFMDIR
-                  Path to the root directory of BFM. (Default: "${BFMDIR_DEFAULT}" if environment variable is not defined)
        NETCDF
                   Path to netcdf library and header files. (Default: "${NETCDF_DEFAULT}" if environment variable is not defined)
-       BFMDIR_RUN
-                  Path to folder where experiments will be created. (Default: "${BFMDIR}/run" if environment variable is not defined)
        NEMODIR
-                  Path to the root directory of NEMO. Must define this environment variable if you use NEMO
+                  Path to the root directory of NEMO code. Must define this environment variable if you use NEMO coupled presets
 EOF
 }
 
@@ -184,10 +177,10 @@ while getopts "hvgcdPp:m:k:N:S:a:fx:F:i:D:e:V:r:q:o:R:" opt; do
       x ) [ ${VERBOSE} ] && echo "experiment $OPTARG"       ; exp_usr=$OPTARG      ;;
       F ) [ ${VERBOSE} ] && echo "experiment files $OPTARG" ; expfiles_usr=$OPTARG ;;
       i ) [ ${VERBOSE} ] && echo "forcing files $OPTARG"    ; forcing_usr=$OPTARG  ;;
-      D ) [ ${VERBOSE} ] && echo "namelist dir $OPTARG"     ; expdir_usr=$OPTARG   ;;
+      D ) [ ${VERBOSE} ] && echo "inputdata dir $OPTARG"    ; expdir_usr=$OPTARG   ;;
       e ) [ ${VERBOSE} ] && echo "exe command $OPTARG"      ; execmd_usr=$OPTARG   ;;
       V ) [ ${VERBOSE} ] && echo "valgrind command $OPTARG" ; valgrind_usr=$OPTARG ;;
-      r ) [ ${VERBOSE} ] && echo "n. procs $OPTARG"         ; proc_usr=$OPTARG     ;;
+      r ) [ ${VERBOSE} ] && echo "run directory $OPTARG"    ; rundir_usr=$OPTARG   ;;
       q ) [ ${VERBOSE} ] && echo "queue name $OPTARG"       ; queue_usr=$OPTARG    ;;
       o ) [ ${VERBOSE} ] && echo "executable name $OPTARG"  ; bfmexe_usr=$OPTARG   ;;
       R ) [ ${VERBOSE} ] && echo "run proto  name $OPTARG"  ; runproto_usr=$OPTARG ;;
@@ -198,6 +191,7 @@ done
 #set bfm path
 if [[ ! ${BFMDIR} ]]; then
     BFMDIR="${BFMDIR_DEFAULT}"
+    export BFMDIR
     [ ${VERBOSE} ] && echo "setting BFM path with default: ${BFMDIR}"
 fi
 
@@ -219,13 +213,11 @@ if [ $VERBOSE ]; then
     cmd_gmake="${GMAKE}"
     cmd_gen="${GENCONF}.pl -v"
     cmd_gennml="${GENNML}.pl -v"
-    cmd_mknemo="${MKNEMO}"
 else
     cmd_mkmf="${MKMF}"
     cmd_gmake="${GMAKE} -s"
     cmd_gen="${GENCONF}.pl"
     cmd_gennml="${GENNML}.pl"
-    cmd_mknemo="${MKNEMO} -v0"
 fi
 if [ $DEBUG ]; then
     cmd_gen=${cmd_gen}" -d"
@@ -244,6 +236,7 @@ for option in "${OPTIONS[@]}"; do
     if [ "${value}" ]; then 
         [ ${VERBOSE} ] && echo "- replacing ${option}=${value}"
         eval ${option}=\"\${value}\"
+    if [ "${option}" == "DIRFILES" ] ; then DIRFILES=${BFMDIR}/${CONFDIR}/${PRESET}/${value} ; fi
     fi
 done
 
@@ -254,6 +247,12 @@ for option in "${OPTIONS_USR[@]}"; do
     eval [ \"\${$option}\" ] && eval "${opt_name}"=\"\${$option}\"
     [ ${VERBOSE} ] && eval [ \"\${$option}\" ]  && eval echo "- replacing ${opt_name}="\"\${$option}\"
 done
+
+if [ "$MODE" == "NEMO_CESM" ]; then
+    PROC=0
+    BFMDIR="${BFMDIR_DEFAULT}"
+    echo "setting BFM path to : ${BFMDIR}"
+fi
 
 #specify build dir of BFM
 blddir="${BFMDIR}/${TEMPDIR}/${PRESET}"
@@ -267,7 +266,7 @@ if [[ ! $NEMODIR && ( "$MODE" == "NEMO" || "$MODE" == "NEMO_3DVAR" ) ]]; then
     echo ${ERROR_MSG}
     exit
 fi
-if [[ "$MODE" != "STANDALONE" && "$MODE" != "POM1D" && "$MODE" != "OGS" && "$MODE" != "NEMO" && "$MODE" != "NEMO_3DVAR" ]]; then 
+if [[ "$MODE" != "STANDALONE" && "$MODE" != "POM1D" && "$MODE" != "OGS" && "$MODE" != "NEMO" && "$MODE" != "NEMO_3DVAR" && "$MODE" != "NEMO_CESM" ]]; then 
     echo "ERROR: MODE value not valid ($MODE). Available values are: STANDALONE or OGS or POM1D or NEMO or NEMO_3DVAR."
     echo ${ERROR_MSG}
     exit
@@ -281,46 +280,15 @@ fi
 # Print setting informations
 echo "bfm_configure for preset ${PRESET} with mode ${MODE}"
 echo "BFMDIR is ${BFMDIR}"
+
+# NEMO specific info
 if [[ "$MODE" == "NEMO" ]]; then 
     echo "NEMODIR is ${NEMODIR}"
+    cmd_mknemo="${NEMODIR}/${MKNEMO} -r ${PRESET}"
+    NEMODIRCFG="${NEMODIR}/cfgs"
+    cfgfile_nemo="work_cfgs.txt"
 fi
 echo ""
-
-# -----------------------------------------------------
-# Retrieve git version control info if available:
-# -----------------------------------------------------
-# create an include file for the code
-#
-GIT_CODE_INFO=${BFMDIR}/include/git_code_info.h
-if [ -d ${BFMDIR}/.git  ] ; then
-    BFMBRANCH=$( git rev-parse --abbrev-ref HEAD )
-    BFMCOMMIT=$( git rev-parse --short HEAD )
-    if [ $? -ne 0 ] ; then
-       echo "Unable to extract BFM git commit info!"
-       BFMCOMMIT="NOT AVAILABLE"
-       BFMBRANCH=${BFMCOMMIT}
-    fi
-    echo "   git_branch_name = '${BFMBRANCH}'" > ${GIT_CODE_INFO}
-    echo "   git_commit_id = '${BFMCOMMIT}'" >> ${GIT_CODE_INFO}
-    echo "   LEVEL1 ' BFM version:   ',TRIM(git_commit_id),' (',TRIM(git_branch_name),' branch)'" >> ${GIT_CODE_INFO}
-    echo "   LEVEL1 ' '" >> ${GIT_CODE_INFO}
-    # Annote changes to tracked files
-    if [[ $(git diff --stat) != '' ]] ; then
-        echo "Local changes to BFM git tracked files:" >>${BFMDIR}/${TEMPDIR}/gitpatch
-        git diff HEAD >> ${BFMDIR}/${TEMPDIR}/gitpatch
-    else
-        echo "No changes in BFM git tracked files" >> ${BFMDIR}/${TEMPDIR}/gitpatch
-    fi
-    cat ${BFMDIR}/${TEMPDIR}/gitpatch \
-        | sed 's,","",g' \
-        | sed 's,^,LEVEL0 ",g' \
-        | sed 's,$,",g' \
-        >> ${GIT_CODE_INFO}
-    rm -f ${BFMDIR}/${TEMPDIR}/gitpatch
-else
-    echo "BFM git version control is missing !"
-    echo "   LEVEL1 'BFM git version control is missing '" > ${GIT_CODE_INFO}
-fi
 
 # -----------------------------------------------------
 # Memory and namelist files GENERATION
@@ -332,7 +300,7 @@ addproto=""
 if [ "$MODE" == "OGS" ]; then
    addproto="BFM_var_list.h BFM1D_Output_Ecology.F90 namelist.passivetrc"
 fi
-if [ "$MODE" == "NEMO" ]; then
+if [[ "$MODE" == "NEMO" || "$MODE" == "NEMO_CESM" ]]; then
    addproto="field_def_bfm.xml file_def_bfm.xml"
 fi
 
@@ -353,7 +321,7 @@ if [ ${GEN} ]; then
     if [ ! -d ${blddir} ]; then mkdir ${blddir}; fi
     cd ${blddir}
     rm -rf *
-    cp ${presetdir}/* ${blddir} 2>/dev/null
+    find ${presetdir} -maxdepth 1 -type f -execdir cp "{}" ${blddir} ";"
     
     #add -D to cppdefs
     cppdefs=`echo ${CPPDEFS} | sed -e 's/\([a-zA-Z_0-9]*\)/-D\1/g'`
@@ -377,17 +345,6 @@ if [ ${GEN} ]; then
 
 
     if [[ ${MODE} == "STANDALONE" || "$MODE" == "POM1D"  || "$MODE" == "OGS" ]]; then
-
-        # Move BFM Layout files to target folders
-        mv ${blddir}/init_var_bfm.F90 ${BFMDIR}/src/share
-        mv ${blddir}/INCLUDE.h ${BFMDIR}/src/BFM/include
-        mv ${blddir}/*.F90 ${BFMDIR}/src/BFM/General
-        if [[ "$MODE" == "OGS" ]]; then
-            cp ${BFMDIR}/include/BFM_module_list.proto.h ${blddir}/
-            sed ':a;N;$!ba;s/, \&\n/,  /g' ${blddir}/BFM_var_list.h | sed -e "s/,    /\n     integer,parameter ::/g" > ${BFMDIR}/include/BFM_var_list.h
-            mv ${BFMDIR}/src/BFM/General/BFM1D_Output_Ecology.F90 ${BFMDIR}/src/ogstm/
-        fi
-
         # list files
         find ${BFMDIR}/src/BFM/General -name "*.?90" -print > BFM.lst
         if [[ ${MODE} == "STANDALONE" ]]; then
@@ -429,7 +386,6 @@ if [ ${GEN} ]; then
             sed -e "s,\${NETCDF},${NETCDF_DEFAULT}," ${BFMDIR}/compilers/${ARCH} > ${blddir}/${ARCH}
         fi
 
-        # Make makefile
         if [ ${VERBOSE} ]; then
             echo "Executing: "
             echo "${BFMDIR}/${SCRIPTS_BIN}/${cmd_mkmf}"
@@ -440,6 +396,7 @@ if [ ${GEN} ]; then
             echo "    BFM.lst && echo \" "
         fi
 
+        # Make makefile
         ${BFMDIR}/${SCRIPTS_BIN}/${cmd_mkmf} \
             -c "${cppdefs}" \
             -o "-I${BFMDIR}/include -I${BFMDIR}/src/BFM/include" \
@@ -448,15 +405,31 @@ if [ ${GEN} ]; then
             BFM.lst && echo ""
 
 
+        # Move BFM Layout files to target folders 
+        cp ${blddir}/*.F90 ${BFMDIR}/src/BFM/General
+        mv ${BFMDIR}/src/BFM/General/init_var_bfm.F90 ${BFMDIR}/src/share
+        cp ${blddir}/init_var_bfm.F90 ${BFMDIR}/src/share
+        cp ${blddir}/INCLUDE.h ${BFMDIR}/src/BFM/include
+
+        if [[ "$MODE" == "OGS" ]]; then
+            cp ${BFMDIR}/include/BFM_module_list.proto.h ${blddir}/
+            sed ':a;N;$!ba;s/, \&\n/,  /g' ${blddir}/BFM_var_list.h | sed -e "s/,    /\n     integer,parameter ::/g" > ${BFMDIR}/include/BFM_var_list.h 
+            mv ${BFMDIR}/src/BFM/General/BFM1D_Output_Ecology.F90 ${BFMDIR}/src/ogstm/
+        fi
+
     elif [[ "$MODE" == "NEMO" || "$MODE" == "NEMO_3DVAR" ]]; then 
-        #Generate NEMO configuration with subdirs
-        if [ ! -d ${NEMODIR}/NEMOGCM/CONFIG/${PRESET} ]; then
+        #Setup new NEMO configuration
+        if [ ! -d ${NEMODIRCFG}/${PRESET} ]; then
             if [ "$NEMOSUB" ] ; then
-                ${NEMODIR}/NEMOGCM/CONFIG/${cmd_mknemo} -j0 -n ${PRESET} -m ${ARCH} -d "${NEMOSUB}"
-	
+                echo "Setup new configuration in ${NEMODIRCFG}/${PRESET}"
                 if [ ! -f "${presetdir}/cpp_${PRESET}.fcm" ]; then
                     echo "ERROR: cpp_${PRESET}.fcm must exist in ${presetdir}" 
                     exit
+                fi
+                mkdir -p ${NEMODIRCFG}/${PRESET}
+                if ! grep -q "${PRESET} " ${NEMODIRCFG}/${cfgfile_nemo} ; then
+                    echo "add ${PRESET} to ${cfgfile_nemo}"
+                    echo "${PRESET}    ${NEMOSUB}" >> ${NEMODIRCFG}/${cfgfile_nemo}
                 fi
             else
                 echo "ERROR: NEMO configuration not exists. If you want to create a NEMO configuration, you have to specify NEMOSUB option"
@@ -464,15 +437,16 @@ if [ ${GEN} ]; then
                 exit
             fi
         fi
+        NEMOSUB=`grep ${PRESET} ${NEMODIRCFG}/${cfgfile_nemo} | cut -d " " -f3-`
+        echo "NEMOSUBS: ${NEMOSUB}"
 
         #if cpp_PRESET exists in configuration folder => copy to nemo preset folder
         if [ -f "${presetdir}/cpp_${PRESET}.fcm" ]; then 
-            cp "${presetdir}/cpp_${PRESET}.fcm" "${NEMODIR}/NEMOGCM/CONFIG/${PRESET}"
+            cp "${presetdir}/cpp_${PRESET}.fcm" "${NEMODIRCFG}/${PRESET}"
         fi
 
         #substitute BFM/src/nemo path in cpp according to the version
-        [ ${VERBOSE} ] && echo "Changing nemo version to: \"$VER\""
-        sed -ie "s;^\s*inc.*;inc \$BFMDIR/src/nemo${VER}/bfm\.fcm;" ${NEMODIR}/NEMOGCM/CONFIG/${PRESET}/cpp_${PRESET}.fcm
+        sed -ie "s;^\s*inc.*;inc \$BFMDIR/src/nemo${VER}/bfm\.fcm;" ${NEMODIRCFG}/${PRESET}/cpp_${PRESET}.fcm
 
 
         # Generate the specific bfm.fcm include file for makenemo
@@ -490,19 +464,32 @@ if [ ${GEN} ]; then
             [ $VERBOSE ] && echo "include SEAICE in bfm.fcm"
             FCMIce="src::bfm::seaice          ${BFMDIR}/src/BFM/Seaice"
         fi
-        FCMMacros="BFM_NEMO BFM_NOPOINTERS ${CPPDEFS}"
+        FCMMacros="${CPPDEFS}"
         sed -e "s/_place_keys_/${FCMMacros}/" -e "s;_place_def_;${myGlobalConf};" \
             -e "s;_place_ben_;${FCMBen};g"     -e "s;_place_ice_;${FCMIce};"       \
             ${BFMDIR}/${SCRIPTS_PROTO}/Default_bfm.fcm | tr "\&" "\n" > ${blddir}/bfm.fcm
         [ ${VERBOSE} ] && echo "Memory Layout generated in local folder: ${blddir}"
 
-        # Move BFM Layout files to target folders
-        mv ${blddir}/init_var_bfm.F90 ${BFMDIR}/src/share
-        mv ${blddir}/INCLUDE.h ${BFMDIR}/src/BFM/include
-        mv ${blddir}/*.F90 ${BFMDIR}/src/BFM/General
-        mv ${blddir}/bfm.fcm ${BFMDIR}/src/nemo${VER}
-    fi
+        # Move BFM Layout files to target folders 
+        cp ${blddir}/*.F90 ${BFMDIR}/src/BFM/General
+        mv ${BFMDIR}/src/BFM/General/init_var_bfm.F90 ${BFMDIR}/src/share
+        cp ${blddir}/init_var_bfm.F90 ${BFMDIR}/src/share
+        cp ${blddir}/INCLUDE.h ${BFMDIR}/src/BFM/include
+        cp ${blddir}/bfm.fcm ${BFMDIR}/src/nemo${VER}
 
+    elif [ "$MODE" == "NEMO_CESM" ]; then
+        # Move BFM Layout files namelists to configuration folders
+        # note that here a relative path is used for CESM root dir
+        cd ${BFMDIR}
+        exedir="../cesm/models/ocn/nemo/BFM/configurations/${EXP}"
+        echo "Copy files to ${exedir}"
+        mkdir -p ${exedir}
+        cp ${blddir}/*.?90     ${exedir}
+        cp ${blddir}/*.h       ${exedir}
+        cp ${blddir}/*.nml     ${exedir}
+        cp ${presetdir}/*.xml  ${exedir}
+        cp ${blddir}/*top_cfg  ${exedir}
+    fi
     echo "${PRESET} generation done!"
 fi
 
@@ -512,7 +499,7 @@ fi
 # -----------------------------------------------------
 
 
-if [ ${CMP} ]; then
+if [[ ${CMP} && "$MODE" != "NEMO_CESM" ]]; then
     if [ ! -d ${blddir} ]; then
         echo "ERROR: directory ${blddir} not exists"
         echo ${ERROR_MSG}
@@ -542,19 +529,19 @@ if [ ${CMP} ]; then
 
         if [ ${CLEAN} == 1 ]; then
             [ ${VERBOSE} ] && echo "Cleaning up ${PRESET}..."
-            [ ${VERBOSE} ] && echo "Command: ${NEMODIR}/NEMOGCM/CONFIG/${cmd_mknemo} -n ${PRESET} -m ${ARCH} clean"
-            ${NEMODIR}/NEMOGCM/CONFIG/${cmd_mknemo} -n ${PRESET} -m ${ARCH} clean
+            [ ${VERBOSE} ] && echo "Command: ${cmd_mknemo} -m ${ARCH} clean"
+            ${cmd_mknemo} -n ${PRESET} -m ${ARCH} clean
         fi
         [ ${VERBOSE} ] && echo "Starting ${PRESET} compilation..."
-        rm -rf ${NEMODIR}/NEMOGCM/CONFIG/${PRESET}/BLD/bin/${NEMOEXE}
-        if [[ "$MODE" == "NEMO" ]]; then 
-            [ ${VERBOSE} ] && echo "Command: ${NEMODIR}/NEMOGCM/CONFIG/${cmd_mknemo} -n ${PRESET} -m ${ARCH} -e ${BFMDIR}/src/nemo${VER} -j ${PROC_CMP}"
-            ${NEMODIR}/NEMOGCM/CONFIG/${cmd_mknemo} -n ${PRESET} -m ${ARCH} -e ${BFMDIR}/src/nemo${VER} -j ${PROC_CMP}
+        rm -rf ${NEMODIRCFG}/${PRESET}/BLD/bin/${NEMOEXE}
+        if [[ "$MODE" == "NEMO" ]]; then
+            [ ${VERBOSE} ] && echo "Command: ${cmd_mknemo} -m ${ARCH} -e ${BFMDIR}/src/nemo${VER} -j ${PROC_CMP}"
+            ${cmd_mknemo} -m ${ARCH} -e ${BFMDIR}/src/nemo${VER} -j ${PROC_CMP}
         else
-            [ ${VERBOSE} ] && echo "Command: ${NEMODIR}/NEMOGCM/CONFIG/${cmd_mknemo} -n ${PRESET} -m ${ARCH} -e \"${BFMDIR}/src/nemo${VER};${NEMODIR}/3DVAR\" -j ${PROC_CMP}"
-            ${NEMODIR}/NEMOGCM/CONFIG/${cmd_mknemo} -n ${PRESET} -m ${ARCH} -e "${BFMDIR}/src/nemo${VER};${NEMODIR}/3DVAR" -j ${PROC_CMP}
+            [ ${VERBOSE} ] && echo "Command: ${cmd_mknemo} -m ${ARCH} -e \"${BFMDIR}/src/nemo${VER};${NEMODIR}/3DVAR\" -j ${PROC_CMP}"
+            ${cmd_mknemo} -m ${ARCH} -e "${BFMDIR}/src/nemo${VER};${NEMODIR}/3DVAR" -j ${PROC_CMP}
         fi
-        if [ ! -f ${NEMODIR}/NEMOGCM/CONFIG/${PRESET}/BLD/bin/${NEMOEXE} ]; then 
+        if [ ! -f ${NEMODIRCFG}/${PRESET}/BLD/bin/${NEMOEXE} ]; then 
             echo "ERROR in ${PRESET} compilation!" ; 
             exit 1; 
         else
@@ -569,12 +556,12 @@ fi
 # -----------------------------------------------------
 
 
-if [ ${DEP} ]; then
+if [[ ${DEP} && "$MODE" != "NEMO_CESM" ]]; then
     [ ${VERBOSE} ] && echo "creating Experiment ${PRESET}"
 
     #set run dir path
-    if [ ${BFMDIR_RUN} ]; then
-        exedir="${BFMDIR_RUN}/${EXP}"
+    if [ ${RUNDIR} ]; then
+        exedir="${RUNDIR}/${EXP}"
         [ ${VERBOSE} ] && echo "setting run dir path with environment variable: ${exedir}"
     else
         exedir="${BFMDIR}/run/${EXP}"
@@ -596,15 +583,7 @@ if [ ${DEP} ]; then
         cp *.nml ${exedir}/
         if [ "$MODE" == "OGS" ] ; then cp namelist* ${exedir}/; fi
         if [ "${EXPFILES}" ]; then cp ${EXPFILES} ${exedir}/; fi
-        if [ "${EXPDIR}"   ]; then
-           if [ -d ${presetdir}/${EXPDIR} ] ; then
-              cp -R ${presetdir}/${EXPDIR} ${exedir}/
-           elif [ -d ${EXPDIR} ] ; then
-              cp -R ${EXPDIR} ${exedir}/
-           else
-              echo "Cannot find EXPDIR=${EXPDIR}"
-           fi
-        fi
+        if [ "${DIRFILES}" ]; then cp -R ${DIRFILES} ${exedir}/; fi
 
         #link forcing files to exedir
         if [ "${FORCING}" ]; then
@@ -621,14 +600,16 @@ if [ ${DEP} ]; then
         fi
 
         #link reference nemo files from the shared directory
-        if [[ "$MODE" == "NEMO" || "$MODE" == "NEMO_3DVAR" ]] && [ -d ${NEMODIR}/NEMOGCM/CONFIG/SHARED ]; then 
-           ln -sf ${NEMODIR}/NEMOGCM/CONFIG/SHARED/*_ref ${exedir}/;
-           ln -sf ${NEMODIR}/NEMOGCM/CONFIG/SHARED/field_def.xml ${exedir}/;
-           ln -sf ${NEMODIR}/NEMOGCM/CONFIG/GYRE_XIOS/EXP00/domain_def.xml ${exedir}/;
+        if [[ "$MODE" == "NEMO" || "$MODE" == "NEMO_3DVAR" ]] && [ -d ${NEMODIRCFG}/SHARED ]; then 
+           shared_files="namelist_ref namelist_top_ref axis_def_nemo.xml domain_def_nemo.xml grid_def_nemo.xml field_def_nemo-oce.xml"
+           [[ "${NEMOSUB}" == *"ICE"* ]] && shared_files="$shared_files namelist_ice_ref field_def_nemo-ice.xml"
+           for ff in ${shared_files} ; do
+               ln -sf ${NEMODIRCFG}/SHARED/${ff} ${exedir}/
+           done
            cp *.xml ${exedir}/
         fi
     else
-        echo "WARNING: directory ${exedir} exists (not overwriting namelists)"
+        echo "WARNING: directory ${exedir} exists (not overwriting namelists)\n"
     fi
 
     #Copy executable and insert exe and valgrind commands
@@ -640,7 +621,7 @@ if [ ${DEP} ]; then
             execmd="${VALGRIND} ./${BFMEXE}"
         fi
     elif [[ "$MODE" == "NEMO" || "$MODE" == "NEMO_3DVAR" ]]; then 
-        ln -sf ${NEMODIR}/NEMOGCM/CONFIG/${PRESET}/BLD/bin/${NEMOEXE} ${exedir}/${NEMOEXE}
+        ln -sf ${NEMODIRCFG}/${PRESET}/BLD/bin/${NEMOEXE} ${exedir}/${NEMOEXE}
         if [ "${EXECMD}" ]; then 
             execmd="${EXECMD} ${VALGRIND} ./${NEMOEXE}"
         else 

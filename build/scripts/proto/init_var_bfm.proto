@@ -1,3 +1,26 @@
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! MODULE: init_var_bfm_local
+!
+! DESCRIPTION
+!   Initialize state variables and model setting
+!
+! COPYING
+!
+!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU General Public License for more details.
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! INCLUDE
 #include"cppdefs.h"
 
 
@@ -16,18 +39,17 @@ MODULE init_var_bfm_local
 %init-func-constituents
 
 !-----------------------------------------------------------------------
-!BOP
 !
-! !ROUTINE: Initialise quotas of living and non-living organic components
+! ROUTINE: Initialise quotas of living and non-living organic components
 !
-! !INTERFACE:
+! DESCRIPTION:
+!   Call the initialization of internal ratios for the living
+!   and non-living organic components
+!
+! INTERFACE
    subroutine ini_organic_quotas()
 !
-! !DESCRIPTION:
-!  Call the initialization of internal ratios for the living
-! and non-living organic components
-!
-! !USES:
+! USES
    use mem
    use mem_PelChem
    use mem_PelBac
@@ -54,15 +76,12 @@ MODULE init_var_bfm_local
 #endif
 
    IMPLICIT NONE
-!
-! !INPUT PARAMETERS:
-!
-! !REVISION HISTORY:
-!  Original author(s): BFM System Team 
-!
-! !LOCAL VARIABLES:
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Local Variables
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    integer              :: i
-!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    !---------------------------------------------
    ! Initialise other pelagic internal components
    ! with Redfield
@@ -88,21 +107,21 @@ MODULE init_var_bfm_local
 
 #endif
       return
+
 end subroutine ini_organic_quotas
 
 !-----------------------------------------------------------------------
-!BOP
 !
-! !ROUTINE: Update quotas of Living and non-living organic components
+! ROUTINE: Update quotas of Living and non-living organic components
 !
-! !INTERFACE:
+! DESCRIPTION
+!   Update the internal ratios to carbon content for the living
+!   and non-living organic components
+!
+! INTERFACE
    subroutine upd_organic_quotas()
 !
-! !DESCRIPTION:
-!  Update the internal ratios to carbon content for the living
-! and non-living organic components
-!
-! !USES:
+! USES
    use mem
    use mem_PelChem
    use mem_PelBac
@@ -122,16 +141,14 @@ end subroutine ini_organic_quotas
    use mem_SeaiceBac
    use mem_SeaiceZoo
 #endif
+
    IMPLICIT NONE
-!
-! !INPUT PARAMETERS:
-!
-! !REVISION HISTORY:
-!  Original author(s): BFM System Team
-!
-! !LOCAL VARIABLES:
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Local Variables
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    integer              :: i
-!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    !---------------------------------------------
    ! Update quotas for pelagic components
    !---------------------------------------------
@@ -161,29 +178,23 @@ END MODULE init_var_bfm_local
 
 
 !-----------------------------------------------------------------------
-!BOP
 !
-! !ROUTINE: Initialise BFM variables
+! ROUTINE: Initialise BFM variables
 !
-! !INTERFACE:
+! DESCRIPTION:
+!   Allocate BFM variables and give initial values of
+!   parameters and state variables
+!
+! INTERFACE
    subroutine init_var_bfm(setup)
 !
-! !DESCRIPTION:
-!  Allocate BFM variables and give initial values of
-!  parameters and state variables
-!
-! !USES:
+! USES
 #ifndef NOT_STANDALONE
    use api_bfm
    use global_mem
 #else
    use api_bfm, ONLY: GetLun
    use global_mem, ONLY: NMLUNIT
-#endif
-#ifdef BFM_GOTM
-   use bio_var
-   use bio_bfm
-   use global_mem, ONLY: RLEN,ZERO,ONE
 #endif
    use mem
    use mem_PelChem
@@ -214,19 +225,19 @@ END MODULE init_var_bfm_local
 #endif 
 
    IMPLICIT NONE
-!
-! !INPUT PARAMETERS:
+
+  ! INPUT
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    integer,          intent(in)        :: setup
 
-!
-! !REVISION HISTORY:
-!  Original author(s): Marcello Vichi
-!
-! !LOCAL VARIABLES:
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Local Variables
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    integer              :: icontrol,i,j,n,Flun
    integer,parameter    :: NSAVE=300  ! Maximum no variables which can be saved
    character(len=64),dimension(NSAVE):: var_save
    character(len=64),dimension(NSAVE):: ave_save
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 ! Definition of Initial Pelagic (D3) state variables
@@ -251,24 +262,6 @@ END MODULE init_var_bfm_local
 
    namelist /bfm_init_nml_ice/ %2d-state-ice-Initpp
 #endif
-
-
-! COPYING
-!
-!   Copyright (C) 2020 BFM System Team (bfm_st@cmcc.it)
-!   Copyright (C) 2006 P. Ruardij and Marcello Vichi
-!   (rua@nioz.nl, vichi@bo.ingv.it)
-!
-!   This program is free software; you can redistribute it and/or modify
-!   it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation;
-!   This program is distributed in the hope that it will be useful,
-!   but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-!   GNU General Public License for more details.
-!EOP
-!-----------------------------------------------------------------------
-!BOC
 
    LEVEL2 'init_var_bfm'
    !---------------------------------------------
@@ -369,13 +362,6 @@ END MODULE init_var_bfm_local
       end if
    end do
 
-#ifdef BFM_GOTM
-   !---------------------------------------------
-   ! Create pointers
-   !---------------------------------------------
-    call pointers_gotm_bfm()
-#endif
-
    !---------------------------------------------
    ! Initialize BFM parameters
    !---------------------------------------------
@@ -466,15 +452,6 @@ END MODULE init_var_bfm_local
         LEVEL3 "Benthic model is: not used"
    endif
 
-#if defined key_obcbfm
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! All variables are inizialized on obc default
-  ! D3STATEOBC(:)=OBCSTATES
-  ! Put D3STATEOBC(..)=NOOBCSTATES to exclude
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-    D3STATEOBC(:)=OBCSTATES
-#endif
-
    !---------------------------------------------
    ! Check for transport flag
    !---------------------------------------------
@@ -552,5 +529,8 @@ END MODULE init_var_bfm_local
 155 FORMAT(10x,a4,1x,a5,1x,a12,1x,a40,1x,a10)
 156 FORMAT(10x,i4,1x,a5,1x,a12,1x,a40,1x,i6)
    end subroutine init_var_bfm
-!EOC
+
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 

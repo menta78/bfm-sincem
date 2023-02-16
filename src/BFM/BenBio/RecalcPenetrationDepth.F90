@@ -1,51 +1,42 @@
-#include "DEBUG.h"
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-! MODEL
-!	   BFM - Biogeochemical Flux Model 
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 !
-! FUNCTION
-!   RecalcPenetrationDepth.f90
-!
-! FILE
-!   RecalcPenetrationDepth.f90
+! ROUTINE: RecalcPenetrationDepth
 !
 ! DESCRIPTION
-!   
-!	Recompute the penetration depth of detritus to conserve mass
-!       in the lower layers. 
-!       The new thickness is calculated Newton's rule of approximation:
-!           x(i+1)=x(i)-f(x)/f'(x for f(x)==0
-!  
-! !INTERFACE
-    subroutine RecalcPenetrationDepth(D1m, Dxm, input, mass,newDxm )
-!
-! !AUTHORS
-!   Piet Ruardij   
-!
-! !USES:
-     use global_mem, ONLY:RLEN,ONE
-     use mem,ONLY:NO_BOXES_XY
-     IMPLICIT  NONE
-!
-! CHANGE_LOG
-!   
+!   Recompute the penetration depth of detritus to conserve mass
+!   in the lower layers. 
+!   The new thickness is calculated Newton's rule of approximation:
+!        x(i+1)=x(i)-f(x)/f'(x for f(x)==0
 !
 ! COPYING
-!   
-!   Copyright (C) 2020 BFM System Team (bfm_st@cmcc.it)
-!   Copyright (C) 2007 P. Ruardij, the BFM team
-!   (rua@nioz.nl, vichi@bo.ingv.it)
 !
-!   This program is free software; you can redistribute it and/or modify
+!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
+!
+!   This program is free software: you can redistribute it and/or modify
 !   it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation;
+!   the Free Software Foundation.
 !   This program is distributed in the hope that it will be useful,
 !   but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-!   GNU General Public License for more details.
-!
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU General Public License for more details.
 !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-!BOC
+!
+! INCLUDE
+#include "DEBUG.h"
+!  
+! INTERFACE
+    subroutine RecalcPenetrationDepth(D1m, Dxm, input, mass,newDxm )
+!
+! USES
+     use global_mem, ONLY:RLEN,ONE
+     use mem,ONLY:NO_BOXES_XY
+
+     IMPLICIT  NONE
+
+  ! INPUT
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
         real(RLEN),intent(IN)     :: D1m(NO_BOXES_XY)
         real(RLEN),intent(IN)     :: Dxm(NO_BOXES_XY)
         real(RLEN),intent(IN)     :: input(NO_BOXES_XY)
@@ -63,6 +54,7 @@
         real(RLEN)                :: c
         real(RLEN)                :: newalpha
         integer                   :: i
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=        
       
         do i = 1,NO_BOXES_XY ! loop over no. of grid points
            alpha=ONE/Dxm(i)
@@ -89,5 +81,7 @@
         return
 
     end subroutine  RecalcPenetrationDepth
-!EOC
-!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=        
+
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

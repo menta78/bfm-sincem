@@ -35,6 +35,7 @@
   use mem,  ONLY: ppG3c, ppG3h
 #endif
 #endif
+  use time,       only: GetDelta
 
 !  
 !
@@ -48,7 +49,7 @@
 !
 ! COPYING
 !   
-!   Copyright (C) 2020 BFM System Team (bfm_st@cmcc.it)
+!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
 !   Copyright (C) 2006 P. Ruardij, the mfstep group, the ERSEM team 
 !   (rua@nioz.nl, vichi@bo.ingv.it)
 !
@@ -73,13 +74,6 @@
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   ! Local Variables
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  ! user defined external functions
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-  real(RLEN), external  :: GetDelta
-  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-
 
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   ! Get actual time step for the calculation of the transient profile of &

@@ -1,21 +1,37 @@
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! ROUTINE: Read other external event data (instantaneous events)
+!
+! DESCRIPTION
+!   This routine reads values of model state variables at a certain
+!   moment in time and assign them to the STATE array
+!   (thus overriding any value computed during the integration)
+!   This routine is primarily meant for inoculation experiments.
+!   It now reads phytoplankton concentrations but the user needs
+!   to adapt the reading and assignements to its own need.
+!
+! COPYING
+!
+!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU General Public License for more details.
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! INCLUDE
 #include "cppdefs.h"
-!-----------------------------------------------------------------------
-!BOP
-!
-! !IROUTINE: Read other external event data (instantaneous events)
-!
-! !INTERFACE:
+
+! INTERFACE
    subroutine event_data
 !
-! !DESCRIPTION:
-!  This routine reads values of model state variables at a certain 
-!  moment in time and assign them to the STATE array
-!  (thus overriding any value computed during the integration)
-!  This routine is primarily meant for inoculation experiments. 
-!  It now reads phytoplankton concentrations but the user needs 
-!  to adapt the reading and assignements to its own need.
-!
-! !USES:
+! USES
    use global_mem, only: RLEN,ZERO
    use constants,  only: SEC_PER_DAY
    use mem
@@ -23,30 +39,12 @@
                          julian_day,calendar_date,dayofyear
    use envforcing
    use api_bfm
+
    IMPLICIT NONE
-!
-! !INPUT PARAMETERS:
-!
-! !REVISION HISTORY:
-!  Original author(s): Marcello Vichi
-!                      using functions from Karsten Bolding
-!
-!
-! COPYING
-!
-!   Copyright (C) 2020 BFM System Team (bfm_st@cmcc.it)
-!
-!   This program is free software; you can redistribute it and/or modify
-!   it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation;
-!   This program is distributed in the hope that it will be useful,
-!   but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-!   GNU General Public License for more details.
-!
-!EOP
-!
-! !LOCAL VARIABLES:
+
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  ! Local Variables
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
    ! The number of event variables is now equal to the number 
    ! of Phyto groups. Additional variables can be added
    integer,parameter         :: NOBS=iiPhytoPlankton
@@ -63,8 +61,7 @@
    real(RLEN),parameter      :: pc_ratio=0.7862e-3_RLEN
    real(RLEN),parameter      :: sc_ratio=0.0145_RLEN
    real(RLEN),parameter      :: lc_ratio=0.03_RLEN
-!-----------------------------------------------------------------------
-!BOC
+  !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
    if (use_event_data) then
 #ifdef DEBUG
@@ -93,11 +90,11 @@
          !  Assign the instantaneous value (ex. phytoplankton)
          do i=1,iiPhytoPlankton
             if (obs2(i) > ZERO) then
-               D3STATE(ppPhytoPlankton(i,iiC),:) = obs2(i) 
-               D3STATE(ppPhytoPlankton(i,iiN),:) = obs2(i) * nc_ratio
-               D3STATE(ppPhytoPlankton(i,iiP),:) = obs2(i) * pc_ratio
-               D3STATE(ppPhytoPlankton(i,iiS),:) = obs2(i) * sc_ratio
-               D3STATE(ppPhytoPlankton(i,iiL),:) = obs2(i) * lc_ratio
+               D3STATE(:,ppPhytoPlankton(i,iiC)) = obs2(i) 
+               D3STATE(:,ppPhytoPlankton(i,iiN)) = obs2(i) * nc_ratio
+               D3STATE(:,ppPhytoPlankton(i,iiP)) = obs2(i) * pc_ratio
+               D3STATE(:,ppPhytoPlankton(i,iiS)) = obs2(i) * sc_ratio
+               D3STATE(:,ppPhytoPlankton(i,iiL)) = obs2(i) * lc_ratio
             end if
          end do
       end if
@@ -105,6 +102,9 @@
    end if
 
   return
-   end subroutine event_data
-!EOC
 
+   end subroutine event_data
+
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
