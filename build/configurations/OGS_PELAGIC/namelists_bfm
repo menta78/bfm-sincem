@@ -49,9 +49,9 @@
    bfm_init     = 0
    bfm_rstctl   = .FALSE.
    bio_setup    = 1
-   out_fname    = 'BFM_standalone_pelagic'
+   out_fname    = 'BFM_ogs_pelagic'
    out_dir      = '.'
-   out_title    = 'BFM_STANDALONE_PELAGIC'
+   out_title    = 'BFM_OGS_PELAGIC'
    in_rst_fname = 'in_bfm_restart'
    out_delta    = 300  !every 30 days
    parallel_log = .TRUE.

@@ -61,6 +61,9 @@ jobs:
       run: |
           cd build/
           bash -e bfm_configure.sh -gcd -a gfortran.inc -p OGS_PELAGIC
+          cd ../run/ogs.pelagic
+          ./bfm_standalone.x
+          ncdump -h BFM_ogs_pelagic.nc
           
     - name: BFM_POM1D
       shell: bash
