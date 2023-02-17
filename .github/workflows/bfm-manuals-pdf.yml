@@ -1,0 +1,67 @@
+# Workflow to check standalone compilation and execution
+name: bfm-manuals-pdf
+
+# when activate
+on:
+  push:
+    paths:
+      - 'doc/**'
+      
+jobs:
+  #
+  bfm-manuals-pdf:
+
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # tasks
+    steps:
+
+    # checkout code in the workspace
+    - uses: actions/checkout@v1
+
+    # install additional packages
+    - name: Install packages
+      run: |
+        set -x
+        sudo apt-get update
+        sudo apt-get install -y texlive-base texlive-xetex latex-cjk-common latexmk lyx
+
+    - name: BFM
+      shell: bash
+      run: |
+        lyx --export pdf4 doc/manual/bfm-manual.lyx
+        cp doc/manual/bfm-manual.pdf .
+    
+    - name: BFM-NEMO
+      shell: bash
+      run: |
+        lyx --export pdf4 doc/nemo/bfm-nemo.lyx
+        cp doc/nemo/bfm-nemo.pdf .
+   
+    - name: BFM-POM
+      shell: bash
+      run: |
+        lyx -v --export pdf4 doc/pom/bfm-pom.lyx
+        cp doc/pom/bfm-pom.pdf .
+
+    - name: BFM-OGSTM
+      shell: bash
+      run: |
+        lyx --export pdf4 doc/ogstm/bfm-ogstm.lyx
+        cp doc/ogstm/bfm-ogstm.pdf .
+
+    # get PDF files
+    - name: 'Upload files'
+      uses: actions/upload-artifact@v3
+      with:
+          if-no-files-found: error
+          retention-days: 1
+          name: bfm-manuals-pdf
+          path: |
+               bfm-manual.pdf
+               bfm-nemo.pdf
+               bfm-pom.pdf
+               bfm-ogstm.pdf
+
+
