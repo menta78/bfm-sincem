@@ -342,7 +342,7 @@ Zavatarelli M., Pinardi N., Mussap G., Lovato T., Amadio C., Mentaschi L., Buten
  (2023).
  Coupling BFM with Ocean models: the 1D Princeton Ocean Model.
  BFM Report series N.
- 3, Release 1.1, June 2020, Bologna, Italy, http://bfm-community.eu, pp.
+ 3, Release 1.1, February 2023, Bologna, Italy, http://bfm-community.eu, pp.
  58
 \end_layout
 
@@ -537,7 +537,7 @@ name "subsec: POM-Governing-equations"
 
 \begin_layout Standard
 POM1D originates directly from a modification of the original three-dimensional
- model .
+ model.
  The model adopts the hydrostatic and the Boussinesq approximation.
  The one-dimensional primitive equations and the equations for the physical
  tracers, written only for the 
@@ -876,16 +876,8 @@ with
 \begin_inset Formula $\Phi_{\left(T,S\right)}$
 \end_inset
 
- are the terms that parameterize lateral advection of temperature and salinity
- (see sec.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:LatAdv"
-
-\end_inset
-
-) 
+ are the terms that parameterize lateral advection of temperature and salinity,
+ and 
 \begin_inset Formula $F_{\left(u,v,q,l,T,S\right)},$
 \end_inset
 
@@ -922,7 +914,7 @@ F_{l}=\frac{\partial}{\partial z}\left(\chi_{L}\frac{\partial q_{2}l}{\partial z
 \begin_layout Standard
 \begin_inset Formula 
 \begin{equation}
-F_{\left(T,S\right)}=\frac{\partial}{\partial z}\left[\chi_{\left(T,S\right)}\frac{\partial\left(T,S\right)}{\partial z}\right]\label{eq:mdiffT}
+F_{\left(T,S\right)}=\frac{\partial}{\partial z}\left[\chi_{\left(T,S\right)}\frac{\partial\left(T,S\right)}{\partial z}\right]\label{eq:mdiffTS}
 \end{equation}
 
 \end_inset
@@ -1528,7 +1520,8 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename Figures/Vertical_grid_odf.png
+	filename Figures/vertical_grid_odf.png
+	lyxscale 90
 
 \end_inset
 
@@ -2340,6 +2333,7 @@ status open
 \begin_inset Graphics
 	filename Figures/coupling_structure.png
 	lyxscale 30
+	scale 125
 
 \end_inset
 
@@ -2523,15 +2517,7 @@ For temperature and salinity the intermediate values
 \end_inset
 
  are given (for the prognostic mode only) by the forward in time integration
- of the lateral advective fluxes (sec.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:LatAdv"
-
-\end_inset
-
-).
+ of the lateral advective fluxes.
  The intermediate values are then given by:
 \begin_inset VSpace defskip
 \end_inset
@@ -2877,6 +2863,7 @@ status open
 \align center
 \begin_inset Graphics
 	filename Figures/coupling_source_splitting.png
+	scale 175
 
 \end_inset
 
@@ -2927,22 +2914,7 @@ name "chap:The-computer-code"
 \begin_layout Standard
 The BFM site repository allows for the download of the complete BFM-POM1D
  computer code.
- Installation and generation instruction of the 
-\begin_inset Quotes eld
-\end_inset
-
-root
-\begin_inset Quotes erd
-\end_inset
-
- directory instructions are provided in sec.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Installation"
-
-\end_inset
-
+ Installation and code generation instruction are provided in the BFM manual.
  In the following 
 \family typewriter
 $BFMDIR
@@ -2977,7 +2949,7 @@ $BFMDIR/src/pom/phys
 \family default
 ), and the soubroutines operating the coupling (
 \family typewriter
-$BFMdir/pom/coupling
+$BFMDIR/pom/coupling
 \family default
 ).
  An example of the namelists needed for the modeling system parameterisation
@@ -3376,7 +3348,7 @@ calcdepth.F90
 
 \family typewriter
 \size footnotesize
-DENS 
+DENS
 \end_layout
 
 \end_inset
@@ -3414,7 +3386,7 @@ dens.F90
 
 \family typewriter
 \size footnotesize
-pom_env_forcing_1d 
+pom_env_forcing_1d
 \end_layout
 
 \end_inset
@@ -4773,7 +4745,10 @@ reference "sec:pom_bfm_settings-namelist"
  and 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "namelist-pom_input"
+reference "sec:pom_bfm_settings-namelist"
+plural "false"
+caps "false"
+noprefix "false"
 
 \end_inset
 
@@ -6345,14 +6320,6 @@ integer(ilong) :: TRT, SRT
 \begin_inset Formula $\beta_{S}$
 \end_inset
 
- in eq.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "eq:LTS"
-
-\end_inset
-
 ).
 \end_layout
 
@@ -6367,14 +6334,6 @@ Relaxation times (
 
  and 
 \begin_inset Formula $\beta_{S}$
-\end_inset
-
- in eq.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "eq:LTS"
-
 \end_inset
 
 ).
@@ -6569,7 +6528,7 @@ REAL(RLEN) :: UMOLT,UMOLS,UMOLBFM
  in eq.
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "eq:mdiffT"
+reference "eq:mdiffTS"
 
 \end_inset
 
@@ -6581,7 +6540,10 @@ reference "eq:mdiffT"
  
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "eq:mdiffS"
+reference "eq:mdiffTS"
+plural "false"
+caps "false"
+noprefix "false"
 
 \end_inset
 
@@ -7129,7 +7091,7 @@ name "sec:moduleService"
 \begin_layout Standard
 This module (contained in the directory 
 \family typewriter
-$BFMdir/pom/coupling
+$BFMDIR/pom/coupling
 \family default
  with the filename 
 \family typewriter
@@ -9289,7 +9251,10 @@ pom_input
  
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "namelist-pom_input"
+reference "sec:pom_bfm_settings-namelist"
+plural "false"
+caps "false"
+noprefix "false"
 
 \end_inset
 
@@ -9393,7 +9358,10 @@ pom_input
  
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "namelist-pom_input"
+reference "sec:pom_bfm_settings-namelist"
+plural "false"
+caps "false"
+noprefix "false"
 
 \end_inset
 
@@ -9753,7 +9721,10 @@ namelist pom_input
  
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "namelist-pom_input"
+reference "sec:pom_bfm_settings-namelist"
+plural "false"
+caps "false"
+noprefix "false"
 
 \end_inset
 
@@ -9835,10 +9806,6 @@ definition contained in the
 open 
 \family default
 statement.
-\begin_inset VSpace defskip
-\end_inset
-
-
 \end_layout
 
 \begin_layout Subsection
@@ -10857,25 +10824,6 @@ literal "true"
 \end_layout
 
 \begin_layout Standard
-Such coarse and preliminary initialisation can be refined trough the use
- of 
-\family typewriter
-subroutine set_initial_conditions
-\family default
- (sec.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:Subroutine-set_initial_condition"
-
-\end_inset
-
-) that can be customized by the user in order to provide (via hardwiring
- or data file reading) an initial conditions set more consistent with the
- specific implementation that is being defined.
-\end_layout
-
-\begin_layout Standard
 The numerical integration method of choice for the BFM-POM1D system is the
  leapfrog scheme (see sec.
  
@@ -11197,10 +11145,6 @@ reference "tab:Array-to-array"
 \end_inset
 
 
-\begin_inset VSpace defskip
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
@@ -11308,8 +11252,6 @@ Potential Temperature
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family typewriter
 TB(k)
 \end_layout
 
@@ -11330,7 +11272,7 @@ ETW(k)
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $\textdegree C$
+\begin_inset Formula $°C$
 \end_inset
 
 
@@ -11353,8 +11295,6 @@ Salinity
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family typewriter
 SB(k)
 \end_layout
 
@@ -11398,16 +11338,12 @@ Density
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family typewriter
-[RHO(k)
-\family default
-
-\begin_inset Formula $\cdot10^{3}$
+[RHO(k)·
+\begin_inset Formula $10^{3}$
 \end_inset
 
 ]+
-\begin_inset Formula $rho0$
+\begin_inset Formula $\rho_{0}$
 \end_inset
 
 
@@ -11453,22 +11389,12 @@ Pressure
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family typewriter
-RHO(k)
-\family default
-
-\begin_inset Formula $\cdot g\cdot$
+RHO(k)·
+\begin_inset Formula $g$
 \end_inset
 
-
-\family typewriter
-ZZ(k)
-\begin_inset Formula $\cdot$
-\end_inset
-
-H
-\begin_inset Formula $\cdot10^{-5}$
+·ZZ(k)·H·
+\begin_inset Formula $10^{-5}$
 \end_inset
 
 
@@ -11515,8 +11441,6 @@ Inorg.
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family typewriter
 ISM(k)
 \end_layout
 
@@ -11560,15 +11484,11 @@ Radiance
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family typewriter
--SWRAD
-\family default
-
-\begin_inset Formula $\cdot\left(\rho_{0}\cdot Cp\right)$
+-SWRAD·(
+\begin_inset Formula $\rho_{0}\cdot C_{p}$
 \end_inset
 
-
+)
 \end_layout
 
 \end_inset
@@ -11611,8 +11531,6 @@ Wind velocity
 \begin_inset Text
 
 \begin_layout Plain Layout
-
-\family typewriter
 [(WUSURF
 \begin_inset Formula $^{2}$
 \end_inset
@@ -11622,14 +11540,14 @@ Wind velocity
 \end_inset
 
 )
-\begin_inset Formula $^{0.5}/$
+\begin_inset Formula $^{0.5}$
 \end_inset
 
-
-\begin_inset Formula $(\rho_{a}\cdot C_{d})$
+/(
+\begin_inset Formula $\rho_{a}\cdot C_{d}$
 \end_inset
 
-]
+)]
 \begin_inset Formula $^{0.5}$
 \end_inset
 
@@ -11676,19 +11594,11 @@ Bottom Stress
 \begin_inset Text
 
 \begin_layout Plain Layout
-(
-\family typewriter
-WUBOT
-\family default
-
+(WUBOT
 \begin_inset Formula $^{2}$
 \end_inset
 
-+
-\family typewriter
-WVBOT
-\family default
-
++WVBOT
 \begin_inset Formula $^{2}$
 \end_inset
 
@@ -11747,15 +11657,11 @@ name "tab:Array-to-array"
 
 \end_inset
 
- 
+
 \end_layout
 
 \end_inset
 
-
-\end_layout
-
-\begin_layout Plain Layout
 
 \end_layout
 
@@ -13204,17 +13110,6 @@ name "tab:JWtypes"
 
 \end_layout
 
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset VSpace defskip
 \end_inset
 
 
@@ -15228,7 +15123,10 @@ subroutine
  
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:get_init_TS_IC"
+reference "subsec:get-TS-IC"
+plural "false"
+caps "false"
+noprefix "false"
 
 \end_inset
 
@@ -15638,10 +15536,6 @@ name "fig:BFM-POM1D-Trieste"
 
 \end_inset
 
-
-\end_layout
-
-\begin_layout Standard
 
 \end_layout
 
