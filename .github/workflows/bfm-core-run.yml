@@ -1,8 +1,12 @@
 # Workflow to check standalone compilation and execution
 name : bfm-core-run
 
-on: [workflow_dispatch]
-
+on: 
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      
 jobs:
   #
   bfm-core-run :
