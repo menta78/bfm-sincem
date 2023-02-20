@@ -3,6 +3,7 @@ name: bfm-manuals-pdf
 
 # when activate
 on:
+  workflow_dispatch:
   push:
     paths:
       - 'doc/**'
