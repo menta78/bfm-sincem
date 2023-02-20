@@ -35,7 +35,7 @@
 !
 ! COPYING
 !   
-!   Copyright (C) 2022 BFM System Team (bfm_st@cmcc.it)
+!   Copyright (C) 2023 BFM System Team (bfm_st@cmcc.it)
 !   Copyright (C) 2006 P. Ruardij 
 !   (rua@nioz.nl, vichi@bo.ingv.it)
 !
