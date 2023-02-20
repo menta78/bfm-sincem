@@ -1,0 +1,82 @@
+# Workflow to check standalone compilation and execution
+name : bfm-core-run
+
+on: 
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
+      
+jobs:
+  #
+  bfm-core-run :
+
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # location of NetCDF libraries
+    env:
+        NC_LIB : /usr/lib/x86_64-linux-gnu
+        NC_INC : /usr
+
+    # tasks
+    steps:
+
+    # checkout code in the workspace
+    - uses: actions/checkout@v1
+
+    # install additional packages
+    - name: Install packages
+      run: |
+        set -x
+        sudo apt-get update
+        sudo apt-get install gfortran netcdf-bin libnetcdf-dev libnetcdff-dev
+
+    # TESTS
+    - name: Environment settings
+      shell: bash
+      run: |
+          gfortran --version
+          nc-config --version
+          cat include/version.h | cut -d '"' -f2 | cut -d 'y' -f2
+          export BFMDIR=${GITHUB_WORKSPACE}
+          cp .github/workflows/gfortran-ci.inc compilers/gfortran.inc
+
+    - name: STANDALONE
+      shell: bash
+      run: |
+          cd build/
+          bash -e bfm_configure.sh -gcd -p STANDALONE
+          cd ../run/standalone
+          ./bfm_standalone.x
+          ncdump -h BFM_standalone.nc
+
+    - name: STANDALONE_SEAICE
+      shell: bash
+      run: |
+          cd build/
+          bash -e bfm_configure.sh -gcd -p STANDALONE_SEAICE
+          cd ../run/standalone.seaice
+          ./bfm_standalone.x
+          ncdump -h BFM_standalone_seaice.nc
+          
+    - name: OGS_PELAGIC
+      shell: bash
+      run: |
+          cd build/
+          bash -e bfm_configure.sh -gcd -a gfortran.inc -p OGS_PELAGIC
+          cd ../run/ogs.pelagic
+          ./bfm_standalone.x
+          ncdump -h BFM_ogs_pelagic.nc
+          
+    - name: BFM_POM1D
+      shell: bash
+      run: |
+          cd build/
+          bash -e bfm_configure.sh -gcd -p BFM_POM1D
+          cd ../run/bfm_pom1d
+          sed -i 's/3600/360/' pom_bfm_settings.nml # 1-year long test
+          ./bfm_pom.exe
+          ncdump -h BFM_POM_MA21.nc
