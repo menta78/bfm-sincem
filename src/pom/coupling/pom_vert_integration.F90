@@ -77,8 +77,7 @@
 !
      use constants, ONLY: SEC_PER_DAY
 !
-     use mem_Param, ONLY: AssignAirPelFluxesInBFMFlag,                    &
-                          AssignPelBenFluxesInBFMFlag,p_small
+     use mem_Param, ONLY: p_small, AssignPelBenFluxesInBFMFlag
 !
      use mem_PelSinkSet
 !
@@ -129,7 +128,7 @@
 !
 !-----SEDIMENTATION VELOCITY-----
 !
- real(RLEN)               :: sink(KB)
+ real(RLEN)               :: sink(KB), W(KB)
 !
 !-----TWICE THE TIME STEP-----
 !
@@ -353,6 +352,7 @@
                        sink(kb) = sink(kb-1)
 !
         end if
+
 !
 !                 -----SINKING: UPSTREAM VERTICAL ADVECTION-----
 !
@@ -367,19 +367,21 @@
 !                 *******************************************************
 !                 *******************************************************
 !
+
+                  W = sink * SEDI_FACTOR(MONTH_OF_SIMULATION)
                   IF (USE_W_PROFILE) THEN
-                     sink = sink + W_PROFILE
+                     W = sink + W_PROFILE
                   END IF
                   IF (AssignPelBenFluxesInBFMFlag) THEN
                      ! the fluxes at the bottom are already accounted for in D3SOURCE and D2SOURCE_BEN
                      botflux = 0
-                     sink(KB-1:) = 0
+                     W(KB:) = 0
                   END IF
-                  call adverte(fbio,advtnd,sink) ! computing the advection tendency on the central time step
-!
-!                 -----SOURCE SPLITTING LEAPFROG INTEGRATION-----
-!
+                  CALL VERT_ADV_UPWIND_SCHEME(FBIO, W, DZ, KB, H, ADVTND) ! computing the advection tendency on the central time step
 
+!
+!                 ----- GETTING THE LATERAL RELAXATION COEFF.
+!
                   SELECT CASE (m)
                      CASE (ppN1p)
                         LAMBDA = L_PO4(MONTH_OF_SIMULATION)
@@ -431,133 +433,5 @@
 
    enddo ! loop over NO_D3_BOX_STATES
 !
-      end subroutine vert_integration
-!
-!<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><
-!
-! !ROUTINE: adverte
-!
-! **************************************************************
-! **************************************************************
-! **                                                          **
-! ** ONE-DIMENSIONAL BFM-POM  MODELING SYSTEM (BFM-POM1D)     **
-! **                                                          **
-! ** The modeling system originate from the direct on-line    **
-! ** coupling of the 1D Version of the Princeton Ocean model  **
-! ** "POM" and the Biogeochemical Flux Model "BFM".           **
-! **                                                          **
-! ** The whole modelling system and its documentation are     **
-! ** available for download from the BFM web site:            **
-! **                                                          **
-! **                  bfm-community.eu                        **
-! **                                                          **
-! ** For questions and/or information please address to the   **
-! ** BFM system team:                                         **
-! **                                                          **
-! **                 (bfm_st@lists.cmcc.it)                   **
-! **                                                          **
-! ** Version 1.0 2016                                         **
-! **                                                          **
-! ** This release has been finalised by Marco Zavatarelli,    **
-! ** Giulia Mussap and Nadia Pinardi. However, previous       **
-! ** significant contributions were provided also by          **
-! ** Momme Butenschoen and Marcello Vichi.                    **
-! ** Thanks are due to Prof. George L. Mellor that allowed us **
-! ** to modify, use and distribute the one dimensional        **
-! ** version of the Princeton Ocean Model.                    **
-! **                                                          **
-! **                            Marco.Zavatarelli@unibo.it    **
-! **                                                          **
-! ** This program is free software; you can redistribute it   **
-! ** and/or modify it under the terms of the GNU General      **
-! ** Public License as published by the Free Software         **
-! ** Foundation.                                              **
-! ** This program is distributed in the hope that it will be  **
-! ** useful,but WITHOUT ANY WARRANTY; without even the        **
-! ** implied warranty of  MERCHANTEABILITY or FITNESS FOR A   **
-! ** PARTICULAR PURPOSE.  See the GNU General Public License  **
-! ** for more details.                                        **
-! ** A copy of the GNU General Public License is available at **
-! ** http://www.gnu.org/copyleft/gpl.html or by writing to    **
-! ** the Free Software Foundation, Inc. 59 Temple Place,      **
-! ** Suite 330, Boston, MA 02111, USA.                        **
-! **                                                          **
-! **************************************************************
-! **************************************************************
-!
-! !INTERFACE
-!
-  SUBROUTINE adverte(F,ADVTND,W)
-!
-!DESCRIPTION
-!
-!    SUBROUTINE TO HANDLE THE SINKING OF BFM STATE VAR'S.
-!    SINKING IS TREATED AS DOWNWARD VERTICAL ADVECTION
-!    COMPUTED WITH UPSTREAM FINITE DIFFERENCES SCHEME.
-!
-!    THE DUMMY ARGUMENTS ARE:
-!    F:     ISTANTANEOUS STATE VARIABLE
-!    FDWDT: VERTICAL ADVECTION (SINKING) FLUX
-!    W:     SINKING VELOCITY (<0)
-!
-!*******************************************************************************
-!
-!     -----MODULES (USE OF ONLY IS STRONGLY ENCOURAGED)-----
-!
-      use POM, ONLY:KB, DZR, DZ, DZZ, H
-      use CPL_VARIABLES
-!
-      use global_mem, ONLY:RLEN
-!
-!    -----IMPLICIT TYPING IS NEVER ALLOWED----
-!
-     IMPLICIT NONE
+end subroutine vert_integration
 
-     real(RLEN) :: F(KB),ADVTND(KB)
-     real(RLEN) :: W(KB)
-     real(RLEN) :: DTI2, GRDFTRM, GRDWTRM
-     integer :: k
-!
-     !
-     ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=
-     ! Calculate vertical advection. Mind downward velocities are negative!
-     ! Upwind scheme:
-     ! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=
-     !
-     F(KB)=F(KB-1) ! there are KB-1 boxes, F(KB) set in order to have a 0-gradient at the bottom
-     SELECT CASE (VERT_ADV)
-         CASE (VERT_ADV_SINKING_UPWIND)
-             ADVTND(1)=DZR(1)/H*F(1)*W(2)
-             do K=2,KB-1
-                ADVTND(K)=DZR(K)/H*(F(K)*W(K+1)-F(K-1)*W(K))
-             end do
-         CASE DEFAULT !(VERT_ADV_CENTERED)
-          !  ! centered scheme: Gordon & Stern 1982
-             !   --- W(K-1)   ---
-             !    |            |
-             !    |  F(K-1)    |  H*DZ(K-1) ---
-             !    |            |             |
-             !   --- W(K)     ---            |  H*DZZ(K-1)
-             !    |            |             |
-             !    |  F(K)      |  H*DZ(K)   ---
-             !    |            |             |
-             !   --- W(K+1)   ---            |  H*DZZ(K)
-             !                               |
-             !                              ---
-          !  de F/de t = - grad(W*F) = - W*grad(F) - F*grad(W)
-             GRDFTRM = 0.5*(H*DZZ(1)) * W(2) * (F(2)-F(1))
-             GRDWTRM = F(1) * 0.5*W(2)/(H*DZ(1))
-             ADVTND(1) = GRDFTRM + GRDWTRM
-             do K=2,KB-1
-                GRDFTRM = 0.5/H*( W(K)*(F(K)-F(K-1))/DZZ(K-1) + W(K+1)*(F(K+1)-F(K))/DZZ(K) )
-                GRDWTRM = F(K) * (W(K+1) - W(K)) / (H*DZ(K))
-                ADVTND(K) = GRDFTRM + GRDWTRM
-             end do
-         END SELECT
-         ! there are only KB-1 reactors
-         ADVTND(KB) = 0
-!
-      return
-!
-    end subroutine adverte 
-!

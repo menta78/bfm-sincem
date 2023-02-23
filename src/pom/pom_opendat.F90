@@ -83,9 +83,10 @@
                         heat_input,     & ! Time varying (monthly) surface heat flux
                         surfNut_input,  & ! Time varying (monthly) surface nutrient
                         ism_input,      & ! Inorganic suspended matter Initial Conditions
-                        VERT_ADV,       & ! scheme for vertical advection: 0: sinking upwind, 1: centered. Default: 1
+                        BENT_INT_SCHEME,& ! scheme for benthic time integration: 0: leapfrog, 1: euler-forward. Default: 0
                         USE_KH_EXT,     & ! true if KH is loaded from an external source
                         KH_FACTOR,      & ! scaling factor for KH_EXT
+                        SEDI_FACTOR,    & ! adjustment factor of sedimentation in vertical advection
                         USE_W_PROFILE,  &
                         NUTSBC_MODE,    & ! NUTRIENT SURFACE BOUNDARY CONDITIONS: 0 (default): concentrations. 1: fluxes
                         L_PO4,          &
@@ -138,6 +139,7 @@
                           surfNut_input,  &
                           NUTSBC_MODE,    &
                           KH_FACTOR,      &
+                          SEDI_FACTOR,    &
                           L_PO4,          &
                           L_NO3,          &
                           L_SIO4,         &
@@ -148,7 +150,6 @@
                           ASURF_NH4,      &
                           ASURF_SIO4,     &
                           SWR_FILE_STEP,  &
-                          VERT_ADV,       &
                           read_restart
 !
      open(namlst,file='pom_bfm_settings.nml',status='old',action='read',err=100)

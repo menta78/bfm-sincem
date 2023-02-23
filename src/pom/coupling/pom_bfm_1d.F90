@@ -115,12 +115,9 @@
 !      *******************************************************************
 !      *******************************************************************
 !
-       call vert_integration
+       call VERT_INTEGRATION
 !
-!      -----INTEGRATION OF SCALAR (BENTHIC) BFM STATE VAR'S WITH LEAPFROG SCHEME----
-!
-!
-       call SCHEME_BENTHIC_LF1D
+       call BENTHIC_TIME_INTEGRATION
 !
 !
 !      -----DEFINE AND UPDATE TIME FOR OUTPUT WRITING-----

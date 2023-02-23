@@ -69,7 +69,7 @@
   !   Therefore division by the light_period!
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-          EIR(1) = EIR(1)*p_PAR/ E2W
+   EIR(1) = EIR(1)*p_PAR / E2W ! computation of surface PAR, expressed in uE
 
    do BoxNumberZ=2,NO_BOXES_Z
 

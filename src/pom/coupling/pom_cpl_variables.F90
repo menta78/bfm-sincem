@@ -97,6 +97,7 @@
 !     ----- relaxation coefficients for: PO4, NO3, SiO4, O2, anything else
 !
       INTEGER, PARAMETER                :: N_MONTHS = 12
+      real(RLEN), DIMENSION(N_MONTHS)   :: SEDI_FACTOR = 1
       real(RLEN), DIMENSION(N_MONTHS)   :: L_PO4=0, L_NO3=0, L_SIO4=0, L_O2=0, L_X=0
 !
 !     -----NUTRIENT SURFACE BOUNDARY CONDITIONS MODE:
@@ -105,7 +106,7 @@
 !
       INTEGER                  :: NUTSBC_MODE=0
 !     -----SCALING FACTOR FOR SURFACE FLUXES IF NUTSBC_MODE == 1
-      real(RLEN)                        :: ASURF_PO4=1, ASURF_NO3=1, ASURF_NH4=1, ASURF_SIO4=1
+      real(RLEN)               :: ASURF_PO4=1, ASURF_NO3=1, ASURF_NH4=1, ASURF_SIO4=1
 !
 !     ! short wave radiation stepping: if 1 shortwave radiation is loaded hourly if 0 monthly
 !
@@ -134,13 +135,11 @@
                                            read_restart
 
 !
-!     ---- FLAGS FOR VERTICAL ADVECTION SCHEME:
-!          0: UPWIND SCHEME FOR SINING POM, NO POSITIVE VELOCITY
-!          1: CENTERED SCHEME: GORDON & STERN 1982
+!     ---- FLAGS FOR BENTHIC TIME INTEGRATION:
+!          0: LEAP-FROG (DEFAULT)
+!          1: EULER-FORWARD
+      INTEGER                 :: BENT_INT_SCHEME = 0
 !
-      INTEGER, PARAMETER      :: VERT_ADV_SINKING_UPWIND = 0
-      INTEGER, PARAMETER      :: VERT_ADV_CENTERED = 1
-      INTEGER                 :: VERT_ADV = VERT_ADV_SINKING_UPWIND
 !
  end module CPL_VARIABLES
 !
