@@ -18,7 +18,6 @@ MODULE trcini_my_trc
    USE par_my_trc
    USE trcnam_my_trc     ! MY_TRC SMS namelist
    USE lib_fortran,    ONLY: glob_sum
-   USE iom,        ONLY: iom_open,iom_get,iom_close
    USE sbcapr,     ONLY: apr
    USE trcopt,     ONLY: trc_opt_alloc, trc_opt_ini, parlux
    !! BFM
@@ -26,7 +25,7 @@ MODULE trcini_my_trc
    USE mem_param,  ONLY: p_atm0
    USE mem,        ONLY: D3STATE, NO_D3_BOX_STATES, D2STATE_BEN, NO_D2_BOX_STATES_BEN, iiPhytoPlankton
    USE mem_PAR,    ONLY: p_PAR, ChlAttenFlag, LightLocationFlag
-   USE global_mem, ONLY: RLEN, ZERO, LOGUNIT, bfm_lwp
+   USE global_mem, ONLY: RLEN, ONE, ZERO, LOGUNIT, bfm_lwp
    USE api_bfm,    ONLY: bfm_init, in_rst_fname, InitVar, var_names, stBenStateS
    USE mem_globalfun, ONLY: analytical_ic
    USE init_var_bfm_local, ONLY: ini_organic_quotas
@@ -63,8 +62,7 @@ CONTAINS
       !! ** Method  : - Read the namcfc namelist and check the parameter values
       !!----------------------------------------------------------------------
       INTEGER, INTENT(in) ::   Kmm  ! time level indices
-      INTEGER :: ji, jj, jk, jn, jt, numfld, ierr
-      REAL(RLEN) :: ztraf, zexp, zdexp
+      INTEGER :: ji, jj, jk, jn, jt
       !
       IF( ln_timing )   CALL timing_start('trc_ini_my_trc')
       !
@@ -202,29 +200,9 @@ CONTAINS
       ENDIF 
 
 #ifdef INCLUDE_PELFE
-      ! Iron supply from sediments (see Aumont & Bopp, 2005)
+      ! Prescribe iron release from seabed sediments
       !-------------------------------------------------------
-      ALLOCATE (fesed(jpi,jpj,jpk))
-      fesed = ZERO
-      IF ( p_rN7fsed > 0. ) THEN
-         CALL iom_open ( TRIM( "bottom_fraction.nc" ), numfld )
-         CALL iom_get  ( numfld, 1, TRIM( "btmfrac" ), fesed(:,:,:), 1 )
-         CALL iom_close( numfld )
-         ! iron release dependence on depth (metamodel of Middelburg et al.,1996)
-         DO_3D( nn_hls, nn_hls, nn_hls, nn_hls, 1, jpk )
-              zexp  = MIN( 8.,( gdept(ji,jj,jk,Kmm) / 500. )**(-1.5) )
-              zdexp = -0.9543 + 0.7662 * LOG( zexp ) - 0.235 * LOG( zexp )**2
-              fesed(ji,jj,jk) = fesed(ji,jj,jk) * MIN( 1., EXP( zdexp ) / 0.5 )
-         END_3D
-         ! total supply (TODO this is killing execution .. need to check)
-         ztraf = glob_sum('fesed', fesed * spread(e1e2t,3,jpk) * p_rN7fsed * 365. * 1.e-15 * tmask )
-         LEVEL1 ''
-         LEVEL1 'trc_ini_my_trc: Read fraction mask from bottom_fraction.nc (varname: btmfrac)'
-         LEVEL1 '  Constant Iron flux from sediments: ', p_rN7fsed
-         LEVEL1 '  Total iron load from Sediment [Gmol/y] : ', ztraf
-         ! Iron flux into pelagic (umolFe/m2/d to umolFe/m3/s)
-         fesed = fesed * p_rN7fsed / ( SEC_PER_DAY * e3t_0(:,:,:) )
-      ENDIF
+      CALL seabed_iron_release
 #endif
       !
       IF (bfm_lwp) THEN
@@ -308,6 +286,59 @@ CONTAINS
 9000  FORMAT(' STAT tracer nb :',i2,'    name :',a10,'    mean :',e18.10,'    min :',e18.10, '    max :',e18.10)
 
    END SUBROUTINE log_bgc_stats
+
+
+   SUBROUTINE seabed_iron_release()
+      !!----------------------------------------------------------------------
+      !!                 ***  seabed_iron_release  ***
+      !!
+      !! ** Purpose : Prescribe the iron release from the seabed sediments
+      !!
+      !! ** Method  : create source array (fesed) with constant rate (p_rN7fsed) 
+      !!            - constant relase at each bottom cell
+      !!            - use depth varying mask as in Aumont & Bopp (2006)
+      !!----------------------------------------------------------------------
+      USE iom,        ONLY: iom_open,iom_get,iom_close
+      USE par_my_trc, ONLY: bottom_level
+      !
+      INTEGER    :: ji, jj, jk, numfld
+      REAL(RLEN) :: ztraf, zexp, zdexp
+      LOGICAL    :: exists
+      !!----------------------------------------------------------------------
+
+      ALLOCATE (fesed(jpi,jpj,jpk))
+      fesed = ZERO
+      IF ( p_rN7fsed > 0. ) THEN
+         LEVEL1 ''
+         ! check if the mask file exists or create one only for bottom gridcells
+         INQUIRE(FILE="bottom_fraction.nc", EXIST=exists)
+         if ( exists ) then
+            LEVEL1 'trc_ini_my_trc: Read fraction mask from bottom_fraction.nc (varname: btmfrac)'
+            CALL iom_open ( TRIM( "bottom_fraction.nc" ), numfld )
+            CALL iom_get  ( numfld, 1, TRIM( "btmfrac" ), fesed(:,:,:), 1 )
+            CALL iom_close( numfld )
+         ELSE
+            LEVEL1 'trc_ini_my_trc: apply input to seabottom gridcells'
+            DO_2D( nn_hls, nn_hls, nn_hls, nn_hls)
+                 jk = bottom_level(ji,jj)
+                 fesed(ji,jj,jk) = ONE
+            END_2D
+         ENDIF
+         ! iron release dependence on depth (metamodel of Middelburg et al.,1996)
+         DO_3D( nn_hls, nn_hls, nn_hls, nn_hls, 1, jpk )
+              zexp  = MIN( 8.,( gdept(ji,jj,jk,Kmm) / 500. )**(-1.5) )
+              zdexp = -0.9543 + 0.7662 * LOG( zexp ) - 0.235 * LOG( zexp )**2
+              fesed(ji,jj,jk) = fesed(ji,jj,jk) * MIN( 1., EXP( zdexp ) / 0.5 )
+         END_3D
+         ! total supply (TODO check why this is killing intialization time)
+         ztraf = glob_sum('fesed', fesed * spread(e1e2t,3,jpk) * p_rN7fsed * 365. * 1.e-15 * tmask )
+         LEVEL1 '  Constant Iron flux from sediments: ', p_rN7fsed
+         LEVEL1 '  Total iron load from Sediment [Gmol/y] : ', ztraf
+         ! Iron flux into pelagic (umolFe/m2/d to umolFe/m3/s)
+         fesed = fesed * p_rN7fsed / ( SEC_PER_DAY * e3t_0(:,:,:) )
+      ENDIF
+
+   END SUBROUTINE seabed_iron_release
 
 
    !!======================================================================
