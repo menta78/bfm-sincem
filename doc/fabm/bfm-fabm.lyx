@@ -1,0 +1,1205 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass scrbook
+\begin_preamble
+\usepackage{listings}
+
+\usepackage{a4wide}
+\usepackage{balance}
+
+\newcommand{\NSP}{\! \! \! \! \! \! \! \! }
+\newcommand{\BNSP}{\NSP \NSP \NSP \NSP}
+\newcommand{\DS}{\displaystyle}
+\newcommand{\CL}{\centerline}
+
+\usepackage{float}
+\floatname{algorithm}{Equation Box}
+%\renewcommand{\listofalgorithms}{ 
+ % \begingroup 
+  %  \listof{algorithm}{List of Equation Boxes} 
+ % \endgroup 
+%}
+
+
+\date{}
+% HEADERS
+%\usepackage{fancyhdr}
+%\lhead{\small{bfm-community.eu}}
+%\rhead{\small{all rights reserved}} 
+
+\usepackage{alltt}              %%  alltt for namelist
+\usepackage{verbatim}   %%  alltt for namelist
+% namelists
+\newcommand{\NML} [1] {
+\begin{alltt}
+{\tiny \verbatiminput{./Namelists/#1.nml}}
+\end{alltt}
+  \vspace{-10pt}
+}
+\end_preamble
+\use_default_options true
+\begin_modules
+eqs-within-sections
+\end_modules
+\maintain_unincluded_children false
+\language american
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "times" "default"
+\font_sans "helvet" "default"
+\font_typewriter "courier" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize a4paper
+\use_geometry true
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 0
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine natbib
+\cite_engine_type authoryear
+\biblio_style plainnat
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date true
+\justification true
+\use_refstyle 0
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\leftmargin 3cm
+\topmargin 3cm
+\rightmargin 3cm
+\bottommargin 3cm
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 2
+\papersides 2
+\paperpagestyle headings
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+onecolumn 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{titlepage}
+\end_layout
+
+\end_inset
+
+
+\begin_inset Separator latexpar
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename ../logos/BFM-Consortium_members.png
+	lyxscale 15
+	scale 40
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+\align center
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0cm"
+width "15cm"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace 1cm
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+
+\size giant
+Coupling BFM with FABM:
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace 1cm
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+
+\series bold
+\emph on
+Eva Álvarez, Anna Teruzzi, Paolo Lazzari, Gianpiero Cossarini, Jorn Bruggeman
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace 1cm
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+Release 1.0, April 2023
+\begin_inset Newline newline
+\end_inset
+
+—– BFM Report series N.
+ ? —–
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+http://bfm-community.eu
+\emph on
+
+\begin_inset Newline newline
+\end_inset
+
+bfm_st@cmcc.it
+\end_layout
+
+\begin_layout Standard
+\noindent
+\align center
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0cm"
+width "15cm"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace 4cm
+\end_inset
+
+
+\begin_inset space \hspace{}
+\length 8cm
+\end_inset
+
+
+\begin_inset Graphics
+	filename ../logos/BFM_Full_logo.png
+	lyxscale 40
+	width 50text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{titlepage}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage clearpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Quote
+This document should be cited as:
+\begin_inset Newline newline
+\end_inset
+
+
+\series bold
+\emph on
+Álvarez, E., Teruzzi, A., Lazzari, P.
+ , Cossarini, G., Bruggeman
+\series default
+\emph default
+, 
+\series bold
+\emph on
+J.
+
+\series default
+\emph default
+ (2023) Coupling BFM with FABM; BFM Report series N.
+ ? April 2023, Trieste, Italy, http://bfm-community.eu
+\end_layout
+
+\begin_layout Address
+
+\size footnotesize
+\begin_inset VSpace 13cm
+\end_inset
+
+Copyright 2022, The BFM System Team.
+ This work is licensed under the Creative Commons Attribution-Noncommercial-No
+ Derivative Works 2.5 License.
+ To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-
+nd/2.5/ or send a letter to Creative Commons, 171 Second Street, Suite 300,
+ San Francisco, California, 94105, USA.
+
+\size default
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage clearpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset toc
+LatexCommand tableofcontents
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Chapter
+Introduction
+\end_layout
+
+\begin_layout Standard
+The open source, Fortran-based Framework for Aquatic Biogeochemical Models
+ (FABM, Bruggeman and Bolding, 2014) provides a coupling layer that enables
+ flexible coupling of ecosystem processes with GOTM and other physical drivers.
+ FABM enables the development of complex BGC models in the form of stand-alone,
+ process-specific modules.
+ These are combined at runtime through coupling links to form a customised
+ BGC/ecosystem model.
+ At each simulation time step, the BGC equations are applied to each layer
+ and the rates of sink and source terms at the current time and space are
+ calculated using local variables (e.g., light, temperature, and concentrations
+ of state variables) provided by GOTM.
+ The rates are passed through FABM to the hydrodynamic model, which performs
+ numerical integration of BGC processes and transport of BGC substances
+ (e.g., nutrients, dissolved and particulate organic matter) between layers.
+ The updated states are then fed back to the BGC model via FABM.
+ 
+\end_layout
+
+\begin_layout Standard
+The development of BFM for FABM was based on a modular approach.
+ In particular, different subroutines and FABM models are associated with
+ the different functional plankton species (PFTs, e.g., phytoplankton, zooplankton
+) and chemical processes (e.g., light, denitrification) included in the ecosystem
+ model.
+ Since the models in FABM are classified by reference institutes, a new
+ folder named OGS was created to contain the BFM code adapted for FABM.
+ In FABM, each modular component is defined per se as a model.
+ The models we included in the framework are ogs/Phyto, ogs/PelBac, ogs/MicroZoo
+, ogs/MesoZoo, ogs/PelChem, ogs/CalciteDissolution, ogs/PelOxygen, ogs/PelagicCS
+YS,.
+ These modules map the one present in BFM Pel folder.
+ The additional general routines ogs/bfm_pelagic_base and shared.F90.
+ To manage the extended code for many channels, a set of Python scripts
+ was developed to create diagnostic variables for any number of channels,
+ see AUX _SCRIPTS folder.
+ The relationships between the modular components (FABM models) are defined
+ in the fabm.yaml file.
+ Therefore, a special fabm.yaml file for BFM was configured to run the model
+ with 4 phytoplankton groups, 1 heterotrophic bacteria, 2 microzooplankton
+ groups, and 2 mesozooplankton groups.
+ The fabm.yaml file contains both the information of the layout and namelist
+ contained in the presets of the standard BFM code.
+\end_layout
+
+\begin_layout Standard
+The new biogeochemical model FABM reproducing BFM was developed starting
+ from the original style and structure of the official BFM code.
+ The version of BFM coupled with FABM is the one described in (Álvarez et
+ al.,2023; Cossarini et al., 2015; Lazzari et al., 2021, 2016, 2012).
+ The coding work related to the standard BFM version was mainly related
+ to the inherent structure required by FABM (e.g.
+ header, initialize, do, do_surface structure of each model).
+ We started to include the type extension header based on type_ogs_bfm_pelagic_b
+ase defined in ogs/bfm_pelagic_base.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Tabular
+<lyxtabular version="3" rows="9" columns="3">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Models
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Module name
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\series bold
+Type extension
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Phyto.F90
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+bfm_Phyto
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+type_ogs_bfm_primary_producer
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+PelBac.F90
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+bfm_PelBac
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+type_ogs_bfm_pelagic_bacteria
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+MicroZoo.F90
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+bfm_MicroZoo
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+type_ogs_bfm_microzoo
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+MesoZoo.F90
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+bfm_Mesozoo
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+type_ogs_bfm_mesozoo
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+PelChem.F90
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+bfm_PelChem
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+type_ogs_bfm_PelChem
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+CalciteDissolution.F90
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+bfm_CalciteDissolution
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+type_ogs_bfm_CalciteDissolution
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+PelOxygen.F90
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+bfm_PelOxygen
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+type_ogs_bfm_PelOxygen
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+PelagicCSYS.F90
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+bfm_PelagicCSYS
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+type_ogs_bfm_PelagicCSYS
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+New BFM biogeochemical model units introduced in the FABM folder
+\begin_inset CommandInset label
+LatexCommand label
+name "tab:FABM-BFM"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We specified for each model, ,reported in Tab.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "tab:FABM-BFM"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, the relevant entries of the type extension sections based on BFM variables,
+ parameters and diagnostics:
+\end_layout
+
+\begin_layout Enumerate
+identification of state variables of other models required;
+\end_layout
+
+\begin_layout Enumerate
+environmental dependencies;
+\end_layout
+
+\begin_layout Enumerate
+identifiers of diagnostic variables;
+\end_layout
+
+\begin_layout Enumerate
+parameters (described in subroutine initialize, below).
+\end_layout
+
+\begin_layout Standard
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In the module initialize procedure we included all the parameters using
+ the same formalism of BFM (i.e., parameters have prefix “p_”).
+ We set up the register state variables by adding the specific constituents
+ for each model (e.g.: for phytoplankton carbon ‘c’, nitrogen ‘n’, phosphorus
+ ‘p’, chlorophyll ‘chl’ and silicon ‘s’).
+ Moreover, we included a diagnostic variable for each biogeochemical process
+ to be able to check if the FABM-BFM prototype was consistent with respect
+ to the official BFM version.
+ In the do procedure we replicated the structure of BFM (i.e., the original
+ code opportunely adapted and comments are included) and we set a diagnostic
+ for each process included.
+ 
+\end_layout
+
+\begin_layout Standard
+Few changes with respect to the original BFM structure have been included:
+ 
+\end_layout
+
+\begin_layout Enumerate
+nutrient stress sinking process in phytoplankton was added to the Phyto
+ model through two specific functions get_sinking_rate and get_vertical_movement
+; 
+\end_layout
+
+\begin_layout Enumerate
+the terms of alkalinity sink/source have been directly included in Phyto,
+ PelChem, PelBac, MicroZoo and MesoZoo; 
+\end_layout
+
+\begin_layout Chapter
+Compiling FABM-BFM
+\end_layout
+
+\begin_layout Standard
+On most Linux-like systems (UNIX/Linux/Mac OS X), a Git client is already
+ installed.
+ You can then obtain the FABM source code systems by executing:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+git clone https://github.com/fabm-model/fabm.git
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+to compile the FABM-BFM code it is necessary to download the BFM code:
+\end_layout
+
+\begin_layout Chapter
+Testing the BFM porting in FABM
+\end_layout
+
+\begin_layout Standard
+In order to test the accuracy of the BFM porting we used both the python
+ coupling (https://github.com/fabm-model/fabm/wiki/python) and the 0D FORTRAN
+ setup (fabm/src/drivers/0d/) and a 2-phase check was implemented.
+ In the first phase we performed a test checking that all the diagnostics
+ were identical up to machine precision between the two FABM configurations.
+ In the second phase, we performed a check of the integration in time by
+ setting up a 10 day simulation using the original BFM in a standalone model
+ (https://bfm-community.github.io/www.bfm-community.eu/bfm-quick-guide/) and
+ the BFM-FABM 0D configuration.
+ The two configurations had the same initial conditions, the same constant
+ environmental forcings (i.e., constant light, T, atmospheric 
+\begin_inset Formula $CO_{2}$
+\end_inset
+
+ and wind speed) and the time step of 864 s.
+ Output were saved at each time step to avoid differences arising from interpola
+tion in time.
+ Results show an extremely satisfactorily agreement between the two configuratio
+ns for all state variables, see examples shown in Fig.
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:BFM-FABM_check"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+a)
+\begin_inset space \hspace{}
+\length 7.5cm
+\end_inset
+
+b)
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename Figures/Fig_P1l_Check.png
+
+\end_inset
+
+
+\begin_inset Graphics
+	filename Figures/Fig_O2_Check.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+c)
+\begin_inset space \hspace{}
+\length 7.5cm
+\end_inset
+
+d)
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename Figures/Fig_N1p_Check.png
+
+\end_inset
+
+
+\begin_inset Graphics
+	filename Figures/Fig_pH_Check.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Results for the comparison between BFM official configuration and FABM coupled
+ BFM.
+ All state variables have been checked and here a subset is proposed, chlorophyl
+l content in Diatoms a), Oxygen b), PO4 c) and pH d).
+ Each panel shows a 10 days timeseries of BFM standalone (black line) with
+ super imposed FABM-BFM (red line).
+ Each timeseries is accompanied by the differences between the two simulations
+ (diff FABM-BFM).
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:BFM-FABM_check"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Chapter
+Running FABM-BFM as a python package
+\begin_inset CommandInset label
+LatexCommand label
+name "Running FABM-BFM"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+import os,sys
+\end_layout
+
+\begin_layout Plain Layout
+
+import numpy as np 
+\end_layout
+
+\begin_layout Plain Layout
+
+import scipy.integrate
+\end_layout
+
+\begin_layout Plain Layout
+
+import pyfabm 
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+# Configure the environment 
+\end_layout
+
+\begin_layout Plain Layout
+
+# Note: the set of environmental dependencies depends on the loaded biogeochemic
+al model.
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+model.dependencies['cell_thickness'].value = 1.
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+model.dependencies['temperature'].value = 15.
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+model.dependencies['practical_salinity'].value = 30.
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+model.dependencies['density'].value = 1000.
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+model.dependencies['depth'].value = 1.
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+model.dependencies['pressure'].value = 1.
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+model.dependencies['longitude'].value = 0.
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+model.dependencies['latitude'].value = 0.
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+model.dependencies['surface_downwelling_shortwave_flux'].value = 50.
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+model.dependencies['surface_air_pressure'].value = 1.
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+model.dependencies['wind_speed'].value = 5.
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+model.dependencies['mole_fraction_of_carbon_dioxide_in_air'].value = 390.
+\end_layout
+
+\begin_layout Plain Layout
+
+model.dependencies['number_of_days_since_start_of_the_year'].value = 1.
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+# Verify the model is ready to be used model.cell_thickness=1.
+\end_layout
+
+\begin_layout Plain Layout
+
+assert model.checkReady(), 'One or more model dependencies have not been
+ fulfilled.'
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+# Time derivative 
+\end_layout
+
+\begin_layout Plain Layout
+
+def dy(t0, y):     
+\end_layout
+
+\begin_layout Plain Layout
+
+	model.state[:] = y     
+\end_layout
+
+\begin_layout Plain Layout
+
+	return model.getRates()
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+# Time-integrate over 1000 days (note: FABM's internal time unit is seconds!)
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+t_eval = np.linspace(0, 3650.*86400, 10000)  
+\end_layout
+
+\begin_layout Plain Layout
+
+y = scipy.integrate.odeint(dy, model.state, t*86400)
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+# Plot results 
+\end_layout
+
+\begin_layout Plain Layout
+
+import pylab 
+\end_layout
+
+\begin_layout Plain Layout
+
+pylab.plot(t, y) 
+\end_layout
+
+\begin_layout Plain Layout
+
+pylab.legend([variable.path for variable in model.state_variables]) 
+\end_layout
+
+\begin_layout Plain Layout
+
+pylab.show()
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Chapter
+Output and diagnostics
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage cleardoublepage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset bibtex
+LatexCommand bibtex
+btprint "btPrintCited"
+bibfiles "bfm-ogstm-references"
+options "bibtotoc,elsart-harv"
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document
