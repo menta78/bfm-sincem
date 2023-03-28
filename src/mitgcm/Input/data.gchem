@@ -1,0 +1,6 @@
+ &GCHEM_PARM01
+  useDIC=.FALSE.,
+  useDARWIN=.FALSE.,
+  useBFMcoupler=.TRUE.,
+  nsubtime=1,
+ &END

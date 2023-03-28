@@ -1,0 +1,87 @@
+# Model parameters
+# Continuous equation parameters
+
+# Continuous equation parameters
+ &PARM01
+ tRef=30*15.,
+ sRef=30*38.,
+
+ viscAh=4.E2,
+ viscAz=1.E-4,
+ diffKhT=4.E2,
+ diffKzT=1.E-4,
+
+ rigidLid=.FALSE.,
+ implicitFreeSurface=.TRUE.,
+ staggerTimeStep=.TRUE.,
+ eosType='LINEAR',
+
+ useConstantF=.FALSE.,
+ useBetaPlaneF=.FALSE.,
+ useSphereF=.TRUE.,
+ use3dCoriolis=.TRUE.,
+ eosType='JMD95Z',
+
+ readBinaryPrec=32,
+
+ no_slip_sides=.TRUE.,
+ no_slip_bottom=.TRUE.,
+
+ implicitDiffusion=.TRUE.,
+ implicitViscosity=.TRUE.,
+
+ globalFiles=.FALSE.,
+ useSingleCpuIO=.TRUE.,
+
+ bottomDragLinear=0.0000,
+ bottomDragQuadratic=0.002,
+ tempAdvScheme=33,
+ saltAdvScheme=33,
+ 
+ exactConserv=.TRUE.,
+ useRealFreshwaterFlux=.TRUE.,
+ selectAddFluid=1,
+ linFSConserveTr=.FALSE.,
+ nonlinFreeSurf=4,
+ &END
+
+# Elliptic solver parameters
+ &PARM02
+ cg2dMaxIters=1000,
+ cg2dTargetResidual=1.E-7,
+ &
+
+# Time stepping parameters
+ &PARM03
+ startTime=0,
+ endTime=31104001,
+ deltaT=300., 
+
+ pChkptFreq=31104000,
+ chkptFreq =31104000,
+ dumpFreq=0.0,
+ monitorFreq=86400,
+ periodicExternalForcing=.FALSE.,
+ &
+
+# Gridding parameters
+ &PARM04
+ usingCartesianGrid=.FALSE.,
+ usingSphericalPolarGrid=.TRUE.,
+ ygOrigin=40.9375,
+ xgOrigin=16.9375,
+ delX=64*0.03125,
+ delY=64*0.03125,
+  delZ= 1.500,  1.501,  3.234,  3.483,  3.750,  4.035,  4.339,  4.665,  5.012,  5.384,
+        5.781,  6.206,  6.659,  7.144,  7.661,  8.215,  8.806,  9.437, 10.112, 10.833,
+       11.603, 12.426, 13.305, 14.244, 15.247, 16.319, 17.463, 18.685, 19.990, 21.384,
+ &END
+
+# Input datasets
+ &PARM05
+ bathyFile='../input/closed_box.bat',
+ hydrogThetaFile=,
+ hydrogSaltFile=,
+ zonalWindFile=,
+ meridWindFile=,
+ &

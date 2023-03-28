@@ -1,0 +1,63 @@
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL
+!	   BFM - Biogeochemical Flux Model verion 2.0
+!
+! NAMELIST
+!   BenBac
+!
+! FILE
+!   BenBac
+!
+! DESCRIPTION
+!   List of parameters values
+!  
+!   This file is generated directly from OpenSesame model code, using a code 
+!   generator which transposes from the sesame meta language into F90.
+!   F90 code generator written by P. Ruardij
+!   structure of the code based on ideas of M. Vichi.
+!
+! AUTHORS
+!   mfstep/ERSEM team
+!
+! CHANGE_LOG
+!   ---
+!
+! COPYING
+!   Copyright (C) 2004 P. Ruardij, the mfstep group, the ERSEM team 
+!   (rua@nioz.nl, vichi@bo.ingv.it)
+!
+!   This program is free software; you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation;
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+!   GNU General Public License for more details.
+!
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+!
+  &BenBac_parameters
+p_cdm = 0.001,0.01,
+p_qn = 0.0167,0.0167,
+p_qp = 0.00125,0.00125,
+p_q10 = 2.0,2.0,
+p_suhQ6 = 0.01,0.01,
+p_sulQ6 = 0.002,0.002,
+p_sum = 8.38,8.38,
+p_pue = 0.1,0.1,
+p_suQ1 = 0.05,0.05,
+p_pur = 0.3,0.6,
+p_srr = 0.02,0.02,
+p_cuKIn = 0.0,0.0,
+p_cuKIp = 0.0,0.0,
+p_puinc = 2.0,2.0,
+p_sd = 0.05,0.05,
+p_iK4 = 1,2,
+p_iK1 = 1,2,
+p_iQ1 = 1,2
+/
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!END namelist
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+

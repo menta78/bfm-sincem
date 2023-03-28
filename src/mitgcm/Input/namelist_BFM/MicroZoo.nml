@@ -1,0 +1,66 @@
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL
+!	   BFM - Biogeochemical Flux Model verion 2.0
+!
+! NAMELIST
+!   MicroZoo
+!
+! FILE
+!   MicroZoo
+!
+! DESCRIPTION
+!   List of parameters values
+!  
+!   This file is generated directly from OpenSesame model code, using a code 
+!   generator which transposes from the sesame meta language into F90.
+!   F90 code generator written by P. Ruardij
+!   structure of the code based on ideas of M. Vichi.
+!
+! AUTHORS
+!   mfstep/ERSEM team
+!
+! CHANGE_LOG
+!   ---
+!
+! COPYING
+!   Copyright (C) 2004 P. Ruardij, the mfstep group, the ERSEM team 
+!   (rua@nioz.nl, vichi@bo.ingv.it)
+!
+!   This program is free software; you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation;
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+!   GNU General Public License for more details.
+!
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+!
+  &MicroZoo_parameters
+p_q10 = 2.0,2.0,
+p_srs = 0.02,0.02,
+p_sum = 2.0,5.0,
+p_sdo = 0.05,0.05,
+p_sd = 0.000000e+00,0.000000e+00,
+p_pu = 0.5,0.3,
+p_pu_ea = 0.5,0.5,
+p_pe_R1 = 0.7,0.7,
+p_chro = 7.8,7.8,
+p_chuc = 30.0,100.0,
+p_minfood = 50.0,50.0,
+p_suP1 = 0.7,0.0,
+p_suP2 = 1.0,0.2,
+p_suP3 = 0.1,1.0,
+p_suP4 = 0.1,0.0,
+p_suZ5 = 1.0,0.0,
+p_suZ6 = 1.0,0.2,
+p_suB1 = 0.1,1.0,
+p_qp_mz = 0.00185,0.00185,
+p_qn_mz = 0.0167,0.0167,
+p_stemp = 0.5,0.5
+/
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!END namelist
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+

@@ -1,0 +1,63 @@
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL
+!	   BFM - Biogeochemical Flux Model verion 2.0
+!
+! NAMELIST
+!   FilterFeeder
+!
+! FILE
+!   FilterFeeder
+!
+! DESCRIPTION
+!   List of parameters values
+!  
+!   This file is generated directly from OpenSesame model code, using a code 
+!   generator which transposes from the sesame meta language into F90.
+!   F90 code generator written by P. Ruardij
+!   structure of the code based on ideas of M. Vichi.
+!
+! AUTHORS
+!   mfstep/ERSEM team
+!
+! CHANGE_LOG
+!   ---
+!
+! COPYING
+!   Copyright (C) 2004 P. Ruardij, the mfstep group, the ERSEM team 
+!   (rua@nioz.nl, vichi@bo.ingv.it)
+!
+!   This program is free software; you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation;
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+!   GNU General Public License for more details.
+!
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+!
+  &FilterFeeder_parameters
+p_dwat = 3.0,
+p_su = 0.13,
+p_q10 = 2.0,
+p_R6 = 0.1,
+p_clu = 50.0,
+p_chu = 300.0,
+p_pue = 0.25,
+p_pueQ6 = 0.7,
+p_pudsil = 0.8,
+p_sr = 0.0027,
+p_pur = 0.15,
+p_sd = 0.0025,
+p_qn = 0.0119,
+p_qp = 0.000792,
+p_clm = 0.0,
+p_cm = 0.001,
+p_puQ6 = 0.065,
+p_PI = 1.0
+/
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!END namelist
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+

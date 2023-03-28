@@ -1,0 +1,89 @@
+# *********************
+# External Forcing Data
+# *********************
+#
+ &EXF_NML_01
+ useExfCheckRange=.FALSE.,
+ exf_albedo=0.08,
+ &END
+
+ &EXF_NML_02
+ atempstartdate1   = 20130101,
+ atempstartdate2   = 000000,
+ atempperiod       = 864000.0,
+#
+ aqhstartdate1     = 20130101,
+ aqhstartdate2     = 000000,
+ aqhperiod         = 864000.0,        
+#
+ precipstartdate1  = 20130101,
+ precipstartdate2  = 000000,
+ precipperiod      = 864000.0,
+#
+ uwindstartdate1   = 20130101,
+ uwindstartdate2   = 000000,
+ uwindperiod       = 864000.0,
+#
+ vwindstartdate1   = 20130101,
+ vwindstartdate2   = 000000,
+ vwindperiod       = 864000.0,
+#
+ swdownstartdate1  = 20130101,
+ swdownstartdate2  = 000000,
+ swdownperiod      = 864000.0,
+#
+ lwdownstartdate1  = 20130101,
+ lwdownstartdate2  = 000000,
+ lwdownperiod      = 864000.0,
+#
+ apressurestartdate1  = 20130101,
+ apressurestartdate2  = 000000,
+ apressureperiod      = 864000.0,
+#
+ runoffstartdate1  = 20130101,
+ runoffstartdate2  = 000000,
+ runoffperiod      = 864000.0,
+#
+ atempfile     = '../input/input_binaries/atemp_64x64_10dx37.dat',
+ aqhfile       = '../input/input_binaries/aqh_64x64_10dx37.dat',
+ uwindfile     = '../input/input_binaries/uwind_64x64_10dx37.dat',
+ vwindfile     = '../input/input_binaries/vwind_64x64_10dx37.dat',
+ precipfile    = '../input/input_binaries/precip_bal_64x64_10dx37.dat',
+ lwdownfile    = '../input/input_binaries/lwdown_64x64_10dx37.dat',
+ swdownfile    = '../input/input_binaries/swdown_64x64_10dx37.dat',
+ apressurefile = '../input/input_binaries/apressure_64x64_10dx37.dat',
+ runofffile    = '../input/input_binaries/runoff_64x64_10dx37.dat',
+ &END
+
+ &EXF_NML_03
+# input scaling factors
+# convert precip from kg/m2 to m/s
+# exf_inscal_precip   =  2.78E-7,
+# exf_inscal_sst      =  1.0,
+ exf_inscal_precip   =  1.0,
+ exf_inscal_uwind = 1.0,
+ exf_inscal_vwind = 1.0,
+# exf_inscal_sst      =  1.0,
+# output scaling factors
+ &END
+
+ &EXF_NML_04
+ &END
+
+ &EXF_NML_OBCS
+# obcsNstartdate1=20130101,
+# obcsNstartdate2=000000,
+# obcsNperiod=86400.0,
+##
+# obcsSstartdate1=20130101,
+# obcsSstartdate2=000000,
+# obcsSperiod=86400.0,
+##
+# obcsEstartdate1=20130101,
+# obcsEstartdate2=000000,
+# obcsEperiod=86400.0,
+##
+# obcsWstartdate1=20130101,
+# obcsWstartdate2=000000,
+# obcsWperiod=86400.0,
+ &END

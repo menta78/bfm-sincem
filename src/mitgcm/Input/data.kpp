@@ -1,0 +1,8 @@
+# KPP parameters
+ &KPP_PARM01
+ KPPmixingMaps   = .FALSE.,
+ KPPwriteState   = .FALSE.,
+ kpp_freq        = 900.,
+ kpp_dumpFreq    = 0.,
+ kpp_taveFreq    = 0.,
+ &END

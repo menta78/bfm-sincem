@@ -1,0 +1,49 @@
+# *****************************************
+# BFMcoupler_FORCING namelist
+# *****************************************
+#
+# BFMcoupler_atmospFile : atm press 
+# BFMcoupler_sparFile : PAR [uEin/m2/s]
+# BFMcoupler_PCO2file : atmopheric pCO2 380-410 [ppm]
+# BFMcoupler_xESPFile : kextintion 0.03-0.1 [1/m]
+# BFMcoupler_N1pFile : Air deposition of N1p 1E-9 [mmol/m3/s]
+# BFMcoupler_N3nFile : Air deposition of N3n 1E-7 [mmol/m3/s] ATTENTION H CELL
+# vsed : 3.0 m/d   sinking rate of R6 (particulate)
+# BFMcoupoler_forcingCycle (period of forcing in sec, NO WORK if ZERO, 
+#                          IT MUST BE length of simulation, last RECORD is read as ZERO TIME
+#                          first RECORD is read as 0.5*forcingPeriod
+# BFMcoupler_forcingPeriod (frequency of external forcing (time between 2 recors in sec)
+# p_espWATER :: light extinction factor of pure water m-1 [ used if xESPFile not present ]
+# p_espP1 :: light extinction factor for chlorophyll of P1 m2 mgCHL-1
+# p_espP2 :: light extinction factor for chlorophyll of P2 m2 mgCHL-1
+# p_espP3 :: light extinction factor for chlorophyll of P3 m2 mgCHL-1
+# p_espP4 :: light extinction factor for chlorophyll of P4 m2 mgCHL-1
+# p_burial:: burial rate for R3[cnps] -detritus-  [s-1]
+# p_fluxC_bot :: flux of CO2 from sediment to water column mmol/m3/s 
+# p_fluxN_bot :: flux of NO3 from sediment to water column mmol/m3/s 
+# p_fluxP_bot :: flux of PO4 from sediment to water column mmol/m3/s 
+# p_fluxSi_bot :: flux of SiO4 from sediment to water column mmol/m3/s 
+#
+ &BFMcoupler_FORCING
+#  BFMcoupler_atmospFile= '../input/input_binaries/XXXX', 
+#  BFMcoupler_sparFile= '../input/input_binaries/XXXX', 
+# BFMcoupler_PCO2File  = '../input/input_binaries/GRID64x64x366gg_ATMpCO2.bin',
+#  BFMcoupler_xESPFile  = '../input/input_binaries/GRID64x64x366gg_ATMxESP_waterbackground.bin ',
+# BFMcoupler_N1pDepFile= '../input/input_binaries/GRID64x64x366gg_ATMDEP_N1p.bin',
+# BFMcoupler_N3nDepFile= '../input/input_binaries/GRID64x64x366gg_ATMDEP_N3n.bin',
+ BFMcoupler_forcingPeriod = 86400.,
+ BFMcoupler_forcingCycle  = 31536000.,
+ vsed= 3.0,
+ p_espWATER=0.035,
+ p_espP1=10.0E-3,
+ p_espP2=8.0E-3,
+ p_espP3=8.0E-3,
+ p_espP4=8.0E-3,
+ p_burial=0.00,
+ p_fluxC_bot=0.0,
+ p_fluxP_bot=0.0,
+ p_fluxN_bot=0.0,
+ p_fluxSi_bot=0.0,
+ 
+
+ &END

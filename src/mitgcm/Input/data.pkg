@@ -1,0 +1,13 @@
+# Packages
+#
+ &PACKAGES
+ useKPP=.TRUE.,
+ useOBCS=.FALSE.,
+ useEXF=.TRUE.,
+ useDiagnostics=.TRUE.,
+ useGMRedi=.FALSE.,
+ useMNC=.FALSE.,
+ usePTRACERS=.TRUE.,
+ useGCHEM=.TRUE.,
+ useFLT=.FALSE.,
+ &END
