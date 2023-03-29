@@ -1,0 +1,970 @@
+check_conservation: false
+require_initialization: true
+log: true
+instances:
+  zenith_angle:
+    model: ogs/zenith_angle
+  light:
+    model: ogs/light
+    parameters:
+      pEPSCHL: 0.0088                                      # attenuation by Chlorophyll (m^2/mg Chl), default= 0.0088
+      pEPSCDOM: 0.01476                                    # attenuation by CDOM (m^2/mg C), default= 0.0646      
+      EPS0r: 0.04                                          # background shortwave attenuation (1/m), default = 0.04
+      pEIR_eow: 0.4                                        # photosynthetically active fraction of shortwave radiation (-), default = 0.5
+    coupling:
+       P1chl: P1/Chl
+       P2chl: P2/Chl
+       P3chl: P3/Chl
+       P4chl: P4/Chl
+       X1c: X1/c
+       X2c: X2/c
+       X3c: X3/c       
+  lightspectral:
+    model: ogs/light_spectral
+    parameters:
+       nlt: 33                                             # number of wavelenghts considered
+       npft: 4                                             # number of PFT considered
+       SdomX1: 0.0175                                      # spectral slope acdom of X1c [nm-1]
+       X1coeff: 0.015                                      # acdom coeff of X1c at lambda_aCDOM [m2/mgC]
+       SdomX2: 0.0162                                      # spectral slope acdom of X2c [nm-1]
+       X2coeff: 0.015                                      # acdom coeff of X2c at lambda_aCDOM [m2/mgC]
+       SdomX3: 0.0180                                      # spectral slope acdom of X3c [nm-1]
+       X3coeff: 0.015                                      # acdom coeff of X3c at lambda_aCDOM [m2/mgC]
+       Xmincoeff: 0.00                                     # minimum aCDOM [m-1] at 450nm       
+       lambda_aCDOM: 450                                   # lambda at which reference acdom is given [nm]
+       compute_acdom: .TRUE.                               # logical [T=compute coeffs, F=use file]
+       Sapar: 0.013                                        # spectral slope anap [nm-1]
+       lambda_aPart: 440                                   # lambda at which reference anap is given [nm]
+       aparcoeff: 0.00058                                  # anap coeff at lambda_aPart [m2/mgC]
+       Sbpar: 0.5                                          # exponent bnap [-]
+       lambda_bPart: 550                                   # lambda at which reference bnap is given [nm]
+       bparcoeff: 0.0120                                   # bnap coeff at lambda_bPart [m2/mgC]
+       bb_to_b: 0.005                                      # back to total scatter POC [-]
+       compute_anap: .TRUE.                                # logical [T=comptute coeffs, F=use file]
+       p_epsP1: 0.0152                            # mean absorption coefficient from 400-700nm for P1 [m2 mgChl-1]
+       p_epsP2: 0.0293                            # mean absorption coefficient from 400-700nm for P2 [m2 mgChl-1]
+       p_epsP3: 0.0443                            # mean absorption coefficient from 400-700nm for P3 [m2 mgChl-1]
+       p_epsP4: 0.0178                            # mean absorption coefficient from 400-700nm for P4 [m2 mgChl-1]
+       compute_aph: .TRUE.           # logical flag to scale aph [T=use file scaled to p_epsPn or F=use file unscaled]
+       p_bpsP1: 0.0140                            # mean scattering coefficient from 400-700nm for P1 [m2 mgChl-1]
+       p_bpsP2: 0.0077                            # mean scattering coefficient from 400-700nm for P2 [m2 mgChl-1]
+       p_bpsP3: 0.0101                            # mean scattering coefficient from 400-700nm for P3 [m2 mgChl-1]
+       p_bpsP4: 0.0112                            # mean scattering coefficient from 400-700nm for P4 [m2 mgChl-1]
+       compute_bph: .TRUE.           # logical flag to scale bph [T=use file scaled to p_bpsPn or F=use file unscaled]
+       p_bbrP1: 0.0020                            # non-spectral backscattering to total scattering ratio for P1 [-]
+       p_bbrP2: 0.0071                            # non-spectral backscattering to total scattering ratio for P2 [-]
+       p_bbrP3: 0.0039                            # non-spectral backscattering to total scattering ratio for P3 [-]
+       p_bbrP4: 0.0030                            # non-spectral backscattering to total scattering ratio for P4 [-]
+       compute_bbc: .TRUE.           # logical flag to compute bbc or read it from file [T=compute bc*bbr or F=use file]
+    coupling:
+       P1c: P1/c
+       P2c: P2/c
+       P3c: P3/c
+       P4c: P4/c
+       P1chl: P1/Chl
+       P2chl: P2/Chl
+       P3chl: P3/Chl
+       P4chl: P4/Chl
+       X1c  : X1/c
+       X2c  : X2/c
+       X3c  : X3/c
+       R6c  : R6/c
+  N1:
+    long_name: phosphate
+    model: ogs/bfm_pelagic_base
+    parameters:
+      composition: p                                       # elemental composition
+    initialization:
+      p: 0.4                                               # phosphorus (mmol P/m^3)
+  N3:
+    long_name: nitrate
+    model: ogs/bfm_pelagic_base
+    parameters:
+      composition: n                                       # elemental composition
+    initialization:
+      n: 8.0                                               # nitrogen (mmol N/m^3)
+  N4:
+    long_name: ammonium
+    model: ogs/bfm_pelagic_base
+    parameters:
+      composition: n                                       # elemental composition
+    initialization:
+      n: 0.1                                               # nitrogen (mmol N/m^3)
+  N5:
+    long_name: silicate
+    model: ogs/bfm_pelagic_base
+    parameters:
+      composition: s                                       # elemental composition
+    initialization:
+      s: 4.5                                               # silicate (mmol Si/m^3)
+  N6:
+    long_name: Reduction equivalent
+    model: ogs/bfm_pelagic_base
+    parameters:
+      composition: r                                       # elemental composition
+    initialization:
+      r: 1.0                                               # Reduction equivalent (mmol Eq/m^3)
+  O3:
+    long_name: dissolved inorganic carbon              
+    model: ogs/PelagicCSYS
+#    parameters:
+#      composition: c                                       # elemental composition
+    initialization:
+      c: 28500.00                                           # Dissolved Inorganic Carbon (mg C /m^3)
+    coupling:
+      N1p: N1/p                                            # phosphate (mmol P/m^3)
+      N5s: N5/s                                            # silicate  (mmol Si/m^3)
+      O3h: O3h/h       
+  O2:
+    long_name: Dissolved Oxygen
+    model: ogs/PelOxygen
+#    parameters:
+#      composition: o                                       # elemental composition
+    initialization:
+      o: 300.0
+  O3h:
+    long_name: alkalinity
+    model: ogs/bfm_pelagic_base
+    parameters:
+      composition: h                                       # elemental composition
+    initialization:
+      h: 2660.0                                            # alkalinity (mmol m3)
+  O4:
+    long_name: Nitrogen Sink
+    model: ogs/bfm_pelagic_base
+    parameters:
+      composition: n                                       # elemental composition
+    initialization:
+      n: 200.0
+  R1:
+    long_name: Dissolved Organic carbon Labile
+    model: ogs/bfm_pelagic_base
+    parameters:
+      composition: cnp                                     # elemental composition
+    initialization:
+      c: 80.0                                         # Dissolved Organic Carbon (mg C /m^3)
+#      n: 1.260E-002                                   # Dissolved Organic Nitrogen (mmol N /m^3)
+#      p: 7.8620E-004                                  # Dissolved Organic Phosphorus (mmol P /m^3)
+      n: 1.008                                        # adjusted for c=80 instead c=1
+      p: 0.062                                        # adjusted for c=80 instead c=1      
+  R2:
+    long_name: Dissolved Organic carbon semi-Labile
+    model: ogs/bfm_pelagic_base
+    parameters:
+      composition: c                                   # elemental composition
+    initialization:
+      c: 400.0                                         # Dissolved Organic Carbon (mg C /m^3)
+  R3:
+    long_name: Dissolved Organic carbon semi-refractory
+    model: ogs/bfm_pelagic_base
+    parameters:
+      composition: c                                   # elemental composition
+    initialization:
+      c: 480.0                                         # Dissolved Organic Carbon (mg C /m^3)
+  R6: 
+    long_name: Particulate Organic carbon 
+    model: ogs/bfm_pelagic_base
+    parameters:
+      composition: cpns                                # elemental composition
+      rm:  4.25                                       # Sinking Velocity
+    initialization:
+      c: 1.0                                          # POC (mg C   /m^3)
+      n: 1.260E-002                                   # PON (mmol N /m^3)
+      p: 7.8620E-004                                  # POP (mmol P /m^3)
+      s: 1.260E-002                                   # POS (mmol S /m^3)
+  X1:
+    long_name: labile CDOM
+    model: ogs/bfm_pelagic_base
+    parameters:
+      composition: c                                     # elemental composition
+    initialization:
+      c: 1.000000000000000E-000
+  X2:
+    long_name: semi labile CDOM
+    model: ogs/bfm_pelagic_base
+    parameters:
+      composition: c                                     # elemental composition
+    initialization:
+      c: 3.000000000000000E-000
+  X3:
+    long_name: semi refractory CDOM
+    model: ogs/bfm_pelagic_base
+    parameters:
+      composition: c                                     # elemental composition
+    initialization:
+      c:  1.250000000000000E-000
+#   ---------------------- P1 Diatom ----------------------
+  P1:
+    long_name: diatoms
+    model: ogs/Phyto
+    parameters:
+#             --------- Physiological parameters -----------------
+      p_q10:   2.0                          # [-]            Characteristic Q10 coefficient
+      p_temp:  0.0                          # [-]            Cut-off threshold for temperature factor
+      p_sum:   2.5                          # [1/d]          maximum specific productivity at reference temperature (1/d)
+      p_srs:   0.076                        # [1/d]          Respiration rate at 10 degrees C
+      p_sdmo:  0.0                          # [1/d]          Max.specific nutrient-stress lysis rate
+      p_thdo:  0.0                          # [-]            Half saturation constant for nutrient stress lysis
+      p_seo:   0.0                          # [1/d]          Extra lysis rate (biomass density-dependent)
+      p_sheo:  0.0                          # [mgC/3]        Half saturation constant for extra lysis
+      p_pu_ea: 0.10                         # [-]            Excreted fraction of primary production
+      p_pu_ra: 0.1                          # [-]            Activity respiration fraction
+      p_switchDOC: 2                        # [1-3]          Switch for the type of DOC excretion
+                                            #  This choice must be consistent with bacteria
+                                            #     1. All DOC is released as R1c (Vichi et al., 2007)
+                                            #     2. Activity DOC is released as R2c (Vichi et al., 2004)
+                                            #   (there is no nutrient-stress excretion)
+                                            #     3. All DOC is released as R2c (Polimene et al., 2006)
+#              --------- Nutrient parameters in phytoplankton -----------------
+      p_netgrowth: .TRUE.                   # [T or F]       Logical switch for nutrient-limited growth
+                                            # .T. nutrient-balanced growth (Vichi et al.2004)
+                                            # .F. nutrient-stress carbon excretion
+                                            # (Baretta-Bekker et al.1995 and Vichi et al.2007)
+      p_limnut: 1                           #  Switch for N-P co-limitation
+                                            # 0. Geometric mean
+                                            # 1. Threshold (Liebig-like)
+                                            # 2. Combined
+#                   ---- N limitation control ----
+      p_qun: 0.025                          # [m3/mgC/d]     Membrane affinity for N
+      p_lN4: 1.0                            # [mmolN/m3]     Half saturation constant for NH4 uptake preference over NO3
+      p_qnlc: 0.00687                       # [mmolN/mgC]    minimum nitrogen to carbon ratio (mmol N/mg C)
+      p_qncPPY: 0.0126                      # [mmolN/mgC]    Reference quotum N:C
+      p_xqn: 2.0                            # [-]            Multiplication factor for luxury storage
+#                   ---- P limitation control ----
+      p_qup: 0.0025                         # [m3/mgC/d]     Membrane affinity for P
+      p_qplc: 0.00057                       # [mmolN/mgC]    minimum phosphorus to carbon ratio (mmol P/mg C)
+      p_qpcPPY: 0.000786                    # [mmolP/mgC]    Reference quotum P:C
+      p_xqp: 2.0                            # [-]            Multiplication factor for luxury storage
+#                   ---- Si limitation control ----
+      p_switchSi: 2                         # [1-2]          Switch for Silica limitation
+                                            #  1. Si limitation is controlled by external Si conc.
+                                            #  2. Si limitation is controlled by internal quota
+      p_chPs: 0.3                           # [mmolSi/m3]    Half saturation conc. for dissolved Si limitation
+      p_Contois: 0.0                        # [>=0]          If >0, use Contois formulation
+      p_qus: 0.0025                         # [m3/mgC/d]     Membrane affinity for Si
+      p_qslc: 0.007                         # [mmolSi/mgC]   minimum silicate to carbon ratio (mmol Si/mg C)
+      use_Si: .TRUE.                        # use silicate, default = false
+      p_qscPPY: 0.01                        # [mmolSi/mgC]   Reference quotum Si:C
+#                   ---- nutrient stressed sinking ----
+      p_esNI: 0.7                           # [-]            Nutrient stress threshold for sinking
+      p_res: 5.0                            # [m/d]          Maximum Sinking vel city (m/d)
+#                   ---- Calcification ----
+      p_caco3r: 0.0                         # [-]            Reference PIC:POC (rain) ratio
+#                   ---- CDOM production ----
+      p_fX1p: 0.00                          # [-]            fraction of colored labile DOC
+      p_fX2p: 0.080                         # [-]            fraction of colored semi-labile DOC
+#              --------- Chlorophyll parameters -----------
+      p_switchChl: 2                        # [1-4]          Switch for Chla-a synthesis 
+      p_sdchl: 0.2                          # [1/d]          Specific turnover rate for Chla 
+      p_alpha_chl: 1.38e-5                  # [mgC s m2/mgChl/uE]     Initial slope of the P-E curve
+      p_quantum_yield: 0.750e-3             # [mgC / uE]     Photochemical efficiency
+      p_Esource: 1                          # [1-6]          source of light for PP, 1=absorbed by P1, 5=scalar, 6=mono
+                                              
+      p_qlcPPY: 0.026                       # [mgChla/mgC]   Reference quotum Chla:C 
+      p_epsChla: 0.03                       # [m2/mgChla]    Chla-specific extinction coefficient
+      p_tochl_relt: 0.0                     # [1/d]        Relaxation rate towards maximum Chla:C
+      p_EpEk_or: 0.0                        # [-]            Optimal value of E_PAR/E_K
+#              --------- Light parameters ERSEM-II -----------
+      p_iswLtyp:  5                         # [0-6]          Shape of the productivity function
+      p_chELiPPY: 50.0                      # [W/m2]          Maximum Iopt
+      p_clELiPPY: 100.0                     # [W/m2]         Minimum Iopt
+      p_ruELiPPY: 8.0                       # [1/d]          Maximum daily shift in Iopt (1/d)
+      p_addepth: 0.2                        # [m]            Adaptation depth. Meaningless with high-res models
+#              --------- Sinking parameters -----------
+      p_rPIm: 0.0                          # [m/d]          Phytoplankton background sinking rate
+    initialization:
+      c: 8.0                                               # carbon (mg C/m^3)
+      n: 0.1008                                            # nitrogen (mmol N/m^3)
+      p: 0.006288                                          # phosphate (mmol N/m^3)
+      s: 0.08                                              # silicate (mmol Si/m^3)
+      Chl: 0.16                                            # chlorophyll a (mg/m^3)
+    coupling:
+      N1p: N1/p                                            # phosphate (mmol P/m^3)
+      N3n: N3/n                                            # nitrate (mmol N/m^3)
+      N4n: N4/n                                            # ammonium (mmol N/m^3)
+      N5s: N5/s                                            # silicate (mmol Si/m^3)
+      O3c: O3/c                                            # dissolved inorganic carbon (mg C/m^3)
+      O2o: O2/o                                            # Oxygen (mmol O/m^3)
+      R1c: R1/c
+      R1n: R1/n
+      R1p: R1/p
+      R2c: R2/c
+      R6c: R6/c
+      R6n: R6/n
+      R6s: R6/s
+      R6p: R6/p
+      X1c: X1/c
+      X2c: X2/c
+      O3h: O3h/h
+      O5c: O5/c
+      PAR: lightspectral/PAR_dia
+#   ---------------------- P2 nanoflagellates ----------------------
+  P2:
+    long_name: nanoflagellates
+    model: ogs/Phyto
+    parameters:
+#             --------- Physiological parameters -----------------
+      p_q10:   2.25                         # [-]            Characteristic Q10 coefficient
+      p_temp:  0.0                          # [-]            Cut-off threshold for temperature factor
+      p_sum:   2.6                          # [1/d]          maximum specific productivity at reference temperature (1/d)
+      p_srs:   0.09                         # [1/d]          Respiration rate at 10 degrees C
+      p_sdmo:  0.0                          # [1/d]          Max.specific nutrient-stress lysis rate
+      p_thdo:  0.0                          # [-]            Half saturation constant for nutrient stress lysis
+      p_seo:   0.0                          # [1/d]          Extra lysis rate (biomass density-dependent)
+      p_sheo:  0.0                          # [mgC/3]        Half saturation constant for extra lysis
+      p_pu_ea: 0.15                         # [-]            Excreted fraction of primary production
+      p_pu_ra: 0.1                          # [-]            Activity respiration fraction
+      p_switchDOC: 2                        # [1-3]          Switch for the type of DOC excretion
+                                            #  This choice must be consistent with bacteria
+                                            #     1. All DOC is released as R1c (Vichi et al., 2007)
+                                            #     2. Activity DOC is released as R2c (Vichi et al., 2004)
+                                            #   (there is no nutrient-stress excretion)
+                                            #     3. All DOC is released as R2c (Polimene et al., 2006)
+#              --------- Nutrient parameters in phytoplankton -----------------
+      p_netgrowth: .TRUE.                   # [T or F]       Logical switch for nutrient-limited growth
+                                            # .T. nutrient-balanced growth (Vichi et al.2004)
+                                            # .F. nutrient-stress carbon excretion
+                                            # (Baretta-Bekker et al.1995 and Vichi et al.2007)
+      p_limnut: 1                           #  Switch for N-P co-limitation
+                                            # 0. Geometric mean
+                                            # 1. Threshold (Liebig-like)
+                                            # 2. Combined
+#                   ---- N limitation control ----
+      p_qun: 0.025                          # [m3/mgC/d]     Membrane affinity for N
+      p_lN4: 0.5                            # [mmolN/m3]     Half saturation constant for NH4 uptake preference over NO3
+      p_qnlc: 0.00687                       # [mmolN/mgC]    minimum nitrogen to carbon ratio (mmol N/mg C)
+      p_qncPPY: 0.0126                      # [mmolN/mgC]    Reference quotum N:C
+      p_xqn: 2.0                            # [-]            Multiplication factor for luxury storage
+#                   ---- P limitation control ----
+      p_qup: 0.0035                         # [m3/mgC/d]     Membrane affinity for P
+      p_qplc: 0.000352                      # [mmolN/mgC]    minimum phosphorus to carbon ratio (mmol P/mg C)
+      p_qpcPPY: 0.000556                    # [mmolP/mgC]    Reference quotum P:C
+      p_xqp: 2.0                            # [-]            Multiplication factor for luxury storage
+#                   ---- Si limitation control ----
+#     Silicon absent in this PFT                            
+#                   ---- nutrient stressed sinking ----
+      p_esNI: 0.75                          # [-]            Nutrient stress threshold for sinking
+      p_res: 0.0                            # [m/d]          Maximum Sinking vel city (m/d)
+#                   ---- Calcification ----
+      use_CaCO3: .TRUE.                     #                use CaCO3, default = false
+      p_caco3r: 0.3                         # [-]            Reference PIC:POC (rain) ratio
+#                   ---- CDOM production ----
+      p_fX1p: 0.00                          # [-]            fraction of colored labile DOC
+      p_fX2p: 0.043                         # [-]            fraction of colored semi-labile DOC
+#              --------- Chlorophyll parameters -----------
+      p_switchChl: 2                        # [1-4]          Switch for Chla-a synthesis 
+      p_sdchl: 0.2                          # [1/d]          Specific turnover rate for Chla 
+      p_alpha_chl: 0.46e-5                  # [mgC s m2/mgChl/uE]     Initial slope of the P-E curve
+      p_quantum_yield: 0.198e-3             # [mgC / uE]     Photochemical efficiency
+      p_Esource: 2                          # [1-6]          source of light for PP, 2=absorbed by P2, 5=scalar, 6=mono
+                                              
+      p_qlcPPY: 0.045                        # [mgChla/mgC]   Reference quotum Chla:C 
+      p_epsChla: 0.03                       # [m2/mgChla]    Chla-specific extinction coefficient
+      p_tochl_relt: 0.0                     # [1/d]        Relaxation rate towards maximum Chla:C
+      p_EpEk_or: 0.0                        # [-]            Optimal value of E_PAR/E_K
+#              --------- Light parameters ERSEM-II -----------
+      p_iswLtyp:  5                         # [0-6]          Shape of the productivity function
+      p_chELiPPY: 50.0                      # [W/m2]          Maximum Iopt
+      p_clELiPPY: 100.0                     # [W/m2]         Minimum Iopt
+      p_ruELiPPY: 10.0                       # [1/d]          Maximum daily shift in Iopt (1/d)
+      p_addepth: 0.25                        # [m]            Adaptation depth. Meaningless with high-res models
+#              --------- Sinking parameters -----------
+      p_rPIm: 0.0                          # [m/d]          Phytoplankton background sinking rate
+    initialization:
+      c: 8.0                                               # carbon (mg C/m^3)
+      n: 0.1008                                            # nitrogen (mmol N/m^3)
+      p: 0.006288                                          # phosphate (mmol N/m^3)
+      Chl: 0.16                                            # chlorophyll a (mg/m^3)
+    coupling:
+      N1p: N1/p                                            # phosphate (mmol P/m^3)
+      N3n: N3/n                                            # nitrate (mmol N/m^3)
+      N4n: N4/n                                            # ammonium (mmol N/m^3)
+      O3c: O3/c                                            # dissolved inorganic carbon (mg C/m^3)
+      O2o: O2/o                                            # Oxygen (mmol O/m^3)
+      R1c: R1/c 
+      R1n: R1/n 
+      R1p: R1/p 
+      R2c: R2/c 
+      R6c: R6/c 
+      R6n: R6/n 
+      R6p: R6/p 
+      X1c: X1/c 
+      X2c: X2/c 
+      O3h: O3h/h
+      O5c: O5/c
+      PAR: lightspectral/PAR_flag
+#   ---------------------- P3 Picophytoplankton ----------------------
+  P3:
+    long_name: Picoplankton
+    model: ogs/Phyto
+    parameters:
+#             --------- Physiological parameters -----------------
+      p_q10:   2.0                          # [-]            Characteristic Q10 coefficient
+      p_temp:  0.75                         # [-]            Cut-off threshold for temperature factor
+      p_sum:   3.5                          # [1/d]          maximum specific productivity at reference temperature (1/d)
+      p_srs:   0.1                          # [1/d]          Respiration rate at 10 degrees C
+      p_sdmo:  0.0                          # [1/d]          Max.specific nutrient-stress lysis rate
+      p_thdo:  0.0                          # [-]            Half saturation constant for nutrient stress lysis
+      p_seo:   0.0                          # [1/d]          Extra lysis rate (biomass density-dependent)
+      p_sheo:  0.0                          # [mgC/3]        Half saturation constant for extra lysis
+      p_pu_ea: 0.15                         # [-]            Excreted fraction of primary production
+      p_pu_ra: 0.2                          # [-]            Activity respiration fraction
+      p_switchDOC: 2                        # [1-3]          Switch for the type of DOC excretion
+                                            #  This choice must be consistent with bacteria
+                                            #     1. All DOC is released as R1c (Vichi et al., 2007)
+                                            #     2. Activity DOC is released as R2c (Vichi et al., 2004)
+                                            #   (there is no nutrient-stress excretion)
+                                            #     3. All DOC is released as R2c (Polimene et al., 2006)
+#              --------- Nutrient parameters in phytoplankton -----------------
+      p_netgrowth: .TRUE.                   # [T or F]       Logical switch for nutrient-limited growth
+                                            # .T. nutrient-balanced growth (Vichi et al.2004)
+                                            # .F. nutrient-stress carbon excretion
+                                            # (Baretta-Bekker et al.1995 and Vichi et al.2007)
+      p_limnut: 1                           #  Switch for N-P co-limitation
+                                            # 0. Geometric mean
+                                            # 1. Threshold (Liebig-like)
+                                            # 2. Combined
+#                   ---- N limitation control ----
+      p_qun: 0.25                           # [m3/mgC/d]     Membrane affinity for N
+      p_lN4: 0.1                            # [mmolN/m3]     Half saturation constant for NH4 uptake preference over NO3
+      p_qnlc: 0.00687                       # [mmolN/mgC]    minimum nitrogen to carbon ratio (mmol N/mg C)
+      p_qncPPY: 0.0126                      # [mmolN/mgC]    Reference quotum N:C
+      p_xqn: 2.0                            # [-]            Multiplication factor for luxury storage
+#                   ---- P limitation control ----
+      p_qup: 0.0025                         # [m3/mgC/d]     Membrane affinity for P
+      p_qplc: 0.0004288                     # [mmolN/mgC]    minimum phosphorus to carbon ratio (mmol P/mg C)
+      p_qpcPPY: 0.00072                     # [mmolP/mgC]    Reference quotum P:C
+      p_xqp: 2.0                            # [-]            Multiplication factor for luxury storage
+#                   ---- Si limitation control ----
+#     Silicon absent in this PFT                            
+#                   ---- nutrient stressed sinking ----
+      p_esNI: 0.75                           # [-]            Nutrient stress threshold for sinking
+      p_res: 0.0                            # [m/d]          Maximum Sinking vel city (m/d)
+#                   ---- Calcification ----
+      p_caco3r: 0.0                         # [-]            Reference PIC:POC (rain) ratio
+#                   ---- CDOM production ----
+      p_fX1p: 0.00                          # [-]            fraction of colored labile DOC
+      p_fX2p: 0.039                         # [-]            fraction of colored semi-labile DOC
+#              --------- Chlorophyll parameters -----------
+      p_switchChl: 2                        # [1-4]          Switch for Chla-a synthesis 
+      p_sdchl: 0.2                          # [1/d]          Specific turnover rate for Chla 
+      p_alpha_chl: 1.52e-5                  # [mgC s m2/mgChl/uE]     Initial slope of the P-E curve
+      p_quantum_yield: 0.990e-3             # [mgC / uE]     Photochemical efficiency
+      p_Esource: 3                          # [1-6]          source of light for PP, 3=absorbed by P3, 5=scalar, 6=mono
+                                              
+      p_qlcPPY: 0.014                       # [mgChla/mgC]   Reference quotum Chla:C 
+      p_epsChla: 0.03                       # [m2/mgChla]    Chla-specific extinction coefficient
+      p_tochl_relt: 0.0                     # [1/d]        Relaxation rate towards maximum Chla:C
+      p_EpEk_or: 0.0                        # [-]            Optimal value of E_PAR/E_K
+#              --------- Light parameters ERSEM-II -----------
+      p_iswLtyp:  5                         # [0-6]          Shape of the productivity function
+      p_chELiPPY: 50.0                      # [W/m2]          Maximum Iopt
+      p_clELiPPY: 100.0                     # [W/m2]         Minimum Iopt
+      p_ruELiPPY: 10.0                       # [1/d]          Maximum daily shift in Iopt (1/d)
+      p_addepth: 0.25                        # [m]            Adaptation depth. Meaningless with high-res models
+#              --------- Sinking parameters -----------
+      p_rPIm: 0.0                          # [m/d]          Phytoplankton background sinking rate
+    initialization:
+      c: 8.0                                               # carbon (mg C/m^3)
+      n: 0.1008                                            # nitrogen (mmol N/m^3)
+      p: 0.006288                                          # phosphate (mmol N/m^3)
+      Chl: 0.16                                            # chlorophyll a (mg/m^3)
+    coupling:
+      N1p: N1/p                                            # phosphate (mmol P/m^3)
+      N3n: N3/n                                            # nitrate (mmol N/m^3)
+      N4n: N4/n                                            # ammonium (mmol N/m^3)
+      O3c: O3/c                                            # dissolved inorganic carbon (mg C/m^3)
+      O2o: O2/o                                            # Oxygen (mmol O/m^3)
+      R1c: R1/c 
+      R1n: R1/n 
+      R1p: R1/p 
+      R2c: R2/c 
+      R6c: R6/c 
+      R6n: R6/n 
+      R6p: R6/p 
+      X1c: X1/c 
+      X2c: X2/c
+      O3h: O3h/h
+      O5c: O5/c
+      PAR: lightspectral/PAR_pico
+#   ---------------------- P4 dinoflagellates ----------------------
+  P4:
+    long_name: dinoflagellates
+    model: ogs/Phyto
+    parameters:
+#             --------- Physiological parameters -----------------
+      p_q10:   2.0                          # [-]            Characteristic Q10 coefficient
+      p_temp:  0.0                          # [-]            Cut-off threshold for temperature factor
+      p_sum:   1.5                          # [1/d]          maximum specific productivity at reference temperature (1/d)
+      p_srs:   0.1                          # [1/d]          Respiration rate at 10 degrees C
+      p_sdmo:  0.0                          # [1/d]          Max.specific nutrient-stress lysis rate
+      p_thdo:  0.0                          # [-]            Half saturation constant for nutrient stress lysis
+      p_seo:   0.0                          # [1/d]          Extra lysis rate (biomass density-dependent)
+      p_sheo: 100.0                         # [mgC/3]        Half saturation constant for extra lysis
+      p_pu_ea: 0.20                         # [-]            Excreted fraction of primary production
+      p_pu_ra: 0.1                          # [-]            Activity respiration fraction
+      p_switchDOC: 2                        # [1-3]          Switch for the type of DOC excretion
+                                            #  This choice must be consistent with bacteria
+                                            #     1. All DOC is released as R1c (Vichi et al., 2007)
+                                            #     2. Activity DOC is released as R2c (Vichi et al., 2004)
+                                            #   (there is no nutrient-stress excretion)
+                                            #     3. All DOC is released as R2c (Polimene et al., 2006)
+#              --------- Nutrient parameters in phytoplankton -----------------
+      p_netgrowth: .TRUE.                   # [T or F]       Logical switch for nutrient-limited growth
+                                            # .T. nutrient-balanced growth (Vichi et al.2004)
+                                            # .F. nutrient-stress carbon excretion
+                                            # (Baretta-Bekker et al.1995 and Vichi et al.2007)
+      p_limnut: 1                           #  Switch for N-P co-limitation
+                                            # 0. Geometric mean
+                                            # 1. Threshold (Liebig-like)
+                                            # 2. Combined
+#                   ---- N limitation control ----
+      p_qun: 0.025                          # [m3/mgC/d]     Membrane affinity for N
+      p_lN4: 1.0                            # [mmolN/m3]     Half saturation constant for NH4 uptake preference over NO3
+      p_qnlc: 0.00687                       # [mmolN/mgC]    minimum nitrogen to carbon ratio (mmol N/mg C)
+      p_qncPPY: 0.0126                      # [mmolN/mgC]    Reference quotum N:C
+      p_xqn: 2.0                            # [-]            Multiplication factor for luxury storage
+#                   ---- P limitation control ----
+      p_qup: 0.0025                         # [m3/mgC/d]     Membrane affinity for P
+      p_qplc: 0.0004288                     # [mmolN/mgC]    minimum phosphorus to carbon ratio (mmol P/mg C)
+      p_qpcPPY: 0.000786                    # [mmolP/mgC]    Reference quotum P:C
+      p_xqp: 2.0                            # [-]            Multiplication factor for luxury storage
+#                   ---- Si limitation control ----
+#     Silicon absent in this PFT                            
+#                   ---- nutrient stressed sinking ----
+      p_esNI: 0.75                           # [-]            Nutrient stress threshold for sinking
+      p_res: 2.5                            # [m/d]          Maximum Sinking vel city (m/d)
+#                   ---- Calcification ----
+      p_caco3r: 0.0                         # [-]            Reference PIC:POC (rain) ratio
+#                   ---- CDOM production ----
+      p_fX1p: 0.00                          # [-]            fraction of colored labile DOC
+      p_fX2p: 0.053                         # [-]            fraction of colored semi-labile DOC
+#              --------- Chlorophyll parameters -----------
+      p_switchChl: 2                        # [1-4]          Switch for Chla-a synthesis 
+      p_sdchl: 0.2                          # [1/d]          Specific turnover rate for Chla 
+      p_alpha_chl: 0.68e-5                  # [mgC s m2/mgChl/uE]     Initial slope of the P-E curve
+      p_quantum_yield: 0.257e-3             # [mgC / uE]     Photochemical efficiency
+      p_Esource: 4                          # [1-6]          source of light for PP, 4=absorbed by P4, 5=scalar, 6=mono
+                                              
+      p_qlcPPY: 0.019                       # [mgChla/mgC]   Reference quotum Chla:C 
+      p_epsChla: 0.03                       # [m2/mgChla]    Chla-specific extinction coefficient
+      p_tochl_relt: 0.0                     # [1/d]          Relaxation rate towards maximum Chla:C
+      p_EpEk_or: 0.0                        # [-]            Optimal value of E_PAR/E_K
+#              --------- Light parameters ERSEM-II -----------
+      p_iswLtyp:  5                         # [0-6]          Shape of the productivity function
+      p_chELiPPY: 50.0                      # [W/m2]          Maximum Iopt
+      p_clELiPPY: 100.0                     # [W/m2]         Minimum Iopt
+      p_ruELiPPY: 10.0                       # [1/d]          Maximum daily shift in Iopt (1/d)
+      p_addepth: 0.25                        # [m]            Adaptation depth. Meaningless with high-res models
+#              --------- Sinking parameters -----------
+      p_rPIm: 0.0                          # [m/d]          Phytoplankton background sinking rate
+    initialization:
+      c: 8.0                                               # carbon (mg C/m^3)
+      n: 0.1008                                            # nitrogen (mmol N/m^3)
+      p: 0.006288                                          # phosphate (mmol N/m^3)
+      Chl: 0.16                                            # chlorophyll a (mg/m^3)
+    coupling:
+      N1p: N1/p                                            # phosphate (mmol P/m^3)
+      N3n: N3/n                                            # nitrate (mmol N/m^3)
+      N4n: N4/n                                            # ammonium (mmol N/m^3)
+      O3c: O3/c                                            # dissolved inorganic carbon (mg C/m^3)
+      O2o: O2/o                                            # Oxygen (mmol O/m^3)
+      R1c: R1/c 
+      R1n: R1/n 
+      R1p: R1/p 
+      R2c: R2/c 
+      R6c: R6/c 
+      R6n: R6/n 
+      R6p: R6/p 
+      X1c: X1/c 
+      X2c: X2/c 
+      O3h: O3h/h
+      O5c: O5/c
+      PAR: lightspectral/PAR_dino
+#   ---------------------- B1 Pelagic heteretrophic bacteria ----------------------
+#
+  B1:
+    long_name: Bacteria
+    model: ogs/PelBac
+    parameters:
+#             --------- Physiological parameters -----------------
+      p_version : 2 # Switch for bacteria parameterization
+#                              1 : Baretta-Bekker et al. 1995; 
+#                                  Vichi et al., 2007
+#                              2 : Vichi et al., 2004
+#                              3 : Polimene et al., 2006
+      p_q10 : 2.95 # [-]              Q10-value (temperature dependency)
+      p_chdo : 30.0 # [mmol/m3]        Half-saturation constant for O2 limitation
+      p_sd : 0.0  # [1/d]            Specific mortality rate
+      p_sd2 : 0.0  # [1/d]            Density dependent specific mortality rate
+      p_suhR1 : 0.5  # [1/d]            Specific potential uptake for nutrient-rich DOM
+      p_sulR1 : 0.0  #  [1/d]            Specific potential uptake for nutrient-poor DOM
+      p_suR2 : 0.05  #  [1/d]            Specific potential uptake for semi-labile DOC
+      p_suR3 : 0.0  #   [1/d]            Specific potential uptake for semi-refractory DOC
+      p_suR6 : 0.1  #   [1/d]            Specific potential uptake for POM (1/d)
+      p_sum : 8.38 #    [1/d]            Potential specific growth rate
+      p_pu_ra : 0.76  #  [-]              Activity respiration fraction
+      p_pu_ra_o : 0.2  #  [-]              Additional respiration fraction at low O2 conc
+      p_srs : 0.01 #  [1/d]            Specific rest respiration 
+      p_qncPBA : 0.017 #  [mmolN/mgC]      Optimal N/C ratio 
+      p_qpcPBA : 0.0019 #  [mmolP/mgC]      Optimal P/C ratio
+      p_qlnc : 0.0085 #  [mmolN/mgC]      Minimal N/C ratio
+      p_qlpc : 0.00095 #  [mmolP/mgC]      Minimal P/C ratio 
+      p_qun : 0.05    # [mmolN/mgC/day]  Membrane affinity for N 
+      p_qup : 0.005   # [mmolP/mgC/day]  Membrane affinity for P
+      p_chn : 0.05    # [mmolN/m3]       Half saturation ammonium conc. for uptake
+      p_chp : 1.00    # [mmolP/m3]       Half saturation phosphate conc. for uptake
+      p_rec : 1.0     # [1/d]            Relaxation timescale for semi-labile excretion
+      p_ruen : 1.0     # [1/d]            Relaxation timescale for N uptake/remin.
+      p_ruep : 1.0    #  [1/d]            Relaxation timescale for P uptake/remin.
+      p_pu_ea_R3 : 0.0   #  [-]              Excretion of semi-refractory DOC
+      p_qro : 0.5   #  [mmolHS-/mmolO2]  Stoichiometric coefficient for anaerobic reactions
+      p_pe_R1c: 0.60  # [-]           Fractional content of C in cytoplasm
+      p_pe_R1n: 0.72  # [-]           Fractional content of N in cytoplasm
+      p_pe_R1p: 0.832 # [-]           Fractional content of P in cytoplasm
+#                   ---- CDOM production ----
+      p_fX1b: 0.00     # [-]          fraction of colored labile DOC
+      p_fX2b: 0.02     # [-]          fraction of colored semi-labile DOC
+      p_fX3b: 0.018    # [-]          fraction of colored semi-refractory DOC
+    initialization:
+      c: 1.0                                               # carbon (mg C/m^3)
+      n: 1.700000000000000E-002                            # nitrogen (mmol N/m^3)
+      p: 1.900000000000000E-003                            # phosphate (mmol N/m^3)
+    coupling:
+      N1p: N1/p                                            # phosphate (mmol P/m^3)
+      N3n: N3/n                                            # nitrate (mmol N/m^3)
+      N4n: N4/n                                            # ammonium (mmol N/m^3)
+      N6r: N6/r                                            
+      O3c: O3/c                                            # dissolved inorganic carbon (mg C/m^3)
+      O3h: O3h/h
+      O2o: O2/o                                            # Oxygen (mmol O/m^3)
+      R1c: R1/c 
+      R1n: R1/n 
+      R1p: R1/p 
+      R2c: R2/c 
+      R3c: R3/c 
+      R6c: R6/c 
+      R6n: R6/n 
+      R6p: R6/p 
+      X1c: X1/c 
+      X2c: X2/c 
+      X3c: X3/c
+#   ---------------------- Z5 Microzooplankton ----------------------
+  Z5:
+#    use: false
+    long_name: Microzooplankton
+    model: ogs/MicroZoo
+    parameters:
+#             --------- Physiological parameters -----------------
+      p_q10:     2.0     # [-]           Characteristic Q10 coefficient
+      p_srs:     0.02    # [1/d]         Respiration rate at 10 degrees Celsius
+      p_sum:     2.71    # [1/d]         Potential growth rate
+      p_sdo:     0.05    # [1/d]         Mortality rate due to oxygen limitation
+      p_sd:      0.0     # [1/d]         Temperature independent mortality rate
+      p_pu:      0.5     # [-]           Assimilation efficiency
+      p_pu_ea:   0.5     # [-]           Fraction of activity excretion
+      p_chro:    8       # [mmolO2/m3]   Half-saturation oxygen concentration
+      p_chuc:    30.0    # [mgC/m3]      Half-saturation Food concentration for Type II
+      p_minfood: 50.0    # [mgC/m3]      Half-saturation food concentration for
+                                         # preference factor
+      p_pecaco3: 0.5     # [-]           Portion of egested calcified shells during grazing
+      p_qpcMIZ:  1.85e-3 # [mmolN/mgC]   Maximum quotum P:C
+      p_qncMIZ:  1.67e-2 # [mmolN/mgC]   Maximum quotum N:C
+      nprey:     7       # [-]           Number of preys
+      suprey1:   0.1     # [-]           Availability of pelagic Bacteria group b
+                                         # to Zooplankton group z
+      suprey2:   0.7     # [-]           Availability of PhytoPlankton group P1
+                                         # to Zooplankton group z
+      suprey3:   1.0     # [-]           Availability of PhytoPlankton group P2
+                                         # to Zooplankton group z
+      suprey4:   0.1     # [-]           Availability of PhytoPlankton group P3
+                                         # to Zooplankton group z
+      suprey5:   0.1     # [-]           Availability of PhytoPlankton group P4
+                                         # to Zooplankton group z
+      suprey6:   1.0     # [-]           Availability of MicroZooplankton group Z5
+                                         # to Zooplankton group z
+      suprey7:   1.0     # [-]           Availability of MicroZooplankton group Z6
+                                         # to Zooplankton group z
+#--------------------------------------------------------------------
+      isP21: 0           # [-] identify P2 among the preys [1 for P2 otherwise 0]
+      isP22: 0           # [-] identify P2 among the preys [1 for P2 otherwise 0]
+      isP23: 1           # [-] identify P2 among the preys [1 for P2 otherwise 0]
+      isP24: 0           # [-] identify P2 among the preys [1 for P2 otherwise 0]
+      isP25: 0           # [-] identify P2 among the preys [1 for P2 otherwise 0]
+      isP26: 0           # [-] identify P2 among the preys [1 for P2 otherwise 0]
+      isP27: 0           # [-] identify P2 among the preys [1 for P2 otherwise 0]
+#--------------------------------------------------------------------
+      p_pe_R1c: 0.60     # [-]           Fractional content of C in cytoplasm
+      p_pe_R1n: 0.72     # [-]           Fractional content of C in cytoplasm
+      p_pe_R1p: 0.832    # [-]           Fractional content of C in cytoplasm
+      p_fX1z: 0.018      # [-]           fraction of colored labile DOC      
+    initialization:
+      c: 1.0                             # carbon (mg C/m^3)
+      n: 0.0167                          # nitrogen (mmol N/m^3)
+      p: 0.00185                        # phosphate (mmol N/m^3)
+    coupling:
+      O2o:   O2/o                        # Oxygen (mmol O2/m^3)
+      O3c:   O3/c                        # dissolved inorganic carbon (mg C/m^3)
+      N4n:   N4/n                        # ammonium (mmol N/m^3)
+      N1p:   N1/p                        # phosphate (mmol P/m^3)
+      R6c:   R6/c                        # POC  (mgC/m3)
+      R6s:   R6/s                        # POSi (mgSi/m3)
+      R6n:   R6/n                        # PON (mmolN/m3)
+      R6p:   R6/p                        # POP (mmolP/m3)
+      X1c:   X1/c                        # labile CDOM
+      R1c:   R1/c                        # labile DOC
+      R1n:   R1/n                        # labile DON
+      R1p:   R1/p                        # labile DOP
+      prey1: B1
+      prey2: P1
+      prey3: P2
+      prey4: P3
+      prey5: P4
+      prey6: Z5
+      prey7: Z6
+      O3h:   O3h/h
+      O5c:   O5/c
+#   ---------------------- Z6 Microzooplankton ----------------------
+  Z6:
+#    use: false
+    long_name: Heterotrophic Nanoflagellates (HNAN)
+    model: ogs/MicroZoo
+    parameters:
+#             --------- Physiological parameters -----------------
+      p_q10:     2.0     # [-]           Characteristic Q10 coefficient
+      p_srs:     0.02    # [1/d]         Respiration rate at 10 degrees Celsius
+      p_sum:     3.88    # [1/d]         Potential growth rate
+      p_sdo:     0.05    # [1/d]         Mortality rate due to oxygen limitation
+      p_sd:      0.0     # [1/d]         Temperature independent mortality rate
+      p_pu:      0.3     # [-]           Assimilation efficiency
+      p_pu_ea:   0.5     # [-]           Fraction of activity excretion
+      p_chro:    8       # [mmolO2/m3]   Half-saturation oxygen concentration
+      p_chuc:    100.0   # [mgC/m3]      Half-saturation Food concentration for Type II
+      p_minfood: 50.0    # [mgC/m3]      Half-saturation food concentration for
+                                         # preference factor
+      p_pecaco3: 0.5     # [-]           Portion of egested calcified shells during grazing
+      p_qpcMIZ:  1.85e-3 # [mmolN/mgC]   Maximum quotum P:C
+      p_qncMIZ:  1.67e-2 # [mmolN/mgC]   Maximum quotum N:C
+      nprey:     7       # [-]           Number of preys
+      suprey1:   1.0     # [-]           Availability of pelagic Bacteria group b
+                                         # to Zooplankton group z
+      suprey2:   0.0     # [-]           Availability of PhytoPlankton group P1
+                                         # to Zooplankton group z
+      suprey3:   0.2     # [-]           Availability of PhytoPlankton group P2
+                                         # to Zooplankton group z
+      suprey4:   1.0     # [-]           Availability of PhytoPlankton group P3
+                                         # to Zooplankton group z
+      suprey5:   0.0     # [-]           Availability of PhytoPlankton group P4
+                                         # to Zooplankton group z
+      suprey6:   0.0     # [-]           Availability of MicroZooplankton group Z5
+                                         # to Zooplankton group z
+      suprey7:   0.2     # [-]           Availability of MicroZooplankton group Z6
+                                         # to Zooplankton group z
+#--------------------------------------------------------------------
+      isP21: 0           # [-] identify P2 among the preys [1 for P2 otherwise 0]
+      isP22: 0           # [-] identify P2 among the preys [1 for P2 otherwise 0]
+      isP23: 1           # [-] identify P2 among the preys [1 for P2 otherwise 0]
+      isP24: 0           # [-] identify P2 among the preys [1 for P2 otherwise 0]
+      isP25: 0           # [-] identify P2 among the preys [1 for P2 otherwise 0]
+      isP26: 0           # [-] identify P2 among the preys [1 for P2 otherwise 0]
+      isP27: 0           # [-] identify P2 among the preys [1 for P2 otherwise 0]
+#-------------------------------------------------------------------- 
+      p_pe_R1c: 0.60     # [-]           Fractional content of C in cytoplasm
+      p_pe_R1n: 0.72     # [-]           Fractional content of C in cytoplasm
+      p_pe_R1p: 0.832    # [-]           Fractional content of C in cytoplasm
+      p_fX1z: 0.030      # [-]           fraction of colored labile DOC      
+    initialization:
+      c: 1.0                             # carbon (mg C/m^3)
+      n: 0.0167                          # nitrogen (mmol N/m^3)
+      p: 0.00185                         # phosphate (mmol N/m^3)
+    coupling:
+      O2o:   O2/o                        # Oxygen (mmol O2/m^3)
+      O3c:   O3/c                        # dissolved inorganic carbon (mg C/m^3)
+      N4n:   N4/n                        # ammonium (mmol N/m^3)
+      N1p:   N1/p                        # phosphate (mmol P/m^3)
+      R6c:   R6/c                        # POC  (mgC/m3)
+      R6s:   R6/s                        # POSi (mgSi/m3)
+      R6n:   R6/n                        # PON (mmolN/m3)
+      R6p:   R6/p                        # POP (mmolP/m3)
+      X1c:   X1/c                        # labile CDOM
+      R1c:   R1/c                        # labile DOC
+      R1n:   R1/n                        # labile DON
+      R1p:   R1/p                        # labile DOP
+      prey1: B1
+      prey2: P1
+      prey3: P2
+      prey4: P3
+      prey5: P4
+      prey6: Z5
+      prey7: Z6
+      O3h:   O3h/h
+      O5c:   O5/c
+#   ---------------------- Z3 Carnivorous Mesozooplankton ----------------------
+  Z3:
+#    use: false
+    long_name: Carnivorous Mesozooplankton
+    model: ogs/MesoZoo
+    parameters:
+#           --------------- Physiological parameters -----------------
+      p_q10: 2.0                        # [-]             Q10 value for physiological rates
+      p_srs: 0.01                       # [1/d]           Respiration rate at 10 degrees C
+      p_sum: 2.0                        # [1/d]           Maximal productivity at 10 degrees C
+      p_sd:  0.02                       # [1/d]           Background natural mortality
+      p_vum: 0.008                      # [m3/mgC/d]      Specific search volume
+      p_puI: 0.6                        # [-]             Assimilation efficiency
+      p_peI: 0.3                        # [-]             Fraction of Faeces production
+      p_sdo: 0.01                       # [m3/mgC/d]      Specific density-dependent mortality
+      p_sds: 2.0                        # [-]             Exponent of density-dependent mortality
+      p_pecaco3: 0.75                   # [-]             Portion of egested calcified shells during grazing
+      p_qpcMEZ: 1.67e-3                 # [mmolP/mgC]     Maximum quotum P:C
+      p_qncMEZ: 0.015                   # [mmolN/mgC]     Maximum quotum N:C
+      p_clO2o: 30.0                     # [mmolO2/m3]     Half-saturation oxygen concentration
+#-----------------------------------------------------------------------------
+      nprey:     3                      # [-]             Number of preys
+      suprey1:   1.0     # [-]           Availability of PhytoPlankton group P4
+                                         # to Zooplankton group z
+      suprey2:   1.0     # [-]           Availability of MicroZooplankton group Z3
+                                         # to Zooplankton group z
+      suprey3:   1.0     # [-]           Availability of MicroZooplankton group Z4
+                                         # to Zooplankton group z
+#------------------------------------------------------------------------------
+      isP21: 0           # [-] identify P2 among the preys [1 for P2 otherwise 0]
+      isP22: 0           # [-] identify P2 among the preys [1 for P2 otherwise 0]
+      isP23: 0           # [-] identify P2 among the preys [1 for P2 otherwise 0]
+#------------------------------------------------------------------------------
+    initialization:
+      c: 1.0                                               # carbon (mg C/m^3)
+      n: 0.015                                             # nitrogen (mmol N/m^3)
+      p: 0.00167                                           # phosphate (mmol N/m^3)
+    coupling:
+      O2o: O2/o                                            # dissolved oxygen
+      O3c: O3/c                                            # DIC
+      N1p: N1/p                                            # phosphate (mmol P/m^3)
+      N4n: N4/n                                            # ammonium (mmol N/m^3)
+      R6c: R6/c                                            # POC
+      R6n: R6/n                                            # PON
+      R6p: R6/p                                            # POP
+      R6s: R6/s                                            # biogenic silica (mmol Si/m^3)
+      prey1: P4
+      prey2: Z3
+      prey3: Z4
+      O3h: O3h/h
+      O5c: O5/c
+#   ---------------------------------------------------------------------------
+#   ---------------------- Z4 Omnivorous Mesozooplankton ----------------------
+  Z4:
+#    use: false
+    long_name: Omnivorous Mesozooplankton
+    model: ogs/MesoZoo
+    parameters:
+#           ----------------- Physiological parameters -----------------
+      p_q10: 2.0                        # [-]             Q10 value for physiological rates
+      p_srs: 0.02                       # [1/d]           Respiration rate at 10 degrees C
+      p_sum: 2.0                        # [1/d]           Maximal productivity at 10 degrees C
+      p_sd:  0.02                       # [1/d]           Background natural mortality
+      p_vum: 0.02                       # [m3/mgC/d]      Specific search volume
+      p_puI: 0.6                        # [-]             Assimilation efficiency
+      p_peI: 0.35                       # [-]             Fraction of Faeces production
+      p_sdo: 0.01                       # [m3/mgC/d]      Specific density-dependent mortality
+      p_sds: 2.0                        # [-]             Exponent of density-dependent mortality
+      p_pecaco3: 0.75                   # [-]             Portion of egested calcified shells during grazing
+      p_qpcMEZ: 1.67e-3                 # [mmolP/mgC]     Maximum quotum P:C
+      p_qncMEZ: 0.015                   # [mmolN/mgC]     Maximum quotum N:C
+      p_clO2o: 30.0                     # [mmolO2/m3]     Half-saturation oxygen concentration
+#-------------------------------------------------------------------------------
+      nprey:     5                      # [-]             Number of preys
+      suprey1:   1.0     # [-]           Availability of PhytoPlankton group P1
+                                         # to Zooplankton group z
+      suprey2:   0.75    # [-]           Availability of PhytoPlankton group P2
+                                         # to Zooplankton group z
+      suprey3:   1.0     # [-]           Availability of PhytoPlankton group P4
+                                         # to Zooplankton group z
+      suprey4:   1.0     # [-]           Availability of MicroZooplankton group Z5
+                                         # to Zooplankton group z
+      suprey5:   1.0     # [-]           Availability of MicroZooplankton group Z4
+                                         # to Zooplankton group z
+#-------------------------------------------------------------------------------
+      isP21: 0           # [-] identify P2 among the preys [1 for P2 otherwise 0]
+      isP22: 1           # [-] identify P2 among the preys [1 for P2 otherwise 0]
+      isP23: 0           # [-] identify P2 among the preys [1 for P2 otherwise 0]
+      isP24: 0           # [-] identify P2 among the preys [1 for P2 otherwise 0]
+      isP25: 0           # [-] identify P2 among the preys [1 for P2 otherwise 0]
+#-------------------------------------------------------------------------------
+    initialization:
+      c: 1.0                                               # carbon (mg C/m^3)
+      n: 0.015                                             # nitrogen (mmol N/m^3)
+      p: 0.00167                                           # phosphate (mmol N/m^3)
+    coupling:
+      O2o: O2/o                                            # dissolved oxygen
+      O3c: O3/c                                            # DIC
+      N1p: N1/p                                            # phosphate (mmol P/m^3)
+      N4n: N4/n                                            # ammonium (mmol N/m^3)
+      R6c: R6/c                                            # POC
+      R6n: R6/n                                            # PON
+      R6p: R6/p                                            # POP
+      R6s: R6/s                                            # biogenic silica (mmol Si/m^3)
+      prey1: P1
+      prey2: P2
+      prey3: P4
+      prey4: Z5
+      prey5: Z4
+      O3h:   O3h/h
+      O5c:   O5/c
+#   ---------------------- Pelagic chemistry ----------------------
+#
+  PelChem:
+    long_name: pelagic chemistry
+    model: ogs/PelChem
+    parameters:
+      p_clO2o:  10.0       # [mmolO2/m3]      Half-saturation O2 concentration for nitrification and reoxidation
+      p_clN6r:   1.0       # [mmolHS/m3]      Half-saturation concentration of reduction equivalents for denitrification[mmolO2/m3]
+      p_sN4N3:  0.01       # [1/d]            Specific nitrification rate at 10 degC
+      p_q10N4N3: 2.367     # [-]              Q10 factor for nitrification/denit
+      p_qon_nitri: 2.0     # [mmolO2/mmolN]   stoichiometric coefficient for nitrification
+      p_qro: 0.5           # [mmolHS-/mmolO2] Stoichiometric coefficient for anaerobic reactions
+      p_sN3O4n: 0.35       # [1/d]            Specific denitrification rate
+      p_rPAo: 1.0          # [mmolO2/m3/d]    Reference anoxic mineralization rate
+      p_qon_dentri: 1.25   # [mmolO2/mmolN]   Stoichiometric coefficient for denitrification
+      p_rOS: 0.05          # [1/d]            Specific reoxidation rate of reduction equivalents
+      p_sR6N5: 0.1         # [1/d]            Specific remineralization rate of biogenic silica
+      p_q10R6N5: 1.49      # [-]              Q10 factor for biogenic silica
+      p_bX1c: 0.167        # [1/d]            photodegradation (bleaching) rate X1c
+      p_bX2c: 0.167        # [1/d]            photodegradation (bleaching) rate X2c
+      p_bX3c: 0.00119      # [1/d]            photodegradation (bleaching) rate X3c
+      p_IX1: 60.0          # [uE m-2 s-1]     light threshold for X1c bleaching
+      p_IX2: 60.0          # [uE m-2 s-1]     light threshold for X2c bleaching
+      p_IX3: 50.0          # [uE m-2 s-1]     light threshold for X3c bleaching
+      p_rX3c: 0.00003      # [1/d]            remineralization rate X3c and R3c
+      p_q10X: 2.95         # [-]              q10 for CDOM degradation
+      p_Esource: 5         # [5 or 6]         source of light for CDOM bleaching, 5=spectral, 6=mono
+    initialization:
+    coupling:
+      N3n: N3/n                                            # nitrate (mmol N/m^3)
+      N4n: N4/n                                            # ammonium (mmol N/m^3)
+      O2o: O2/o                                            # oxygen (mmol O_2/m^3)
+      O3h: O3h/h                                           # alkalinity (mmol /m^3)
+      O4n: O4/n                                            # N2 (mmol N/m^3)
+      N6r: N6/r                                            # reduction equivalent (mmol HS/m^3)
+      N5s: N5/s                                            # silicate (mmol Si/m^3)
+      X1c: X1/c                                            # cdom X1c (mgC/m^3)
+      X2c: X2/c                                            # cdom X2c (mgC/m^3)
+      X3c: X3/c                                            # cdom X3c (mgC/m^3)
+      R3c: R3/c                                            # cdom R3c (mgC/m^3)
+      R6s: R6/s                                            # POSi (mgSi/m3)
+      PAR_tot: lightspectral/PAR_tot
+##  --------------------- CalciteDissolution
+  O5:
+#    use: false
+    long_name: calcite
+    model: ogs/CalciteDissolution
+    parameters:
+      p_kdca:   10.9     # [d-1]           Calcite dissolution rate constant
+      p_nomega: 1.0       # [-]             Order of the dissolution rate dependence on Omega
+      p_wsinkPIC: 30      # [m d-1]         sinking velocity of PIC (Calcite)
+      c0:       1.0e-05         #                 background concentration (mg C/m^3), default = 0.0
+    initialization:
+      c: 1.0                                         # carbon (mg C/m^3)
+    coupling:
+      OCalc: O3/OCalc                               # calcite saturation (-)
+      O3c: O3/c                                     # total dissolved inorganic carbon (mgC/m^3)
+      O3h: O3h/h                                     # alkalinity (mmol/m^3)
