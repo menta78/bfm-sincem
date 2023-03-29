@@ -47,7 +47,7 @@ def dumpfile(string_list, filename):
     fid.close()
 
 def reducer8(String):
-    RULES={"PPY_ii":"_", "BFM1D_exR2ac_ii":"exR2ac", "MEZ_ii":"_",  "MIZ_ii":"_", "OMT_ii":"_", "PBA_ii":"_" }
+    RULES={"PPY_ii":"_", "BFM1D_exR2ac_ii":"exR2ac", "MEZ_ii":"_",  "MIZ_ii":"_", "OMT_ii":"_", "PBA_ii":"_", 'exPPYR2ac_ii': "exR2"}
     for r in RULES.keys():
         String = String.replace(r, RULES[r])
     return String[:8]
