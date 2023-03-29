@@ -832,6 +832,11 @@ wheel (install with python -m pip install --user wheel)
 \end_layout
 
 \begin_layout Standard
+The usage of conda is encouraged to install the software above.
+ 
+\end_layout
+
+\begin_layout Standard
 On most Linux-like systems (UNIX/Linux/Mac OS X), a Git client is already
  installed.
  You can then obtain the FABM source code systems by executing 
@@ -946,7 +951,9 @@ FABM_ARGS="-DFABM_INSTITUTES=<institute_name>
 
 \begin_layout Plain Layout
 
-               -DCMAKE_Fortran_COMPILER=gfortran"
+               -DCMAKE_Fortran_COMPILER=gfortran" # indicate the fortran
+ compiler e.g.
+ gfortran ifort
 \end_layout
 
 \begin_layout Plain Layout
@@ -1002,11 +1009,11 @@ rm -rf ${WORK_DIR}
 \end_layout
 
 \begin_layout Standard
-then source this script and it will create the python code
+then source this script and it will create the python code.
 \end_layout
 
 \begin_layout Chapter
-The fabm.yaml comfiguration file 
+The fabm.yaml configuration file 
 \end_layout
 
 \begin_layout Standard
@@ -1216,28 +1223,62 @@ name "Running FABM-BFM-1"
 \end_layout
 
 \begin_layout Standard
+To perform a test simulation first create a folder for the setup from the
+ root directory of FABM.
+\end_layout
+
+\begin_layout Standard
 \begin_inset listings
 inline false
 status open
 
 \begin_layout Plain Layout
 
-import os,sys
+mkdir -p setup/0D
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+then copy the configuration file into the setup folder.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+cp extern/<institute_name>/fabm_monospectral.yaml setups/0D/fabm.yaml
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+iimport numpy as np
 \end_layout
 
 \begin_layout Plain Layout
 
-import numpy as np 
+import pyfabm
 \end_layout
 
 \begin_layout Plain Layout
 
-import scipy.integrate
-\end_layout
-
-\begin_layout Plain Layout
-
-import pyfabm 
+import netCDF4 as nc
 \end_layout
 
 \begin_layout Plain Layout
@@ -1250,88 +1291,301 @@ import pyfabm
 
 \begin_layout Plain Layout
 
+t_eval = np.linspace(0, 3650.*86400, 50000)
 \end_layout
 
 \begin_layout Plain Layout
 
-# Configure the environment 
+y = np.zeros((len(t_eval),54))
+\end_layout
+
+\begin_layout Plain Layout
+
+k=0
+\end_layout
+
+\begin_layout Plain Layout
+
+l=[]
+\end_layout
+
+\begin_layout Plain Layout
+
+#sinusoidal temperature fluctuation
+\end_layout
+
+\begin_layout Plain Layout
+
+# parameters
+\end_layout
+
+\begin_layout Plain Layout
+
+MeanTemp = 15           # Average temperature in the country
+\end_layout
+
+\begin_layout Plain Layout
+
+DailyAmpl = 5           # Amplitude of the daily cycle
+\end_layout
+
+\begin_layout Plain Layout
+
+YearlyAmpl =  5         # Amplitude of the yearly cycle
+\end_layout
+
+\begin_layout Plain Layout
+
+#oiseStd = 0.1          # Standard deviation of normally distributed error
+ term
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+# Total seconds in year
+\end_layout
+
+\begin_layout Plain Layout
+
+TotalHours = 24*365*60*60 #year period
+\end_layout
+
+\begin_layout Plain Layout
+
+tau        = 24*60*60     #day period
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+# Generate the frequency components of the data
+\end_layout
+
+\begin_layout Plain Layout
+
+DailyCycle = -DailyAmpl*np.cos( (2*np.pi)*t_eval/tau )
+\end_layout
+
+\begin_layout Plain Layout
+
+YearlyCycle = -YearlyAmpl*np.cos( (2*np.pi)*t_eval/TotalHours )
+\end_layout
+
+\begin_layout Plain Layout
+
+#Noise = np.random.normal(0, NoiseStd, TotalHours)
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+# Final series
+\end_layout
+
+\begin_layout Plain Layout
+
+T = MeanTemp + DailyCycle + YearlyCycle #+ Noise
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+##########sinusoidal light fluctuation
+\end_layout
+
+\begin_layout Plain Layout
+
+# parameters
+\end_layout
+
+\begin_layout Plain Layout
+
+MeanTemp =  0           # Average temperature in the country
+\end_layout
+
+\begin_layout Plain Layout
+
+DailyAmpl = 100          # Amplitude of the daily cycle
+\end_layout
+
+\begin_layout Plain Layout
+
+YearlyAmpl = 10         # Amplitude of the yearly cycle
+\end_layout
+
+\begin_layout Plain Layout
+
+#NoiseStd = 0.1          # Standard deviation of normally distributed error
+ term
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+# Total seconds in year
+\end_layout
+
+\begin_layout Plain Layout
+
+TotalHours = 24*365*60*60 #year period
+\end_layout
+
+\begin_layout Plain Layout
+
+tau        = 24*60*60     #day period
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+# Generate the frequency components of the data
+\end_layout
+
+\begin_layout Plain Layout
+
+DailyCycle = -DailyAmpl*np.cos( (2*np.pi)*t_eval/tau )
+\end_layout
+
+\begin_layout Plain Layout
+
+YearlyCycle = -YearlyAmpl*np.cos( (2*np.pi)*t_eval/TotalHours )
+\end_layout
+
+\begin_layout Plain Layout
+
+#Noise = np.random.normal(0, NoiseStd, TotalHours)
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+# Final series
+\end_layout
+
+\begin_layout Plain Layout
+
+L = np.where((MeanTemp + DailyCycle + YearlyCycle) > 0, MeanTemp + DailyCycle
+ + YearlyCycle, 0.)#+ Noise
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+# Create model (loads fabm.yaml)
+\end_layout
+
+\begin_layout Plain Layout
+
+model = pyfabm.Model('fabm.yaml')
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+# Configure the environment
 \end_layout
 
 \begin_layout Plain Layout
 
 # Note: the set of environmental dependencies depends on the loaded biogeochemic
 al model.
- 
-\end_layout
-
-\begin_layout Plain Layout
-
 \end_layout
 
 \begin_layout Plain Layout
 
 model.dependencies['cell_thickness'].value = 1.
- 
 \end_layout
 
 \begin_layout Plain Layout
 
-model.dependencies['temperature'].value = 15.
- 
+model.dependencies['temperature'].value = T[0]#15.
+\end_layout
+
+\begin_layout Plain Layout
+
+# model.dependencies['temperature'].value = #15.
 \end_layout
 
 \begin_layout Plain Layout
 
 model.dependencies['practical_salinity'].value = 30.
- 
 \end_layout
 
 \begin_layout Plain Layout
 
 model.dependencies['density'].value = 1000.
- 
 \end_layout
 
 \begin_layout Plain Layout
 
 model.dependencies['depth'].value = 1.
- 
 \end_layout
 
 \begin_layout Plain Layout
 
 model.dependencies['pressure'].value = 1.
- 
 \end_layout
 
 \begin_layout Plain Layout
 
 model.dependencies['longitude'].value = 0.
- 
 \end_layout
 
 \begin_layout Plain Layout
 
 model.dependencies['latitude'].value = 0.
- 
 \end_layout
 
 \begin_layout Plain Layout
 
-model.dependencies['surface_downwelling_shortwave_flux'].value = 50.
- 
+# model.dependencies['surface_downwelling_shortwave_flux'].value = 50.
+\end_layout
+
+\begin_layout Plain Layout
+
+model.dependencies['surface_downwelling_shortwave_flux'].value = L[0]#50.
 \end_layout
 
 \begin_layout Plain Layout
 
 model.dependencies['surface_air_pressure'].value = 1.
- 
 \end_layout
 
 \begin_layout Plain Layout
 
 model.dependencies['wind_speed'].value = 5.
- 
 \end_layout
 
 \begin_layout Plain Layout
@@ -1350,7 +1604,16 @@ model.dependencies['number_of_days_since_start_of_the_year'].value = 1.
 
 \begin_layout Plain Layout
 
-# Verify the model is ready to be used model.cell_thickness=1.
+# Verify the model is ready to be used
+\end_layout
+
+\begin_layout Plain Layout
+
+model.cell_thickness=1.
+\end_layout
+
+\begin_layout Plain Layout
+
 \end_layout
 
 \begin_layout Plain Layout
@@ -1365,42 +1628,21 @@ assert model.checkReady(), 'One or more model dependencies have not been
 
 \begin_layout Plain Layout
 
-# Time derivative 
-\end_layout
-
-\begin_layout Plain Layout
-
-def dy(t0, y):     
-\end_layout
-
-\begin_layout Plain Layout
-
-	model.state[:] = y     
-\end_layout
-
-\begin_layout Plain Layout
-
-	return model.getRates()
-\end_layout
-
-\begin_layout Plain Layout
-
 \end_layout
 
 \begin_layout Plain Layout
 
 # Time-integrate over 1000 days (note: FABM's internal time unit is seconds!)
- 
 \end_layout
 
 \begin_layout Plain Layout
 
-t_eval = np.linspace(0, 3650.*86400, 10000)  
+dt = (t_eval[-1]-t_eval[0])/len(t_eval)
 \end_layout
 
 \begin_layout Plain Layout
 
-y = scipy.integrate.odeint(dy, model.state, t*86400)
+y[0,:]=model.state[:]
 \end_layout
 
 \begin_layout Plain Layout
@@ -1409,27 +1651,70 @@ y = scipy.integrate.odeint(dy, model.state, t*86400)
 
 \begin_layout Plain Layout
 
-# Plot results 
+      #print(model.state)
 \end_layout
 
 \begin_layout Plain Layout
 
-import pylab 
+for i in range(len(t_eval)):
 \end_layout
 
 \begin_layout Plain Layout
 
-pylab.plot(t, y) 
+    model.dependencies['temperature'].value = T[i]
 \end_layout
 
 \begin_layout Plain Layout
 
-pylab.legend([variable.path for variable in model.state_variables]) 
+    model.dependencies['surface_downwelling_shortwave_flux'].value = L[i]
 \end_layout
 
 \begin_layout Plain Layout
 
-pylab.show()
+    dy = model.getRates()
+\end_layout
+
+\begin_layout Plain Layout
+
+    for j in range(len(model.state)):
+\end_layout
+
+\begin_layout Plain Layout
+
+        if i!=0:
+\end_layout
+
+\begin_layout Plain Layout
+
+            y[i,j]=y[i-1,j]+dy[j]*dt
+\end_layout
+
+\begin_layout Plain Layout
+
+    model.state[:]=y[i,:]
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+t = t_eval/86400
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+Nt=t.shape[0]
+\end_layout
+
+\begin_layout Plain Layout
+
+deltaT=t[1]-t[0]
 \end_layout
 
 \end_inset
@@ -1438,34 +1723,213 @@ pylab.show()
 \end_layout
 
 \begin_layout Standard
-\begin_inset Float figure
-wide false
-sideways false
+\begin_inset listings
+inline false
 status open
 
 \begin_layout Plain Layout
-\begin_inset Graphics
-	filename Figures/simulation.png
 
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Caption Standard
-
-\begin_layout Plain Layout
-Example of output simulation using the python wrapper
-\end_layout
-
-\end_inset
-
-
+t = t_eval/86400
 \end_layout
 
 \begin_layout Plain Layout
 
+Nt=t.shape[0]
+\end_layout
+
+\begin_layout Plain Layout
+
+deltaT=t[1]-t[0]
+\end_layout
+
+\begin_layout Plain Layout
+
+# Save results
+\end_layout
+
+\begin_layout Plain Layout
+
+fileoutput = 'result.nc'
+\end_layout
+
+\begin_layout Plain Layout
+
+f = nc.Dataset(fileoutput, mode='w')
+\end_layout
+
+\begin_layout Plain Layout
+
+lat_dim = f.createDimension('lat', 1)
+\end_layout
+
+\begin_layout Plain Layout
+
+lon_dim = f.createDimension('lon', 1)
+\end_layout
+
+\begin_layout Plain Layout
+
+dep_dim = f.createDimension('z', 1)
+\end_layout
+
+\begin_layout Plain Layout
+
+time_dim = f.createDimension('time', Nt)
+\end_layout
+
+\begin_layout Plain Layout
+
+lat = f.createVariable('lat', np.float32, ('lat',))
+\end_layout
+
+\begin_layout Plain Layout
+
+lat.units = 'degrees_north'
+\end_layout
+
+\begin_layout Plain Layout
+
+lat.long_name = 'latitude'
+\end_layout
+
+\begin_layout Plain Layout
+
+f.variables['lat'][:]=0
+\end_layout
+
+\begin_layout Plain Layout
+
+lon = f.createVariable('lon', np.float32, ('lon',))
+\end_layout
+
+\begin_layout Plain Layout
+
+lon.units = 'degrees_east'
+\end_layout
+
+\begin_layout Plain Layout
+
+lon.long_name = 'longitude'
+\end_layout
+
+\begin_layout Plain Layout
+
+f.variables['lon'][:]=0
+\end_layout
+
+\begin_layout Plain Layout
+
+time = f.createVariable('time', np.float64, ('time',))
+\end_layout
+
+\begin_layout Plain Layout
+
+time.units = 'days'
+\end_layout
+
+\begin_layout Plain Layout
+
+time.long_name = 'time'
+\end_layout
+
+\begin_layout Plain Layout
+
+f.variables['time'][:]=t
+\end_layout
+
+\begin_layout Plain Layout
+
+depth = f.createVariable('z', np.float32, ('z',))
+\end_layout
+
+\begin_layout Plain Layout
+
+depth.units = 'meters'
+\end_layout
+
+\begin_layout Plain Layout
+
+depth.long_name = 'depth'
+\end_layout
+
+\begin_layout Plain Layout
+
+f.variables['z'][:]=1
+\end_layout
+
+\begin_layout Plain Layout
+
+temp = f.createVariable('temp', np.float64, ('time',))
+\end_layout
+
+\begin_layout Plain Layout
+
+temp.units = 'C'
+\end_layout
+
+\begin_layout Plain Layout
+
+temp.long_name = 'temperature in celsius'
+\end_layout
+
+\begin_layout Plain Layout
+
+f.variables['temp'][:]=T
+\end_layout
+
+\begin_layout Plain Layout
+
+light = f.createVariable('light', np.float64, ('time',))
+\end_layout
+
+\begin_layout Plain Layout
+
+light.units = 'W/m^2'
+\end_layout
+
+\begin_layout Plain Layout
+
+light.long_name = 'surface_downwelling_shortwave_flux'
+\end_layout
+
+\begin_layout Plain Layout
+
+f.variables['light'][:]=L
+\end_layout
+
+\begin_layout Plain Layout
+
+for v,variable in enumerate(model.state_variables):
+\end_layout
+
+\begin_layout Plain Layout
+
+ncvar = variable.name.replace("/","_")
+\end_layout
+
+\begin_layout Plain Layout
+
+var = f.createVariable(ncvar, np.float64, ('time', 'z','lat','lon'))
+\end_layout
+
+\begin_layout Plain Layout
+
+var.units = variable.units
+\end_layout
+
+\begin_layout Plain Layout
+
+var.long_name = variable.long_name
+\end_layout
+
+\begin_layout Plain Layout
+
+f.variables[ncvar][:]=y[:,v]
+\end_layout
+
+\begin_layout Plain Layout
+
+f.close()
 \end_layout
 
 \end_inset
@@ -1612,6 +2076,163 @@ i
 
 \begin_layout Chapter
 Output and diagnostics
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+import numpy as np
+\end_layout
+
+\begin_layout Plain Layout
+
+import netCDF4 as nc
+\end_layout
+
+\begin_layout Plain Layout
+
+import matplotlib.pyplot as plt
+\end_layout
+
+\begin_layout Plain Layout
+
+ncname = 'result.nc'
+\end_layout
+
+\begin_layout Plain Layout
+
+f_det = nc.Dataset(ncname)
+\end_layout
+
+\begin_layout Plain Layout
+
+varnames=['B1_c','P1_c','P2_c','P3_c','P4_c','Z5_c','Z6_c','Z3_c','Z4_c']
+\end_layout
+
+\begin_layout Plain Layout
+
+t = np.linspace(0, 3650., 50000)
+\end_layout
+
+\begin_layout Plain Layout
+
+fig,axs = plt.subplots(3,3,sharex=True)#,constrained_layout=True)
+\end_layout
+
+\begin_layout Plain Layout
+
+fig.tight_layout()
+\end_layout
+
+\begin_layout Plain Layout
+
+plt.subplots_adjust(top=0.90)
+\end_layout
+
+\begin_layout Plain Layout
+
+plt.subplots_adjust(left=0.15)
+\end_layout
+
+\begin_layout Plain Layout
+
+plt.subplots_adjust(bottom=0.10)
+\end_layout
+
+\begin_layout Plain Layout
+
+axs = axs.ravel()
+\end_layout
+
+\begin_layout Plain Layout
+
+titles = ['Bacteria B1', 'Diatoms P1', 'Nanoflagellates P2', 'Picophytoplankton
+ P3', 'Dinoflagellates P4', 'Microzooplankton Z5', 'het.
+ Nanoflagellates Z6', 'carn.
+ Mesozooplankton Z3', 'omn.
+ Mesozooplank
+\end_layout
+
+\begin_layout Plain Layout
+
+ton Z4']
+\end_layout
+
+\begin_layout Plain Layout
+
+for iax,ax in enumerate(axs):
+\end_layout
+
+\begin_layout Plain Layout
+
+lns2 = ax.plot(t[:],f_det.variables[varnames[iax]][:,0,0,0],c='k',label=r'$D=0$')
+\end_layout
+
+\begin_layout Plain Layout
+
+ax.set_title(titles[iax],fontsize=8)
+\end_layout
+
+\begin_layout Plain Layout
+
+ax.tick_params(axis='both', which='major', labelsize=7)
+\end_layout
+
+\begin_layout Plain Layout
+
+fig.text(0.5, 0.04, 'time [days]', ha='center')
+\end_layout
+
+\begin_layout Plain Layout
+
+fig.text(0.04, 0.5, 'Mean Concentration [$mg C/m^3$]', va='center', rotation='verti
+cal')
+\end_layout
+
+\begin_layout Plain Layout
+
+fig.savefig('prova.png', format='png',dpi=250)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename Figures/simulation.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Example of output simulation using the python wrapper
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
