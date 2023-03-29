@@ -66,18 +66,14 @@ C     === Local variables ====
 #endif /* USE_SINK */
        INTEGER i,j,k,jtr,ktmp,iv
 
-#ifdef BFMv2
-       _RL a(jptra),er(10),b(jptra),c(4),d(jptra_dia),d2(1)
-C      _RS AtmosWIND0  (1-OLx:sNx+OLx,1-OLy:sNy+OLy,nSx,nSy) 
-       logical bot,sur
-#else
+
        _RL a(Nr,jptra)
        _RL er(Nr,11)
        _RL b(jptra,Nr)
        _RL c(4,Nr)
        _RL d(jptra_dia,Nr)
        _RL d2(jptra_dia_2d)
-#endif
+
 
        INTEGER kBot(1-OLx:sNx+OLx,1-OLy:sNy+OLy), kB
 C     msgBuf    :: Informational/error message buffer
@@ -220,222 +216,8 @@ c TO DO: should be generalized!
           ENDDO
          ENDDO
 
-#ifdef BFMv2
-
-c      DO j=1-OLy,sNy+OLy
-c      DO i=1-OLx,sNx+OLx
-      DO k=1,Nr
-      DO j=jmin,jmax
-      DO i=imin,imax
-            do jtr=1,jptra_dia 
-               d(jtr)=0.0   ! initialized BFM diagnostics to 0 
-            enddo
-            do jtr=1,4
-               c(jtr)=0.0   ! initialized BFM sinking velocity to 0 
-            enddo
 
 
-            if (HFacC(i,j,k,bi,bj).gt.0. _d 0) then
-
-             DO jtr=1, jptra
-                 b(jtr)=0.0
-                 if (pTracer(i,j,k,bi,bj,jtr).gt.0) then
-                   a(jtr) = pTracer(i,j,k,bi,bj,jtr)
-                 else
-                   a(jtr)=1.0 _d -10 ! in the case of negative values
-                 endif
-             END DO
-c set bot=1.0 if the layer below is not ocean
-             ktmp=min(nR,k+1)
-             if(hFacC(i,j,ktmp,bi,bj).eq.0. _d 0.or.k.eq.Nr) then
-               bot =.TRUE.
-               kBot(i,j)=ktmp-1
-             else
-               bot =.FALSE.
-             endif
-c set sur = 1.0 if the layer is equal 1 (the land is already checked)
-             if (k.eq.1) then
-                sur=.TRUE.
-             else
-                sur=.FALSE.
-             endif
-! Environmental regulating factors (er)
-#ifdef ALLOW_LONGSTEP
-             er(1)  = min(30.,LS_theta(i,j,k,bi,bj))  ! from LONGSTEP.h
-             er(2)  = LS_salt(i,j,k,bi,bj)   ! from LONGSTEP.h
-             er(3)  = rhoConst + rhoInSitu(i,j,k,bi,bj) ! rhoInSitu (density anomaly [kg/m^3] at cell center level) +
-                                                        ! + RhoConst (set equal to rhoNil=999.8 (set_defaults.F and Ini_parms.F))
-#else
-             er(1)  = min(30.,theta(i,j,k,bi,bj))  ! from DYNVARS.h
-             er(2)  = salt(i,j,k,bi,bj)   ! from DYNVARS.h
-             er(3)  = rhoConst + rhoInSitu(i,j,k,bi,bj) ! rhoInSitu (density anomaly [kg/m^3] at cell center level) +
-                                                        ! + RhoConst (set equal to rhoNil=999.8 (set_defaults.F and Ini_parms.F))
-#endif /* ALLOW_LONGSTEP  */
-             er(4)  = 0.0                 ! NO ICE is implemented
-             er(5)  = AtmosPCO2(i,j,bi,bj)! PCO2 atmopheric from BFMcoupler_VAR.h
-             er(6)  = max(1.0,xpar(i,j,k,bi,bj))   ! PAR [uEin/s]  ATTENTION DAILY CYCLE 
-             er(7)  = 24.0                ! 24 hours
-             er(8)  =  drF(k)*hFacC(i,j,k,bi,bj)! H(m) of cell considering the fract of grid box above topography
-             er(9)  = wspeed(i,j,bi,bj)   ! wind speed [m/s] from EXF_FIELDS.H
-              if (er(9).LE.0.0) then
-                    er(9)=0.001
-              endif
-             er(10) = PH(i,j,k,bi,bj)     ! from BFMcoupler_VAR.h
-
-#ifdef BFMcoupler_DEBUG
-c ===== CHECK DEBUGING
-            if (i.eq.8.and.j.eq.8.and.k.eq.1) then
-       WRITE(msgBuf,'(A,E10.3,E10.3,E10.3,E10.3,E10.3)'),'BFM1:'
-     &                 ,er(1),er(2),er(3),er(4),er(5)
-       CALL PRINT_MESSAGE(msgBuf,stdUnit,SQUEEZE_RIGHT,myThid)
-       WRITE(msgBuf,'(A,E10.3,E10.3,E10.3,E10.3,E10.3)'),'BFM2:'
-     &                 ,er(6),er(7),er(8),er(9),er(10)
-       CALL PRINT_MESSAGE(msgBuf,stdUnit,SQUEEZE_RIGHT,myThid)
-       WRITE(msgBuf,'(A,E10.3,E10.3,E10.3,E10.3,E10.3)'),'BFM3:'
-     &                 ,a(1),a(2),a(3),a(4),a(5)
-       CALL PRINT_MESSAGE(msgBuf,stdUnit,SQUEEZE_RIGHT,myThid)
-       WRITE(msgBuf,'(A,E10.3,E10.3,E10.3,E10.3,E10.3)'),'BFM4:'
-     &                 ,a(6),a(7),a(8),a(9),a(10)
-       CALL PRINT_MESSAGE(msgBuf,stdUnit,SQUEEZE_RIGHT,myThid)
-              endif
-#endif /* endif BFMcoupler_debug */
-
-
-c  ===== CALL TO BFM ====
-             CALL BFM0D_Input_EcologyDynamics(sur,bot,a,jptra,er)
-             CALL BFM0D_reset()
-             CALL EcologyDynamics()
-             CALL BFM0D_Output_EcologyDynamics_surf(b,c,d,d2)
-c            CALL BFM0D_Output_EcologyDynamics(b,jptra,c,d,jptra_dia-1)
-c  ===== return of BFM tendency ====
-             DO jtr=1, jptra
-                 gchemTendency(i,j,k,bi,bj,jtr) = 
-     &                 gchemTendency(i,j,k,bi,bj,jtr)+b(jtr) ! tendency [mmol/m3/s]
-             END DO
-
-
-#ifdef BFMcoupler_DEBUG
-c ===== CHECK DEBUGING
-            DO jtr=1,jptra
-            if (isnan2(b(jtr))) then
-       WRITE(msgBuf,'(A,I2,1x,I3,1x,I3,1x,I3,1x,I3,1x,I3,1x,L,1x,L)'),
-     &               'NAN:',jtr,i,j,k,bi,bj,sur,bot
-       CALL PRINT_MESSAGE(msgBuf,stdUnit,SQUEEZE_RIGHT,myThid)
-       WRITE(msgBuf,'(A,E10.3,E10.3,E10.3,E10.3,E10.3)'),'ER1:'
-     &                 ,er(1),er(2),er(3),er(4),er(5)
-       CALL PRINT_MESSAGE(msgBuf,stdUnit,SQUEEZE_RIGHT,myThid)
-       WRITE(msgBuf,'(A,E10.3,E10.3,E10.3,E10.3,E10.3)'),'ER2:'
-     &                 ,er(6),er(7),er(8),er(9),er(10)
-       CALL PRINT_MESSAGE(msgBuf,stdUnit,SQUEEZE_RIGHT,myThid)
-       WRITE(msgBuf,'(A,E10.3,E10.3,E10.3,E10.3,E10.3)'),'A1:'
-     &                 ,a(1),a(2),a(3),a(4),a(5)
-       CALL PRINT_MESSAGE(msgBuf,stdUnit,SQUEEZE_RIGHT,myThid)
-       WRITE(msgBuf,'(A,E10.3,E10.3,E10.3,E10.3,E10.3)'),'A2:'
-     &                 ,a(6),a(7),a(8),a(9),a(10)
-       CALL PRINT_MESSAGE(msgBuf,stdUnit,SQUEEZE_RIGHT,myThid)
-       WRITE(msgBuf,'(A,E10.3,E10.3,E10.3,E10.3,E10.3)'),'A3:'
-     &                 ,a(11),a(12),a(13),a(14),a(15)
-       CALL PRINT_MESSAGE(msgBuf,stdUnit,SQUEEZE_RIGHT,myThid)
-       WRITE(msgBuf,'(A,E10.3,E10.3,E10.3,E10.3,E10.3)'),'A4:'
-     &                 ,a(16),a(17),a(18),a(19),a(20)
-       CALL PRINT_MESSAGE(msgBuf,stdUnit,SQUEEZE_RIGHT,myThid)
-       WRITE(msgBuf,'(A,E10.3,E10.3,E10.3,E10.3,E10.3)'),'A5:'
-     &                 ,a(21),a(22),a(23),a(24),a(25)
-       CALL PRINT_MESSAGE(msgBuf,stdUnit,SQUEEZE_RIGHT,myThid)
-       WRITE(msgBuf,'(A,E10.3,E10.3,E10.3,E10.3,E10.3)'),'A6:'
-     &                 ,a(26),a(27),a(28),a(29),a(30)
-       CALL PRINT_MESSAGE(msgBuf,stdUnit,SQUEEZE_RIGHT,myThid)
-       WRITE(msgBuf,'(A,E10.3,E10.3,E10.3,E10.3,E10.3)'),'A7:'
-     &                 ,a(31),a(32),a(33),a(34),a(35)
-       CALL PRINT_MESSAGE(msgBuf,stdUnit,SQUEEZE_RIGHT,myThid)
-       WRITE(msgBuf,'(A,E10.3,E10.3,E10.3,E10.3,E10.3)'),'A8:'
-     &                 ,a(36),a(37),a(38),a(39),a(40)
-       CALL PRINT_MESSAGE(msgBuf,stdUnit,SQUEEZE_RIGHT,myThid)
-       WRITE(msgBuf,'(A,E10.3,E10.3,E10.3,E10.3,E10.3)'),'A9:'
-     &                 ,a(41),a(42),a(43),a(44),a(45)
-       CALL PRINT_MESSAGE(msgBuf,stdUnit,SQUEEZE_RIGHT,myThid)
-       WRITE(msgBuf,'(A,E10.3,E10.3,E10.3,E10.3,E10.3)'),'A10:'
-     &                 ,a(46),a(47),a(48),a(49),a(50)
-       CALL PRINT_MESSAGE(msgBuf,stdUnit,SQUEEZE_RIGHT,myThid)
-       WRITE(msgBuf,'(A,E10.3)'),'A11:',a(51)
-       CALL PRINT_MESSAGE(msgBuf,stdUnit,SQUEEZE_RIGHT,myThid)
-
-       WRITE(msgBuf,'(A,E10.3,E10.3,E10.3,E10.3,E10.3)'),'B1:'
-     &                 ,b(1),b(2),b(3),b(4),b(5)
-       CALL PRINT_MESSAGE(msgBuf,stdUnit,SQUEEZE_RIGHT,myThid)
-       WRITE(msgBuf,'(A,E10.3,E10.3,E10.3,E10.3,E10.3)'),'B2:'
-     &                 ,b(6),b(7),b(8),b(9),b(10)
-       CALL PRINT_MESSAGE(msgBuf,stdUnit,SQUEEZE_RIGHT,myThid)
-       WRITE(msgBuf,'(A,E10.3,E10.3,E10.3,E10.3,E10.3)'),'B3:'
-     &                 ,b(11),b(12),b(13),b(14),b(15)
-       CALL PRINT_MESSAGE(msgBuf,stdUnit,SQUEEZE_RIGHT,myThid)
-       WRITE(msgBuf,'(A,E10.3,E10.3,E10.3,E10.3,E10.3)'),'B4:'
-     &                 ,b(16),b(17),b(18),b(19),b(20)
-       CALL PRINT_MESSAGE(msgBuf,stdUnit,SQUEEZE_RIGHT,myThid)
-       WRITE(msgBuf,'(A,E10.3,E10.3,E10.3,E10.3,E10.3)'),'B5:'
-     &                 ,b(21),b(22),b(23),b(24),b(25)
-       CALL PRINT_MESSAGE(msgBuf,stdUnit,SQUEEZE_RIGHT,myThid)
-       WRITE(msgBuf,'(A,E10.3,E10.3,E10.3,E10.3,E10.3)'),'B6:'
-     &                 ,b(26),b(27),b(28),b(29),b(30)
-       CALL PRINT_MESSAGE(msgBuf,stdUnit,SQUEEZE_RIGHT,myThid)
-       WRITE(msgBuf,'(A,E10.3,E10.3,E10.3,E10.3,E10.3)'),'B7:'
-     &                 ,b(31),b(32),b(33),b(34),b(35)
-       CALL PRINT_MESSAGE(msgBuf,stdUnit,SQUEEZE_RIGHT,myThid)
-       WRITE(msgBuf,'(A,E10.3,E10.3,E10.3,E10.3,E10.3)'),'B8:'
-     &                 ,b(36),b(37),b(38),b(39),b(40)
-       CALL PRINT_MESSAGE(msgBuf,stdUnit,SQUEEZE_RIGHT,myThid)
-       WRITE(msgBuf,'(A,E10.3,E10.3,E10.3,E10.3,E10.3)'),'B9:'
-     &                 ,b(41),b(42),b(43),b(44),b(45)
-       CALL PRINT_MESSAGE(msgBuf,stdUnit,SQUEEZE_RIGHT,myThid)
-       WRITE(msgBuf,'(A,E10.3,E10.3,E10.3,E10.3,E10.3)'),'B10:'
-     &                 ,b(46),b(47),b(48),b(49),b(50)
-       CALL PRINT_MESSAGE(msgBuf,stdUnit,SQUEEZE_RIGHT,myThid)
-       WRITE(msgBuf,'(A,E10.3)'),'B11:',b(51)
-       CALL PRINT_MESSAGE(msgBuf,stdUnit,SQUEEZE_RIGHT,myThid)
-
-       STOP 'NAN in BFM tendency: ABNORMAL ENDED' 
-            endif
-            enddo
-
-
-
-c            if (i.eq.8.and.j.eq.8.and.k.eq.1) then
-c       WRITE(msgBuf,'(A,E10.3,E10.3,E10.3,E10.3,E10.3)'),'BFM5:'
-c     &                 ,b(1),b(2),b(3),b(4),b(5)
-c       CALL PRINT_MESSAGE(msgBuf,stdUnit,SQUEEZE_RIGHT,myThid)
-c       WRITE(msgBuf,'(A,E10.3,E10.3,E10.3,E10.3,E10.3)'),'BFM6:'
-c     &                 ,b(6),b(7),b(8),b(9),b(10)
-c       CALL PRINT_MESSAGE(msgBuf,stdUnit,SQUEEZE_RIGHT,myThid)
-c             endif
-#endif  /* BFMcoupler_debug */
-
-c  ===== sinking velocity for 4 phyto
-             DO jtr=1,4
-                   sediPI(i,j,k,bi,bj,jtr) = c(jtr) ! sedimentation velocities of 4 phytos
-             END DO
-             
-
-             PH(i,j,k,bi,bj)=d(9) ! stored localy since needed for the Follows solver guess 
-
-#ifdef ALLOW_DIAGNOSTICS
-#include "BFMcoupler_VARDIAGcopy_fromD.h"
-#endif /* ALLOW_DIAGNOSTICS */
-
-             ENDIF ! endif HFacC>0
-c NEDDED to be coded
-c             CALL burial
-c             CALL sediment_flux
-
-c  ====== save BFM diagnostics in MITgcm diagnostic pkg 
-      
-         ENDDO   ! enddo i cycle
-         ENDDO   ! enddo j cycle
-         ENDDO ! enddo k cycle
-
-#else
-
-c      DO j=1-OLy,sNy+OLy
-c      DO i=1-OLx,sNx+OLx
       DO j=jmin,jmax
       DO i=imin,imax
 
@@ -520,17 +302,11 @@ c  ===== sinking velocity for 4 phyto
 #endif /* ALLOW_DIAGNOSTICS */
 
           endif ! endif HFacC>0
-
-c NEDDED to be coded
-c             CALL burial
-c             CALL sediment_flux
-
-c  ====== save BFM diagnostics in MITgcm diagnostic pkg 
       
       ENDDO   ! enddo i cycle
       ENDDO   ! enddo j cycle
 
-#endif
+
 
 c =====  SINKING ===================
 #ifdef USE_SINK
