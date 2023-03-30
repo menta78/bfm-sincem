@@ -705,7 +705,7 @@ type_ogs_bfm_PelagicCSYS
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
-New BFM biogeochemical model units introduced in the FABM folder
+New BFM biogeochemical model components introduced in the FABM folder
 \begin_inset CommandInset label
 LatexCommand label
 name "tab:FABM-BFM"
@@ -726,7 +726,7 @@ name "tab:FABM-BFM"
 \end_layout
 
 \begin_layout Standard
-For each model reported in Tab.
+For each model component reported in Tab.
  
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -899,7 +899,7 @@ After this operation it is necessary to copy the fabm folder contained in
 \end_layout
 
 \begin_layout Standard
-Copy the instruction below in a file editing the <insitute_name> according
+Copy the instruction below in a file editing the <institute_name> according
  to your needs:
 \end_layout
 
@@ -1012,6 +1012,30 @@ rm -rf ${WORK_DIR}
 then source this script and it will create the python code.
 \end_layout
 
+\begin_layout Standard
+To verify correct finalization of the installation you can type from python
+ console
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+import pyfabm
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+and this should not raise any error.
+\end_layout
+
 \begin_layout Chapter
 The fabm.yaml configuration file 
 \end_layout
@@ -1029,7 +1053,7 @@ mical models to use and how to parameterize them.
 
 \begin_layout Standard
 Below is reported an example of part of the block related to diatoms in
- the fabm.yaml used for BFM 
+ the fabm_monospectral.yaml used for BFM 
 \end_layout
 
 \begin_layout Standard
@@ -1069,59 +1093,56 @@ status open
 
 \begin_layout Plain Layout
 
-            p_q10: 2.0              # [-] Characteristic Q10 coefficient
+            p_q10: 2.0        # [-] Characteristic Q10 coefficient
 \end_layout
 
 \begin_layout Plain Layout
 
-            p_temp: 0.0           # [-] Cut-off threshold for temperature
- factor
+            p_temp: 0.0       # [-] Cut-off threshold for temperature factor
 \end_layout
 
 \begin_layout Plain Layout
 
-            p_sum: 2.5             # [1/d] maximum specific productivity
- at reference temperature (1/d)
+            p_sum: 2.5        # [1/d] maximum specific productivity at reference
+ temperature (1/d)
 \end_layout
 
 \begin_layout Plain Layout
 
-            p_srs: 0.1               # [1/d] Respiration rate at 10 degrees
- C 
+            p_srs: 0.1        # [1/d] Respiration rate at 10 degrees C 
 \end_layout
 
 \begin_layout Plain Layout
 
-            p_sdmo: 0.0          # [1/d] Max.specific nutrient-stress lysis
- rate
+            p_sdmo: 0.0       # [1/d] Max.specific nutrient-stress lysis rate
 \end_layout
 
 \begin_layout Plain Layout
 
-            p_thdo: 0.0            # [-] Half saturation constant for nutrient
+            p_thdo: 0.0       # [-] Half saturation constant for nutrient
  stress lysis 
 \end_layout
 
 \begin_layout Plain Layout
 
-            p_seo: 0.0              # [1/d] Extra lysis rate (biomass density-dep
-endent)
+            p_seo: 0.0        # [1/d] Extra lysis rate (biomass density-dependent
+)
 \end_layout
 
 \begin_layout Plain Layout
 
-            p_sheo: 0.0            # [mgC/3] Half saturation constant for
- extra lysis
+            p_sheo: 0.0       # [mgC/3] Half saturation constant for extra
+ lysis
 \end_layout
 
 \begin_layout Plain Layout
 
-            p_pu_ea: 0.05        # [-] Excreted fraction of primary production
+            p_pu_ea: 0.05     # [-] Excreted fraction of primary production
 \end_layout
 
 \begin_layout Plain Layout
 
-            p_pu_ra: 0.1           # [-] Activity respiration fraction
+            p_pu_ra: 0.1      # [-] Activity respiration fraction
 \end_layout
 
 \begin_layout Plain Layout
@@ -1131,29 +1152,29 @@ endent)
 
 \begin_layout Plain Layout
 
-			            					# This choice must be consistent with bacteria
+			            	  # This choice must be consistent with bacteria
 \end_layout
 
 \begin_layout Plain Layout
 
-						            		# 1.
+						      # 1.
  All DOC is released as R1c (Vichi et al., 2007)
 \end_layout
 
 \begin_layout Plain Layout
 
-								            # 2.
+							  # 2.
  Activity DOC is released as R2c (Vichi et al., 2004)
 \end_layout
 
 \begin_layout Plain Layout
 
-								            # (there is no nutrient-stress excretion)
+						      # (there is no nutrient-stress excretion)
 \end_layout
 
 \begin_layout Plain Layout
 
-								            # 3.
+							  # 3.
  All DOC is released as R2c (Polimene et al., 2006)
 \end_layout
 
@@ -1178,22 +1199,22 @@ status open
 
 \begin_layout Plain Layout
 
-            N1p: N1/p              # phosphate (mmol P/m^3)
+            N1p: N1/p # phosphate (mmol P/m^3)
 \end_layout
 
 \begin_layout Plain Layout
 
-            N3n: N3/n             # nitrate (mmol N/m^3) 
+            N3n: N3/n # nitrate (mmol N/m^3) 
 \end_layout
 
 \begin_layout Plain Layout
 
-            N4n: N4/n             # ammonium (mmol N/m^3)
+            N4n: N4/n # ammonium (mmol N/m^3)
 \end_layout
 
 \begin_layout Plain Layout
 
-            N5s: N5/s             # silicate (mmol Si/m^3)
+            N5s: N5/s # silicate (mmol Si/m^3)
 \end_layout
 
 \begin_layout Plain Layout
@@ -1262,13 +1283,27 @@ cp extern/<institute_name>/fabm_monospectral.yaml setups/0D/fabm.yaml
 \end_layout
 
 \begin_layout Standard
+Now it is possible to perform a simulation using a python script initialize
+ the model and perform a time integration of the equations.
+\end_layout
+
+\begin_layout Standard
+If you used a conda environment is necessary to activate it in order to
+ import the pyfabm package.
+\end_layout
+
+\begin_layout Standard
+As a first operation we import the required python packages
+\end_layout
+
+\begin_layout Standard
 \begin_inset listings
 inline false
 status open
 
 \begin_layout Plain Layout
 
-iimport numpy as np
+import numpy as np
 \end_layout
 
 \begin_layout Plain Layout
@@ -1281,13 +1316,29 @@ import pyfabm
 import netCDF4 as nc
 \end_layout
 
-\begin_layout Plain Layout
+\end_inset
+
 
 \end_layout
 
-\begin_layout Plain Layout
+\begin_layout Standard
+the following commands set the time interval, in seconds, to perform the
+ simulation, in the case below we consider a 10 years time window.
+ The state variable 
+\begin_inset Quotes eld
+\end_inset
 
+y
+\begin_inset Quotes erd
+\end_inset
+
+ is also initialized, in this case BFM has 54 state variables
 \end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
 
 \begin_layout Plain Layout
 
@@ -1299,19 +1350,24 @@ t_eval = np.linspace(0, 3650.*86400, 50000)
 y = np.zeros((len(t_eval),54))
 \end_layout
 
-\begin_layout Plain Layout
+\end_inset
 
-k=0
+
 \end_layout
 
-\begin_layout Plain Layout
-
-l=[]
+\begin_layout Standard
+The time series accounting for temperature variability accounts for daily
+ and seasonal variations
 \end_layout
 
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
 \begin_layout Plain Layout
 
-#sinusoidal temperature fluctuation
+#Sinusoidal temperature fluctuation
 \end_layout
 
 \begin_layout Plain Layout
@@ -1321,23 +1377,21 @@ l=[]
 
 \begin_layout Plain Layout
 
-MeanTemp = 15           # Average temperature in the country
+MeanTemp = 15           # Average temperature in the country  Deg Celsius
 \end_layout
 
 \begin_layout Plain Layout
 
-DailyAmpl = 5           # Amplitude of the daily cycle
+DailyAmpl = 5           # Amplitude of the daily cycle        Deg Celsius
 \end_layout
 
 \begin_layout Plain Layout
 
-YearlyAmpl =  5         # Amplitude of the yearly cycle
+YearlyAmpl =  5         # Amplitude of the yearly cycle       Deg Celsius
 \end_layout
 
 \begin_layout Plain Layout
 
-#oiseStd = 0.1          # Standard deviation of normally distributed error
- term
 \end_layout
 
 \begin_layout Plain Layout
@@ -1380,11 +1434,6 @@ YearlyCycle = -YearlyAmpl*np.cos( (2*np.pi)*t_eval/TotalHours )
 
 \begin_layout Plain Layout
 
-#Noise = np.random.normal(0, NoiseStd, TotalHours)
-\end_layout
-
-\begin_layout Plain Layout
-
 \end_layout
 
 \begin_layout Plain Layout
@@ -1394,16 +1443,26 @@ YearlyCycle = -YearlyAmpl*np.cos( (2*np.pi)*t_eval/TotalHours )
 
 \begin_layout Plain Layout
 
-T = MeanTemp + DailyCycle + YearlyCycle #+ Noise
+T = MeanTemp + DailyCycle + YearlyCycle 
 \end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Similarly to temperature also solar irradaince is time dependent
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
 
 \begin_layout Plain Layout
 
-\end_layout
-
-\begin_layout Plain Layout
-
-##########sinusoidal light fluctuation
+#Sinusoidal light fluctuation
 \end_layout
 
 \begin_layout Plain Layout
@@ -1413,23 +1472,17 @@ T = MeanTemp + DailyCycle + YearlyCycle #+ Noise
 
 \begin_layout Plain Layout
 
-MeanTemp =  0           # Average temperature in the country
+MeanTemp =  0           # Average temperature in the country W/m2
 \end_layout
 
 \begin_layout Plain Layout
 
-DailyAmpl = 100          # Amplitude of the daily cycle
+DailyAmpl = 100          # Amplitude of the daily cycle      W/m2
 \end_layout
 
 \begin_layout Plain Layout
 
-YearlyAmpl = 10         # Amplitude of the yearly cycle
-\end_layout
-
-\begin_layout Plain Layout
-
-#NoiseStd = 0.1          # Standard deviation of normally distributed error
- term
+YearlyAmpl = 10         # Amplitude of the yearly cycle      W/m2
 \end_layout
 
 \begin_layout Plain Layout
@@ -1487,16 +1540,23 @@ YearlyCycle = -YearlyAmpl*np.cos( (2*np.pi)*t_eval/TotalHours )
 \begin_layout Plain Layout
 
 L = np.where((MeanTemp + DailyCycle + YearlyCycle) > 0, MeanTemp + DailyCycle
- + YearlyCycle, 0.)#+ Noise
+ + YearlyCycle, 0.)
 \end_layout
 
-\begin_layout Plain Layout
+\end_inset
+
 
 \end_layout
 
-\begin_layout Plain Layout
-
+\begin_layout Standard
+The biogeochemical model object is created basing on the yaml configuration
+ file
 \end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
 
 \begin_layout Plain Layout
 
@@ -1508,9 +1568,20 @@ L = np.where((MeanTemp + DailyCycle + YearlyCycle) > 0, MeanTemp + DailyCycle
 model = pyfabm.Model('fabm.yaml')
 \end_layout
 
-\begin_layout Plain Layout
+\end_inset
+
 
 \end_layout
+
+\begin_layout Standard
+The following commands set the environmental regulating factors providing
+ realistic values and check the parameters consistency
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
 
 \begin_layout Plain Layout
 
@@ -1530,12 +1601,7 @@ model.dependencies['cell_thickness'].value = 1.
 
 \begin_layout Plain Layout
 
-model.dependencies['temperature'].value = T[0]#15.
-\end_layout
-
-\begin_layout Plain Layout
-
-# model.dependencies['temperature'].value = #15.
+model.dependencies['temperature'].value = T[0]
 \end_layout
 
 \begin_layout Plain Layout
@@ -1570,12 +1636,7 @@ model.dependencies['latitude'].value = 0.
 
 \begin_layout Plain Layout
 
-# model.dependencies['surface_downwelling_shortwave_flux'].value = 50.
-\end_layout
-
-\begin_layout Plain Layout
-
-model.dependencies['surface_downwelling_shortwave_flux'].value = L[0]#50.
+model.dependencies['surface_downwelling_shortwave_flux'].value = L[0]
 \end_layout
 
 \begin_layout Plain Layout
@@ -1600,16 +1661,12 @@ model.dependencies['number_of_days_since_start_of_the_year'].value = 1.
 
 \begin_layout Plain Layout
 
+model.cell_thickness=1.
 \end_layout
 
 \begin_layout Plain Layout
 
 # Verify the model is ready to be used
-\end_layout
-
-\begin_layout Plain Layout
-
-model.cell_thickness=1.
 \end_layout
 
 \begin_layout Plain Layout
@@ -1622,17 +1679,24 @@ assert model.checkReady(), 'One or more model dependencies have not been
  fulfilled.'
 \end_layout
 
-\begin_layout Plain Layout
+\end_inset
+
 
 \end_layout
 
-\begin_layout Plain Layout
-
+\begin_layout Standard
+The following blocks performs a temporal integration of the state variables
+ using first order euler method
 \end_layout
 
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
 \begin_layout Plain Layout
 
-# Time-integrate over 1000 days (note: FABM's internal time unit is seconds!)
+# Time-integrate over 10 years (note: FABM's internal time unit is seconds!)
 \end_layout
 
 \begin_layout Plain Layout
@@ -1651,37 +1715,32 @@ y[0,:]=model.state[:]
 
 \begin_layout Plain Layout
 
-      #print(model.state)
-\end_layout
-
-\begin_layout Plain Layout
-
 for i in range(len(t_eval)):
 \end_layout
 
 \begin_layout Plain Layout
 
-    model.dependencies['temperature'].value = T[i]
+    if i!=0:
 \end_layout
 
 \begin_layout Plain Layout
 
-    model.dependencies['surface_downwelling_shortwave_flux'].value = L[i]
+        model.dependencies['temperature'].value = T[i]
 \end_layout
 
 \begin_layout Plain Layout
 
-    dy = model.getRates()
+        model.dependencies['surface_downwelling_shortwave_flux'].value = L[i]
 \end_layout
 
 \begin_layout Plain Layout
 
-    for j in range(len(model.state)):
+        dy = model.getRates()
 \end_layout
 
 \begin_layout Plain Layout
 
-        if i!=0:
+        for j in range(len(model.state)):
 \end_layout
 
 \begin_layout Plain Layout
@@ -1691,35 +1750,19 @@ for i in range(len(t_eval)):
 
 \begin_layout Plain Layout
 
-    model.state[:]=y[i,:]
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-t = t_eval/86400
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-Nt=t.shape[0]
-\end_layout
-
-\begin_layout Plain Layout
-
-deltaT=t[1]-t[0]
+        model.state[:]=y[i,:]
 \end_layout
 
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+The last part of the script save the state vector on a netcdf file, specific
+ diagnostis can be computed directly in the script or offline loading the
+ NetCDF output file.
+ 
 \end_layout
 
 \begin_layout Standard
@@ -1904,27 +1947,27 @@ for v,variable in enumerate(model.state_variables):
 
 \begin_layout Plain Layout
 
-ncvar = variable.name.replace("/","_")
+    ncvar = variable.name.replace("/","_")
 \end_layout
 
 \begin_layout Plain Layout
 
-var = f.createVariable(ncvar, np.float64, ('time', 'z','lat','lon'))
+    var = f.createVariable(ncvar, np.float64, ('time', 'z','lat','lon'))
 \end_layout
 
 \begin_layout Plain Layout
 
-var.units = variable.units
+    var.units = variable.units
 \end_layout
 
 \begin_layout Plain Layout
 
-var.long_name = variable.long_name
+    var.long_name = variable.long_name
 \end_layout
 
 \begin_layout Plain Layout
 
-f.variables[ncvar][:]=y[:,v]
+    f.variables[ncvar][:]=y[:,v]
 \end_layout
 
 \begin_layout Plain Layout
@@ -2059,23 +2102,24 @@ name "fig:BFM-FABM_check"
 
 \end_layout
 
-\begin_layout Standard
-\begin_inset listings
-inline false
-status open
-
-\begin_layout Plain Layout
-
-i
+\begin_layout Chapter
+Output and diagnostics
 \end_layout
+
+\begin_layout Standard
+Below is reported a python script that illustrate how to plot results saved
+ an netCDF file following the example script in Sec.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "Running FABM-BFM-1"
+plural "false"
+caps "false"
+noprefix "false"
 
 \end_inset
 
-
-\end_layout
-
-\begin_layout Chapter
-Output and diagnostics
+.
 \end_layout
 
 \begin_layout Standard
@@ -2195,7 +2239,7 @@ cal')
 
 \begin_layout Plain Layout
 
-fig.savefig('prova.png', format='png',dpi=250)
+fig.savefig('results.png', format='png',dpi=250)
 \end_layout
 
 \end_inset
