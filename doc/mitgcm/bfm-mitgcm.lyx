@@ -610,136 +610,169 @@ Installation, configuration and compilation
 \begin_layout Standard
 In order to build the MITgcm-BFM executable, the following steps have to
  be performed.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily}"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+% git clone git@github.com:inogs/MITgcmBFM-build.git
+\end_layout
+
+\begin_layout Plain Layout
+
+% cd MITgcmBFM-build
+\end_layout
+
+\begin_layout Plain Layout
+
+% git checkout bfm-release-5.3
+\end_layout
+
+\begin_layout Plain Layout
+
+% ./downloader_MITgcm_bfm.sh
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+# Edit builder_MITgcm_bfm.sh, to set debug mode or not, compiler, modules,
+ etc.
+ For example:
+\end_layout
+
+\begin_layout Plain Layout
+
+# MIT_COMPILER=intel (gfortran)
+\end_layout
+
+\begin_layout Plain Layout
+
+# export MODULEFILE=$PWD/compilers/machine_modules/g100.intel (yourmachine.yourcom
+piler)
+\end_layout
+
+\begin_layout Plain Layout
+
+# Put your platform specific INC_FILE for BFM in: $BFMDIR/compilers/$INC_FILE
+ (e.g., x86_64.LINUX.gfortran.inc)
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+# Compile and build bfm
+\end_layout
+
+\begin_layout Plain Layout
+
+% ./builder_MITgcm_bfm.sh -o bfm
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+# Decide the number of cores and the domain decomposition of your model
+ run, configuring your SIZE.h.
+\end_layout
+
+\begin_layout Plain Layout
+
+# choosing among the various options of the benchmark experiment.
  
 \end_layout
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
-\color red
-AGGIUNGERE QUI IL REPOSITORY TO https://github.com/inogs/MITgcmBFM-build
+# E.g., for the cube experiment described in Cossarini et al., 2017
 \end_layout
 
-\begin_layout Standard
-Define your ModelBuild directory and clone from the GitHub repository the
- tool for building the model: 
+\begin_layout Plain Layout
+
 \end_layout
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
-\shape italic
-DIR=ModelBuild 
+# Now we have to choose the preset, between CUBE_GMD and NORTH_ADRIATIC
 \end_layout
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
-\shape italic
-git clone git@github.com:inogs/MITgcmBFM-build.git $DIR 
+# For testcase we can use the preset CUBE_GMD
 \end_layout
 
-\begin_layout Standard
-Download the source code of BFM, of the coupler and of MITgcm: 
+\begin_layout Plain Layout
+
 \end_layout
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
-\shape italic
-cd $DIR 
+# Configure/customize the setup
 \end_layout
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
-\shape italic
-git checkout main ./downloader_MITgcm_bfm.sh 
+% ./configure_MITgcm_bfm.sh --preset CUBE_GMD
 \end_layout
 
-\begin_layout Standard
-Edit builder_MITgcm_bfm.sh, to set debug mode or not, compiler, modules,
- etc… For example: 
+\begin_layout Plain Layout
+
 \end_layout
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
-\shape italic
-MIT_COMPILER=intel (gfortran) 
 \end_layout
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
-\shape italic
-export MODULEFILE=$PWD/compilers/machine_modules/g100.intel (yourmachine.yourcompi
-ler) 
-\end_layout
-
-\begin_layout Standard
-Put your HPC-platform-specific INC_FILE for BFM in: 
-\shape italic
-$BFMDIR/compilers/$INC_FILE (e.g., x86_64.LINUX.gfortran.inc)
-\shape default
+# If needed, update the MYCODE directory with your own modified routines
+ (different OBCs, meteorological forcing files, etc...).
  
 \end_layout
 
-\begin_layout Standard
-Compile and build BFM: 
-\end_layout
+\begin_layout Plain Layout
 
-\begin_layout Standard
-
-\shape italic
-./builder_MITgcm_bfm.sh -o bfm 
-\end_layout
-
-\begin_layout Standard
-Decide the number of cores and the domain decomposition of your model run,
- configuring your SIZE.h (e.g., choosing among the various options of the benchmark
- experiment).
- E.g., for the cube experiment described in Cossarini et al., 2017: 
-\end_layout
-
-\begin_layout Standard
-
-\shape italic
-cp presets/CUBE_GMD/SIZE.h_XXXp presets/CUBE_GMD/SIZE.h 
-\end_layout
-
-\begin_layout Standard
-with XXX is the number of cores for the domain decomposiiton.
-\end_layout
-
-\begin_layout Standard
-Configure/customize the setup: 
-\end_layout
-
-\begin_layout Standard
-
-\shape italic
-./configure_MITgcm_bfm.sh 
-\end_layout
-
-\begin_layout Standard
-If needed, update the MYCODE directory with your own modified routines (differen
-t OBCs, meteorological forcing files, etc...).
- 
-\end_layout
-
-\begin_layout Standard
-Put your HPC-platform-specific INC_FILE for MITgcm in: $PWD/compilers/$INC_FILE
+# Put your platform specific INC_FILE for MITgcm in: $PWD/compilers/$INC_FILE
  (e.g., x86_64.LINUX.gfortran.inc).
  
 \end_layout
 
-\begin_layout Standard
-Compile and build MITgcm: use the same builder used for compiling BFM (i.e.,
- builder_MITgcm_bfm.sh) 
+\begin_layout Plain Layout
+
 \end_layout
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
-\shape slanted
-./builder_MITgcm_bfm.sh -o MITgcm 
+# Compile and build MITgcm
 \end_layout
 
-\begin_layout Standard
-The executable (mitgcmuv) is in $PWD/MITGCM_BUILD.
+\begin_layout Plain Layout
+
+% ./builder_MITgcm_bfm.sh -o MITgcm 
+\end_layout
+
+\begin_layout Plain Layout
+
+# generates the executable mitgcmuv in MITGCM_BUILD.
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Chapter
