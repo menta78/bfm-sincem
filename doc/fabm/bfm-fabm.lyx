@@ -377,6 +377,12 @@ The open source, Fortran-based Framework for Aquatic Biogeochemical Models
 \end_layout
 
 \begin_layout Standard
+The full documentation of FABM can be consulted at https://github.com/fabm-model/
+fabm/wiki.
+ 
+\end_layout
+
+\begin_layout Standard
 The development of BFM for FABM is based on a modular approach leveraging
  of the object oriented tools available in fortran 2003.
  In particular, different subroutines and FABM models are associated with
@@ -404,8 +410,23 @@ S.
 \begin_layout Standard
 The coupled FABM-BFM is developed starting from the original style and structure
  of the official BFM code.
- The version of BFM coupled with FABM is the one described in (Álvarez et
- al.,2023; Cossarini et al., 2015; Lazzari et al., 2021, 2016, 2012).
+ The version of BFM coupled with FABM is the one described in 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "alvarez_chromophoric_2023,cossarini2015,lazzari_cdom_2021,lazzari_spatial_2016,lazzari_seasonal_2012"
+literal "false"
+
+\end_inset
+
+
+\begin_inset CommandInset citation
+LatexCommand citet
+key "alvarez_chromophoric_2023,cossarini2015,lazzari_cdom_2021,lazzari_spatial_2016,lazzari_seasonal_2012"
+literal "false"
+
+\end_inset
+
+..
  The coupling of FABM with BFM is mainly related to the inherent structure
  required by FABM models design.
  The structure is composed of header, initialize, do, do_surface structure.
@@ -727,7 +748,6 @@ name "tab:FABM-BFM"
 
 \begin_layout Standard
 For each model component reported in Tab.
- 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "tab:FABM-BFM"
@@ -737,7 +757,7 @@ noprefix "false"
 
 \end_inset
 
-there are 6 main components to be specified and identified:
+ there are 6 main components to be specified and identified:
 \end_layout
 
 \begin_layout Enumerate
@@ -804,11 +824,7 @@ the terms of alkalinity sink/source have been directly included in Phyto,
 \end_layout
 
 \begin_layout Chapter
-Compiling FABM-BFM
-\end_layout
-
-\begin_layout Section
-FABM-BFM python code
+Compiling FABM-BFM - python code example
 \end_layout
 
 \begin_layout Standard
@@ -905,6 +921,7 @@ Copy the instruction below in a file editing the <institute_name> according
 
 \begin_layout Standard
 \begin_inset listings
+lstparams "language=bash,basicstyle={\small\rmfamily}"
 inline false
 status open
 
@@ -945,19 +962,14 @@ FABM_ARGS="-DFABM_INSTITUTES=<institute_name>
 
 \begin_layout Plain Layout
 
-              -DFABM_<INSTITUTE_NAME>_BASE=${REPO_DIR}/extern/<institute_name>
+           -DFABM_<INSTITUTE_NAME>_BASE=${REPO_DIR}/extern/<institute_name>
  
 \end_layout
 
 \begin_layout Plain Layout
 
-               -DCMAKE_Fortran_COMPILER=gfortran" # indicate the fortran
- compiler e.g.
- gfortran ifort
-\end_layout
-
-\begin_layout Plain Layout
-
+           -DCMAKE_Fortran_COMPILER=gfortran" # e.g.
+ gfortran or ifort
 \end_layout
 
 \begin_layout Plain Layout
@@ -1009,7 +1021,7 @@ rm -rf ${WORK_DIR}
 \end_layout
 
 \begin_layout Standard
-then source this script and it will create the python code.
+by sourcing the script above it will create the python code.
 \end_layout
 
 \begin_layout Standard
@@ -1019,6 +1031,7 @@ To verify correct finalization of the installation you can type from python
 
 \begin_layout Standard
 \begin_inset listings
+lstparams "language=Python,basicstyle={\small\rmfamily}"
 inline false
 status open
 
@@ -1073,17 +1086,17 @@ status open
 
 \begin_layout Plain Layout
 
-        long_name: diatoms
+     long_name: diatoms
 \end_layout
 
 \begin_layout Plain Layout
 
-        model: ogs/Phyto
+     model: ogs/Phyto
 \end_layout
 
 \begin_layout Plain Layout
 
-        parameters:
+     parameters:
 \end_layout
 
 \begin_layout Plain Layout
@@ -1093,89 +1106,67 @@ status open
 
 \begin_layout Plain Layout
 
-            p_q10: 2.0        # [-] Characteristic Q10 coefficient
+        p_q10: 2.0        # [-] Characteristic Q10 coefficient
 \end_layout
 
 \begin_layout Plain Layout
 
-            p_temp: 0.0       # [-] Cut-off threshold for temperature factor
+        p_temp: 0.0       # [-] Cut-off threshold for temperature factor
 \end_layout
 
 \begin_layout Plain Layout
 
-            p_sum: 2.5        # [1/d] maximum specific productivity at reference
- temperature (1/d)
+        p_sum: 2.5        # [1/d] maximum specific productivity 
 \end_layout
 
 \begin_layout Plain Layout
 
-            p_srs: 0.1        # [1/d] Respiration rate at 10 degrees C 
+                          #  at reference temperature (1/d)
 \end_layout
 
 \begin_layout Plain Layout
 
-            p_sdmo: 0.0       # [1/d] Max.specific nutrient-stress lysis rate
+        p_srs: 0.1        # [1/d] Respiration rate at 10 degrees C 
 \end_layout
 
 \begin_layout Plain Layout
 
-            p_thdo: 0.0       # [-] Half saturation constant for nutrient
- stress lysis 
+        p_sdmo: 0.0       # [1/d] Max.specific nutrient-stress lysis rate
 \end_layout
 
 \begin_layout Plain Layout
 
-            p_seo: 0.0        # [1/d] Extra lysis rate (biomass density-dependent
-)
+        p_thdo: 0.0       # [-] Half saturation constant for 
 \end_layout
 
 \begin_layout Plain Layout
 
-            p_sheo: 0.0       # [mgC/3] Half saturation constant for extra
- lysis
+                          # nutrient stress lysis 
 \end_layout
 
 \begin_layout Plain Layout
 
-            p_pu_ea: 0.05     # [-] Excreted fraction of primary production
+        p_seo: 0.0        # [1/d] Extra lysis rate (biomass density-dependent)
 \end_layout
 
 \begin_layout Plain Layout
 
-            p_pu_ra: 0.1      # [-] Activity respiration fraction
+        p_sheo: 0.0       # [mgC/3] Half saturation constant for extra lysis
 \end_layout
 
 \begin_layout Plain Layout
 
-            p_switchDOC: 2    # [1-3] Switch for the type of DOC excretion
+        p_pu_ea: 0.05     # [-] Excreted fraction of primary production
 \end_layout
 
 \begin_layout Plain Layout
 
-			            	  # This choice must be consistent with bacteria
+        p_pu_ra: 0.1      # [-] Activity respiration fraction
 \end_layout
 
 \begin_layout Plain Layout
 
-						      # 1.
- All DOC is released as R1c (Vichi et al., 2007)
-\end_layout
-
-\begin_layout Plain Layout
-
-							  # 2.
- Activity DOC is released as R2c (Vichi et al., 2004)
-\end_layout
-
-\begin_layout Plain Layout
-
-						      # (there is no nutrient-stress excretion)
-\end_layout
-
-\begin_layout Plain Layout
-
-							  # 3.
- All DOC is released as R2c (Polimene et al., 2006)
+        p_switchDOC: 2    # [1-3] Switch for the type of DOC excretion
 \end_layout
 
 \end_inset
@@ -1298,6 +1289,7 @@ As a first operation we import the required python packages
 
 \begin_layout Standard
 \begin_inset listings
+lstparams "language=Python,basicstyle={\small\rmfamily}"
 inline false
 status open
 
@@ -1337,6 +1329,7 @@ y
 
 \begin_layout Standard
 \begin_inset listings
+lstparams "language=Python,basicstyle={\small\ttfamily}"
 inline false
 status open
 
@@ -1362,6 +1355,7 @@ The time series accounting for temperature variability accounts for daily
 
 \begin_layout Standard
 \begin_inset listings
+lstparams "language=Python,basicstyle={\small\rmfamily}"
 inline false
 status open
 
@@ -1457,6 +1451,7 @@ Similarly to temperature also solar irradaince is time dependent
 
 \begin_layout Standard
 \begin_inset listings
+lstparams "language=Python,basicstyle={\small\rmfamily}"
 inline false
 status open
 
@@ -1482,7 +1477,7 @@ DailyAmpl = 100          # Amplitude of the daily cycle      W/m2
 
 \begin_layout Plain Layout
 
-YearlyAmpl = 10         # Amplitude of the yearly cycle      W/m2
+YearlyAmpl = 50         # Amplitude of the yearly cycle      W/m2
 \end_layout
 
 \begin_layout Plain Layout
@@ -1555,6 +1550,7 @@ The biogeochemical model object is created basing on the yaml configuration
 
 \begin_layout Standard
 \begin_inset listings
+lstparams "language=Python,basicstyle={\small\rmfamily}"
 inline false
 status open
 
@@ -1580,6 +1576,7 @@ The following commands set the environmental regulating factors providing
 
 \begin_layout Standard
 \begin_inset listings
+lstparams "language=Python,basicstyle={\small\rmfamily}"
 inline false
 status open
 
@@ -1691,6 +1688,7 @@ The following blocks performs a temporal integration of the state variables
 
 \begin_layout Standard
 \begin_inset listings
+lstparams "language=Python,basicstyle={\small\rmfamily}"
 inline false
 status open
 
@@ -1767,6 +1765,7 @@ The last part of the script save the state vector on a netcdf file, specific
 
 \begin_layout Standard
 \begin_inset listings
+lstparams "language=Python,basicstyle={\small\ttfamily}"
 inline false
 status open
 
@@ -1992,8 +1991,8 @@ In order to test the accuracy of the BFM porting we used both the python
  were identical up to machine precision between the two FABM configurations.
  In the second phase, we performed a check of the integration in time by
  setting up a 10 day simulation using the original BFM in a standalone model
- (https://bfm-community.github.io/www.bfm-community.eu/bfm-quick-guide/) and
- the BFM-FABM 0D configuration.
+ v5.3 (https://bfm-community.github.io/www.bfm-community.eu/bfm-quick-guide/)
+ and the BFM-FABM 0D configuration.
  The two configurations had the same initial conditions, the same constant
  environmental forcings (i.e., constant light, T, atmospheric 
 \begin_inset Formula $CO_{2}$
@@ -2108,7 +2107,7 @@ Output and diagnostics
 
 \begin_layout Standard
 Below is reported a python script that illustrate how to plot results saved
- an netCDF file following the example script in Sec.
+ as netCDF file following the example model script reported in Sec.
  
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -2120,10 +2119,22 @@ noprefix "false"
 \end_inset
 
 .
+ The results of the simulation for population biomasses are shown in Fig.
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Example-of-output"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
 \begin_inset listings
+lstparams "language=Python,basicstyle={\small\ttfamily}"
 inline false
 status open
 
@@ -2154,7 +2165,12 @@ f_det = nc.Dataset(ncname)
 
 \begin_layout Plain Layout
 
-varnames=['B1_c','P1_c','P2_c','P3_c','P4_c','Z5_c','Z6_c','Z3_c','Z4_c']
+varnames=['B1_c','P1_c','P2_c','P3_c','P4_c',
+\end_layout
+
+\begin_layout Plain Layout
+
+          'Z5_c','Z6_c','Z3_c','Z4_c']
 \end_layout
 
 \begin_layout Plain Layout
@@ -2194,16 +2210,25 @@ axs = axs.ravel()
 
 \begin_layout Plain Layout
 
-titles = ['Bacteria B1', 'Diatoms P1', 'Nanoflagellates P2', 'Picophytoplankton
- P3', 'Dinoflagellates P4', 'Microzooplankton Z5', 'het.
- Nanoflagellates Z6', 'carn.
- Mesozooplankton Z3', 'omn.
- Mesozooplank
+titles = ['Bacteria B1', 'Diatoms P1', 'Nanoflagellates P2', 
 \end_layout
 
 \begin_layout Plain Layout
 
-ton Z4']
+          'Picophytoplankton P3','Dinoflagellates P4', 
+\end_layout
+
+\begin_layout Plain Layout
+
+          'Microzooplankton Z5', 'het.
+ Nanoflagellates Z6',
+\end_layout
+
+\begin_layout Plain Layout
+
+          'carn.
+ Mesozooplankton Z3', 'omn.
+ Mesozooplankton Z4']
 \end_layout
 
 \begin_layout Plain Layout
@@ -2213,17 +2238,22 @@ for iax,ax in enumerate(axs):
 
 \begin_layout Plain Layout
 
-lns2 = ax.plot(t[:],f_det.variables[varnames[iax]][:,0,0,0],c='k',label=r'$D=0$')
+    lns2 = ax.plot(t[:],f_det.variables[varnames[iax]][:,0,0,0]
 \end_layout
 
 \begin_layout Plain Layout
 
-ax.set_title(titles[iax],fontsize=8)
+                   ,c='k',label=r'$D=0$')
 \end_layout
 
 \begin_layout Plain Layout
 
-ax.tick_params(axis='both', which='major', labelsize=7)
+    ax.set_title(titles[iax],fontsize=8)
+\end_layout
+
+\begin_layout Plain Layout
+
+    ax.tick_params(axis='both', which='major', labelsize=7)
 \end_layout
 
 \begin_layout Plain Layout
@@ -2233,8 +2263,12 @@ fig.text(0.5, 0.04, 'time [days]', ha='center')
 
 \begin_layout Plain Layout
 
-fig.text(0.04, 0.5, 'Mean Concentration [$mg C/m^3$]', va='center', rotation='verti
-cal')
+fig.text(0.04, 0.5, 'Mean Concentration [$mg C/m^3$]'
+\end_layout
+
+\begin_layout Plain Layout
+
+         , va='center', rotation='vertical')
 \end_layout
 
 \begin_layout Plain Layout
@@ -2267,6 +2301,13 @@ status open
 
 \begin_layout Plain Layout
 Example of output simulation using the python wrapper
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Example-of-output"
+
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -2290,7 +2331,7 @@ Example of output simulation using the python wrapper
 \begin_inset CommandInset bibtex
 LatexCommand bibtex
 btprint "btPrintCited"
-bibfiles "bfm-ogstm-references"
+bibfiles "bfm-fabm-references"
 options "bibtotoc,elsart-harv"
 
 \end_inset
