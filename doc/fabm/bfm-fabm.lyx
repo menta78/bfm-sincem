@@ -196,10 +196,7 @@ Coupling BFM with FABM:
 
 \begin_layout Standard
 \align center
-
-\series bold
-\emph on
-Eva Álvarez, Anna Teruzzi, Paolo Lazzari, Guido Occhipinti, Gianpiero Cossarini,
+Álvarez, Anna Teruzzi, Paolo Lazzari, Guido Occhipinti, Gianpiero Cossarini,
  Jorn Bruggeman 
 \end_layout
 
@@ -302,19 +299,13 @@ This document should be cited as:
 
 
 \series bold
-\emph on
-Álvarez, E., Teruzzi, A., Lazzari, P.
- , Occhipinti, G.
- ,Cossarini, G., Bruggeman
+Álvarez, E., Teruzzi, A., Lazzari, P., Occhipinti, G., Cossarini, G., Bruggeman
 \series default
-\emph default
 , 
 \series bold
-\emph on
 J.
 
 \series default
-\emph default
  (2023) Coupling BFM with FABM; BFM Report series N.
  ? April 2023, Trieste, Italy, http://bfm-community.eu
 \end_layout
@@ -358,8 +349,16 @@ Introduction
 
 \begin_layout Standard
 The open source, Fortran-based Framework for Aquatic Biogeochemical Models
- (FABM, Bruggeman and Bolding, 2014) provides a coupling layer that enables
- flexible coupling of ecosystem processes with GOTM and other physical drivers.
+ (FABM, 
+\begin_inset CommandInset citation
+LatexCommand citealt
+key "bruggeman2014general"
+literal "false"
+
+\end_inset
+
+) provides a coupling layer that enables flexible coupling of ecosystem
+ processes with GOTM and other physical drivers.
  FABM enables the development of complex BGC models in the form of stand-alone,
  process-specific modules.
  These are combined at runtime through coupling links to form a customised
@@ -866,10 +865,6 @@ status open
 \begin_layout Plain Layout
 
 git clone https://github.com/fabm-model/fabm.git
-\end_layout
-
-\begin_layout Plain Layout
-
 \end_layout
 
 \end_inset
@@ -2330,7 +2325,6 @@ name "fig:Example-of-output"
 \begin_layout Standard
 \begin_inset CommandInset bibtex
 LatexCommand bibtex
-btprint "btPrintCited"
 bibfiles "bfm-fabm-references"
 options "bibtotoc,elsart-harv"
 
