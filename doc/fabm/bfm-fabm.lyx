@@ -849,7 +849,7 @@ the terms of alkalinity sink/source have been directly included in Phyto,
 \end_layout
 
 \begin_layout Chapter
-Compiling FABM-BFM using python
+Compiling FABM-BFM as a python module
 \end_layout
 
 \begin_layout Standard
@@ -1330,7 +1330,7 @@ status open
 
 \begin_layout Plain Layout
 
-cp extern/<institute_name>/fabm_monospectral.yaml setups/0D/fabm.yaml
+cp extern/<institute_name>/yaml-cfgs/fabm_monospectral.yaml setups/0D/fabm.yaml
 \end_layout
 
 \end_inset
