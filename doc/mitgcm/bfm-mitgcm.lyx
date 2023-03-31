@@ -497,8 +497,8 @@ Key routines of the MITgcm package BFMCOUPLER are listed for initialization,
  calling the step routing, managing loading fields, and setting diagnostics.
 \end_layout
 
-\begin_layout Standard
-1.2.1 Initialization
+\begin_layout Subsection
+Initialization
 \end_layout
 
 \begin_layout Standard
@@ -526,8 +526,8 @@ INI_FORCING.F or read from external fields.
 ING.F.
 \end_layout
 
-\begin_layout Standard
-1.2.2 step routing
+\begin_layout Subsection*
+1.2.2 step routine
 \end_layout
 
 \begin_layout Standard
@@ -543,7 +543,7 @@ The core of the present coupling scheme is the BFMCOUPLER_CALC_TENDENCY
  the water column.
 \end_layout
 
-\begin_layout Standard
+\begin_layout Subsection*
 1.2.3 lading fields
 \end_layout
 
@@ -558,7 +558,7 @@ The external forcing fields used by the BFMCOUPLER (e.g.
  files.
 \end_layout
 
-\begin_layout Standard
+\begin_layout Subsection*
 1.2.4 Diagnostics
 \end_layout
 
@@ -581,7 +581,7 @@ put_ecology BFM routine and specific instructions from the diagnostics package
  statement to BFMCOUPLER_INIT_FIXED.F in the GCHEM_INIT_FIXED.F routine.
 \end_layout
 
-\begin_layout Standard
+\begin_layout Subsection*
 1.2.5 longstep option
 \end_layout
 
@@ -610,6 +610,13 @@ Installation, configuration and compilation
 \begin_layout Standard
 In order to build the MITgcm-BFM executable, the following steps have to
  be performed.
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace 5mm
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -803,7 +810,7 @@ The configuration of the MITgcm includes the following packages (listed
 \shape italic
 data.pkg
 \shape default
-): cal, exf, kpp, longstep, diagnostics, ptracer and BFMcoupler 
+): cal, exf, kpp, longstep, diagnostics, ptracer and BFMcoupler.
 \end_layout
 
 \begin_layout Standard
@@ -813,7 +820,7 @@ Specific runtime options (e.g., free-surface formulation and volume conservation
 
 \begin_layout Standard
 
-\shape italic
+\family typewriter
 data
 \end_layout
 
@@ -821,52 +828,52 @@ data
 Other specific namelists for the MITgcm-BFM run include are:
 \end_layout
 
-\begin_layout Standard
+\begin_layout Itemize
 
-\shape italic
+\family typewriter
 data.ptracer
 \end_layout
 
-\begin_layout Standard
+\begin_layout Itemize
 
-\shape italic
+\family typewriter
 data.BFMcoupler
 \end_layout
 
-\begin_layout Standard
+\begin_layout Itemize
 
-\shape italic
+\family typewriter
 data.cal 
 \end_layout
 
-\begin_layout Standard
+\begin_layout Itemize
 
-\shape italic
+\family typewriter
 data.diagnostics 
 \end_layout
 
-\begin_layout Standard
+\begin_layout Itemize
 
-\shape italic
+\family typewriter
 data.exf 
 \end_layout
 
-\begin_layout Standard
+\begin_layout Itemize
 
-\shape italic
+\family typewriter
 data.gchem 
 \end_layout
 
-\begin_layout Standard
+\begin_layout Itemize
 
-\shape italic
+\family typewriter
 data.kpp 
 \end_layout
 
-\begin_layout Standard
+\begin_layout Itemize
 
-\shape italic
-data.longstep 
+\family typewriter
+data.longstep
 \end_layout
 
 \begin_layout Standard
@@ -875,203 +882,147 @@ Additional explanation of the data namelists is provided in Cossarini et
 \end_layout
 
 \begin_layout Standard
-All data namelist should be moved into the running directory.
+\begin_inset VSpace 5mm
+\end_inset
+
+The 
+\family sans
+input/
+\family default
+ directory provides files for 10 days of simulations.
 \end_layout
 
 \begin_layout Standard
-Examples of the required MITgcm input files are provided in 
+There are the atmospheric forcings ( 64 x 64 x 10 x 8 bytes):
+\end_layout
+
+\begin_layout Itemize
+shortwave radiation swdown_64x64_10dx37.dat
+\end_layout
+
+\begin_layout Itemize
+longwave radiation lwdown_64x64_10dx37.dat
+\end_layout
+
+\begin_layout Itemize
+precipition precip_bal_64x64_10dx37.dat
+\end_layout
+
+\begin_layout Itemize
+runoff runoff_64x64_10dx37.dat
+\end_layout
+
+\begin_layout Itemize
+u wind component uwind_64x64_10dx37.dat
+\end_layout
+
+\begin_layout Itemize
+v wind component vwind_64x64_10dx37.dat
+\end_layout
+
+\begin_layout Itemize
+air pressure apressure_64x64_10dx37.dat
+\end_layout
+
+\begin_layout Itemize
+air temperature atemp_64x64_10dx37.dat
+\end_layout
+
+\begin_layout Itemize
+air humidity aqh_64x64_10dx37.dat
+\end_layout
+
+\begin_layout Itemize
+the bathymetry which is a 64 x 64 x 30 vertical levels (closed_box64x64.bat)
+\end_layout
+
+\begin_layout Itemize
+in init/ there are the profiles to generate initial condition for biogeochemical
+ tracers
 \end_layout
 
 \begin_layout Standard
-
-\color red
-AGGIUNGERE LA DIR
+Instruction on how to run the MITgcm code are provided at https://mitgcm.readthed
+ocs.io/en/latest/, here thre are the instructions to run the provided testcase.
 \end_layout
 
 \begin_layout Standard
-The list of file in the 
-\shape italic
-input 
-\shape default
-directory includes: 
-\end_layout
+\begin_inset VSpace 5mm
+\end_inset
 
-\begin_layout Standard
-- the batymethry which is a 64 x 64 x 30 vertical levels (closed_box64x64.bat);
-\end_layout
-
-\begin_layout Standard
-- the atmospheric forcing files for 10 days of simulation (binary files
- of dimension 64 x 64 x 10 x 8 bits) and they include short and long shortwave
- radiation, precipition, runoff, u and v wind components, air pressure,
- air temperature and air humidity (swdown_64x64_10dx37.dat, lwdown_64x64_10dx37.da
-t, precip_bal_64x64_10dx37.dat, runoff_64x64_10dx37.dat, uwind_64x64_10dx37.dat,
- vwind_64x64_10dx37.dat, apressure_64x64_10dx37.dat, aqh_64x64_10dx37.dat,
- atemp_64x64_10dx37.dat).
-\end_layout
-
-\begin_layout Standard
-To run a test simulation the executable file and namelist should be moved
- in a working direcotory together with /input/binary files 
-\end_layout
-
-\begin_layout Standard
-Instruction on how to run the MITgcm code are provided in the [
-\shape italic
-\color red
-LINK al manuale MITgcm
-\shape default
-\color inherit
-]
-\end_layout
-
-\begin_layout Standard
-The model is configured to work in serial or parallel configuration.
- The serial configuration operates by the following instruction
-\end_layout
-
-\begin_layout Standard
-The parallel version requires mpirun command and usually the run is submitted
- by a job, specifying the number of processors and other important aspects
- of the simulation, we report an example for the slurm scheduler:
-\end_layout
-
-\begin_layout Standard
-
-\shape italic
-\color red
-/bin/bash
-\end_layout
-
-\begin_layout Standard
-
-\end_layout
-
-\begin_layout Standard
-
-\shape italic
-\color red
-#SBATCH --job-name=TEST
-\end_layout
-
-\begin_layout Standard
-
-\shape italic
-\color red
-#SBATCH -N2 
-\end_layout
-
-\begin_layout Standard
-
-\shape italic
-\color red
-#SBATCH --ntasks-per-node=48 
-\end_layout
-
-\begin_layout Standard
-
-\shape italic
-\color red
-#SBATCH --time=24:00:00 
-\end_layout
-
-\begin_layout Standard
-
-\shape italic
-\color red
-#SBATCH --mem=300gb
-\end_layout
-
-\begin_layout Standard
 
 \end_layout
 
 \begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily}"
+inline false
+status open
 
-\shape italic
-\color red
-    
+\begin_layout Plain Layout
+
+% cd testcase
 \end_layout
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
-\shape italic
-\color red
-cd $SLURM_SUBMIT_DIR
+% ./testcase_generator.sh
 \end_layout
 
-\begin_layout Standard
-
-\shape italic
-\color red
-module purge 
-\end_layout
-
-\begin_layout Standard
-
-\shape italic
-\color red
-module load ...
-\end_layout
-
-\begin_layout Standard
-
-\shape italic
-\color red
-module load ...
- 
-\end_layout
-
-\begin_layout Standard
-
-\shape italic
-\color red
-module load ...
-\end_layout
-
-\begin_layout Standard
-
-\shape italic
-\color red
-ulimit -s unlimited
-\end_layout
-
-\begin_layout Standard
+\begin_layout Plain Layout
 
 \end_layout
 
-\begin_layout Standard
+\begin_layout Plain Layout
 
-\shape italic
-\color red
-date
+# generates the wrkdir/run/ directory by putting inside generated IC, meteo
+ files, bathymetry, namelists
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+# Run the test in serial mode
+\end_layout
+
+\begin_layout Plain Layout
+
+% cd wrkdir/run
+\end_layout
+
+\begin_layout Plain Layout
+
+% source $MODULEFILE  # the same used in compiling
+\end_layout
+
+\begin_layout Plain Layout
+
+% ./mitgcmuv
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
+\begin_inset VSpace 5mm
+\end_inset
 
-\shape italic
-\color red
-export RANKS_PER_NODE=48
-\end_layout
 
-\begin_layout Standard
-
-\shape italic
-\color red
-mpirun -np 96 ./mitgcm.xx
-\end_layout
-
-\begin_layout Standard
-
-\shape italic
-\color red
-date
 \end_layout
 
 \begin_layout Standard
 
 \shape smallcaps
-Referemces
+References
 \end_layout
 
 \begin_layout Standard
