@@ -69,7 +69,16 @@ eqs-within-sections
 \index_command default
 \paperfontsize default
 \spacing single
-\use_hyperref false
+\use_hyperref true
+\pdf_bookmarks true
+\pdf_bookmarksnumbered false
+\pdf_bookmarksopen false
+\pdf_bookmarksopenlevel 1
+\pdf_breaklinks false
+\pdf_pdfborder false
+\pdf_colorlinks false
+\pdf_backref false
+\pdf_pdfusetitle true
 \papersize a4paper
 \use_geometry true
 \use_package amsmath 1
@@ -361,7 +370,7 @@ literal "false"
  processes with GOTM and other physical drivers.
  FABM enables the development of complex BGC models in the form of stand-alone,
  process-specific modules.
- These are combined at runtime through coupling links to form a customised
+ These are combined at runtime through coupling links to form a customized
  BGC/ecosystem model.
  At each simulation time step, the BGC equations are applied to each layer
  and the rates of sink and source terms at the current time and space are
@@ -397,13 +406,36 @@ S.
  These modules map the one present in BFM Pel folder.
  The additional general routines ogs/bfm_pelagic_base and shared.F90.
  The relationships between the modular components (FABM models) are defined
- in the fabm.yaml file.
- Therefore, a special fabm.yaml file for BFM was configured to run the model
- with 4 phytoplankton groups, 1 heterotrophic bacteria, 2 microzooplankton
- groups, and 2 mesozooplankton groups.
- The fabm.yaml file is equivalent to the "layout"contains both the information
- of the layout and namelist contained in the presets of the standard BFM
- code.
+ in the 
+\family typewriter
+\size small
+fabm.yaml
+\family default
+\size default
+ file.
+ Therefore, a special 
+\family typewriter
+\size small
+fabm.yaml
+\family default
+\size default
+ file for BFM was configured to run the model with 4 phytoplankton groups,
+ 1 heterotrophic bacteria, 2 microzooplankton groups, and 2 mesozooplankton
+ groups.
+ The 
+\family typewriter
+\size small
+fabm.yaml
+\family default
+\size default
+ file is equivalent to the 
+\family typewriter
+\size small
+layout
+\family default
+\size default
+ contains both the information of the layout and namelist contained in the
+ presets of the standard BFM code.
 \end_layout
 
 \begin_layout Standard
@@ -1076,8 +1108,8 @@ fabm.yaml
 
 \begin_layout Standard
 In the case of BFM model coupling, there are separate instances for nutrients,
- pelagic chemistry (pelchem), bacteria, and 4 phytoplankton, 2 microplankton,
- 2 mesoplankton groups.
+ pelagic chemistry (pelchem), bacteria, and 4 phytoplankton, 2 microzooplankton,
+ 2 mesozooplankton groups.
  
 \end_layout
 
@@ -1199,7 +1231,13 @@ status open
 \end_layout
 
 \begin_layout Standard
-and for the coupling with other models invoched in the same fabm.yaml:
+and for the coupling with other models invoked in the same 
+\family typewriter
+\size small
+fabm.yaml
+\family default
+\size default
+:
 \end_layout
 
 \begin_layout Standard
@@ -1485,7 +1523,7 @@ T = MeanTemp + DailyCycle + YearlyCycle
 \end_layout
 
 \begin_layout Standard
-Similarly to temperature also solar irradaince is time dependent
+Similarly to temperature also solar irradiance is time dependent
 \end_layout
 
 \begin_layout Standard
@@ -1722,7 +1760,7 @@ assert model.checkReady(), 'One or more model dependencies have not been
 
 \begin_layout Standard
 The following blocks performs a temporal integration of the state variables
- using first order euler method
+ using first order Euler method
 \end_layout
 
 \begin_layout Standard
@@ -1797,7 +1835,7 @@ for i in range(len(t_eval)):
 
 \begin_layout Standard
 The last part of the script save the state vector on a netcdf file, specific
- diagnostis can be computed directly in the script or offline loading the
+ diagnostics can be computed directly in the script or offline loading the
  NetCDF output file.
  
 \end_layout
@@ -2019,7 +2057,7 @@ f.close()
 \end_layout
 
 \begin_layout Chapter
-Testing the BFM porting in FABM
+Testing the BFM coupling with FABM
 \end_layout
 
 \begin_layout Standard
@@ -2033,7 +2071,7 @@ In order to test the accuracy of the BFM porting we used both the python
  v5.3 (https://bfm-community.github.io/www.bfm-community.eu/bfm-quick-guide/)
  and the BFM-FABM 0D configuration.
  The two configurations had the same initial conditions, the same constant
- environmental forcings (i.e., constant light, T, atmospheric 
+ environmental forcing (i.e., constant light, T, atmospheric 
 \begin_inset Formula $CO_{2}$
 \end_inset
 
@@ -2117,7 +2155,7 @@ Results for the comparison between BFM official configuration and FABM coupled
  BFM.
  All state variables have been checked and here a subset is proposed, chlorophyl
 l content in Diatoms a), Oxygen b), PO4 c) and pH d).
- Each panel shows a 10 days timeseries of BFM standalone (black line) with
+ Each panel shows a 10 days time-series of BFM standalone (black line) with
  super imposed FABM-BFM (red line).
  Each timeseries is accompanied by the differences between the two simulations
  (diff FABM-BFM).
