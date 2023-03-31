@@ -428,7 +428,8 @@ literal "false"
 ..
  The coupling of FABM with BFM is mainly related to the inherent structure
  required by FABM models design.
- The structure is composed of header, initialize, do, do_surface structure.
+ This structure applies to each component (phyto, meso, micr) and is composed
+ of header, initialize, do, do_surface structure section.
  There are two extension header based on type_ogs_bfm_pelagic_base defined
  in ogs/bfm_pelagic_base.
  
@@ -792,7 +793,7 @@ parameters (described in subroutines initialize).
 \end_layout
 
 \begin_layout Standard
-In the module initialize procedure we included all the parameters using
+In the module "initialize procedure" all the parameters are included using
  the same formalism of BFM (i.e., parameters have prefix “p_”).
  We set up the register state variables by adding the specific constituents
  for each model (e.g.: for phytoplankton carbon ‘c’, nitrogen ‘n’, phosphorus
