@@ -391,6 +391,10 @@ fabm/wiki.
 \end_layout
 
 \begin_layout Standard
+The FABM version used in the present report is 1.0.4.
+\end_layout
+
+\begin_layout Standard
 The development of BFM for FABM is based on a modular approach leveraging
  of the object oriented tools available in fortran 2003.
  In particular, different subroutines and FABM models are associated with
