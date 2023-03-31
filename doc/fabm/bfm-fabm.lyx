@@ -196,8 +196,15 @@ Coupling BFM with FABM:
 
 \begin_layout Standard
 \align center
-Álvarez, Anna Teruzzi, Paolo Lazzari, Guido Occhipinti, Gianpiero Cossarini,
- Jorn Bruggeman 
+
+\series bold
+E.
+ Álvarez, A.
+ Teruzzi, P.
+ Lazzari, G.
+ Occhipinti, G.
+ Cossarini, J.
+ Bruggeman 
 \end_layout
 
 \begin_layout Standard
@@ -214,7 +221,7 @@ Release 1.0, April 2023
 \end_inset
 
 —– BFM Report series N.
- ? —–
+ 6 —–
 \begin_inset Newline newline
 \end_inset
 
@@ -297,17 +304,10 @@ This document should be cited as:
 \begin_inset Newline newline
 \end_inset
 
-
-\series bold
-Álvarez, E., Teruzzi, A., Lazzari, P., Occhipinti, G., Cossarini, G., Bruggeman
-\series default
-, 
-\series bold
-J.
-
-\series default
+Álvarez, E., Teruzzi, A., Lazzari, P., Occhipinti, G., Cossarini, G., Bruggeman,
+ J.
  (2023) Coupling BFM with FABM; BFM Report series N.
- ? April 2023, Trieste, Italy, http://bfm-community.eu
+ 6 April 2023, Trieste, Italy, http://bfm-community.eu
 \end_layout
 
 \begin_layout Address
@@ -417,19 +417,11 @@ literal "false"
 
 \end_inset
 
-
-\begin_inset CommandInset citation
-LatexCommand citet
-key "alvarez_chromophoric_2023,cossarini2015,lazzari_cdom_2021,lazzari_spatial_2016,lazzari_seasonal_2012"
-literal "false"
-
-\end_inset
-
-..
+.
  The coupling of FABM with BFM is mainly related to the inherent structure
  required by FABM models design.
- This structure applies to each component (phyto, meso, micr) and is composed
- of header, initialize, do, do_surface structure section.
+ This structure applies to each component (phytoplankton, meso- and micro-zoopla
+nkton) and is composed of header, initialize, do, do_surface structure section.
  There are two extension header based on type_ogs_bfm_pelagic_base defined
  in ogs/bfm_pelagic_base.
  
@@ -439,9 +431,10 @@ literal "false"
 \begin_inset Float table
 wide false
 sideways false
-status open
+status collapsed
 
 \begin_layout Plain Layout
+\align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="9" columns="3">
 <features tabularvalignment="middle">
@@ -824,7 +817,7 @@ the terms of alkalinity sink/source have been directly included in Phyto,
 \end_layout
 
 \begin_layout Chapter
-Compiling FABM-BFM - python code example
+Compiling FABM-BFM using python
 \end_layout
 
 \begin_layout Standard
@@ -860,6 +853,7 @@ On most Linux-like systems (UNIX/Linux/Mac OS X), a Git client is already
 
 \begin_layout Standard
 \begin_inset listings
+lstparams "language=bash,basicstyle={\small\ttfamily}"
 inline false
 status open
 
@@ -874,11 +868,15 @@ git clone https://github.com/fabm-model/fabm.git
 \end_layout
 
 \begin_layout Standard
-and then creating the "extern" folder:
-\end_layout
-
-\begin_layout Standard
+and then creating a folder named 
+\family typewriter
+\size small
+extern
+\family default
+\size default
+:
 \begin_inset listings
+lstparams "language=bash,basicstyle={\small\ttfamily}"
 inline false
 status open
 
@@ -899,25 +897,35 @@ mkdir extern
 
 \begin_layout Standard
 to compile the FABM-BFM code it is further necessary to download the BFM
- code with a request to the BFM website (https://bfm-community.github.io/www.bfm-co
-mmunity.eu/, see the "get the code" instructions).
+ code from the BFM website (www.bfm-community.eu and follow "Get the code"
+ instructions).
 \end_layout
 
 \begin_layout Standard
 After this operation it is necessary to copy the fabm folder contained in
  BFM "src" directory and put this in the extern folder in the FABM code.
- You can rename the folder according to your institute name <institute_name>
+ You can rename the folder according to your institute name 
+\family typewriter
+\size small
+<institute_name>
+\family default
+\size default
  to customize the code according to your project activity.
 \end_layout
 
 \begin_layout Standard
-Copy the bash instruction below in a file editing the <institute_name> according
- to your needs:
+Copy the bash instruction below in a file editing the 
+\family typewriter
+\size small
+<institute_name>
+\family default
+\size default
+ according to your needs:
 \end_layout
 
 \begin_layout Standard
 \begin_inset listings
-lstparams "language=bash,basicstyle={\small\rmfamily}"
+lstparams "language=bash,basicstyle={\small\ttfamily},showstringspaces=false"
 inline false
 status open
 
@@ -1007,10 +1015,6 @@ cd -
 rm -rf ${WORK_DIR}
 \end_layout
 
-\begin_layout Plain Layout
-
-\end_layout
-
 \end_inset
 
 
@@ -1027,7 +1031,7 @@ To verify correct finalization of the installation you can type from python
 
 \begin_layout Standard
 \begin_inset listings
-lstparams "language=Python,basicstyle={\small\rmfamily}"
+lstparams "language=Python,basicstyle={\small\ttfamily}"
 inline false
 status open
 
@@ -1050,23 +1054,47 @@ The fabm.yaml configuration file
 \end_layout
 
 \begin_layout Standard
-FABM uses a single configuration file, fabm.yaml, which describes which biogeoche
-mical models to use and how to parameterize them.
- fabm.yaml is a text file in YAML format.
+FABM uses a single configuration file, 
+\family typewriter
+\size small
+fabm.yaml
+\family default
+\size default
+, describing which biogeochemical models to use and how to setup the related
+ parameterizations.
+ The 
+\family typewriter
+\size small
+fabm.yaml
+\family default
+\size default
+ is a text file in YAML format.
  It contains a hierarchy of information represented by a spatial indentation.
  Each active model has its own block in the configuration file.
- In the case of BFM model coupling, there are separate instances of nutrients
- , bacteria, 4 phyto, 2 micro,2 meso and pelchem.
  
 \end_layout
 
 \begin_layout Standard
-Below is reported an example of part of the block related to diatoms in
- the fabm_monospectral.yaml used for BFM 
+In the case of BFM model coupling, there are separate instances for nutrients,
+ pelagic chemistry (pelchem), bacteria, and 4 phytoplankton, 2 microplankton,
+ 2 mesoplankton groups.
+ 
+\end_layout
+
+\begin_layout Standard
+Below it is reported an example of a part of the block related to diatoms
+ in the 
+\family typewriter
+\size small
+fabm_monospectral.yaml
+\family default
+\size default
+ used for BFM:
 \end_layout
 
 \begin_layout Standard
 \begin_inset listings
+lstparams "language=Python,basicstyle={\footnotesize\ttfamily}"
 inline false
 status open
 
@@ -1176,6 +1204,7 @@ and for the coupling with other models invoched in the same fabm.yaml:
 
 \begin_layout Standard
 \begin_inset listings
+lstparams "language=Python,basicstyle={\footnotesize\ttfamily}"
 inline false
 status open
 
@@ -1237,6 +1266,7 @@ To perform a test simulation first create a folder for the setup from the
 
 \begin_layout Standard
 \begin_inset listings
+lstparams "language=bash,basicstyle={\small\ttfamily}"
 inline false
 status open
 
@@ -1256,6 +1286,7 @@ then copy the configuration file into the setup folder.
 
 \begin_layout Standard
 \begin_inset listings
+lstparams "language=bash,basicstyle={\small\ttfamily}"
 inline false
 status open
 
@@ -1275,8 +1306,20 @@ Now it is possible to perform a simulation using a python script, to initialize
 \end_layout
 
 \begin_layout Standard
-If pyfabm is installed using a conda environment it is necessary to activate
- it in order to import the pyfabm package.
+If 
+\family typewriter
+\size small
+pyfabm
+\family default
+\size default
+ is installed using a conda environment it is necessary to activate the
+ associated environment in order to import the 
+\family typewriter
+\size small
+pyfabm
+\family default
+\size default
+ package.
 \end_layout
 
 \begin_layout Standard
@@ -1285,7 +1328,7 @@ As a first operation we import the required python packages
 
 \begin_layout Standard
 \begin_inset listings
-lstparams "language=Python,basicstyle={\small\rmfamily}"
+lstparams "language=Python,basicstyle={\small\ttfamily}"
 inline false
 status open
 
@@ -1325,7 +1368,7 @@ y
 
 \begin_layout Standard
 \begin_inset listings
-lstparams "language=Python,basicstyle={\small\ttfamily}"
+lstparams "language=Python,basicstyle={\footnotesize\ttfamily}"
 inline false
 status open
 
@@ -1351,7 +1394,7 @@ The time series accounting for temperature variability accounts for daily
 
 \begin_layout Standard
 \begin_inset listings
-lstparams "language=Python,basicstyle={\small\rmfamily}"
+lstparams "language=Python,basicstyle={\small\ttfamily}"
 inline false
 status open
 
@@ -1447,7 +1490,7 @@ Similarly to temperature also solar irradaince is time dependent
 
 \begin_layout Standard
 \begin_inset listings
-lstparams "language=Python,basicstyle={\small\rmfamily}"
+lstparams "language=Python,basicstyle={\footnotesize\ttfamily}"
 inline false
 status open
 
@@ -1546,7 +1589,7 @@ The biogeochemical model object is created basing on the yaml configuration
 
 \begin_layout Standard
 \begin_inset listings
-lstparams "language=Python,basicstyle={\small\rmfamily}"
+lstparams "language=Python,basicstyle={\footnotesize\ttfamily}"
 inline false
 status open
 
@@ -1572,7 +1615,7 @@ The following commands set the environmental regulating factors providing
 
 \begin_layout Standard
 \begin_inset listings
-lstparams "language=Python,basicstyle={\small\rmfamily}"
+lstparams "language=Python,basicstyle={\footnotesize\ttfamily}"
 inline false
 status open
 
@@ -1684,7 +1727,7 @@ The following blocks performs a temporal integration of the state variables
 
 \begin_layout Standard
 \begin_inset listings
-lstparams "language=Python,basicstyle={\small\rmfamily}"
+lstparams "language=Python,basicstyle={\footnotesize\ttfamily}"
 inline false
 status open
 
@@ -1761,7 +1804,7 @@ The last part of the script save the state vector on a netcdf file, specific
 
 \begin_layout Standard
 \begin_inset listings
-lstparams "language=Python,basicstyle={\small\ttfamily}"
+lstparams "language=Python,basicstyle={\footnotesize\ttfamily}"
 inline false
 status open
 
@@ -2130,7 +2173,7 @@ noprefix "false"
 
 \begin_layout Standard
 \begin_inset listings
-lstparams "language=Python,basicstyle={\small\ttfamily}"
+lstparams "language=Python,basicstyle={\footnotesize\ttfamily}"
 inline false
 status open
 
