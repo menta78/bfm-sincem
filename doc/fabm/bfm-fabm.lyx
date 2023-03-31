@@ -906,11 +906,11 @@ mmunity.eu/, see the "get the code" instructions).
 After this operation it is necessary to copy the fabm folder contained in
  BFM "src" directory and put this in the extern folder in the FABM code.
  You can rename the folder according to your institute name <institute_name>
- to customize the code according to your progect activity.
+ to customize the code according to your project activity.
 \end_layout
 
 \begin_layout Standard
-Copy the instruction below in a file editing the <institute_name> according
+Copy the bash instruction below in a file editing the <institute_name> according
  to your needs:
 \end_layout
 
@@ -1269,13 +1269,13 @@ cp extern/<institute_name>/fabm_monospectral.yaml setups/0D/fabm.yaml
 \end_layout
 
 \begin_layout Standard
-Now it is possible to perform a simulation using a python script initialize
- the model and perform a time integration of the equations.
+Now it is possible to perform a simulation using a python script, to initialize
+ the biogeochemical model and to perform a time integration of the equations.
 \end_layout
 
 \begin_layout Standard
-If you used a conda environment is necessary to activate it in order to
- import the pyfabm package.
+If pyfabm is installed using a conda environment it is necessary to activate
+ it in order to import the pyfabm package.
 \end_layout
 
 \begin_layout Standard
