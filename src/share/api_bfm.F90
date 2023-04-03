@@ -162,6 +162,7 @@
    ! logical obc: variable has open boundary data
    ! logical sbc: variable has surface boundary data
    ! logical cbc: variable has coastal boundary data
+   ! logical rho: initial condition scaled by seawater density
    !---------------------------------------------
    type InputInfo
       integer           :: init
@@ -175,6 +176,7 @@
       logical           :: obc
       logical           :: sbc
       logical           :: cbc
+      logical           :: rho
    end type InputInfo
    type(InputInfo),dimension(NO_D3_BOX_STATES) :: InitVar
 

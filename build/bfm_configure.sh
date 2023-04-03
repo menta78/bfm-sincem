@@ -609,7 +609,7 @@ if [[ ${DEP} && "$MODE" != "NEMO_CESM" ]]; then
            cp *.xml ${exedir}/
         fi
     else
-        echo "WARNING: directory ${exedir} exists (not overwriting namelists)\n"
+        echo "WARNING: directory ${exedir} exists (not overwriting namelists)"
     fi
 
     #Copy executable and insert exe and valgrind commands
