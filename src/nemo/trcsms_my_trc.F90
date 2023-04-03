@@ -18,7 +18,7 @@ MODULE trcsms_my_trc
    USE trc             ! TOP variables
    USE trd_oce
    USE trdtrc
-   USE trcini_my_trc,  ONLY: log_bgc_stats
+   USE trcini_my_trc,  ONLY: log_bgc_stats, scale_by_density
    USE trcwri_my_trc,  ONLY: diags_mapping, diags_collect
    USE trcset,         ONLY: trc_set
    USE iom,            ONLY: iom_put
@@ -67,6 +67,10 @@ CONTAINS
       ! Set diagnostic fields to be saved
       !-------------------------------------------------------
       IF (kt == nittrc000) CALL diags_mapping()
+   
+      ! Scale initial conditions by seawater density
+      !-------------------------------------------------------
+      IF (kt == nittrc000 .AND. .NOT. ln_rsttr ) CALL scale_by_density(Kbb, Kmm) 
 
       ! Save to BFM log global statistics of tracers
       !-------------------------------------------------------

@@ -45,6 +45,7 @@ MODULE trcini_my_trc
    PRIVATE
 
    PUBLIC   trc_ini_my_trc, log_bgc_stats   ! called by trcini.F90 module
+   PUBLIC   scale_by_density                ! called by trcsms_my_trc.F90
 
    !!----------------------------------------------------------------------
    !! NEMO/TOP 4.0 , NEMO Consortium (2018)
@@ -120,7 +121,7 @@ CONTAINS
          !-------------------------------------------------------
          IF (bfm_lwp) THEN
             WRITE(LOGUNIT,157) 'Init', 'Unif', 'Filename    ', 'Var', 'Anal. Z1', 'Anal. V1', &
-                 'Anal. Z2', 'Anal. V2', 'OBC', 'SBC', 'CBC'
+                 'Anal. Z2', 'Anal. V2', 'OBC', 'SBC', 'CBC', 'RHO'
             DO jn = 1,NO_D3_BOX_STATES
                  WRITE(LOGUNIT, 158) InitVar(jn)
             !     write(LOGUNIT,*) var_names(m), D3STATE(m,:)
@@ -214,8 +215,8 @@ CONTAINS
       !
       IF( ln_timing )   CALL timing_stop('trc_ini_my_trc')
       !
-157 FORMAT(a4, 1x, a10  , 1x, a25, 1x, a3, 1x, a10  , 1x, a10  , 1x, a10  , 1x, a10  , 3x, a3, 3x, a3, 3x, a3)
-158 FORMAT(i4, 1x, E10.3, 1x, a25, 1x, a3, 1x, E10.3, 1x, E10.3, 1x, E10.3, 1x, E10.3, 3x, L3, 3x, L3, 3x, L3)
+157 FORMAT(a4, 1x, a10  , 1x, a25, 1x, a3, 1x, a10  , 1x, a10  , 1x, a10  , 1x, a10  , 3x, a3, 3x, a3, 3x, a3, 3x, a3)
+158 FORMAT(i4, 1x, E10.3, 1x, a25, 1x, a3, 1x, E10.3, 1x, E10.3, 1x, E10.3, 1x, E10.3, 3x, L3, 3x, L3, 3x, L3, 3x, L3)
       !
    END SUBROUTINE trc_ini_my_trc
 
@@ -340,6 +341,36 @@ CONTAINS
 
    END SUBROUTINE seabed_iron_release
 
+
+   SUBROUTINE scale_by_density(Kbb, Kmm)
+      !!----------------------------------------------------------------------
+      !!                 ***  scale_by_density  ***
+      !!
+      !! ** Purpose : Scale the value of a tracer by the seawater density
+      !!
+      !! ** Method  : scale bgc tracers by the value of ocean model density
+      !!              based on the settings of Initvar(:)%rho 
+      !!----------------------------------------------------------------------
+      USE phycst,     ONLY: rho0
+      !
+      INTEGER, INTENT(in) :: Kbb, Kmm  ! time level indices
+      INTEGER    :: ji, jj, jn
+      REAL(RLEN) :: ztraf, zexp, zdexp
+      LOGICAL    :: exists
+      !!----------------------------------------------------------------------
+      DO jn = 1, NO_D3_BOX_STATES
+          IF ( Initvar(jn)%rho ) THEN 
+             LEVEL1 'ic value ', tr(15,15,1,var_map(jn),Kmm)
+             tr(:,:,:,var_map(jn),Kmm) = tr(:,:,:,var_map(jn),Kmm) * tmask(:,:,:) * (rhd(:,:,:) + 1._RLEN) * rho0
+             tr(:,:,:,var_map(jn),Kbb) = tr(:,:,:,var_map(jn),Kmm)
+             LEVEL1 ' Scale by density : ', trim(var_names(jn))
+             LEVEL1 'dens ', tmask(15,15,1) * (rhd(15,15,1) + 1._RLEN) * rho0
+             LEVEL1 'aft value ', tr(15,15,1,var_map(jn),Kmm)
+          ENDIF
+      END DO
+      LEVEL1 ''
+
+   END SUBROUTINE scale_by_density
 
    !!======================================================================
 END MODULE trcini_my_trc

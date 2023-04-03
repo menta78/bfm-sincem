@@ -235,6 +235,8 @@ CONTAINS
          ENDIF
       ENDDO
 
+      LEVEL1 ''
+
    END SUBROUTINE diags_mapping
 
 #else
