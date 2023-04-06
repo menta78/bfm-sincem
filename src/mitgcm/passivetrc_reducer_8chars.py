@@ -47,7 +47,7 @@ def dumpfile(string_list, filename):
     fid.close()
 
 def reducer8(String):
-    RULES={"PPY_ii":"_", "BFM1D_exR2ac_ii":"exR2ac", "MEZ_ii":"_",  "MIZ_ii":"_", "OMT_ii":"_", "PBA_ii":"_", 'exPPYR2ac_ii': "exR2"}
+    RULES={"PPY_ii":"_", "BFM1D_exR2ac_ii":"exR2ac", "MEZ_ii":"_",  "MIZ_ii":"_", "OMT_ii":"_", "PBA_ii":"_", 'exPPYR2ac_ii': "exR2ac"}
     for r in RULES.keys():
         String = String.replace(r, RULES[r])
     return String[:8]
@@ -64,6 +64,7 @@ def stringlist_modify(LINES, section, var_identifier):
             if var_identifier in line:
                 prefix,var, _= line.rsplit("\"")
                 new_line = "%s\"%s\"" %(prefix, reducer8(var))
+                if var != reducer8(var) : print('Renaming %s --> %s ' % (var,reducer8(var)))
                 LINES[iline] = new_line
             if line=="/":
                 break
