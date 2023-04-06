@@ -71,7 +71,7 @@ C     === Local variables ====
        _RL er(Nr,11)
        _RL b(jptra,Nr)
        _RL c(4,Nr)
-       _RL d(jptra_dia,Nr)
+       _RL d(Nr,jptra_dia)
        _RL d2(jptra_dia_2d)
 
 
@@ -278,10 +278,10 @@ c TO DO: should be generalized!
              er(1:kBot(i,j),11) = 0.0
 
 c  ===== CALL TO BFM ====
-             CALL BFM1D_Input_EcologyDynamics(kBot(i,j),a,jptra,er)
+             CALL BFMmit_Input_EcologyDynamics(kBot(i,j),a,jptra,er)
              CALL BFM1D_reset()
              CALL EcologyDynamics()
-             CALL BFM1D_Output_EcologyDynamics(b,c,d,d2)
+             CALL BFMmit_Output_EcologyDynamics(b,c,d,d2)
 c  ===== return of BFM tendency ====
              DO jtr=1, jptra
                  gchemTendency(i,j,1:kBot(i,j),bi,bj,jtr) = 

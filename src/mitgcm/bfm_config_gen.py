@@ -77,9 +77,9 @@ class BFM_vars(object):
 
         self._vars = parse_namelist(namelist, var_section, var_identifier, var_units_identifier)
         self._vars_properties = dict() # additional properties for all tracers, initialized to null
-        diag_vars = parse_namelist(namelist, diag_var_section, diag_var_identifier, diag_var_units_identifier)
-        diag_vars_2d = parse_namelist(namelist, diag_var_section_2d, diag_var_identifier_2d, diag_var_units_identifier_2d)
-        self._diag_vars = diag_vars + diag_vars_2d # diag_vars and diag_vars_2d in one single list
+        self._diag_vars = parse_namelist(namelist, diag_var_section, diag_var_identifier, diag_var_units_identifier)
+        self._diag_vars_2d = parse_namelist(namelist, diag_var_section_2d, diag_var_identifier_2d, diag_var_units_identifier_2d)
+        self._diag_vars_all = self._diag_vars + self._diag_vars_2d # diag_vars and diag_vars_2d in one single list
         self._diag_vars_MIT = list() # MITgcm-BFM-only diagnostic variables, initialized to null
 
 
@@ -216,6 +216,8 @@ C
             # loop on diagnostic variables
             for var in self._diag_vars:
                 ofile.write('      _RL   dia' + var[0] + '(1-OLx:sNx+OLx,1-OLy:sNy+OLy,Nr)\n')
+            for var in self._diag_vars_2d:
+                ofile.write('      _RL   dia' + var[0] + '(1-OLx:sNx+OLx,1-OLy:sNy+OLy,Nr)\n')
 
             # loop on MITgcm_BFM-only diagnostic variables
             for var in self._diag_vars_MIT:
@@ -228,13 +230,16 @@ C
         # First part of the code
         header = '''C $Header:/MITgcm/pkg/BFMcoupler/BFMcoupler_VARDIAGinitializ.h,v 1.01
 C initialization of local variables of diagnostic in BFMcoupler_calc_tendency.f
-C 
+C
+'''
+        headerDO='''
       DO j=1-OLy,sNy+OLy
       DO i=1-OLx,sNx+OLx
-          do k=1,Nr
+      DO k=1,Nr
 '''
 
-        footer = '''          enddo
+        footer = '''
+      ENDDO
       ENDDO
       ENDDO'''
 
@@ -244,14 +249,17 @@ C
             ofile.write(header)
 
             # loop on diagnostic variables
-            for var in self._diag_vars:
+            for var in self._diag_vars_all:
+                ofile.write(headerDO)
                 ofile.write('              dia' + var[0] + '(i,j,k)=0. _d 0\n')
+                ofile.write(footer)
+
+
 
             # loop on MITgcm-BFM-only diagnostic variables
             for var in self._diag_vars_MIT:
                 ofile.write('              dia' + var[1][0] + '(i,j,k)=0. _d 0\n')
 
-            ofile.write(footer)
 
 
 
@@ -260,7 +268,7 @@ C
         # First part of the code
         header = '''C $Header:/MITgcm/pkg/BFMcoupler/BFMcoupler_VARDIAGcopy_fromD.h,v 1.01
 C copy OUTPUT_ECOLOGY diagnostics from vector d to local variables of diagnostic in BFMcoupler_calc_tendency.f
-C '''
+'''
 
         # write to file
         with open(output_file, 'w') as ofile:
@@ -268,8 +276,11 @@ C '''
             ofile.write(header)
 
             # loop on diagnostic variables
-            for var in self._diag_vars:
-                ofile.write('              dia' + var[0] + '(i,j,1:kBot(i,j))=d(' + str(self._diag_vars.index(var)+1) + ',1:kBot(i,j))\n')
+            for index, var in enumerate(self._diag_vars):
+                #ofile.write('              dia' + var[0] + '(i,j,1:kBot(i,j))=d(' + str(self._diag_vars.index(var)+1) + ',1:kBot(i,j))\n')
+                ofile.write('              dia%s(i,j,1:kBot(i,j))=d(1:kBot(i,j),%d)\n' %(var[0],index+1))
+            for index, var in enumerate(self._diag_vars_2d):
+                ofile.write('              dia%s(i,j,1)=d2(%d)\n' %(var[0],index+1))
 
             # loop on MITgcm-BFM-only diagnostic variables
             for var in self._diag_vars_MIT:
@@ -303,7 +314,7 @@ C fill the diagnostic memory using DIAGNOSTICS_FILL
 
     def write_data_ptracers(self, output_file='data.ptracers'):
 
-        header = ' &PTRACERS_PARM01\n' + ' PTRACERS_numInUse=' + str(len(self._vars)) + ',\n PTRACERS_Iter0= 0,'
+        header = ' &PTRACERS_PARM01\n' + ' PTRACERS_numInUse=' + str(len(self._vars)) + ',\n PTRACERS_Iter0= 0,\n'
 
         with open(output_file, 'w') as ofile:
 
@@ -311,36 +322,40 @@ C fill the diagnostic memory using DIAGNOSTICS_FILL
 
             for var in self._vars:
 
-                idx = str(self._vars.index(var))
+                idx = self._vars.index(var)+1
+                ofile.write("\n")
+                ofile.write('# tracer %d - %s\n' %(idx,var[0]))
+                ofile.write(' PTRACERS_names(%d)=\'%s\',\n' %(idx,var[0]))
+                ofile.write(' PTRACERS_long_names(%d)=\'%s\',\n' %(idx,var[0]))
+                ofile.write(' PTRACERS_units(%d)=\'%s\',\n' %(idx,var[1]))
 
-                ofile.write('# tracer ' + idx + ' - ' + var[0] + '\n')
-                ofile.write(' PTRACERS_names(' + idx + ')=\'' + var[0] + '\',\n')
-                ofile.write(' PTRACERS_long_names(' + idx + ')=\'' + var[0] + '\',\n')
-                ofile.write(' PTRACERS_units(' + idx + ')=\'' + var[1] + '\',\n')
+#                ofile.write('# tracer ' + idx + ' - ' + var[0] + '\n')
+#                ofile.write(' PTRACERS_names(' + idx + ')=\'' + var[0] + '\',\n')
+                #ofile.write(' PTRACERS_long_names(' + idx + ')=\'' + var[0] + '\',\n')
+                #ofile.write(' PTRACERS_units(' + idx + ')=\'' + var[1] + '\',\n')
                 
                 if 'ADVscheme' in self._vars_properties:
-                    ofile.write(' PTRACERS_advScheme(' + idx + ')=' + self._vars_properties['ADVscheme'] + ',\n')
+                    ofile.write(' PTRACERS_advScheme(%d)= %s,\n' %(idx, self._vars_properties['ADVscheme']))
                 if 'diffKh' in self._vars_properties:
-                    ofile.write(' PTRACERS_diffKh(' + idx + ')=' + self._vars_properties['diffKh'] + ',\n')
+                    ofile.write(' PTRACERS_diffKh(%d)= %s,\n' %(idx, self._vars_properties['diffKh']))
                 if 'diffKr' in self._vars_properties:
-                    ofile.write(' PTRACERS_diffKr(' + idx + ')=' + self._vars_properties['diffKr'] + ',\n')
+                    ofile.write(' PTRACERS_diffKr(%d)= %s,\n' %(idx, self._vars_properties['diffKr']))
                 if 'useGMRedi' in self._vars_properties:
-                    ofile.write(' PTRACERS_useGMRedi(' + idx + ')=' + self._vars_properties['useGMRedi'] + ',\n')
+                    ofile.write(' PTRACERS_useGMRedi(%d)=%s,\n' %(idx, self._vars_properties['useGMRedi']))
                 if 'useKPP' in self._vars_properties:
-                    ofile.write(' PTRACERS_useKPP(' + idx + ')=' + self._vars_properties['useKPP'] + ',\n')
+                    ofile.write(' PTRACERS_useKPP(%d)= %s,\n' %(idx, self._vars_properties['useKPP']))
                 if 'initialFile' in self._vars_properties:
-                    ofile.write(' PTRACERS_initialFile(' + idx + ')=\'' + self._vars_properties['initialFile'] + var[0] + '.bin\'' + ',\n')
+                    ofile.write(' PTRACERS_initialFile(%d)= \'%s%s.dat\',\n'  %(idx,self._vars_properties['initialFile'],var[0]))
                 if 'EvPrRn' in self._vars_properties:
-                    ofile.write('#PTRACERS_EvPrRn(' + idx + ')=' + self._vars_properties['EvPrRn'] + ',\n')
+                    ofile.write('#PTRACERS_EvPrRn(%d)=' + self._vars_properties['EvPrRn'] + ',\n')
 
-                ofile.write('#PTRACERS_ref(1:Nr,' + idx + ')=Null,Null,Null ... ,\n')
-                ofile.write(' &END\n')
+#                ofile.write('#PTRACERS_ref(1:Nr,%d)=Null,Null,Null ... ,\n')
+            ofile.write(' &END\n')
 
 
 
-    def write_data_diagnostic(self, output_file='data.diagnostic'):
+    def write_data_diagnostic(self, output_file='data.diagnostic',default_frequency='432000'):
 
-        default_frequency = '432000'
         default_time_phase = '0'
 
         header = '''# Diagnostic Package Choices
@@ -363,8 +378,38 @@ C fill the diagnostic memory using DIAGNOSTICS_FILL
 #  fileFlags(n)     : specific code (8c string) for output file "n"
 #--------------------
  &DIAGNOSTICS_LIST
-# diag_mnc     = .FALSE.,
-# dumpAtLast   = .TRUE.,
+ fields(1,1)  = 'ETAN',
+ fileName(1)  = 'Eta',
+ frequency(1) = 3600,
+#
+ fields(1,2)  = 'THETA',
+ fileName(2)  = 'T',
+ frequency(2) = 3600,
+#
+ fields(1,3)  = 'SALT',
+ fileName(3)  = 'S',
+ frequency(3) = 3600,
+#
+ fields(1,4)  = 'UE_VEL_C',
+ fileName(4)  = 'U',
+ frequency(4) = 3600,
+#
+ fields(1,5)  = 'VN_VEL_C',
+ fileName(5)  = 'V',
+ frequency(5) = 3600,
+#
+ fields(1,6)  = 'WVEL',
+ fileName(6)  = 'W',
+ frequency(6) = 3600,
+#
+ fields(1,7)  = 'RHOAnoma',
+ fileName(7)  = 'RHOAnoma',
+ frequency(7) = 86400,
+#
+ fields(1,8)  = 'MXLDEPTH',
+ fileName(8)  = 'mld',
+ frequency(8) = 86400,
+
 '''
 
         footer = ''' &END
@@ -386,15 +431,31 @@ C fill the diagnostic memory using DIAGNOSTICS_FILL
 '''
 
         with open(output_file, 'w') as ofile:
-
+            ind=8
+            l_ind=0
             ofile.write(header)
+
+            for var in self._vars:
+                ind=ind+1
+                l_ind = l_ind + 1
+                ofile.write(' fields(1,%d)  = \'TRAC%02d\',\n' %(ind, l_ind))
+                ofile.write(' fileName(%d)  = \'%s\',\n'      %(ind,var[0]))
+                ofile.write(' frequency(%d) = %s,\n'  %(ind, default_frequency) )
+                # ofile.write(' fields(1,' + str(ind) + ')  = \'' + var[0] + '\',\n')
+                #ofile.write(' fileName(' + str(ind) + ')  = \'' + var[0] + '\',\n')
+                #ofile.write(' frequency(' + str(ind) + ')  = ' + default_frequency + ',\n')
+                ofile.write('#\n')
 
             # loop on diagnostic variables
             for var in self._diag_vars:
-                ofile.write(' fields(1,' + str(self._diag_vars.index(var)) + ')  = \'' + var[0] + '\',\n')
-                ofile.write(' fileName(' + str(self._diag_vars.index(var)) + ')  = \'' + var[0] + '\',\n')
-                ofile.write(' frequency(' + str(self._diag_vars.index(var)) + ')  = ' + default_frequency + ',\n')
-                ofile.write(' timePhase(' + str(self._diag_vars.index(var)) + ')  = ' + default_time_phase + ',\n')
+                ind=ind+1
+                l_ind = l_ind + 1
+                if l_ind > 92: continue
+                #ind=self._diag_vars.index(var)+1
+                ofile.write(' fields(1,' + str(ind) + ')  = \'' + var[0] + '\',\n')
+                ofile.write(' fileName(' + str(ind) + ')  = \'' + var[0] + '\',\n')
+                ofile.write(' frequency(' + str(ind) + ')  = ' + default_frequency + ',\n')
+                #ofile.write(' timePhase(' + str(ind) + ')  = ' + default_time_phase + ',\n')
                 ofile.write('#\n')
 
             # loop on MITgcm-BFM-only diagnostic variables
@@ -424,7 +485,7 @@ if __name__ == '__main__':
     my_BFM_vars.set_vars_property('diffKr', '1.E-4')
     my_BFM_vars.set_vars_property('useGMRedi', '.FALSE.')
     my_BFM_vars.set_vars_property('useKPP', '.FALSE.')
-    my_BFM_vars.set_vars_property('initialFile', '../input/input_binaries/IC_SAD_')
+    my_BFM_vars.set_vars_property('initialFile', '../input/binaries/ICs/BIO/IC_')
     my_BFM_vars.set_vars_property('EvPrRn', '0.0')
 
     # debug
@@ -439,4 +500,5 @@ if __name__ == '__main__':
         my_BFM_vars.write_fill_diags(OUTDIR+'BFMcoupler_VARDIAG_fill_diags.h')
     if args.type=='namelist':
         my_BFM_vars.write_data_ptracers(OUTDIR + 'data.ptracers')
-        my_BFM_vars.write_data_diagnostic(OUTDIR + 'data.diagnostic')
+        my_BFM_vars.write_data_diagnostic(OUTDIR + 'data.diagnostics', default_frequency='86400')
+
