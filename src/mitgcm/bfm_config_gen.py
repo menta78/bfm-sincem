@@ -107,17 +107,18 @@ class BFM_vars(object):
     def flush(self):
 
         print('Vars:\n')
-        print self._vars
+        print(self._vars)
         print('\nDiagnostic variables:\n')
-        print self._diag_vars
+        print(self._diag_vars)
         print('\nDiagnostic variables - MITgcm-BFM-only:\n')
-        print self._diag_vars_MIT
+        print(self._diag_vars_MIT)
 
 
 
     def write_diagnostic_init(self, output_file='BFMcoupler_diagnostics_init.F'):
 
-        header = '''C $Header:/MITgcm/pkg/BFMcoupler/BFMcoupler_diagnostics_init.F,v 1.01
+        header = '''C
+C $Header:/MITgcm/pkg/BFMcoupler/BFMcoupler_diagnostics_init.F,v 1.01
 C 2014/04/10
 
 #include "GCHEM_OPTIONS.h"
@@ -199,7 +200,8 @@ C     Define diagnostics Names :
 
     def write_local(self, output_file='BFMcoupler_VARDIAGlocal.h'):
 
-        header = '''C $Header:/MITgcm/pkg/BFMcoupler/BFMcoupler_VARDIAGlocal.h,v 1.01
+        header = '''C
+C $Header:/MITgcm/pkg/BFMcoupler/BFMcoupler_VARDIAGlocal.h,v 1.01
 C 2014/04/10
 C local variables of diagnostic for BFMcoupler_calc_tendency.f
 C 
@@ -224,7 +226,8 @@ C
 
     def write_init(self, output_file='BFMcoupler_VARDIAGinitializ.h'):
 
-        header = '''C $Header:/MITgcm/pkg/BFMcoupler/BFMcoupler_VARDIAGinitializ.h,v 1.01
+        header = '''C
+C $Header:/MITgcm/pkg/BFMcoupler/BFMcoupler_VARDIAGinitializ.h,v 1.01
 C initialization of local variables of diagnostic in BFMcoupler_calc_tendency.f
 C
 '''
@@ -234,10 +237,10 @@ C
       DO k=1,Nr
 '''
 
-        footer = '''
+        footer = '''      ENDDO
       ENDDO
       ENDDO
-      ENDDO'''
+'''
 
         # write to file
         with open(output_file, 'w') as ofile:
@@ -261,7 +264,8 @@ C
 
     def write_copy_from_d(self, output_file='BFMcoupler_VARDIAGcopy_fromD.h'):
 
-        header = '''C $Header:/MITgcm/pkg/BFMcoupler/BFMcoupler_VARDIAGcopy_fromD.h,v 1.01
+        header = '''C
+C $Header:/MITgcm/pkg/BFMcoupler/BFMcoupler_VARDIAGcopy_fromD.h,v 1.01
 C copy OUTPUT_ECOLOGY diagnostics from vector d to local variables of diagnostic in BFMcoupler_calc_tendency.f
 '''
 
@@ -284,7 +288,8 @@ C copy OUTPUT_ECOLOGY diagnostics from vector d to local variables of diagnostic
 
     def write_fill_diags(self, output_file='BFMcoupler_VARDIAG_fill_diags.h'):
 
-        header = '''C $Header:/MITgcm/pkg/BFMcoupler/BFMcoupler_VARDIAG_fill_diags.h,v 1.01
+        header = '''C
+C $Header:/MITgcm/pkg/BFMcoupler/BFMcoupler_VARDIAG_fill_diags.h,v 1.01
 C fill the diagnostic memory using DIAGNOSTICS_FILL
 '''
 
@@ -345,7 +350,8 @@ C fill the diagnostic memory using DIAGNOSTICS_FILL
 
         default_time_phase = '0'
 
-        header = '''# Diagnostic Package Choices
+        header = '''#
+# Diagnostic Package Choices
 #--------------------
 #  dumpAtLast (logical): always write output at the end of simulation (default=F)
 #  diag_mnc   (logical): write to NetCDF files (default=useMNC)
@@ -399,7 +405,8 @@ C fill the diagnostic memory using DIAGNOSTICS_FILL
 
 '''
 
-        footer = ''' &END
+        footer = '''
+&END
   
 # Parameter for Diagnostics of per level statistics:
 #-----------------
