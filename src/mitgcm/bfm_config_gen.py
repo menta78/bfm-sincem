@@ -117,7 +117,6 @@ class BFM_vars(object):
 
     def write_diagnostic_init(self, output_file='BFMcoupler_diagnostics_init.F'):
 
-        # First part of the code
         header = '''C $Header:/MITgcm/pkg/BFMcoupler/BFMcoupler_diagnostics_init.F,v 1.01
 C 2014/04/10
 
@@ -162,7 +161,6 @@ C     Define diagnostics Names :
         # diag_code(10)='R'; % levels = Nr#
         diag_code = 'SMRP    MR'
 
-        # Last part of the code
         footer = '''C---+----1----+----2----+----3----+----4----+----5----+----6----+----7-|--+----|
 
 #endif /* ALLOW_DIAGNOSTICS */
@@ -201,7 +199,6 @@ C     Define diagnostics Names :
 
     def write_local(self, output_file='BFMcoupler_VARDIAGlocal.h'):
 
-        # First part of the code
         header = '''C $Header:/MITgcm/pkg/BFMcoupler/BFMcoupler_VARDIAGlocal.h,v 1.01
 C 2014/04/10
 C local variables of diagnostic for BFMcoupler_calc_tendency.f
@@ -227,7 +224,6 @@ C
 
     def write_init(self, output_file='BFMcoupler_VARDIAGinitializ.h'):
 
-        # First part of the code
         header = '''C $Header:/MITgcm/pkg/BFMcoupler/BFMcoupler_VARDIAGinitializ.h,v 1.01
 C initialization of local variables of diagnostic in BFMcoupler_calc_tendency.f
 C
@@ -265,7 +261,6 @@ C
 
     def write_copy_from_d(self, output_file='BFMcoupler_VARDIAGcopy_fromD.h'):
 
-        # First part of the code
         header = '''C $Header:/MITgcm/pkg/BFMcoupler/BFMcoupler_VARDIAGcopy_fromD.h,v 1.01
 C copy OUTPUT_ECOLOGY diagnostics from vector d to local variables of diagnostic in BFMcoupler_calc_tendency.f
 '''
@@ -277,7 +272,6 @@ C copy OUTPUT_ECOLOGY diagnostics from vector d to local variables of diagnostic
 
             # loop on diagnostic variables
             for index, var in enumerate(self._diag_vars):
-                #ofile.write('              dia' + var[0] + '(i,j,1:kBot(i,j))=d(' + str(self._diag_vars.index(var)+1) + ',1:kBot(i,j))\n')
                 ofile.write('              dia%s(i,j,1:kBot(i,j))=d(1:kBot(i,j),%d)\n' %(var[0],index+1))
             for index, var in enumerate(self._diag_vars_2d):
                 ofile.write('              dia%s(i,j,1)=d2(%d)\n' %(var[0],index+1))
@@ -290,7 +284,6 @@ C copy OUTPUT_ECOLOGY diagnostics from vector d to local variables of diagnostic
 
     def write_fill_diags(self, output_file='BFMcoupler_VARDIAG_fill_diags.h'):
 
-        # First part of the code
         header = '''C $Header:/MITgcm/pkg/BFMcoupler/BFMcoupler_VARDIAG_fill_diags.h,v 1.01
 C fill the diagnostic memory using DIAGNOSTICS_FILL
 '''
@@ -329,10 +322,6 @@ C fill the diagnostic memory using DIAGNOSTICS_FILL
                 ofile.write(' PTRACERS_long_names(%d)=\'%s\',\n' %(idx,var[0]))
                 ofile.write(' PTRACERS_units(%d)=\'%s\',\n' %(idx,var[1]))
 
-#                ofile.write('# tracer ' + idx + ' - ' + var[0] + '\n')
-#                ofile.write(' PTRACERS_names(' + idx + ')=\'' + var[0] + '\',\n')
-                #ofile.write(' PTRACERS_long_names(' + idx + ')=\'' + var[0] + '\',\n')
-                #ofile.write(' PTRACERS_units(' + idx + ')=\'' + var[1] + '\',\n')
                 
                 if 'ADVscheme' in self._vars_properties:
                     ofile.write(' PTRACERS_advScheme(%d)= %s,\n' %(idx, self._vars_properties['ADVscheme']))
@@ -348,8 +337,6 @@ C fill the diagnostic memory using DIAGNOSTICS_FILL
                     ofile.write(' PTRACERS_initialFile(%d)= \'%s%s.dat\',\n'  %(idx,self._vars_properties['initialFile'],var[0]))
                 if 'EvPrRn' in self._vars_properties:
                     ofile.write('#PTRACERS_EvPrRn(%d)=' + self._vars_properties['EvPrRn'] + ',\n')
-
-#                ofile.write('#PTRACERS_ref(1:Nr,%d)=Null,Null,Null ... ,\n')
             ofile.write(' &END\n')
 
 
@@ -441,20 +428,15 @@ C fill the diagnostic memory using DIAGNOSTICS_FILL
                 ofile.write(' fields(1,%d)  = \'TRAC%02d\',\n' %(ind, l_ind))
                 ofile.write(' fileName(%d)  = \'%s\',\n'      %(ind,var[0]))
                 ofile.write(' frequency(%d) = %s,\n'  %(ind, default_frequency) )
-                # ofile.write(' fields(1,' + str(ind) + ')  = \'' + var[0] + '\',\n')
-                #ofile.write(' fileName(' + str(ind) + ')  = \'' + var[0] + '\',\n')
-                #ofile.write(' frequency(' + str(ind) + ')  = ' + default_frequency + ',\n')
                 ofile.write('#\n')
 
             # loop on diagnostic variables
             for var in self._diag_vars:
                 ind=ind+1
-                l_ind = l_ind + 1
-                #ind=self._diag_vars.index(var)+1
-                ofile.write(' fields(1,' + str(ind) + ')  = \'' + var[0] + '\',\n')
-                ofile.write(' fileName(' + str(ind) + ')  = \'' + var[0] + '\',\n')
-                ofile.write(' frequency(' + str(ind) + ')  = ' + default_frequency + ',\n')
-                #ofile.write(' timePhase(' + str(ind) + ')  = ' + default_time_phase + ',\n')
+                ofile.write(' fields(1,%d)  = \'%s\',\n'      %(ind,var[0]))
+                ofile.write(' fileName(%d)  = \'%s\',\n'      %(ind,var[0]))
+                ofile.write(' frequency(%d) = %s,\n'  %(ind, default_frequency) )
+                ofile.write(' timePhase(%d) = %s,\n'  %(ind, default_time_phase))
                 ofile.write('#\n')
 
             # loop on MITgcm-BFM-only diagnostic variables
