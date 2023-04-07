@@ -679,7 +679,11 @@ piler)
 
 \begin_layout Plain Layout
 
-# Compile and build bfm
+\end_layout
+
+\begin_layout Plain Layout
+
+############   Compile and build bfm ########
 \end_layout
 
 \begin_layout Plain Layout
@@ -689,12 +693,17 @@ piler)
 
 \begin_layout Plain Layout
 
+#############################################
 \end_layout
 
 \begin_layout Plain Layout
 
-# Decide the number of cores and the domain decomposition of your model
- run, configuring your SIZE.h.
+\end_layout
+
+\begin_layout Plain Layout
+
+# Set the number of cores and the domain decomposition of your model run,
+ configuring your SIZE.h
 \end_layout
 
 \begin_layout Plain Layout
@@ -714,7 +723,7 @@ piler)
 
 \begin_layout Plain Layout
 
-# Now we have to choose the preset, between CUBE_GMD and NORTH_ADRIATIC
+# Choosing the preset from presets/ directory.
 \end_layout
 
 \begin_layout Plain Layout
@@ -728,12 +737,47 @@ piler)
 
 \begin_layout Plain Layout
 
-# Configure/customize the setup
+\end_layout
+
+\begin_layout Plain Layout
+
+######  Configure/customize the setup ###########
 \end_layout
 
 \begin_layout Plain Layout
 
 % ./configure_MITgcm_bfm.sh --preset CUBE_GMD
+\end_layout
+
+\begin_layout Plain Layout
+
+#################################################
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+# The precedure generates the code in MYCODE/ directory and namelists (data.diagn
+ostics and data.ptracers) in READY_FOR_MODEL_NAMELISTS/.
+\end_layout
+
+\begin_layout Plain Layout
+
+# Namelists can be edited by the user, data.diagnostics is used by MITgcm
+ DIAGNOSTICS package to manage the outputs of the simulation (see MITgcm
+ manual), 
+\end_layout
+
+\begin_layout Plain Layout
+
+# data.ptracers to set IC, advection scheme, etc.
+\end_layout
+
+\begin_layout Plain Layout
+
 \end_layout
 
 \begin_layout Plain Layout
@@ -755,7 +799,11 @@ piler)
 
 # Put your platform specific INC_FILE for MITgcm in: $PWD/compilers/$INC_FILE
  (e.g., x86_64.LINUX.gfortran.inc).
- 
+\end_layout
+
+\begin_layout Plain Layout
+
+# Last command to generate the executable mitgcmuv in MITGCM_BUILD:
 \end_layout
 
 \begin_layout Plain Layout
@@ -764,7 +812,7 @@ piler)
 
 \begin_layout Plain Layout
 
-# Compile and build MITgcm
+#####   Compile and build MITgcm ###############
 \end_layout
 
 \begin_layout Plain Layout
@@ -774,7 +822,11 @@ piler)
 
 \begin_layout Plain Layout
 
-# generates the executable mitgcmuv in MITGCM_BUILD.
+################################################
+\end_layout
+
+\begin_layout Plain Layout
+
 \end_layout
 
 \end_inset
@@ -961,6 +1013,11 @@ status open
 
 \begin_layout Plain Layout
 
+####  Work area generation  ########
+\end_layout
+
+\begin_layout Plain Layout
+
 % cd testcase
 \end_layout
 
@@ -971,16 +1028,17 @@ status open
 
 \begin_layout Plain Layout
 
+####################################
+\end_layout
+
+\begin_layout Plain Layout
+
 \end_layout
 
 \begin_layout Plain Layout
 
 # generates the wrkdir/run/ directory by putting inside generated IC, meteo
  files, bathymetry, namelists
-\end_layout
-
-\begin_layout Plain Layout
-
 \end_layout
 
 \begin_layout Plain Layout
@@ -1004,7 +1062,25 @@ status open
 
 \begin_layout Plain Layout
 
+\end_layout
+
+\begin_layout Plain Layout
+
+####  launch of the executable  #####
+\end_layout
+
+\begin_layout Plain Layout
+
 % ./mitgcmuv
+\end_layout
+
+\begin_layout Plain Layout
+
+#####################################
+\end_layout
+
+\begin_layout Plain Layout
+
 \end_layout
 
 \end_inset
