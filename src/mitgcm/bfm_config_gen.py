@@ -450,7 +450,6 @@ C fill the diagnostic memory using DIAGNOSTICS_FILL
             for var in self._diag_vars:
                 ind=ind+1
                 l_ind = l_ind + 1
-                if l_ind > 92: continue
                 #ind=self._diag_vars.index(var)+1
                 ofile.write(' fields(1,' + str(ind) + ')  = \'' + var[0] + '\',\n')
                 ofile.write(' fileName(' + str(ind) + ')  = \'' + var[0] + '\',\n')
