@@ -360,12 +360,9 @@ CONTAINS
       !!----------------------------------------------------------------------
       DO jn = 1, NO_D3_BOX_STATES
           IF ( Initvar(jn)%rho ) THEN 
-             LEVEL1 'ic value ', tr(15,15,1,var_map(jn),Kmm)
+             LEVEL1 ' Scale by density : ', trim(var_names(jn))
              tr(:,:,:,var_map(jn),Kmm) = tr(:,:,:,var_map(jn),Kmm) * tmask(:,:,:) * (rhd(:,:,:) + 1._RLEN) * rho0
              tr(:,:,:,var_map(jn),Kbb) = tr(:,:,:,var_map(jn),Kmm)
-             LEVEL1 ' Scale by density : ', trim(var_names(jn))
-             LEVEL1 'dens ', tmask(15,15,1) * (rhd(15,15,1) + 1._RLEN) * rho0
-             LEVEL1 'aft value ', tr(15,15,1,var_map(jn),Kmm)
           ENDIF
       END DO
       LEVEL1 ''
