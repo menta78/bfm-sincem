@@ -69,7 +69,16 @@ eqs-within-sections
 \index_command default
 \paperfontsize default
 \spacing single
-\use_hyperref false
+\use_hyperref true
+\pdf_bookmarks true
+\pdf_bookmarksnumbered false
+\pdf_bookmarksopen false
+\pdf_bookmarksopenlevel 1
+\pdf_breaklinks false
+\pdf_pdfborder false
+\pdf_colorlinks false
+\pdf_backref false
+\pdf_pdfusetitle true
 \papersize a4paper
 \use_geometry true
 \use_package amsmath 1
@@ -244,7 +253,7 @@ Release 1.0, April 2023
 \end_inset
 
 —– BFM Report series N.
- 4 —–
+ 5 —–
 \begin_inset Newline newline
 \end_inset
 
@@ -330,7 +339,7 @@ This document should be cited as:
 Querin S., Cossarini G., Lazzari, P., Bolzon, G.
  (2023).
  Coupling BFM with MITgcm model Release 1.0; BFM Report series N.
- 4.
+ 5.
  April 2023, Trieste, Italy, http://bfm-community.eu
 \end_layout
 
@@ -340,7 +349,7 @@ Querin S., Cossarini G., Lazzari, P., Bolzon, G.
 \begin_inset VSpace 13cm
 \end_inset
 
-Copyright 2022, The BFM System Team.
+Copyright 2023, The BFM System Team.
  This work is licensed under the Creative Commons Attribution-Noncommercial-No
  Derivative Works 2.5 License.
  To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-
@@ -378,13 +387,39 @@ The MITgcm and BFM models and the basic coupling equations
 \begin_layout Standard
 The MITgcm-BFM is an online coupled hydrodynamic-biogeochemical model: ocean
  dynamics and tracers transport are solved by the MITgcm, while biogeochemical
- reactions are handled by the BFM (Figure 1.1).
+ reactions are handled by the BFM (Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:integration-scheme"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+).
  The MITgcm (Massachusetts Institute of Technology general circulation model;
- Marshall et al., 1997) is a 3-D, finite volume, general circulation model
- used by a wide scientific community.
+ 
+\begin_inset CommandInset citation
+LatexCommand citealp
+key "marshall1997finite"
+literal "false"
+
+\end_inset
+
+) is a 3-D, finite volume, general circulation model used by a wide scientific
+ community.
  It can be customized to obtain different configurations by modifying its
  available packages and parameters, according to the user's needs and to
- the design of the numerical experiment (Campin et al., 2023).
+ the design of the numerical experiment (
+\begin_inset CommandInset citation
+LatexCommand citealp
+key "campin2023"
+literal "false"
+
+\end_inset
+
+).
  The code and documentation of the MITgcm are under continuous development:
  the modular Fortran77 code is open source and it can be downloaded from
  the MITgcm Git repository (https://github.com/MITgcm/MITgcm).
@@ -403,7 +438,17 @@ literal "false"
 .
  The software described in this document is essentially the coupler (BFMCOUPLER)
  between the MITgcm ocean circulation model and the BFM biogeochemical reaction
- model (Figure 1.1).
+ model (Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:integration-scheme"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+).
  The BFMCOUPLER code has been designed as an additional MITgcm package that
  handles the exchange of information between the hydrodynamic and the biogeochem
 ical compartments.
@@ -465,6 +510,7 @@ status open
 \begin_inset Graphics
 	filename Figures/Figure_1_1_BFMcoupler.png
 	lyxscale 20
+	scale 65
 
 \end_inset
 
@@ -473,6 +519,13 @@ status open
 
 \begin_layout Plain Layout
 Scheme of the numerical integration of the MITgcm-BFM online coupled model.
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:integration-scheme"
+
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -519,7 +572,7 @@ INI_FORCING.F or read from external fields.
  BFMCOUPLER_READPARAMS.F reads the data.bfmcoupler namelist, which contains
  the names of the files for the above fields.
  The parameters that manage the time intervals for reading, interpolating,
- and applying the external forcing are read from the abovementioned namelist.
+ and applying the external forcing are read from the above mentioned namelist.
  The input namelist also contains specific parameters for the processes
  solved by the BFMCOUPLER: sinking speed for detritus, self-shading coefficients
  for different phytoplankton groups, and background values of the seawater
@@ -586,7 +639,7 @@ put_ecology BFM routine and specific instructions from the diagnostics package
 \end_layout
 
 \begin_layout Subsection*
-1.2.5 Longstep option
+1.2.5 Long-step option
 \end_layout
 
 \begin_layout Standard
@@ -603,8 +656,15 @@ ple parameter set in the data.longstep namelist file.
 \end_layout
 
 \begin_layout Standard
-A full description of the BFMCOUPLER package is provided in Cossarini et
- al., GMD 2017 doi:10.5194/gmd-10-1423-2017.
+A full description of the BFMCOUPLER package is provided in 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "cossarini2017"
+literal "false"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Chapter
@@ -625,7 +685,7 @@ In order to build the MITgcm-BFM executable, the following steps have to
 
 \begin_layout Standard
 \begin_inset listings
-lstparams "basicstyle={\ttfamily}"
+lstparams "basicstyle={\footnotesize\ttfamily},breaklines=true"
 inline false
 status open
 
@@ -733,7 +793,8 @@ piler)
 
 \begin_layout Plain Layout
 
-# E.g., the cube test case experiment described in Cossarini et al., 2017.
+# E.g., the cube test case experiment described in Cossarini et al.
+ (2017).
 \end_layout
 
 \begin_layout Plain Layout
@@ -856,7 +917,15 @@ Running a MITgcm-BFM test case
 \end_layout
 
 \begin_layout Standard
-A test case for the MITgcm-BFM model is described in Cossarini et al., 2017.
+A test case for the MITgcm-BFM model is described in 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "cossarini2017"
+literal "false"
+
+\end_inset
+
+.
  The numerical experiment is based on a idealized domain forced by steady
  winds and a seasonal cycle of surface heat (downward long-wave and short-wave
  radiation) and mass (precipitation) fluxes.
@@ -876,9 +945,11 @@ A test case for the MITgcm-BFM model is described in Cossarini et al., 2017.
 \begin_layout Standard
 The configuration of the MITgcm includes the following packages (listed
  in 
-\shape italic
+\family typewriter
+\size small
 data.pkg
-\shape default
+\family default
+\size default
 ): cal, exf, kpp, longstep, diagnostics, ptracer and BFMCOUPLER.
 \end_layout
 
@@ -890,6 +961,7 @@ Specific runtime options (e.g., free-surface formulation and volume conservation
 \begin_layout Itemize
 
 \family typewriter
+\size small
 data
 \end_layout
 
@@ -900,54 +972,69 @@ Other package-specific namelists for the MITgcm-BFM runs are:
 \begin_layout Itemize
 
 \family typewriter
+\size small
 data.ptracer
 \end_layout
 
 \begin_layout Itemize
 
 \family typewriter
+\size small
 data.BFMcoupler
 \end_layout
 
 \begin_layout Itemize
 
 \family typewriter
+\size small
 data.cal 
 \end_layout
 
 \begin_layout Itemize
 
 \family typewriter
+\size small
 data.diagnostics 
 \end_layout
 
 \begin_layout Itemize
 
 \family typewriter
+\size small
 data.exf 
 \end_layout
 
 \begin_layout Itemize
 
 \family typewriter
+\size small
 data.gchem 
 \end_layout
 
 \begin_layout Itemize
 
 \family typewriter
+\size small
 data.kpp 
 \end_layout
 
 \begin_layout Itemize
 
 \family typewriter
+\size small
 data.longstep
 \end_layout
 
 \begin_layout Standard
-Additional explanation of the MITgcm namelists is provided in Cossarini
- et al., 2017.
+Additional explanation of the MITgcm namelists is provided in 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "cossarini2017"
+literal "false"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
@@ -967,35 +1054,59 @@ The atmospheric forcing is provided by the 8 components listed below (summing
 \end_layout
 
 \begin_layout Itemize
-short-wave radiation: swdown_64x64_10dx37.dat
+short-wave radiation: 
+\family typewriter
+\size small
+swdown_64x64_10dx37.dat
 \end_layout
 
 \begin_layout Itemize
-long-wave radiation: lwdown_64x64_10dx37.dat
+long-wave radiation: 
+\family typewriter
+\size small
+lwdown_64x64_10dx37.dat
 \end_layout
 
 \begin_layout Itemize
-precipitation: precip_bal_64x64_10dx37.dat
+precipitation: 
+\family typewriter
+\size small
+precip_bal_64x64_10dx37.dat
 \end_layout
 
 \begin_layout Itemize
-zonal wind component: uwind_64x64_10dx37.dat
+zonal wind component: 
+\family typewriter
+\size small
+uwind_64x64_10dx37.dat
 \end_layout
 
 \begin_layout Itemize
-meridional wind component: vwind_64x64_10dx37.dat
+meridional wind component: 
+\family typewriter
+\size small
+vwind_64x64_10dx37.dat
 \end_layout
 
 \begin_layout Itemize
-air pressure: apressure_64x64_10dx37.dat
+air pressure: 
+\family typewriter
+\size small
+apressure_64x64_10dx37.dat
 \end_layout
 
 \begin_layout Itemize
-air temperature: atemp_64x64_10dx37.dat
+air temperature: 
+\family typewriter
+\size small
+atemp_64x64_10dx37.dat
 \end_layout
 
 \begin_layout Itemize
-air humidity: aqh_64x64_10dx37.dat
+air humidity: 
+\family typewriter
+\size small
+aqh_64x64_10dx37.dat
 \end_layout
 
 \begin_layout Standard
@@ -1008,7 +1119,10 @@ y and the vertical profiles that characterize the initial conditions:
 \end_layout
 
 \begin_layout Itemize
-runoff: runoff_64x64_10dx37.dat
+runoff: 
+\family typewriter
+\size small
+runoff_64x64_10dx37.dat
 \end_layout
 
 \begin_layout Itemize
@@ -1036,7 +1150,7 @@ A detailed documentation on how to run the MITgcm model can be found at
 
 \begin_layout Standard
 \begin_inset listings
-lstparams "basicstyle={\ttfamily}"
+lstparams "basicstyle={\footnotesize\ttfamily},breaklines=true"
 inline false
 status open
 
@@ -1121,41 +1235,6 @@ status open
 \end_layout
 
 \begin_layout Standard
-
-\shape smallcaps
-References
-\end_layout
-
-\begin_layout Standard
-Cossarini, G., Querin, S., Solidoro, C., Sannino, G., Lazzari, P., Di Biagio,
- V., Bolzon, G., 2017.
- Development of BFMCOUPLER (v1.
- 0), the coupling scheme that links the MITgcm and BFM models for ocean
- biogeochemistry simulations.
- Geoscientific Model Development, 10(4), 1423-1445.
-\end_layout
-
-\begin_layout Standard
-Campin, J.-M., Heimbach, P., Losch, M., Forget, G., Hill, E., Adcroft, A., Molod,
- A., Menemenlis, D., Fer, D., Jahn, O., Hill, C., Scott, J., Dutkiewicz, S., Mazloff,
- M., Fox-Kemper, B., Nguyen, A., Doddridge, E., Fenty, I., Bates, M., Smith, T.,
- Eichmann, A., Heisey, M., Lauderdale, J., Torge, M., Abernathey, R., Khatiwala,
- S., Wang, O., Goldberg, D., Hongandyan, Deremble, B., 2023.
- MITgcm/MITgcm: checkpoint68n.
- https://doi.org/10.5281/zenodo.7621779.
-\end_layout
-
-\begin_layout Standard
-Marshall, J.
- C., Adcroft, A., Hill, C., Perelman, L., Heisey, C., 1997.
- A finite-volume, incompressible Navier-Stokes model for the studies of
- the ocean on parallel computers.
- J.
- Geophys.
- Res., 102, 5753–5766.
-\end_layout
-
-\begin_layout Standard
 \begin_inset Newpage cleardoublepage
 \end_inset
 
@@ -1165,7 +1244,7 @@ Marshall, J.
 \begin_layout Standard
 \begin_inset CommandInset bibtex
 LatexCommand bibtex
-bibfiles "bfm-ogstm-references"
+bibfiles "bfm-mitgcm-references"
 options "bibtotoc,elsart-harv"
 
 \end_inset
