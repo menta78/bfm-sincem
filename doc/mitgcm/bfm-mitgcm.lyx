@@ -747,7 +747,7 @@ piler)
 
 \begin_layout Plain Layout
 
-# For the test case, use the preset CUBE_GMD.
+# For the test case, use the preset CUBE-GMD.
 \end_layout
 
 \begin_layout Plain Layout
@@ -765,7 +765,7 @@ piler)
 
 \begin_layout Plain Layout
 
-% ./configure_MITgcm_bfm.sh --preset CUBE_GMD
+% ./configure_MITgcm_bfm.sh --preset CUBE-GMD
 \end_layout
 
 \begin_layout Plain Layout
