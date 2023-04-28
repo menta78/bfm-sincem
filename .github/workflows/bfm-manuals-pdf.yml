@@ -58,6 +58,12 @@ jobs:
         lyx --export pdf4 doc/fabm/bfm-fabm.lyx
         cp doc/fabm/bfm-fabm.pdf .
 
+    - name: BFM-MITGCM
+      shell: bash
+      run: |
+        lyx --export pdf4 doc/mitgcm/bfm-mitgcm.lyx
+        cp doc/fabm/bfm-mitgcm.pdf .
+
     # get PDF files
     - name: 'Upload files'
       uses: actions/upload-artifact@v3
@@ -71,5 +77,6 @@ jobs:
                bfm-pom.pdf
                bfm-ogstm.pdf
                bfm-fabm.pdf
+               bfm-mitgcm.pdf
 
 
