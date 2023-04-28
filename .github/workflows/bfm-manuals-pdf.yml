@@ -56,7 +56,7 @@ jobs:
       shell: bash
       run: |
         lyx --export pdf4 doc/mitgcm/bfm-mitgcm.lyx
-        cp doc/fabm/bfm-mitgcm.pdf .
+        cp doc/mitgcm/bfm-mitgcm.pdf .
 
     - name: BFM-FABM
       shell: bash
