@@ -326,7 +326,7 @@ This document should be cited as:
 \end_inset
 
 Lazzari, P., Bolzon, G.
- (2022) Coupling BFM with OGSTM model Release 2.0; BFM Report series N.
+ (2023) Coupling BFM with OGSTM model Release 2.0; BFM Report series N.
  4.
  February 2023, Trieste, Italy, http://bfm-community.eu
 \end_layout
@@ -337,7 +337,7 @@ Lazzari, P., Bolzon, G.
 \begin_inset VSpace 13cm
 \end_inset
 
-Copyright 2022, The BFM System Team.
+Copyright 2023, The BFM System Team.
  This work is licensed under the Creative Commons Attribution-Noncommercial-No
  Derivative Works 2.5 License.
  To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-
@@ -895,7 +895,7 @@ Both the OGSTM and the BFM codes are under a GIT versioning systems.
 
 \begin_layout Standard
 \begin_inset listings
-lstparams "basicstyle={\ttfamily}"
+lstparams "basicstyle={\footnotesize\ttfamily},breaklines=true"
 inline false
 status open
 
@@ -957,7 +957,7 @@ The builder needs to be edited at its top, about compiler flags and machine
 
 \begin_layout Standard
 \begin_inset listings
-lstparams "basicstyle={\ttfamily}"
+lstparams "basicstyle={\footnotesize\ttfamily},breaklines=true"
 inline false
 status open
 
@@ -1138,7 +1138,7 @@ Then, there is the actual automatic configuration of the model by using
 
 \begin_layout Standard
 \begin_inset listings
-lstparams "basicstyle={\ttfamily}"
+lstparams "basicstyle={\footnotesize\ttfamily},breaklines=true"
 inline false
 status open
 
@@ -1188,7 +1188,7 @@ This file uses the F90 namelist format to set values and strings must be
 
 \begin_layout Standard
 \begin_inset listings
-lstparams "basicstyle={\small\ttfamily}"
+lstparams "basicstyle={\footnotesize\ttfamily},breaklines=true"
 inline false
 status open
 
@@ -1273,7 +1273,7 @@ The TEST_LIST.dat file contains some of the features of the model domain
 
 \begin_layout Standard
 \begin_inset listings
-lstparams "basicstyle={\scriptsize\ttfamily}"
+lstparams "basicstyle={\footnotesize\ttfamily},breaklines=true"
 inline false
 status open
 
@@ -1342,7 +1342,7 @@ Code
 
 \begin_layout Standard
 \begin_inset listings
-lstparams "basicstyle={\small\ttfamily}"
+lstparams "basicstyle={\footnotesize\ttfamily},breaklines=true"
 inline false
 status open
 
@@ -1409,7 +1409,7 @@ the argumet test is a data structure containing all the informations defined
 
 \begin_layout Standard
 \begin_inset listings
-lstparams "basicstyle={\small\ttfamily}"
+lstparams "basicstyle={\footnotesize\ttfamily}"
 inline false
 status open
 
@@ -1429,7 +1429,7 @@ Create ascii file for MPI domain decomposition (domdec.txt)
 
 \begin_layout Standard
 \begin_inset listings
-lstparams "basicstyle={\small\ttfamily}"
+lstparams "basicstyle={\footnotesize\ttfamily}"
 inline false
 status open
 
@@ -1450,7 +1450,7 @@ Create meshmask.nc file with Longitude, Latitude, and georeferencing parameters
 
 \begin_layout Standard
 \begin_inset listings
-lstparams "basicstyle={\small\ttfamily}"
+lstparams "basicstyle={\footnotesize\ttfamily}"
 inline false
 status open
 
@@ -1504,7 +1504,7 @@ yyyy
 
 \begin_layout Standard
 \begin_inset listings
-lstparams "basicstyle={\small\ttfamily}"
+lstparams "basicstyle={\small\ttfamily},breaklines=true"
 inline false
 status open
 
@@ -1528,7 +1528,7 @@ Light extinction parameter files (e.g.
 
 \begin_layout Standard
 \begin_inset listings
-lstparams "basicstyle={\small\ttfamily}"
+lstparams "basicstyle={\footnotesize\ttfamily},breaklines=true"
 inline false
 status open
 
@@ -1571,7 +1571,7 @@ The files for boundary conditions are in the directory BC.
 
 \begin_layout Standard
 \begin_inset listings
-lstparams "basicstyle={\small\ttfamily}"
+lstparams "basicstyle={\footnotesize\ttfamily},breaklines=true"
 inline false
 status open
 
@@ -1613,7 +1613,7 @@ Create a link of the executable form the directory specified in TEST_LIST.dat
 
 \begin_layout Standard
 \begin_inset listings
-lstparams "basicstyle={\small\ttfamily}"
+lstparams "basicstyle={\footnotesize\ttfamily},breaklines=true"
 inline false
 status open
 
@@ -1640,7 +1640,7 @@ The following command automatically create all the running directory specified
 
 \begin_layout Standard
 \begin_inset listings
-lstparams "basicstyle={\small\ttfamily}"
+lstparams "basicstyle={\normalsize\ttfamily},breaklines=true"
 inline false
 status open
 
@@ -1665,7 +1665,7 @@ The model is consifgured to work in serial or parallel configuration.
 
 \begin_layout Standard
 \begin_inset listings
-lstparams "basicstyle={\small\ttfamily}"
+lstparams "basicstyle={\footnotesize\ttfamily},breaklines=true"
 inline false
 status open
 
@@ -1687,7 +1687,7 @@ The parallel version requires mpirun command and usully the run is submitted
 
 \begin_layout Standard
 \begin_inset listings
-lstparams "basicstyle={\small\ttfamily}"
+lstparams "basicstyle={\footnotesize\ttfamily},breaklines=true"
 inline false
 status open
 
@@ -1794,10 +1794,6 @@ date
 
 \end_layout
 
-\begin_layout Section
-Results of the ogstm testcase run
-\end_layout
-
 \begin_layout Chapter
 Output and diagnostics
 \end_layout
@@ -1813,7 +1809,7 @@ Model output is configurable.
 
 \begin_layout Standard
 \begin_inset listings
-lstparams "basicstyle={\small\ttfamily}"
+lstparams "basicstyle={\small\ttfamily},breaklines=true"
 inline false
 status open
 
@@ -1896,7 +1892,7 @@ the output is constituted by one file per variable per dumping frequency.
 
 \begin_layout Standard
 \begin_inset listings
-lstparams "basicstyle={\small\ttfamily}"
+lstparams "basicstyle={\footnotesize\ttfamily},breaklines=true"
 inline false
 status open
 
