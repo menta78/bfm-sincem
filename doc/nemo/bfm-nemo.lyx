@@ -269,8 +269,15 @@ Release 2.0, February 2023
 \begin_inset Newline newline
 \end_inset
 
-http://bfm-community.eu
+
 \emph on
+
+\begin_inset CommandInset href
+LatexCommand href
+target "http://bfm-community.eu"
+
+\end_inset
+
 
 \begin_inset Newline newline
 \end_inset
@@ -365,7 +372,7 @@ Lovato T., and Butenschön M.
  Modelling of the Ocean).
  BFM Report series N.
  2, Release 2.0, February 2023, Bologna, Italy, http://bfm-community.eu, pp.
- 32
+ 30
 \end_layout
 
 \begin_layout Address
@@ -377,9 +384,15 @@ Lovato T., and Butenschön M.
 Copyright 2023, The BFM System Team.
  This work is licensed under the Creative Commons Attribution-Noncommercial-No
  Derivative Works 2.5 License.
- To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-
-nd/2.5/ or send a letter to Creative Commons, 171 Second Street, Suite 300,
- San Francisco, California, 94105, USA.
+ To view a copy of this license, visit 
+\begin_inset CommandInset href
+LatexCommand href
+target "http://creativecommons.org/licenses/by-nc-nd/2.5/"
+
+\end_inset
+
+ or send a letter to Creative Commons, 171 Second Street, Suite 300, San
+ Francisco, California, 94105, USA.
 
 \size default
  
@@ -419,9 +432,22 @@ name "sec:Eulerian-coupling"
 \begin_layout Standard
 This introduction presents the major theoretical assumptions for the Eulerian
  coupling between a general circulation model of the ocean (NEMO, Nucleus
- for the European Modelling of the Ocean, http://nemo-ocean.eu) and a biogeochemi
-cal model of the pelagic system (BFM, Biogeochemical Flux Model, http://bfm-comm
-unity.eu).
+ for the European Modelling of the Ocean, 
+\begin_inset CommandInset href
+LatexCommand href
+target "http://nemo-ocean.eu"
+
+\end_inset
+
+) and a biogeochemical model of the pelagic system (BFM, Biogeochemical
+ Flux Model, 
+\begin_inset CommandInset href
+LatexCommand href
+target "http://bfm-community.eu"
+
+\end_inset
+
+).
  The concepts presented in this section and partly in the more technical
  Chap.
  
@@ -2809,8 +2835,15 @@ MODE
 NEMO
 \family default
 , prepares the BFM code and make it compatible with the NEMO compilation
- using the FCM configuration manager (http://www.metoffice.gov.uk/research/collabor
-ation/fcm).
+ using the FCM configuration manager (
+\begin_inset CommandInset href
+LatexCommand href
+target "https://www.metoffice.gov.uk/research/weather/weather-science-it/fcm"
+literal "false"
+
+\end_inset
+
+).
  More specifically, 
 \family typewriter
 bfm_configure.sh
@@ -2949,8 +2982,14 @@ stry.
 Together with the BFM, the GYRE configuration increases substantially the
  computational burden, therefore it is also a good example to learn how
  to use the model with multiple processes.
- In this case, it is necessary to install an MPI library (like http://www.open-mp
-i.org/) and use a NEMO ARCH file with the 
+ In this case, it is necessary to install an MPI library (like 
+\begin_inset CommandInset href
+LatexCommand href
+target "http://www.open-mpi.org/"
+
+\end_inset
+
+) and use a NEMO ARCH file with the 
 \family typewriter
 mpif90
 \family default
@@ -3260,7 +3299,14 @@ literal "false"
 \end_inset
 
 .
- Input data can be retrieved from BFM website at www.bfm-community.eu.
+ Input data can be requeste to the BFM Systema Team (see 
+\begin_inset CommandInset href
+LatexCommand href
+target "http://bfm-community.eu"
+
+\end_inset
+
+).
  
 \end_layout
 

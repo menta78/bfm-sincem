@@ -269,8 +269,15 @@ Release 1.3, Ferbuary 2023
 \begin_inset Newline newline
 \end_inset
 
-http://bfm-community.eu
+
 \emph on
+
+\begin_inset CommandInset href
+LatexCommand href
+target "http://bfm-community.eu"
+
+\end_inset
+
 
 \begin_inset Newline newline
 \end_inset
@@ -342,7 +349,7 @@ This document should be cited as:
 
 Vichi M., Lovato T., Butenschön M., Tedesco L., Lazzari P., Cossarini G., Masina
  S., Pinardi N., Solidoro C., Zavatarelli M.
- (2022).
+ (2023).
  The Biogeochemical Flux Model (BFM): Equation Description and User Manual.
  BFM version 5.3.
  BFM Report series N.
@@ -356,12 +363,18 @@ Vichi M., Lovato T., Butenschön M., Tedesco L., Lazzari P., Cossarini G., Masin
 \begin_inset VSpace 13cm
 \end_inset
 
-Copyright 2020, The BFM System Team.
+Copyright 2023, The BFM System Team.
  This work is licensed under the Creative Commons Attribution-Noncommercial-No
  Derivative Works 2.5 License.
- To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-
-nd/2.5/ or send a letter to Creative Commons, 171 Second Street, Suite 300,
- San Francisco, California, 94105, USA.
+ To view a copy of this license, visit 
+\begin_inset CommandInset href
+LatexCommand href
+target "http://creativecommons.org/licenses/by-nc-nd/2.5/"
+
+\end_inset
+
+ or send a letter to Creative Commons, 171 Second Street, Suite 300, San
+ Francisco, California, 94105, USA.
 
 \size default
  
@@ -515,8 +528,14 @@ tion of the structure, yet the fundamentals of the coupling strategy are
  very similar to the first coupled implementations.
  From BFM version 5.1 the coupled configurations are publicly supported.
  The BFM module can be easily coupled with different ocean models and an
- example of the coupled configuration with the NEMO ocean model (http://nemo-oce
-an.eu) is given in the companying manual of this release 
+ example of the coupled configuration with the NEMO ocean model (
+\begin_inset CommandInset href
+LatexCommand href
+target "http://nemo-ocean.eu"
+
+\end_inset
+
+) is given in the companying manual of this release 
 \begin_inset CommandInset citation
 LatexCommand citet
 key "BFM-NEMO-manual"
@@ -632,7 +651,7 @@ literal "false"
 \end_layout
 
 \begin_layout Quote
-Copyright 2022, The BFM System Team (bfm_st@cmcc.it)
+Copyright 2023, The BFM System Team (bfm_st@cmcc.it)
 \begin_inset Newline newline
 \end_inset
 
@@ -653,7 +672,14 @@ The BFM is free software: you can redistribute it and/or modify it under
  FOR A PARTICULAR PURPOSE.
  See the GNU General Public License for more details.You should have received
  a copy of the GNU General Public License along with the BFM core.
- If not, see <http://www.gnu.org/licenses/>.
+ If not, see <
+\begin_inset CommandInset href
+LatexCommand href
+target "http://www.gnu.org/licenses/"
+
+\end_inset
+
+>.
 \end_layout
 
 \begin_layout Section*
@@ -662,7 +688,14 @@ Acknowledgments
 
 \begin_layout Standard
 The code support and development is currently done by the BFM System Team
- whose members are listed on the BFM web site (http://bfm-community.eu).
+ whose members are listed on the BFM web site (
+\begin_inset CommandInset href
+LatexCommand href
+target "http://bfm-community.eu"
+
+\end_inset
+
+).
  The initial core of the BFM system software was developed by Piet Ruardij
  and Marcello Vichi.
  The BFM system team is grateful to Job Baretta, Hanneke Baretta-Bekker,
@@ -23350,8 +23383,14 @@ Installation
 \end_layout
 
 \begin_layout Standard
-The BFM code repository is made available through the website (http://www.bfm-com
-munity.eu/).
+The BFM code repository is made available through the website (
+\begin_inset CommandInset href
+LatexCommand href
+target "http://bfm-community.eu"
+
+\end_inset
+
+).
  After the compilation of the online form, an email will be automatically
  sent to you with a temporary link to download the code compressed archive.The
  upacked folder contains the 
@@ -23408,8 +23447,14 @@ FORTRAN 90/95 compiler.
 \end_layout
 
 \begin_layout Itemize
-NetCDF library (version 4 and above, http://www.unidata.ucar.edu/software/netcdf)
- .
+NetCDF library (version 4 and above, 
+\begin_inset CommandInset href
+LatexCommand href
+target "http://www.unidata.ucar.edu/software/netcdf"
+
+\end_inset
+
+) .
  It is mandatory that the library has been compiled with the same compiler
  used for the model compilation since the F90 netcdf module is used.
 \end_layout
@@ -24004,13 +24049,11 @@ status collapsed
 
 \begin_layout Plain Layout
 If you experience problems during the generation or compilation, visit 
-\begin_inset Flex URL
-status open
-
-\begin_layout Plain Layout
-
-http://bfm-community.eu/documentation
-\end_layout
+\begin_inset CommandInset href
+LatexCommand href
+name "http:/bfm-community.eu/bfm-quick-guide/"
+target "https://bfm-community.github.io/www.bfm-community.eu/bfm-quick-guide/"
+literal "false"
 
 \end_inset
 
@@ -28218,44 +28261,26 @@ Output visualization
 
 \begin_layout Standard
 Output values are stored in netCDF according to the CF convention (
-\begin_inset Flex URL
-status collapsed
-
-\begin_layout Plain Layout
-
-http://www.cgd.ucar.edu/ cms/eaton/cf-metadata/
-\end_layout
+\begin_inset CommandInset href
+LatexCommand href
+target "https://cfconventions.org/"
 
 \end_inset
 
 ).
- The STANDALONE test cases output can be visualized with the all-round 
+ The STANDALONE test cases output can be visualized, e.g., with the all-round
+ 
 \family typewriter
 ncview
 \family default
  software (
-\begin_inset Flex URL
-status collapsed
-
-\begin_layout Plain Layout
-
-http://meteora.ucsd.edu/~pierce/ncview_home_page.html
-\end_layout
+\begin_inset CommandInset href
+LatexCommand href
+target "http://meteora.ucsd.edu/~pierce/ncview_home_page.html"
 
 \end_inset
 
-) or with the Python utility PyNcview 
-\begin_inset Flex URL
-status collapsed
-
-\begin_layout Plain Layout
-
-https://sourceforge.net/projects/pyncview/
-\end_layout
-
-\end_inset
-
-.
+) .
  
 \end_layout
 
