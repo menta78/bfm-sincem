@@ -1,11 +1,27 @@
-C $Header: MITgcm/pkg/BFMcoupler/BFMcoupler_calc_tendency.F,v 1.01
-C 2014/04/10  cgp
-C modified 4 sept 2015 by Valeria, introducing N1p, N3n, N5s, O3c, O3h
-C contribution by rivers
-C in sept 2017 for the bottom contributions
-C in feb 2019 for the daily PAR modulation
-CBOP
-C !ROUTINE: BFMcoupler_calc_tendency
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! ROUTINE: BFMcoupler_calc_tendency
+!
+! DESCRIPTION
+!   Passes Tr and environmental variables to the BFM library
+!   and gets the gchemTendency due to biological activity
+!
+! COPYING
+!
+!   Copyright (C) 2023 BFM System Team (bfm_st@cmcc.it)
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU General Public License for more details.
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-!
+
+
 
 #include "BFMcoupler_OPTIONS.h"
 
@@ -18,9 +34,8 @@ C !INTERFACE: ==========================================================
       SUBROUTINE BFMCOUPLER_CALC_TENDENCY(
      I                bi,bj,imin,imax,jmin,jmax,
      I                myIter,myTime,myThid)
-C !DESCRIPTION:
-C passes Tr and environmental variables to the BFM library and get the gchemTendency
-C due to biological activity
+
+
 
 C !USES: ===============================================================
       IMPLICIT NONE

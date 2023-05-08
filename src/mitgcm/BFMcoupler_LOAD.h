@@ -1,9 +1,7 @@
-C $Header: /MITgcm/pkg/BFMcoupler/BFMcoupler_LOAD.h,v 1.01
-C 2014/04/09 by Gianpiero Cossarini
-C 2015/09/03 edited by Valeria Di Biagio: introducing N1p, N3n, N5s, O3c, O3h surface contribution
-C 2017/09/05 edited by Valeria Di Biagio: bottom contributions
+! This file is included in BFMcoupler_fields_load.F and BFMcoupler_ini_forcing.F
+! File BFMcoupler_LOAD.h
 
-C--   COMMON /BFMcoupler_LOAD/
+
 C     BFMcoupler_ldRec     :: time-record currently loaded (in temp arrays *[1])
 
       COMMON /BFMcoupler_LOAD_I/ BFMcoupler_ldRec

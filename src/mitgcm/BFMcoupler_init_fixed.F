@@ -1,19 +1,31 @@
-C $Header: /MITgcm/pkg/BFMcoupler/BFMcoupler_init_fixed.F,v 1.01
-C 2014/04/10 
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! ROUTINE: BFMcoupler_init_fixed
+!
+! DESCRIPTION
+!    Initialize fixed quantities
+!
+! COPYING
+!
+!   Copyright (C) 2023 BFM System Team (bfm_st@cmcc.it)
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU General Public License for more details.
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-!
+
 
 #include "BFMcoupler_OPTIONS.h"
-
-C---+----1----+----2----+----3----+----4----+----5----+----6----+----7-|--+----|
-CBOP
-C     !ROUTINE: BFMcoupler_INIT_FIXED
 
 C     !INTERFACE:
       SUBROUTINE BFMcoupler_INIT_FIXED( myThid )
 
-C     !DESCRIPTION:
-C     Initialize fixed quantities
-
-C     !USES:
       IMPLICIT NONE
 #include "SIZE.h"
 #include "EEPARAMS.h"

@@ -1,25 +1,32 @@
-C $Header: /MITgcm/pkg/BFMcoupler/BFMcoupler_readparms.F,v 1.1 2014/04/09
-C $Name:  Gianpiero Cossarini
-C 2018/02/15 edited by Valeria Di Biagio
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! ROUTINE: BFMcoupler_readparms
+!
+! DESCRIPTION
+!    Initialize Memory of BFM and read BFM package parameters
+!     from BFM namelist
+!
+! COPYING
+!
+!   Copyright (C) 2023 BFM System Team (bfm_st@cmcc.it)
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU General Public License for more details.
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-!
+
 
 #include "BFMcoupler_OPTIONS.h"
-CBOP
-C !ROUTINE: BFMcoupler_READPARMS
+
 C !INTERFACE: ==========================================================
       SUBROUTINE BFMcoupler_READPARMS( myThid )
       use api_bfm
-C     !DESCRIPTION: \bv
-C     *==========================================================*
-C     | S/R BFMcoupler_READPARMS
-C     | o Initialise Memory of BFM and read BFM package parameters
-C     | from BFM namelist
-C     *==========================================================*
-C     \ev
-
-C     !USES:
-C     === uses module
-C ANY MODULEs of BFM are needed?
-
 
       IMPLICIT NONE
 C     === Global variables ===

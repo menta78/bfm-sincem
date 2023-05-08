@@ -1,6 +1,4 @@
-C $Header: /MITgcm/pkg/BFMcoupler/BFMcoupler_VARS.h,v1.01
-C 2014/04/09 by Gianpiero Cossarini
-C 2018/02/15 edited by Valeria Di Biagio
+! file BFMcoupler_VARS.h
 
 C     *==========================================================*
 C     | BFMcoupler_VARS.h

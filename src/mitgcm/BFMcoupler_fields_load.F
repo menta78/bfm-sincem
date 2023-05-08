@@ -1,21 +1,36 @@
-C $Header: /MITgcm/pkg/BFMcoupler/BFMcoupler_fields_load.F,v 1.01
-C 2014/04/10 by Gianpiero Cossarini
-C 2018/02/15 edited by Valeria Di Biagio
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+! MODEL  BFM - Biogeochemical Flux Model
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+!
+! ROUTINE: BFMcoupler_FIELDS_LOAD
+!
+! DESCRIPTION
+!    Reads if necessary, AtmosPCO2, AtmosP, spar, xESP, N1p_surfF,
+!    N3n_surfF, N5s_surfF, O3c_surfF, O3h_surfF
+!    N1p_botF, N3n_botF, N4n_botF,O2o_botF, O3c_botF, O3h_botF
+!
+! COPYING
+!
+!   Copyright (C) 2023 BFM System Team (bfm_st@cmcc.it)
+!
+!   This program is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation.
+!   This program is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTEABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!   See the GNU General Public License for more details.
+!-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-!
+
+
 #include "BFMcoupler_OPTIONS.h"
 
-CBOP
-C !ROUTINE: BFMcoupler_FIELDS_LOAD
 
 C !INTERFACE: ==========================================================
       SUBROUTINE BFMcoupler_FIELDS_LOAD (
      I           myIter,myTime,myThid)
 
-C !DESCRIPTION:
-C  Read, if necessary, AtmosPCO2, AtmosP, spar, xESP, N1p_surfF
-C  and N3n_surfF
-C  and N5s_surfF, O3c_surfF, O3h_surfF 
-C  and N1p_botF, N3n_botF, N4n_botF,O2o_botF, O3c_botF, O3h_botF
-C !USES: ===============================================================
+
       IMPLICIT NONE
 #include "SIZE.h"
 #include "EEPARAMS.h"

@@ -1,4 +1,4 @@
-C $Header: /pkg/BFMcouler/BFMcoupler_OPTIONS.h,v 1.01 2014/04/24
+! file BFMcoupler_OPTIONS.h
 
 #ifndef BFMcoupler_OPTIONS_H
 #define BFMcoupler_OPTIONS_H
