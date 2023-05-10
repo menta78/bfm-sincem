@@ -193,7 +193,7 @@ height "1pt"
 \align center
 
 \size giant
-Coupling BFM with FABM:
+Coupling BFM with FABM
 \end_layout
 
 \begin_layout Standard
@@ -242,8 +242,15 @@ Release 1.0, April 2023
 \begin_inset Newline newline
 \end_inset
 
-http://bfm-community.eu
+
 \emph on
+
+\begin_inset CommandInset href
+LatexCommand href
+target "http://bfm-community.eu"
+
+\end_inset
+
 
 \begin_inset Newline newline
 \end_inset
@@ -325,12 +332,18 @@ This document should be cited as:
 \begin_inset VSpace 13cm
 \end_inset
 
-Copyright 2022, The BFM System Team.
+Copyright 2023, The BFM System Team.
  This work is licensed under the Creative Commons Attribution-Noncommercial-No
  Derivative Works 2.5 License.
- To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-
-nd/2.5/ or send a letter to Creative Commons, 171 Second Street, Suite 300,
- San Francisco, California, 94105, USA.
+ To view a copy of this license, visit 
+\begin_inset CommandInset href
+LatexCommand href
+target "http://creativecommons.org/licenses/by-nc-nd/2.5/"
+
+\end_inset
+
+ or send a letter to Creative Commons, 171 Second Street, Suite 300, San
+ Francisco, California, 94105, USA.
 
 \size default
  
@@ -385,8 +398,14 @@ literal "false"
 \end_layout
 
 \begin_layout Standard
-The full documentation of FABM can be consulted at https://github.com/fabm-model/
-fabm/wiki.
+The full documentation of FABM can be consulted at 
+\begin_inset CommandInset href
+LatexCommand href
+target "https://github.com/fabm-model/fabm/wiki"
+
+\end_inset
+
+.
  
 \end_layout
 
@@ -2066,14 +2085,29 @@ Testing the BFM coupling with FABM
 
 \begin_layout Standard
 In order to test the accuracy of the BFM porting we used both the python
- coupling (https://github.com/fabm-model/fabm/wiki/python) and the 0D FORTRAN
- setup (fabm/src/drivers/0d/) and a 2-phase check was implemented.
+ coupling (
+\begin_inset CommandInset href
+LatexCommand href
+target "https://github.com/fabm-model/fabm/wiki/python"
+
+\end_inset
+
+) and the 0D FORTRAN setup (fabm/src/drivers/0d/) and a 2-phase check was
+ implemented.
  In the first phase we performed a test checking that all the diagnostics
  were identical up to machine precision between the two FABM configurations.
  In the second phase, we performed a check of the integration in time by
  setting up a 10 day simulation using the original BFM in a standalone model
- v5.3 (https://bfm-community.github.io/www.bfm-community.eu/bfm-quick-guide/)
- and the BFM-FABM 0D configuration.
+ v5.3 (
+\begin_inset CommandInset href
+LatexCommand href
+name "http://bfm-community.eu/bfm-quick-guide/"
+target "https://bfm-community.github.io/www.bfm-community.eu/bfm-quick-guide/"
+literal "false"
+
+\end_inset
+
+) and the BFM-FABM 0D configuration.
  The two configurations had the same initial conditions, the same constant
  environmental forcing (i.e., constant light, T, atmospheric 
 \begin_inset Formula $CO_{2}$

@@ -258,8 +258,15 @@ Release 1.1, February 2023
 \begin_inset Newline newline
 \end_inset
 
-http://bfm-community.eu
+
 \emph on
+
+\begin_inset CommandInset href
+LatexCommand href
+target "http://bfm-community.eu"
+
+\end_inset
+
 
 \begin_inset Newline newline
 \end_inset
@@ -355,9 +362,15 @@ Zavatarelli M., Pinardi N., Mussap G., Lovato T., Amadio C., Mentaschi L., Buten
 Copyright 2020, The BFM System Team.
  This work is licensed under the Creative Commons Attribution-Noncommercial-No
  Derivative Works 2.5 License.
- To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-
-nd/2.5/ or send a letter to Creative Commons, 171 Second Street, Suite 300,
- San Francisco, California, 94105, USA.
+ To view a copy of this license, visit 
+\begin_inset CommandInset href
+LatexCommand href
+target "http://creativecommons.org/licenses/by-nc-nd/2.5/"
+
+\end_inset
+
+ or send a letter to Creative Commons, 171 Second Street, Suite 300, San
+ Francisco, California, 94105, USA.
 
 \size default
  
@@ -395,7 +408,14 @@ literal "true"
 
 , and the Biogeochemical Flux Model (hereafter BFM), in term of the main
  equations and their translation into a computer code, and its code is distribut
-ed with BFM (see details in http://bfm-community.eu).
+ed with BFM (see details in 
+\begin_inset CommandInset href
+LatexCommand href
+target "http://bfm-community.eu"
+
+\end_inset
+
+).
  
 \end_layout
 

@@ -52,6 +52,12 @@ jobs:
         lyx --export pdf4 doc/ogstm/bfm-ogstm.lyx
         cp doc/ogstm/bfm-ogstm.pdf .
 
+    - name: BFM-MITGCM
+      shell: bash
+      run: |
+        lyx --export pdf4 doc/mitgcm/bfm-mitgcm.lyx
+        cp doc/mitgcm/bfm-mitgcm.pdf .
+
     - name: BFM-FABM
       shell: bash
       run: |
@@ -70,6 +76,7 @@ jobs:
                bfm-nemo.pdf
                bfm-pom.pdf
                bfm-ogstm.pdf
+               bfm-mitgcm.pdf
                bfm-fabm.pdf
 
 

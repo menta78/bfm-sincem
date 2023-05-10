@@ -1,0 +1,1291 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass scrbook
+\begin_preamble
+\usepackage{listings}
+
+\usepackage{a4wide}
+\usepackage{balance}
+
+\newcommand{\NSP}{\! \! \! \! \! \! \! \! }
+\newcommand{\BNSP}{\NSP \NSP \NSP \NSP}
+\newcommand{\DS}{\displaystyle}
+\newcommand{\CL}{\centerline}
+
+\usepackage{float}
+\floatname{algorithm}{Equation Box}
+%\renewcommand{\listofalgorithms}{ 
+ % \begingroup 
+  %  \listof{algorithm}{List of Equation Boxes} 
+ % \endgroup 
+%}
+
+
+\date{}
+% HEADERS
+%\usepackage{fancyhdr}
+%\lhead{\small{bfm-community.eu}}
+%\rhead{\small{all rights reserved}} 
+
+\usepackage{alltt}              %%  alltt for namelist
+\usepackage{verbatim}   %%  alltt for namelist
+% namelists
+\newcommand{\NML} [1] {
+\begin{alltt}
+{\tiny \verbatiminput{./Namelists/#1.nml}}
+\end{alltt}
+  \vspace{-10pt}
+}
+\end_preamble
+\use_default_options true
+\begin_modules
+eqs-within-sections
+\end_modules
+\maintain_unincluded_children false
+\language american
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "times" "default"
+\font_sans "helvet" "default"
+\font_typewriter "cmtl" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref true
+\pdf_bookmarks true
+\pdf_bookmarksnumbered false
+\pdf_bookmarksopen false
+\pdf_bookmarksopenlevel 1
+\pdf_breaklinks false
+\pdf_pdfborder false
+\pdf_colorlinks false
+\pdf_backref false
+\pdf_pdfusetitle true
+\papersize a4paper
+\use_geometry true
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 0
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine natbib
+\cite_engine_type authoryear
+\biblio_style plainnat
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date true
+\justification true
+\use_refstyle 0
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\leftmargin 3cm
+\topmargin 3cm
+\rightmargin 3cm
+\bottommargin 3cm
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 2
+\papersides 2
+\paperpagestyle headings
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+onecolumn 
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{titlepage}
+\end_layout
+
+\end_inset
+
+
+\begin_inset Separator latexpar
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename ../logos/BFM-Consortium_members.png
+	lyxscale 15
+	scale 40
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+\align center
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0cm"
+width "15cm"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace 1cm
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+
+\size giant
+Coupling BFM with ocean models:
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+
+\size largest
+the MITgcm model 
+\size default
+
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace 1cm
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+
+\series bold
+\emph on
+S.
+ Querin, G.
+ Cossarini, P.
+ Lazzari, G.
+ Bolzon
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace 1cm
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\align center
+Release 1.0, April 2023
+\begin_inset Newline newline
+\end_inset
+
+—– BFM Report series N.
+ 5 —–
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+
+\emph on
+
+\begin_inset CommandInset href
+LatexCommand href
+target "http://bfm-community.eu"
+
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+bfm_st@cmcc.it
+\end_layout
+
+\begin_layout Standard
+\noindent
+\align center
+\begin_inset CommandInset line
+LatexCommand rule
+offset "0cm"
+width "15cm"
+height "1pt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace 4cm
+\end_inset
+
+
+\begin_inset space \hspace{}
+\length 8cm
+\end_inset
+
+
+\begin_inset Graphics
+	filename ../logos/BFM_Full_logo.png
+	lyxscale 40
+	width 50text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{titlepage}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage clearpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Quote
+This document should be cited as:
+\begin_inset Newline newline
+\end_inset
+
+Querin S., Cossarini G., Lazzari, P., Bolzon, G.
+ (2023).
+ Coupling BFM with MITgcm model Release 1.0; BFM Report series N.
+ 5.
+ April 2023, Trieste, Italy, http://bfm-community.eu
+\end_layout
+
+\begin_layout Address
+
+\size footnotesize
+\begin_inset VSpace 13cm
+\end_inset
+
+Copyright 2023, The BFM System Team.
+ This work is licensed under the Creative Commons Attribution-Noncommercial-No
+ Derivative Works 2.5 License.
+ To view a copy of this license, visit 
+\begin_inset CommandInset href
+LatexCommand href
+target "http://creativecommons.org/licenses/by-nc-nd/2.5/"
+
+\end_inset
+
+ or send a letter to Creative Commons, 171 Second Street, Suite 300, San
+ Francisco, California, 94105, USA.
+
+\size default
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage clearpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset toc
+LatexCommand tableofcontents
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Chapter
+Introduction
+\end_layout
+
+\begin_layout Section
+The MITgcm and BFM models and the basic coupling equations
+\end_layout
+
+\begin_layout Standard
+The MITgcm-BFM is an online coupled hydrodynamic-biogeochemical model: ocean
+ dynamics and tracers transport are solved by the MITgcm, while biogeochemical
+ reactions are handled by the BFM (Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:integration-scheme"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+).
+ The MITgcm (Massachusetts Institute of Technology general circulation model;
+ 
+\begin_inset CommandInset citation
+LatexCommand citealp
+key "marshall1997finite"
+literal "false"
+
+\end_inset
+
+) is a 3-D, finite volume, general circulation model used by a wide scientific
+ community.
+ It can be customized to obtain different configurations by modifying its
+ available packages and parameters, according to the user's needs and to
+ the design of the numerical experiment (
+\begin_inset CommandInset citation
+LatexCommand citealp
+key "campin2023"
+literal "false"
+
+\end_inset
+
+).
+ The code and documentation of the MITgcm are under continuous development:
+ the modular Fortran77 code is open source and it can be downloaded from
+ the MITgcm Git repository (
+\begin_inset CommandInset href
+LatexCommand href
+target "https://github.com/MITgcm/MITgcm"
+
+\end_inset
+
+).
+ Further information and useful links can be found on the MITgcm website
+ (
+\begin_inset CommandInset href
+LatexCommand href
+target "http://mitgcm.org/"
+
+\end_inset
+
+).
+ The Biogeochemical Flux Model (BFM) is an open-source, modular, Fortran90
+ numerical model designed to describe the dynamics of the major biogeochemical
+ processes that occur in marine ecosystems 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "BFM-manual"
+literal "false"
+
+\end_inset
+
+.
+ The software described in this document is essentially the coupler (BFMCOUPLER)
+ between the MITgcm ocean circulation model and the BFM biogeochemical reaction
+ model (Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:integration-scheme"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+).
+ The BFMCOUPLER code has been designed as an additional MITgcm package that
+ handles the exchange of information between the hydrodynamic and the biogeochem
+ical compartments.
+ The coupled numerical model solves the transport-reaction equations, where
+ the reaction terms are defined within the BFM framework.
+ Specifically, the set of partial differential equations for a generic tracer
+ concentration 
+\begin_inset Formula $C$
+\end_inset
+
+ can be written as:
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial C}{\partial t}=-\mathbf{u}\cdot\nabla C+\nabla_{H}\cdot\left(A_{H}\nabla_{H}C\right)+\frac{\partial}{\partial z}A_{V}\frac{\partial C}{\partial z}-w_{B}\frac{\partial C}{\partial z}+\left.\frac{\partial C}{\partial t}\right|_{bio}\label{eq:primitive}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{u}\equiv(u,v,w)$
+\end_inset
+
+ is the three-dimensional current velocity and 
+\begin_inset Formula $\left(A_{H},A_{V}\right)$
+\end_inset
+
+ are the horizontal and vertical turbulent diffusivity coefficients, respectivel
+y.
+ 
+\begin_inset Formula $w_{b}$
+\end_inset
+
+ is the sinking velocity of living or dead organic particulate matter.
+ The first three terms on the right hand side (advection and diffusion terms)
+ are solved by the PTRACER package of the MITgcm.
+ Additionally, the BFMCOUPLER handles the sinking process and the computation
+ of the biogeochemical derivatives, which are the reaction terms described
+ in BFM as a set of ordinary differential equations that express the transformat
+ion fluxes of biogeochemical properties in the marine environment.
+ The BFM formulation and the standalone implementation are fully described
+ in the BFM manual 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "BFM-manual"
+literal "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename Figures/Figure_1_1_BFMcoupler.png
+	lyxscale 30
+	scale 65
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Scheme of the numerical integration of the MITgcm-BFM online coupled model.
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:integration-scheme"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Main features of the coupled model code
+\end_layout
+
+\begin_layout Standard
+The MITgcm–BFM coupling was achieved by upgrading a few routines of the
+ MITgcm GCHEM package (Geo-CHEMistry), which handles the evolution of tracers,
+ and by developing the additional package BFMCOUPLER, which was specifically
+ designed as the interface with the BFM model.
+ The BFM is called by the MITgcm as an external library; therefore, the
+ BFM must be compiled separately using the same compiler used for the MITgcm.
+\end_layout
+
+\begin_layout Standard
+The key routines of the BFMCOUPLER package that drive the initialization,
+ the internal time stepping, the external fields loading, and the diagnostics
+ setting are listed in the following paragraphs.
+\end_layout
+
+\begin_layout Subsection
+Initialization
+\end_layout
+
+\begin_layout Standard
+BFMCOUPLER_VARS.h contains the common blocks for the list of the BFM state
+ variables and diagnostic variables (BFM_var_list.h) and for the parameters
+ and fields that are required to calculate the carbonate system solution,
+ carbon dioxide air–sea exchange, PAR, light extinction, sinking, and nutrient
+ air deposition and bottom fluxes.
+ Forcing fields can be initialized either with a background value by BFMCOUPLER_
+INI_FORCING.F or read from external fields.
+ BFMCOUPLER_READPARAMS.F reads the data.bfmcoupler namelist, which contains
+ the names of the files for the above fields.
+ The parameters that manage the time intervals for reading, interpolating,
+ and applying the external forcing are read from the above mentioned namelist.
+ The input namelist also contains specific parameters for the processes
+ solved by the BFMCOUPLER: sinking speed for detritus, self-shading coefficients
+ for different phytoplankton groups, and background values of the seawater
+ light extinction factor.
+ The allocation of memory used by the BFM is set (at this point) here by
+ the BFM BFM_initialize routine.
+ The BFMCOUPLER_READPARAMS.F routine is called from the conveniently modified
+ GCHEM_READPARAMS.F routine (a call statement to BFMCOUPLER_READPARAMS must
+ be added).
+ Accordingly, GCHEM_INI_VAR.F must contain a call statement to BFMCOUPLER_INI_FOR
+CING.F.
+\end_layout
+
+\begin_layout Subsection*
+1.2.2 Time stepping routine
+\end_layout
+
+\begin_layout Standard
+The core of the present coupling scheme is the BFMCOUPLER_CALC_TENDENCY
+ routine, which is called by the MITgcm native routine GCHEM_CALC_TENDENCY.
+ The approach adopted in this coupling scheme is to loop in space and to
+ call the BFM as a subroutine to calculate the derivative terms of each
+ biogeochemical tracer for each computational grid point.
+ The BFMCOUPLER_CALC_TENDENCY routine solves some additional processes such
+ as light penetration, sinking of phytoplankton and detritus, and the exchange
+ processes across the surface and bottom layers of the water column.
+\end_layout
+
+\begin_layout Subsection*
+1.2.3 Loading fields
+\end_layout
+
+\begin_layout Standard
+The external forcing fields used by the BFMCOUPLER (i.e., CO2 air concentration,
+ PAR, light extinction factor, nutrient air deposition, and bottom fluxes)
+ are read by the BFMCOUPLER_FIELDS_LOAD.F routine, which is called from the
+ modified GCHEM_FIELDS_LOAD.F routine (a call statement must be added).
+ Input/output directives are based on the native MITgcm I/O package (MDSIO),
+ a set of Fortran routines for reading and writing direct-access binary
+ files.
+\end_layout
+
+\begin_layout Subsection*
+1.2.4 Diagnostics
+\end_layout
+
+\begin_layout Standard
+The BFMCOUPLER package uses the MITgcm’s DIAGNOSTICS package.
+ The definition of new specific diagnostics from the BFM’s fluxes and variables
+ is managed in BFMCOUPLER_DIAGNOSTICS_INIT.F, which is called from BFMCOUPLER_INI
+T_FIXED.F.
+ The new diagnostics quantities are calculated in BFMCOUPLER_CALC_TENDENCY.F
+ through a list of files (BFMcoupler_VARDIAGlocal.h, BFMcoupler_VARDIAGcopy_fromD.
+h, and BFMcoupler_VARDIAG_fill_diags.h) that use the variables from the BFM0D_out
+put_ecology BFM routine and specific instructions from the diagnostics package
+ (DIAGNOSTICS_FILL.F routine).
+ New diagnostic quantities are listed in the namelist in the data.diagnostics
+ parameter file, which specifies the frequency and type of output, the number
+ of levels, and the names of all the separate output files.
+ The coupled MITgcm–BFM model can use a large number of tracers; therefore,
+ increasing the ndiagMax parameter in diagnostics_size.h may be necessary.
+ The initialization of BFMCOUPLER diagnostics is provided by adding a call
+ statement to BFMCOUPLER_INIT_FIXED.F in the GCHEM_INIT_FIXED.F routine.
+\end_layout
+
+\begin_layout Subsection*
+1.2.5 Long-step option
+\end_layout
+
+\begin_layout Standard
+The LONGSTEP MITgcm package allows the tracer time step to be longer than
+ the time step used by the hydrodynamic model.
+ When this package is activated along with the BFMCOUPLER package, a new
+ specifically developed version of the LONGSTEP_THERMODYNAMICS.F routine
+ has to be used.
+ The new version of this routine includes a call to BFMCOUPLER_CALC_TENDENCY.
+ The BFMCOUPLER routines use the hydrodynamic variables stored in the LONGSTEP
+ variables, which are either the averages or the temporal sub-samplings
+ of the variables of the master hydrodynamic model, depending on the when_to_sam
+ple parameter set in the data.longstep namelist file.
+\end_layout
+
+\begin_layout Standard
+A full description of the BFMCOUPLER package is provided in 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "cossarini2017"
+literal "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Chapter
+Installation, configuration and compilation
+\end_layout
+
+\begin_layout Standard
+In order to build the MITgcm-BFM executable, the following steps have to
+ be performed.
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace 5mm
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\footnotesize\ttfamily},breaklines=true"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+# Download the source codes from GitHub:
+\end_layout
+
+\begin_layout Plain Layout
+
+% git clone git@github.com:inogs/MITgcmBFM-build.git
+\end_layout
+
+\begin_layout Plain Layout
+
+% cd MITgcmBFM-build
+\end_layout
+
+\begin_layout Plain Layout
+
+% git checkout bfm-release-5.3
+\end_layout
+
+\begin_layout Plain Layout
+
+% ./downloader_MITgcm_bfm.sh
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+# The downloader is configured to retrieve the checkpoint66j version of
+ the MITgcm and the dev_mitgcm branch of the BFM, which contains the BFMCOUPLER
+ code.
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+# Edit builder_MITgcm_bfm.sh, to set debug mode or not, compiler paths, modules,
+ etc.
+ For example:
+\end_layout
+
+\begin_layout Plain Layout
+
+# MIT_COMPILER=intel (gfortran)
+\end_layout
+
+\begin_layout Plain Layout
+
+# export MODULEFILE=$PWD/compilers/machine_modules/g100.intel (yourmachine.yourcom
+piler)
+\end_layout
+
+\begin_layout Plain Layout
+
+# Put your platform specific INC_FILE for BFM in: $BFMDIR/compilers/$INC_FILE
+ (e.g., x86_64.LINUX.gfortran.inc)
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+##########  Compile and build bfm  ##########
+\end_layout
+
+\begin_layout Plain Layout
+
+% ./builder_MITgcm_bfm.sh -o bfm
+\end_layout
+
+\begin_layout Plain Layout
+
+#############################################
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+# Set the number of cores and the domain decomposition of your model run,
+ configuring SIZE.h
+\end_layout
+
+\begin_layout Plain Layout
+
+# and choosing among the various options of the experiment.
+\end_layout
+
+\begin_layout Plain Layout
+
+# E.g., the cube test case experiment described in Cossarini et al.
+ (2017).
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+# Choose the experiment configuration from the presets/ directory.
+\end_layout
+
+\begin_layout Plain Layout
+
+# For the test case, use the preset CUBE-GMD.
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+#######  Configure/customize the setup  #########
+\end_layout
+
+\begin_layout Plain Layout
+
+% ./configure_MITgcm_bfm.sh --preset CUBE-GMD
+\end_layout
+
+\begin_layout Plain Layout
+
+#################################################
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+# This procedure generates the code in the MYCODE/ directory and the namelists
+ (i.e., data.diagnostics and data.ptracers) in the READY_FOR_MODEL_NAMELISTS/.
+\end_layout
+
+\begin_layout Plain Layout
+
+# To customize the experiment, the namelists can be edited by the user,
+ for example:
+\end_layout
+
+\begin_layout Plain Layout
+
+# data.diagnostics is used by the MITgcm DIAGNOSTICS package to manage the
+ output of the simulation (see the MITgcm manual); 
+\end_layout
+
+\begin_layout Plain Layout
+
+# data.ptracers in used to set ICs, advection scheme, etc.
+ for each tracer.
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+# If needed, the MYCODE directory can be updated with specifically modified
+ routines (different OBCs, meteorological forcing files, etc.).
+\end_layout
+
+\begin_layout Plain Layout
+
+# Platform-specific INC_FILE for MITgcm must be also added in: $PWD/compilers/$I
+NC_FILE (e.g., x86_64.LINUX.gfortran.inc)
+\end_layout
+
+\begin_layout Plain Layout
+
+# Lastly, the executable mitgcmuv can be generated in the MITGCM_BUILD directory
+:
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+########  Compile and build MITgcm  ############
+\end_layout
+
+\begin_layout Plain Layout
+
+% ./builder_MITgcm_bfm.sh -o MITgcm 
+\end_layout
+
+\begin_layout Plain Layout
+
+################################################
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Chapter
+Running a MITgcm-BFM test case
+\end_layout
+
+\begin_layout Standard
+A test case for the MITgcm-BFM model is described in 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "cossarini2017"
+literal "false"
+
+\end_inset
+
+.
+ The numerical experiment is based on a idealized domain forced by steady
+ winds and a seasonal cycle of surface heat (downward long-wave and short-wave
+ radiation) and mass (precipitation) fluxes.
+ The horizontal shear in the surface wind field maintains a permanent cyclonic
+ gyre, whereas the surface heat fluxes act on the thermohaline properties
+ of the water column.
+ The closed domain is discretized by adopting a uniform grid spacing in
+ the horizontal direction, creating 64 grid cells in both directions.
+ All the peripheral grid points of the bathymetry are land points (closed
+ box), whereas the bottom of the domain is a bowl-shaped pit.
+ In the vertical direction, the model is composed of 30 layers with non-uniform
+ thickness (from 1.5 to 21 m).
+ The time step equals 300 s.
+ 
+\end_layout
+
+\begin_layout Standard
+The configuration of the MITgcm includes the following packages (listed
+ in 
+\family typewriter
+\size small
+data.pkg
+\family default
+\size default
+): cal, exf, kpp, longstep, diagnostics, ptracer and BFMCOUPLER.
+\end_layout
+
+\begin_layout Standard
+Specific runtime options (e.g., free-surface formulation and volume conservation
+ constraints) are set in the parameters contained in the namelist
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+\size small
+data
+\end_layout
+
+\begin_layout Standard
+Other package-specific namelists for the MITgcm-BFM runs are:
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+\size small
+data.ptracer
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+\size small
+data.BFMcoupler
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+\size small
+data.cal 
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+\size small
+data.diagnostics 
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+\size small
+data.exf 
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+\size small
+data.gchem 
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+\size small
+data.kpp 
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+\size small
+data.longstep
+\end_layout
+
+\begin_layout Standard
+Additional explanation of the MITgcm namelists is provided in 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "cossarini2017"
+literal "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace 5mm
+\end_inset
+
+The 
+\family typewriter
+\size small
+input/
+\family default
+\size default
+ directory provides files for a 10-day long simulation.
+\end_layout
+
+\begin_layout Standard
+The atmospheric forcing is provided by the 8 components listed below (summing
+ up to 64 x 64 x 10 x 8 bytes for each variable):
+\end_layout
+
+\begin_layout Itemize
+short-wave radiation: 
+\family typewriter
+\size small
+swdown_64x64_10dx37.dat
+\end_layout
+
+\begin_layout Itemize
+long-wave radiation: 
+\family typewriter
+\size small
+lwdown_64x64_10dx37.dat
+\end_layout
+
+\begin_layout Itemize
+precipitation: 
+\family typewriter
+\size small
+precip_bal_64x64_10dx37.dat
+\end_layout
+
+\begin_layout Itemize
+zonal wind component: 
+\family typewriter
+\size small
+uwind_64x64_10dx37.dat
+\end_layout
+
+\begin_layout Itemize
+meridional wind component: 
+\family typewriter
+\size small
+vwind_64x64_10dx37.dat
+\end_layout
+
+\begin_layout Itemize
+air pressure: 
+\family typewriter
+\size small
+apressure_64x64_10dx37.dat
+\end_layout
+
+\begin_layout Itemize
+air temperature: 
+\family typewriter
+\size small
+atemp_64x64_10dx37.dat
+\end_layout
+
+\begin_layout Itemize
+air humidity: 
+\family typewriter
+\size small
+aqh_64x64_10dx37.dat
+\end_layout
+
+\begin_layout Standard
+Further forcing and setup files are provided for the river runoff, the bathymetr
+y and the vertical profiles that characterize the initial conditions:
+\begin_inset Separator plain
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+runoff: 
+\family typewriter
+\size small
+runoff_64x64_10dx37.dat
+\end_layout
+
+\begin_layout Itemize
+the bathymetry and grid, which is a 64 x 64 box, with 30 vertical levels
+ (closed_box64x64.bat)
+\end_layout
+
+\begin_layout Itemize
+init/ contains the profiles that can be used to generate the initial conditions
+ for the biogeochemical tracers
+\end_layout
+
+\begin_layout Standard
+A detailed documentation on how to run the MITgcm model can be found at
+ 
+\begin_inset CommandInset href
+LatexCommand href
+target "https://mitgcm.readthedocs.io/en/latest/"
+
+\end_inset
+
+, while the instructions to run the provided test case are reported below.
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace 5mm
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\footnotesize\ttfamily},breaklines=true"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+######  Work area generation  ######
+\end_layout
+
+\begin_layout Plain Layout
+
+% cd testcase
+\end_layout
+
+\begin_layout Plain Layout
+
+% ./testcase_generator.sh
+\end_layout
+
+\begin_layout Plain Layout
+
+####################################
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+# This script creates the wrkdir/run/ directory and populates it with the
+ generated ICs, meteo files, bathymetry and namelists
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+# Run the test in serial mode
+\end_layout
+
+\begin_layout Plain Layout
+
+% cd wrkdir/run
+\end_layout
+
+\begin_layout Plain Layout
+
+% source $MODULEFILE  # the same used for compiling the code
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+####  Launch of the executable  #####
+\end_layout
+
+\begin_layout Plain Layout
+
+% ./mitgcmuv
+\end_layout
+
+\begin_layout Plain Layout
+
+#####################################
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset VSpace 5mm
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage cleardoublepage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset bibtex
+LatexCommand bibtex
+bibfiles "bfm-mitgcm-references"
+options "bibtotoc,elsart-harv"
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document
