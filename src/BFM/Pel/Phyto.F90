@@ -183,9 +183,6 @@
   if (ppphytof > 0) then
      iN7f = min( ONE, max( p_small, ( qfcPPY(:,phyto) &
             - p_qflc(phyto))/( p_qfcPPY(phyto)- p_qflc(phyto))))
-     fpplim = fpplim*iN7f
-  else 
-     iN7f   = ONE  
   end if
 #endif
 
@@ -197,7 +194,15 @@
       iN  =   (iN1p* iNIn)**(0.5_RLEN)  ! geometric mean
 
     case ( 1 )
+#ifdef INCLUDE_PELFE
+      if (ppphytof > 0) then
+         iN  =   min(  iN1p,  iNIn, iN7f)  ! Liebig rule
+      else
+         iN  =   min(  iN1p,  iNIn)  ! Liebig rule
+      endif
+#else
       iN  =   min(  iN1p,  iNIn)  ! Liebig rule
+#endif
 
     case ( 2 )
       iN  =   2.0_RLEN/( ONE/ iN1p+ ONE/ iNIn)  ! combined
