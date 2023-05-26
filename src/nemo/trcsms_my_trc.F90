@@ -293,27 +293,27 @@ CONTAINS
       ! NEMO
       USE trcbc,         ONLY: n_trc_indsbc, sf_trcsbc, rf_trsfac
       USE sbcapr,        ONLY: apr
-      !USE trcopt,        ONLY: trc_opt
+      USE trc,           ONLY: ln_trc_sbc
       ! BFM
       USE SystemForcing, ONLY: FieldRead
       USE mem_CO2,       ONLY: AtmSLP, patm3d
       USE mem_PAR,       ONLY: ChlAttenFlag
-      USE mem,           ONLY: iiPhytoPlankton, iiC, iiL, ppPhytoPlankton
+      USE mem,           ONLY: iiPhytoPlankton, iiC, iiL, ppPhytoPlankton, ppN1p, ppN5s
       USE mem_Phyto,     ONLY: p_qlcPPY
       USE constants,     ONLY: E2W
 #ifdef INCLUDE_PELCO2
-      USE mem,        ONLY: ppO3c, ppO3h, ppN7f
+      USE mem,        ONLY: ppO3c, ppO3h
       USE mem_CO2,    ONLY: AtmCO20, AtmCO2
-      USE trcbc,      ONLY: sf_trcsbc, n_trc_indsbc
 #endif
 #ifdef INCLUDE_PELFE
       USE mem_PelChem,   ONLY: p_rDust
+      USE mem,           ONLY: ppN7f
 #endif
       !
       INTEGER, INTENT(in) :: kt   ! ocean time-step index
       INTEGER, INTENT(in) :: Kbb, Kmm, Krhs ! time level indices
       INTEGER             :: jk, jl, jn
-      REAL(wp), DIMENSION(jpi,jpj,jpk) :: irondep
+      REAL(wp), DIMENSION(jpi,jpj,jpk) :: dustdep
       REAL(wp), DIMENSION(jpi,jpj)     :: dustinp
       REAL(wp), DIMENSION(jpi,jpj,jpk) :: par_r, par_g, par_b
       REAL(wp)   :: dustsink 
@@ -356,22 +356,47 @@ CONTAINS
       !-------------------------------------------------------
       jl = var_map(ppN7f)
       tr(:,:,:,jl,Krhs) = tr(:,:,:,jl,Krhs) + fesed
+#endif
 
-      ! Iron dust deposition below the surface (surface layer applied in trcbc)
+      ! Nutrients from dust deposition below the surface (surface layer applied in trcbc)
       !-------------------------------------------------------
-      IF (p_rDust > 0. ) THEN
-         irondep = ZERO
-         ! surface input (rf_trsfac = Solub(0.01) * FeinDust(0.035) * g->ug (1e6) / Fe g->mol (55.85))
-         jn = n_trc_indsbc(ppN7f)
-         dustinp =  rf_trsfac(jn) * sf_trcsbc(jn)%fnow(:,:,1)
+      IF (p_rDust > 0.) THEN
          ! dust sink length scale (1/m): dust assumed to be 0.01% (1/d) , sink speed p_rDust (m/d)
          dustsink =  0.01_wp * 1. / p_rDust
-         DO jk = 2, jpkm1
-            irondep(:,:,jk) = dustinp(:,:) * dustsink / SEC_PER_DAY * EXP( -gdept(:,:,jk,Kmm) / 540. )
-            tr(:,:,jk,jl,Krhs) = tr(:,:,jk,jl,Krhs) + irondep(:,:,jk)
-         END DO
-      ENDIF
+#ifdef INCLUDE_PELFE
+         ! Iron
+         IF (ln_trc_sbc(jl)) THEN
+           dustdep = ZERO
+           ! surface input (rf_trsfac = Solub(0.01) * FeinDust(0.035) * g->ug (1e6) / Fe g->mol (55.85))
+           jn = n_trc_indsbc(jl)
+           dustinp =  rf_trsfac(jn) * sf_trcsbc(jn)%fnow(:,:,1)
+           DO jk = 2, jpkm1
+              dustdep(:,:,jk) = dustinp(:,:) * dustsink / SEC_PER_DAY * EXP( -gdept(:,:,jk,Kmm) / 540. )
+              tr(:,:,jk,jl,Krhs) = tr(:,:,jk,jl,Krhs) + dustdep(:,:,jk)
+           END DO
+         ENDIF
 #endif
+         ! Phosphate
+         jl = var_map(ppN1p)
+         IF (ln_trc_sbc(jl)) THEN
+           jn = n_trc_indsbc(jl)
+           dustinp =  rf_trsfac(jn) * sf_trcsbc(jn)%fnow(:,:,1)
+           DO jk = 2, jpkm1
+              dustdep(:,:,jk) = dustinp(:,:) * dustsink / SEC_PER_DAY * EXP( -gdept(:,:,jk,Kmm) / 540. )
+              tr(:,:,jk,jl,Krhs) = tr(:,:,jk,jl,Krhs) + dustdep(:,:,jk)
+           END DO
+         ENDIF
+         ! silicate
+         jl = var_map(ppN5s)
+         IF (ln_trc_sbc(jl)) THEN
+           jn = n_trc_indsbc(jl)
+           dustinp =  rf_trsfac(jn) * sf_trcsbc(jn)%fnow(:,:,1)
+           DO jk = 2, jpkm1
+              dustdep(:,:,jk) = dustinp(:,:) * dustsink / SEC_PER_DAY * EXP( -gdept(:,:,jk,Kmm) / 540. )
+              tr(:,:,jk,jl,Krhs) = tr(:,:,jk,jl,Krhs) + dustdep(:,:,jk)
+           END DO
+         ENDIF
+      ENDIF
 
       ! print control on received fluxes
       !-------------------------------------------------------
