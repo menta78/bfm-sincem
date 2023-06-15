@@ -3,11 +3,8 @@
 # you may also need the following netcdf libraries 
 # -L/usr/local/lib -lhdf5_hl -lhdf5 -lz
 
-  NCDF_DIR=${NETCDF}
-  NCDFF_DIR=${NETCDFF}
-
-  NCDF_LIB= -L${NCDF_DIR}/lib -lnetcdf -L${NCDFF_DIR}/lib -lnetcdff
-  NCDF_INC= -I${NCDFF_DIR}/include
+  NCDF_LIB= $(shell nc-config --libs) $(shell nf-config --flibs )
+  NCDF_INC= -I$(shell nf-config --includedir )
 
   FC=gfortran
   LD=gfortran
