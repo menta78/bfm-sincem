@@ -11,22 +11,21 @@
 #OTHERFLAGS   User defined additional flags
 #NOTE: in athena you have to load module: NETCDF/netcdf-4.3
 
-  NCDF_DIR=${NETCDF}
-  NCDF_LIB= -L${NCDF_DIR}/lib -lnetcdff -lnetcdf
-  NCDF_INC= -I${NCDF_DIR}/include
+NCDF_LIB= $(shell nc-config --libs) $(shell nf-config --flibs )
+NCDF_INC= -I$(shell nf-config --includedir )
 
-  FC=ifort
-  LD=ifort
+FC=ifort
+LD=ifort
 
-  AR=ar
-  ARFLAGS=-r
+AR=ar
+ARFLAGS=-r
 
-  CPPFLAGS=
-  # production
-  FFLAGS= -O3 -r8 -xHost -fp-model source -traceback -qopt-zmm-usage=high -no-fma ${NCDF_INC}
+CPPFLAGS=
+# production
+FFLAGS= -O3 -r8 -xHost -fp-model source -traceback -qopt-zmm-usage=high -no-fma ${NCDF_INC}
 
-  # debug
-  # FFLAGS= -g -O0 -r8 -xHost -fp-model source -traceback -fp-stack-check -check all -fpe0 ${NCDF_INC}
-  
-  LDFLAGS= ${NCDF_INC} ${NCDF_LIB}
+# debug
+# FFLAGS= -g -O0 -r8 -xHost -fp-model source -traceback -fp-stack-check -check all -fpe0 ${NCDF_INC}
+
+LDFLAGS= ${NCDF_INC} ${NCDF_LIB}
 
