@@ -30,14 +30,13 @@ Software requirements:
 - GNU make. Makefile only works with GNU make, therefore substitute your system make or use an alias to ensure that the right one is set in case you are not on a linux machine.
 
 ## Get started with STANDALONE presets
-Configuration and deployment of the model is done automatically by the script `bfm_configure.sh` found in the `build` directory. The minimal user local settings for compilation is provided by means of the environmental shell variable `$BFMDIR`
+Configuration and deployment of the model is done automatically by the script `bfm_configure.sh` found in the `build` directory.
 ```bash
-$> export BFMDIR=/path/to/bfm
 $> cd $BFMDIR/build
 [$BFMDIR/build]> ./bfm_configure.sh -h
 ```
 
-The user-dependent options are set either through the command line of the script or by adjusting (or adding) an architecture file in directory `$BFMDIR/compilers`. Default file is `gfortran.inc`. The standard GNU gmake variables are used for compiler and archiver names. **Remember** to add the right path for the NetCDF library files in the appropriate `.inc` file.
+The user-dependent options are set either through the command line of the script or by adjusting (or adding) an architecture file in directory `$BFMDIR/compilers`. Default file is `gfortran.inc` that automatically detects the path of NetCDF libraries. The standard GNU gmake variables are used for compiler and archiver names.
 
 If preset is not specified, the **STANDALONE** zero-dimensional configuration is compiled by default with the command
 ```bash
