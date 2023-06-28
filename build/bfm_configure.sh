@@ -278,7 +278,7 @@ if [[ ${PROC} ]] && ! [[ "$PROC" =~ ^[0-9]+$ ]] ; then
 fi
 
 # Print setting informations
-echo "bfm_configure for preset ${PRESET} with mode ${MODE}"
+echo "bfm_configure for preset ${PRESET} (using mode ${MODE})"
 echo "BFMDIR is ${BFMDIR}"
 
 # NEMO specific info
