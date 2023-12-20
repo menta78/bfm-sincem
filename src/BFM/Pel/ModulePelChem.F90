@@ -71,6 +71,7 @@
   real(RLEN)  :: p_rPAo
   real(RLEN)  :: p_aeR6N5
   real(RLEN)  :: p_sR6N5
+  real(RLEN)  :: p_rDust     ! Dust sinking speed below surface (m/d)
 #ifdef INCLUDE_PELFE
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   !NAMELIST PelChem_parameters, PelChem_parameters_iron
@@ -82,7 +83,6 @@
   real(RLEN)  :: p_scavOrg   ! Specific scavenging rate organic matter (m3 mgC-1 d-1)
   real(RLEN)  :: p_scavIng   ! Specific scavenging rate inorganic (d-1)
   real(RLEN)  :: p_N7fLigand ! Iron Ligand concentration in seawater (umol Fe/m3)
-  real(RLEN)  :: p_rDust     ! Dust sinking speed below surface (m/d)
   real(RLEN)  :: p_rN7fsed   ! Iron released from seabed sediments(umolFe/m2/d)
 #endif
   !-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=

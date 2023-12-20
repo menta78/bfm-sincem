@@ -239,7 +239,7 @@ CONTAINS
    END FUNCTION trc_ini_my_trc_alloc
 
 
-   SUBROUTINE log_bgc_stats(kt, Kmm)
+   SUBROUTINE log_bgc_stats(kt, Kmm, Krhs)
       !!----------------------------------------------------------------------
       !!                 ***  log_bgc_stats  ***
       !!
@@ -250,7 +250,7 @@ CONTAINS
       USE api_bfm,    ONLY: var_names, stPelStateS, parallel_rank, NO_D3_BOX_STATES
       !
       INTEGER, INTENT(in) :: kt   ! ocean time-step index
-      INTEGER, INTENT(in) :: Kmm  ! time level indices
+      INTEGER, INTENT(in) :: Kmm, Krhs  ! time level indices
       INTEGER :: jn, jk, jl
       REAL(wp) :: ztraf, zmin, zmax, zmean
       REAL(wp), DIMENSION(jpi,jpj,jpk) :: zvol
@@ -289,6 +289,7 @@ CONTAINS
    END SUBROUTINE log_bgc_stats
 
 
+#ifdef INCLUDE_PELFE
    SUBROUTINE seabed_iron_release()
       !!----------------------------------------------------------------------
       !!                 ***  seabed_iron_release  ***
@@ -340,6 +341,7 @@ CONTAINS
       ENDIF
 
    END SUBROUTINE seabed_iron_release
+#endif
 
 
    SUBROUTINE scale_by_density(Kbb, Kmm)

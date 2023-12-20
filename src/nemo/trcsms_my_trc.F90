@@ -75,7 +75,7 @@ CONTAINS
       ! Save to BFM log global statistics of tracers
       !-------------------------------------------------------
       IF ( (kt-nit000)<100 .OR. MOD(kt,200)==0 .OR. kt==nitend ) &
-         call log_bgc_stats(kt, Kmm)
+         call log_bgc_stats(kt, Kmm, Krhs)
 
       ! Update bfm internal time
       !-------------------------------------------------------
@@ -301,12 +301,12 @@ CONTAINS
       USE mem,           ONLY: iiPhytoPlankton, iiC, iiL, ppPhytoPlankton, ppN1p, ppN5s
       USE mem_Phyto,     ONLY: p_qlcPPY
       USE constants,     ONLY: E2W
+      USE mem_PelChem,   ONLY: p_rDust
 #ifdef INCLUDE_PELCO2
       USE mem,        ONLY: ppO3c, ppO3h
       USE mem_CO2,    ONLY: AtmCO20, AtmCO2
 #endif
 #ifdef INCLUDE_PELFE
-      USE mem_PelChem,   ONLY: p_rDust
       USE mem,           ONLY: ppN7f
 #endif
       !
