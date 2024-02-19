@@ -169,6 +169,10 @@ CONTAINS
       !---------------------------------------------
       call EcologyDynamics
 
+      where (d3source /= d3source)
+              d3source = 0
+      end where
+
       ! ODE solver for benthic and not transported pelagic
       ! & assign trend back main arrays
       !---------------------------------------------
