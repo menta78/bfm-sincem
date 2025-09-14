@@ -44,21 +44,10 @@ contains
   
       !np = idx_bdy(ibdy)%nblen(1)
       np = size(idx_bdy(ibdy)%nbi, 1)
-      has_nbr = associated(idx_bdy(ibdy)%nbr)
   
-      if (np > 0) then
-        if (has_nbr) then
-          do ip = 1, np
-            if (idx_bdy(ibdy)%nbr(ip, 1) <= nn_rimwidth(ibdy)) then
-              mbdy(idx_bdy(ibdy)%nbi(ip, 1), idx_bdy(ibdy)%nbj(ip, 1)) = 1
-            end if
-          end do
-        else
-          do ip = 1, np
-            mbdy(idx_bdy(ibdy)%nbi(ip, 1), idx_bdy(ibdy)%nbj(ip, 1)) = 1
-          end do
-        end if
-      end if
+      do ip = 1, np
+        mbdy(idx_bdy(ibdy)%nbi(ip, 1), idx_bdy(ibdy)%nbj(ip, 1)) = 1
+      end do
     end do
   end subroutine init_mbdy
 
@@ -83,14 +72,7 @@ contains
     r  = 10
     if (present(radius)) r = max(0, radius)
 
-    if (.not. allocated(mbdylim)) then
-      allocate(mbdylim(nx, ny))
-    else
-      if (size(mbdylim,1) /= nx .or. size(mbdylim,2) /= ny) then
-        deallocate(mbdylim)
-        allocate(mbdylim(nx, ny))
-      end if
-    end if
+    allocate(mbdylim(nx, ny))
 
     mbdylim = 0
 
@@ -168,8 +150,8 @@ contains
     trcount = trcnt_loc
    !if (mpprank .eq. 0) WRITE(6,*) 'calling mpp_sum trcbdylim:count'
     call mpp_sum('trcbdylimiter', trcount)
-   !if (mpprank .eq. 0) WRITE(6,*) 'called mpp_sum trcbdylim:count, count=', trcount
-   !call flush(6)
+    if (mpprank .eq. 0) WRITE(6,*) 'called mpp_sum trcbdylim:count, count=', trcount
+    call flush(6)
 
     nwet = count(wet3d)
     trcnt_loc = count(statmask)
@@ -207,7 +189,7 @@ contains
 
       if (mpprank .eq. 0) 
           WRITE(6,*) ''
-          WRITE(6,*) 'tracer ',k
+          WRITE(6,*) '  tracer ',k
           WRITE(6,*) '  trmean      = ',trmean
           WRITE(6,*) '  thrshldhigh = ',thrshldhigh
           WRITE(6,*) '  thrshldlow = ',thrshldlow
