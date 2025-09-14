@@ -51,6 +51,7 @@ CONTAINS
       !! ** Method  : -
       !!----------------------------------------------------------------------
       !
+      USE trcbdylimiter
       INTEGER, INTENT(in) ::   kt   ! ocean time-step index
       INTEGER, INTENT(in) ::   Kbb, Kmm, Krhs  ! time level indices
       INTEGER ::   ji, jj, jn   ! dummy loop index
@@ -63,6 +64,9 @@ CONTAINS
          IF(lwp) WRITE(numout,*) 'trc_sms_my_trc:  BFM ecosystem dynamics'
          IF(lwp) WRITE(numout,*) '~~~~~~~~~~~~~~'
       ENDIF
+
+      ! bdy limiter
+      CALL bdy_limit_tracers(tr(:,:,:,:,Kmm))
 
       ! Set diagnostic fields to be saved
       !-------------------------------------------------------
