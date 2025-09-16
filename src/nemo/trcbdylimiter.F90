@@ -140,8 +140,8 @@ contains
 
     ! default to p90 for Normal using mean abs deviation about mean
     ! k = z0.9 / E|Z| = 1.281551565 / 0.797884561 = 1.606186694
-    s = 1.606186694
-    !s = 2.5 ! corresponds to 97.5% of a normal distribution
+    ! s = 1.606186694
+    s = 2.5 ! corresponds to 97.5% of a normal distribution
     if (present(scoeff)) then
       s = scoeff
     end if
@@ -185,9 +185,9 @@ contains
      !call flush(6)
       trmad = trdvsum/trcount
       thrshldhigh = trmean + s*trmad
-      thrshldlow = max(trmean - s*trmad, 0)
+      thrshldlow = max(trmean - s*trmad, 0.)
 
-      if (mpprank .eq. 0) 
+      if (mpprank .eq. 0) then
           WRITE(6,*) ''
           WRITE(6,*) '  tracer ',k
           WRITE(6,*) '  trmean      = ',trmean
@@ -196,8 +196,11 @@ contains
       end if
     
       ! ---- trim only inside boundary buffer & only on wet ocean
-      where (rim3d .and. wet3d .and. tra(:,:,:,k) > thrshld)
-        tra(:,:,:,k) = thrshld
+      where (rim3d .and. wet3d .and. tra(:,:,:,k) > thrshldhigh)
+        tra(:,:,:,k) = thrshldhigh
+      end where
+      where (rim3d .and. wet3d .and. tra(:,:,:,k) < thrshldlow)
+        tra(:,:,:,k) = thrshldlow
       end where
     end do
     deallocate(vals)

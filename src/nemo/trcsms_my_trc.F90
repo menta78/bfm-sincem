@@ -66,6 +66,7 @@ CONTAINS
       ENDIF
 
       ! bdy limiter
+      CALL bdy_limit_tracers(tr(:,:,:,:,Kbb))
       CALL bdy_limit_tracers(tr(:,:,:,:,Kmm))
 
       ! Set diagnostic fields to be saved
