@@ -5,6 +5,8 @@ module trcbdylimiter
 
   integer, allocatable :: mbdy(:,:) ! bdy mask
   integer, allocatable :: mbdylim(:,:) ! limiter mask
+  logical, allocatable :: statmask(:,:,:), wet3d(:,:,:), rim3d(:,:,:)
+  real(8), save :: trcount
   logical, save :: initialized = .FALSE.
 
 contains
@@ -34,15 +36,6 @@ contains
   
     ! ---- Loop through boundary sets and mark their T-grid points ----
     do ibdy = 1, nb_bdy
-      ! Depending on your NEMO version, the T-grid lists are exposed as one of:
-      !   idx_bdy(ibdy)%nblen(1)         : number of T points
-      !   idx_bdy(ibdy)%nbi(:)      : i indices
-      !   idx_bdy(ibdy)%nbj(:)      : j indices
-      !   idx_bdy(ibdy)%nbr(:)      : rim index (1..nn_rimwidth); may not exist on older branches
-      !
-      ! If your branch uses a single structure (e.g., idx(ibdy)%nbi(:,igrid)) adapt accordingly.
-  
-      !np = idx_bdy(ibdy)%nblen(1)
       np = size(idx_bdy(ibdy)%nbi, 1)
   
       do ip = 1, np
@@ -95,8 +88,33 @@ contains
 
       end do
     end do
+    call init_trcount()
     initialized = .true.
   end subroutine init_bdylim
+
+  subroutine init_trcount
+    USE dom_oce, ONLY: tmask
+    USE lib_fortran, ONLY: glob_sum
+    integer   :: nx, ny, nz
+    real(8),    allocatable :: statmask_r(:,:,:)
+
+    nx = size(tmask,1)
+    ny = size(tmask,2)
+    nz = size(tmask,3)
+
+    wet3d = (tmask /= 0)                     ! same shape as tra(:,:,:,1)
+    rim3d = spread(mbdylim /= 0, 3, nz)      ! replicate mbdylim vertically
+    statmask = wet3d .and. .not. rim3d
+    allocate(statmask_r(nx, ny, nz))
+    statmask_r = 0
+    where (statmask)
+      statmask_r = 1
+    end where
+
+    trcount = glob_sum('bdy_limit_tracers', statmask_r)
+
+    deallocate(statmask_r)
+  end subroutine init_trcount
 
   !--------------------------------------------------------------------
   ! bdy_limit_tracers:
@@ -115,28 +133,19 @@ contains
   !--------------------------------------------------------------------
   subroutine bdy_limit_tracers(tra, scoeff)
     USE par_oce,  only: wp
-    USE dom_oce, ONLY: tmask
     USE lib_mpp, ONLY: mpp_sum, mpprank
-   !USE lib_fortran, ONLY: glob_sum
+    USE lib_fortran, ONLY: glob_sum
     USE, INTRINSIC :: ieee_arithmetic
     real,    intent(inout)  :: tra(:,:,:,:)
     real,    intent(in), optional :: scoeff
-    logical, allocatable :: wet3d(:,:,:), rim3d(:,:,:), statmask(:,:,:)
-    integer :: nwet, idx, k, ntr, nx, ny, nz, trcnt_loc
-    real(8),    allocatable :: vals(:), trak(:,:,:)
-    real(8):: s, trcount, trsum, trdvsum, trmean, trmad, thrshldhigh, thrshldlow
+    integer :: idx, k, ntr, nx, ny, nz
+    real(8),    allocatable :: trak(:,:,:)
+    real(8):: s, trsum, trdvsum, trmean, trmad, thrshldhigh, thrshldlow
     ! bdy limiter
     
     if (.not. initialized) call init_bdylim
 
     ntr = size(tra,4)
-    nx = size(tra,1)
-    ny = size(tra,2)
-    nz = size(tra,3)
-
-    wet3d = (tmask /= 0)                     ! same shape as tra(:,:,:,1)
-    rim3d = spread(mbdylim /= 0, 3, nz)      ! replicate mbdylim vertically
-    statmask = wet3d .and. .not. rim3d
 
     ! default to p90 for Normal using mean abs deviation about mean
     ! k = z0.9 / E|Z| = 1.281551565 / 0.797884561 = 1.606186694
@@ -146,54 +155,35 @@ contains
       s = scoeff
     end if
 
-    trcnt_loc = count(statmask)
-    trcount = trcnt_loc
-   !if (mpprank .eq. 0) WRITE(6,*) 'calling mpp_sum trcbdylim:count'
-    call mpp_sum('trcbdylimiter', trcount)
-    if (mpprank .eq. 0) WRITE(6,*) 'called mpp_sum trcbdylim:count, count=', trcount
-    call flush(6)
+   !if (mpprank .eq. 0) WRITE(6,*) 'called mpp_sum trcbdylim:count, count=', trcount
+   !call flush(6)
 
-    nwet = count(wet3d)
-    trcnt_loc = count(statmask)
-    if (trcnt_loc > 0) then
-      allocate(vals(trcnt_loc))
-    else
-      allocate(vals(1))
-    end if
     allocate(trak(nx,ny,nz))
 
     do k = 1, ntr
       ! ---- gather wet points only
       trak = tra(:,:,:,k)
-      vals = 0
-      if (trcnt_loc > 0) vals(:) = pack(trak, mask=statmask)
-      where (vals /= vals .OR. .NOT. ieee_is_finite(vals))
-          vals = 0
+      where (.NOT. statmask .OR. trak /= trak .OR. .NOT. ieee_is_finite(trak))
+          trak = 0
       end where
 
       ! ---- compute mean and mad and threahold
-      trsum = sum(vals)
-     !if (mpprank .eq. 0) WRITE(6,*) 'calling mpp_sum trcbdylim:sum'
-      call mpp_sum('trcbdylimiter', trsum)
-     !if (mpprank .eq. 0) WRITE(6,*) 'called mpp_sum trcbdylim:sum, sum=', trsum
-     !call flush(6)
+      !trsum = sum(vals)
+      !call mpp_sum('trcbdylimiter', trsum)
+      trsum = glob_sum('bdy_limit_tracers', trak)
       trmean = trsum/trcount
-      trdvsum = sum(abs(vals-trmean))
-     !if (mpprank .eq. 0) WRITE(6,*) 'calling mpp_sum trcbdylim:mad'
-      call mpp_sum('trcbdylimiter', trdvsum)
-     !if (mpprank .eq. 0) WRITE(6,*) 'called mpp_sum trcbdylim:mad, trdvsum', trdvsum
-     !call flush(6)
+      trdvsum = glob_sum('bdy_limit_tracers', abs(trak-trmean))
       trmad = trdvsum/trcount
       thrshldhigh = trmean + s*trmad
       thrshldlow = max(trmean - s*trmad, 0.)
 
-      if (mpprank .eq. 0) then
-          WRITE(6,*) ''
-          WRITE(6,*) '  tracer ',k
-          WRITE(6,*) '  trmean      = ',trmean
-          WRITE(6,*) '  thrshldhigh = ',thrshldhigh
-          WRITE(6,*) '  thrshldlow = ',thrshldlow
-      end if
+     !if (mpprank .eq. 0) then
+     !    WRITE(6,*) ''
+     !    WRITE(6,*) '  tracer ',k
+     !    WRITE(6,*) '  trmean      = ',trmean
+     !    WRITE(6,*) '  thrshldhigh = ',thrshldhigh
+     !    WRITE(6,*) '  thrshldlow = ',thrshldlow
+     !end if
     
       ! ---- trim only inside boundary buffer & only on wet ocean
       where (rim3d .and. wet3d .and. tra(:,:,:,k) > thrshldhigh)
@@ -203,7 +193,6 @@ contains
         tra(:,:,:,k) = thrshldlow
       end where
     end do
-    deallocate(vals)
     deallocate(trak)
   end subroutine bdy_limit_tracers
 
