@@ -195,23 +195,3 @@ contains
     end do
     deallocate(trak)
   end subroutine bdy_limit_tracers
-
-
-  subroutine mpp_sum_dp(val)
-    ! mpp_sum from nemo does not seem to work here
-    USE mpi
-    USE lib_mpp, ONLY: mpi_comm_oce
-    implicit none
-    real(8), intent(inout) :: val
-    real(8) :: tmp
-    integer :: ierr
-    logical :: inited
-
-    call MPI_Initialized(inited, ierr)
-    if (.not. inited) return
-  
-    tmp = val
-    call MPI_Allreduce(tmp, val, 1, MPI_DOUBLE_PRECISION, MPI_SUM, mpi_comm_oce, ierr)
-  end subroutine mpp_sum_dp
-
-end module trcbdylimiter
